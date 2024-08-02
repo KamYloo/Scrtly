@@ -128,3 +128,60 @@
     color: white;
     transition: 0.3s;
 }
+
+.playListBox {
+    cursor: pointer;
+    margin: 15px 0;
+}
+
+.playListBox .nameBox {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: rgb(177, 177, 177);
+    margin-bottom: 10px;
+}
+
+.playListBox .nameBox p {
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.playListBox .nameBox i {
+    cursor: pointer;
+    color: white;
+}
+
+.playListBox .scrollBox {
+    height: 140px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    position: relative;
+}
+
+.playListBox .scrollBox .playList {
+    display: flex;
+    align-items: center;
+    color: rgb(177, 177, 177);
+    margin: 10px 0;
+}
+
+.playListBox .scrollBox .playList .iconP {
+    margin-right: 15px;
+}
+
+.playListBox .scrollBox .playList .trash {
+    margin-left: auto;
+}
+
+.playListBox .scrollBox .playList i {
+    font-size: 18px;
+}
+
+.playListBox .scrollBox .playList p {
+    font-size: 16px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    display: inline;
+}
