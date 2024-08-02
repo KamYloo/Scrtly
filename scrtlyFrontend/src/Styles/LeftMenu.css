@@ -1,0 +1,130 @@
+.LeftMenu {
+    width: 280px;
+    height: 100%;
+    min-height: 100vh;
+    background: rgba(27, 27, 27, 0.644);
+    backdrop-filter: blur(10px);
+    padding: 20px 15px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.LeftMenu .logoBox {
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.LeftMenu .logoBox i {
+    font-size: 30px;
+}
+
+.LeftMenu .logoBox i {
+    font-size: 30px;
+}
+
+.LeftMenu .logoBox i:nth-of-type(2) {
+    font-size: 20px !important;
+}
+
+.LeftMenu .logoBox h2 {
+    font-size: 20px;
+}
+
+.LeftMenu .searchBox {
+    width: 100%;
+    height: 45px;
+    position: relative;
+    margin-top: 20px;
+    color: aliceblue;
+    overflow: hidden;
+    border-radius: 10px;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.384);
+}
+
+.LeftMenu .searchBox input {
+    width: 100%;
+    height: 100%;
+    outline: none;
+    border: none;
+    background: rgba(0, 0, 0, 0.521);
+    padding-left: 45px;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+
+}
+
+.LeftMenu .searchBox .searchIcon {
+    position: absolute;
+    color: aliceblue;
+    top: 0;
+    left: 0;
+    width: 45px;
+    height: 45px;
+    text-align: center;
+    line-height: 45px;
+    font-size: 20px;
+}
+
+.menuBox {
+    margin: 15px 0;
+}
+
+.menuBox .title {
+    color: rgb(177, 177, 177);
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.menuBox ul {
+    width: 100%;
+    padding: 0;
+}
+
+.menuBox ul li {
+    list-style: none;
+    margin: 5px 0;
+    width: 100%;
+    padding: 5px 0;
+    position: relative;
+}
+
+.menuBox ul li a {
+    text-decoration: none;
+    color: rgb(177, 177, 177);
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+}
+
+.menuBox ul li a i {
+    font-size: 18px;
+    margin-right: 15px;
+}
+
+.menuBox ul li:before {
+    position: absolute;
+    content: "";
+    top: 0;
+    left: -15px;
+    width: 0px;
+    height: 100%;
+    background: aqua;
+    border-radius: 5px;
+}
+
+.menuBox ul li:hover::before,
+.menuBox ul li.active::before {
+    width: 5px;
+    transition: 0.3s;
+}
+
+.menuBox ul li:hover a,
+.menuBox ul li.active a {
+    color: white;
+    transition: 0.3s;
+}
