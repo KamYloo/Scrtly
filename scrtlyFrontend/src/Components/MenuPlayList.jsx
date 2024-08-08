@@ -14,7 +14,7 @@ function MenuPlayList() {
 
                 {
                     Playlist && Playlist.map((playList)=> (
-                    <div className="playList">
+                    <div className="playList" key={playList.id}>
                         <i className='iconP'><BsMusicNoteList /></i>
                         <p>{playList.name}</p>
                         <i className='trash'><BsTrash /></i>
