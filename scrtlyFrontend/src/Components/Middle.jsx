@@ -1,9 +1,15 @@
 import React from 'react'
+import '../Styles/Middle.css'
+import { Banner } from './Banner'
+
+
 
 function Middle() {
   return (
-    <div></div>
+    <div className='mainBox'>
+      <Banner />
+    </div>
   )
 }
 
-export  {Middle}
+export { Middle }
