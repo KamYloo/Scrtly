@@ -175,7 +175,6 @@
     position: absolute;
     content: '';
     bottom: -20px;
-    left: 10px;
     width: 0px;
     height: 5px;
     border-radius: 5px;
@@ -184,7 +183,7 @@
 
 .mainBox .menuList ul li:hover::before,
 .mainBox .menuList ul li.active::before {
-    width: 20px;
+    width: 100%;
     transition: width 0.3s ease;
 }
 
@@ -209,4 +208,108 @@
     text-align: center;
     color: rgb(151, 151, 151);
     margin-left: 6px;
+}
+
+.audioList {
+    padding: 10px 30px;
+}
+
+.audioList .title {
+    font-size: 18px;
+    color: white;
+}
+
+.audioList .title span {
+    font-size: 12px;
+    color: rgb(151, 151, 151);
+}
+
+.songsBox {
+    height: 220px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.songsBox .songs {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: rgb(151, 151, 151);
+    width: 100%;
+    margin: 10px 0;
+    padding: 5px;
+}
+
+.songsBox .songs:hover,
+.songsBox .songs.active {
+    color: white;
+    transition: 0.3s;
+}
+
+.songsBox .songs .count {
+    margin-right: 10px;
+}
+
+.songsBox .songs .song {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.103);
+    padding-bottom: 5px;
+    cursor: pointer;
+}
+
+.songsBox .songs .song .imgBox {
+    width: 45px;
+    height: 45px;
+    min-width: 45px;
+    border-radius: 0.5em;
+    background: rgb(49, 49, 56);
+    margin-right: 10px;
+    overflow: hidden;
+}
+
+.songsBox .songs .song .imgBox img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+}
+
+.songsBox .songs .song .section {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.songsBox .songs .song .section .songName {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 50%;
+}
+
+.songsBox .songs .song .section .hits {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.songsBox .songs .song .section .hits .hit,
+.songsBox .songs .song .section .hits .duration {
+    margin-right: 15px;
+}
+
+.songsBox .songs .song .section .hits .hit i,
+.songsBox .songs .song .section .hits .duration i {
+    font-size: 12px;
+    margin-right: 5px;
+}
+
+
+
+.songsBox .songs .song .section .hits .favourite i {
+    color: rgb(74, 189, 28);
+    filter: drop-shadow(0px 0px 4px rgb(74, 189, 28));
 }

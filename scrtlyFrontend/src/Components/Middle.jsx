@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import '../Styles/Middle.css'
 import { Banner } from './Banner'
 import { FaUsers } from 'react-icons/fa'
+import { AudioList } from './AudioList'
 
 
 
@@ -31,6 +32,7 @@ function Middle() {
         </ul>
         <p><i><FaUsers /></i>12.3M <span>Followers</span></p>
       </div>
+      <AudioList/>
     </div>
   )
 }
