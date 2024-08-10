@@ -119,9 +119,10 @@
     border-radius: 100vh;
     font-weight: bold;
     text-align: center;
+    transition: 0.3s;
 }
 
-.banner .content .artist .right a i{
+.banner .content .artist .right a i {
     margin-right: 10px;
     font-size: 12px;
 }
@@ -141,4 +142,71 @@
 
 .banner .content .artist .right a:hover {
     box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.411);
+}
+
+.mainBox .menuList {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 25px;
+    background: rgb(44, 44, 44);
+}
+
+.mainBox .menuList ul {
+    display: flex;
+    align-items: center;
+}
+
+.mainBox .menuList ul li {
+    list-style: none;
+    margin: 0 20px;
+    position: relative;
+}
+
+.mainBox .menuList ul li a {
+    text-decoration: none;
+    color: rgb(151, 151, 151);
+    font-size: 14px;
+    font-weight: bold;
+}
+
+
+.mainBox .menuList ul li::before {
+    position: absolute;
+    content: '';
+    bottom: -20px;
+    left: 10px;
+    width: 0px;
+    height: 5px;
+    border-radius: 5px;
+    background: white;
+}
+
+.mainBox .menuList ul li:hover::before,
+.mainBox .menuList ul li.active::before {
+    width: 20px;
+    transition: width 0.3s ease;
+}
+
+.mainBox .menuList ul li:hover a,
+.mainBox .menuList ul li.active a {
+    color: white;
+    transition: 0.3s;
+}
+
+.mainBox .menuList p {
+    color: white;
+    font-size: 14px;
+}
+
+.mainBox .menuList p i {
+    margin-right: 6px;
+    font-size: 12px;
+}
+
+.mainBox .menuList p span {
+    font-size: 12px;
+    text-align: center;
+    color: rgb(151, 151, 151);
+    margin-left: 6px;
 }
