@@ -1,0 +1,123 @@
+.musicPlayer {
+    width: 100%;
+    padding: 10px;
+    display: flex;
+}
+
+.musicPlayer .songImage {
+    width: 120px;
+    min-width: 120px;
+    height: 120px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.568);
+}
+
+.musicPlayer .songImage img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.musicPlayer .songAttributes {
+    width: 100%;
+    padding-left: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.musicPlayer .songAttributes .top,
+.musicPlayer .songAttributes .bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.musicPlayer .songAttributes .top .left,
+.musicPlayer .songAttributes .top .middle,
+.musicPlayer .songAttributes .top .right {
+    color: rgb(219, 215, 215);
+    display: flex;
+    font-size: 16px;
+    cursor: pointer;
+    align-items: center;
+}
+
+.musicPlayer .songAttributes .top .left i,
+.musicPlayer .songAttributes .top .middle i,
+.musicPlayer .songAttributes .top .right i {
+    margin: 0px 15px;
+    font-size: 18px;
+}
+
+.musicPlayer .songAttributes .top .left .loved {
+    color: rgb(74, 189, 28) !important;
+    filter: drop-shadow(0px 0px 4px rgb(74, 189, 28));
+}
+
+
+.musicPlayer .songAttributes .top .middle .back i:nth-child(2),
+.musicPlayer .songAttributes .top .middle .forward i:nth-child(1) {
+    color: rgb(175, 175, 175) !important;
+}
+
+.musicPlayer .songAttributes .top .middle .playPause {
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+    border-radius: 100%;
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: black;
+}
+
+.musicPlayer .songAttributes .bottom {
+    margin-top: 20px;
+    padding: 0px 15px;
+}
+
+.musicPlayer .songAttributes .bottom .progresBar {
+    width: 78%;
+    position: relative;
+    height: 6px;
+    border: none;
+    outline: none;
+    appearance: none;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.103);
+    cursor: pointer;
+}
+
+.musicPlayer .songAttributes .bottom .progresBar::before {
+    position: absolute;
+    content: '';
+    top: 0;
+    left: 0;
+    background: #848484;
+    width: 50%;
+    height: 100%;
+    border-radius: 10px;
+    z-index: 2;
+    transition: all 0.3s ease;
+}
+
+.musicPlayer .songAttributes .bottom .progresBar::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    border: none;
+    outline: none;
+}
+
+.musicPlayer .songAttributes .bottom .currentTime,
+.musicPlayer .songAttributes .bottom .duration {
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+}
