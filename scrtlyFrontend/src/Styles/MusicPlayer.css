@@ -7,10 +7,10 @@
 .musicPlayer .songImage {
     width: 120px;
     min-width: 120px;
-    height: 120px;
+    height: 80px;
     border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.568);
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.678);
 }
 
 .musicPlayer .songImage img {
@@ -99,7 +99,7 @@
     top: 0;
     left: 0;
     background: #848484;
-    width: 50%;
+    width: var(--player-played);
     height: 100%;
     border-radius: 10px;
     z-index: 2;

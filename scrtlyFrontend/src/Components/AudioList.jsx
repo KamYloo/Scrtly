@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { FaHeadphones, FaHeart, FaRegClock, FaRegHeart } from 'react-icons/fa'
 import { Songs } from './Songs'
-import { MusicPlayer } from './MusicPlayer'
+import { MusicPlayer } from './MusicPlayer.jsx'
 
 function AudioList() {
     const [songs, setSongs] = useState(Songs)
-    const [song, setSong] = useState(Songs[0].song)
-    const [img, setImage] = useState(Songs[0].imgSrc)
+    const [song, setSong] = useState(songs[0].song)
+    const [img, setImage] = useState(songs[0].imgSrc)
     const [isFavourite, setFavourite] = useState(false)
 
     useEffect(() => {
