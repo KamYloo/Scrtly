@@ -121,3 +121,43 @@
     font-size: 12px;
     font-weight: bold;
 }
+
+
+
+@media screen and (max-width: 550px) {
+    .musicPlayer .songImage {
+        width: 100px;
+        min-width: 100px;
+    }
+
+    .musicPlayer .songAttributes .bottom .currentTime {
+        margin-right: 0px;
+    }
+
+    .musicPlayer .songAttributes .bottom .duration {
+        margin-left: 0px;
+    }
+
+    .musicPlayer .songAttributes .top .left i,
+    .musicPlayer .songAttributes .top .middle i,
+    .musicPlayer .songAttributes .top .right i {
+        margin: 0 5px;
+    }
+
+    .musicPlayer .songAttributes .bottom {
+        padding: unset;
+    }
+
+    .musicPlayer .songAttributes .bottom .progresBar {
+        width: 65%;
+    }
+
+}
+
+@media screen and (min-width: 550px) and (max-width: 1080px) {
+    .musicPlayer .songImage {
+        width: 100px;
+        min-width: 100px;
+        height: 100px;
+    }
+}

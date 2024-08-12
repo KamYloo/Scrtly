@@ -225,7 +225,7 @@
 }
 
 .songsBox {
-    height: 220px;
+    height: 440px;
     overflow-y: scroll;
     overflow-x: hidden;
 }
@@ -312,4 +312,85 @@
 .songsBox .songs .song .section .hits .favourite i {
     color: rgb(74, 189, 28);
     filter: drop-shadow(0px 0px 4px rgb(74, 189, 28));
+}
+
+@media screen and (max-width : 550px) {
+    .mainBox {
+        min-width: 380px;
+    }
+
+    .mainBox .content {
+        padding: 10px 15px;
+    }
+
+    .mainBox .content .top p {
+        font-size: 12px;
+    }
+
+    .mainBox .content .artist .left .name h2 {
+        font-size: 25px;
+    }
+
+    .mainBox .content .artist .right a {
+        padding: 5px 15px;
+        font-size: 12px;
+        margin: 0 10px;
+    }
+
+    .mainBox .menuList {
+        padding: 10px 15px;
+    }
+
+    .mainBox .menuList ul li {
+        margin: 0 5px;
+    }
+
+    .mainBox .menuList ul li a {
+        font-size: 14px;
+    }
+
+    .mainBox .menuList p {
+        font-size: 12px;
+    }
+
+    .mainBox .menuList p i {
+        font-size: 10px;
+    }
+
+    .mainBox .menuList p span {
+        margin-left: 0px;
+        font-size: 10px;
+        text-align: center;
+        display: block;
+    }
+
+    .audioList {
+        padding: 10px 5px;
+    }
+
+    .audioList .songsBox {
+        height: 220px;
+    }
+
+    .audioList .songs .song .section {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .audioList .songs .song .section .songName {
+        width: 100%;
+    }
+
+    .audioList .songs .song .section .hits {
+        margin-left: 0;
+        margin-top: 10px;
+        justify-content: space-between;
+    }
+}
+
+@media screen and (max-width: 950px) {
+    .Banner {
+        height: 240px !important;
+        position: relative;
+    }
 }
