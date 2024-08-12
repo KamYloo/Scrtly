@@ -7,7 +7,7 @@ function AudioList() {
     const [songs, setSongs] = useState(Songs)
     const [song, setSong] = useState(songs[0].song)
     const [img, setImage] = useState(songs[0].imgSrc)
-    const [isFavourite, setFavourite] = useState(false)
+    const [auto, setAuto] = useState(false);
 
     useEffect(() => {
         const songs = document.querySelectorAll(".songs")
@@ -33,7 +33,7 @@ function AudioList() {
     const setMainSong = (songSrc, imgSrc) => {
         setSong(songSrc)
         setImage(imgSrc)
-
+        setAuto(true);
     }
 
     return (
@@ -81,7 +81,7 @@ function AudioList() {
                     ))
                 }
             </div>
-            <MusicPlayer song={song} imgSrc={img} />
+            <MusicPlayer song={song} imgSrc={img} autoplay={auto} />
         </div>
     )
 }

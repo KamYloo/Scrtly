@@ -3,7 +3,7 @@ import '../Styles/MusicPlayer.css'
 import { FaBackward, FaForward, FaHeart, FaPause, FaPlay, FaRegHeart, FaShareAlt, FaStepBackward, FaStepForward } from 'react-icons/fa'
 import { BsDownload } from 'react-icons/bs'
 
-function MusicPlayer({ song, imgSrc }) {
+function MusicPlayer({ song, imgSrc, auto }) {
 
     const [isLove, setLoved] = useState(false)
     const [isPlaying, setPlay] = useState(false)
@@ -113,7 +113,7 @@ function MusicPlayer({ song, imgSrc }) {
 
                 <div className="bottom">
                     <div className="currentTime">{calculateTime(currentTime)}</div>
-                    <input type="range" className='progresBar' ref={progressBar} onChange={changeProgress} />
+                    <input type="range" className='progresBar' ref={progressBar} onChange={changeProgress} autoPlay={auto} />
                     <div className="duration">{duration && !isNaN(duration) && calculateTime(duration)
                         ? duration && !isNaN(duration) && calculateTime(duration)
                         : "00:00"}</div>
