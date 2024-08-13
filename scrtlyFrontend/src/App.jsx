@@ -7,10 +7,16 @@ import { RightMenu } from './Components/RightMenu'
 
 function App() {
   const [volume, setVolume] = useState(0.5)
+  const [currentTrack, setCurrentTrack] = useState({ songName: 'Default Song', artist: 'Default Artist' });
+
+  const handleTrackChange = (songName, artist) => {
+    setCurrentTrack({ songName, artist });
+  };
+
   return (
     <div className='App'>
-      <LeftMenu onVolumeChange={setVolume} />
-      <Middle volume={volume} />
+      <LeftMenu onVolumeChange={setVolume} currentTrack={currentTrack} />
+      <Middle volume={volume} onTrackChange={handleTrackChange}/>
       <RightMenu />
 
 

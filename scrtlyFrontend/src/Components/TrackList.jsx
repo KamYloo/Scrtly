@@ -3,7 +3,7 @@ import { BsFillVolumeUpFill, BsMusicNoteList } from 'react-icons/bs'
 import { FaDesktop } from 'react-icons/fa'
 import TrackImg from "../img/track.png"
 
-function TrackList({ onVolumeChange }) {
+function TrackList({ onVolumeChange, songName, artist }) {
     const [volume, setVolume] = useState(0.5);
 
 
@@ -25,8 +25,8 @@ function TrackList({ onVolumeChange }) {
         <div className='trackList'>
             <div className="top">
                 <img src={TrackImg} alt="" />
-                <p className='trackName'>Song Name
-                    <span className='trackArtist'>Artist</span>
+                <p className='trackName'>{songName}
+                    <span className='trackArtist'>{artist}</span>
                 </p>
             </div>
             <div className="bottom">

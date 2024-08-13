@@ -3,7 +3,7 @@ import { FaHeadphones, FaHeart, FaRegClock, FaRegHeart } from 'react-icons/fa'
 import { Songs } from './Songs'
 import { MusicPlayer } from './MusicPlayer.jsx'
 
-function AudioList({ volume }) {
+function AudioList({ volume, onTrackChange }) {
     const [songs, setSongs] = useState(Songs)
     const [song, setSong] = useState(songs[0].song)
     const [img, setImage] = useState(songs[0].imgSrc)
@@ -30,10 +30,11 @@ function AudioList({ volume }) {
         setSongs([...songs])
     }
 
-    const setMainSong = (songSrc, imgSrc) => {
+    const setMainSong = (songSrc, imgSrc, songName, songArtist) => {
         setSong(songSrc)
         setImage(imgSrc)
-        setAuto(true);
+        setAuto(true)
+        onTrackChange(songName, songArtist)
     }
 
     return (
@@ -44,7 +45,7 @@ function AudioList({ volume }) {
             <div className="songsBox">
                 {
                     Songs && Songs.map((song, index) => (
-                        <div className="songs" key={song?.id} onClick={() => setMainSong(song?.song, song?.imgSrc)}>
+                        <div className="songs" key={song?.id} onClick={() => setMainSong(song?.song, song?.imgSrc, song?.songName, song?.artist)}>
                             <div className="count">#{index + 1}</div>
                             <div className="song">
                                 <div className="imgBox">

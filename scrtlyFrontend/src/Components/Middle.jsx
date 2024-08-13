@@ -5,7 +5,7 @@ import { FaUsers } from 'react-icons/fa'
 import { AudioList } from './AudioList'
 
 
-function Middle({ volume }) {
+function Middle({ volume, onTrackChange}) {
   useEffect(() => {
     const allLi = document.querySelector(".menuList").querySelectorAll("li")
 
@@ -31,7 +31,7 @@ function Middle({ volume }) {
         </ul>
         <p><i><FaUsers /></i>12.3M <span>Followers</span></p>
       </div>
-      <AudioList volume={volume}/>
+      <AudioList volume={volume} onTrackChange={onTrackChange}/>
     </div>
   )
 }
