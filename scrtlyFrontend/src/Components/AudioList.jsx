@@ -3,7 +3,7 @@ import { FaHeadphones, FaHeart, FaRegClock, FaRegHeart } from 'react-icons/fa'
 import { Songs } from './Songs'
 import { MusicPlayer } from './MusicPlayer.jsx'
 
-function AudioList() {
+function AudioList({ volume }) {
     const [songs, setSongs] = useState(Songs)
     const [song, setSong] = useState(songs[0].song)
     const [img, setImage] = useState(songs[0].imgSrc)
@@ -81,7 +81,7 @@ function AudioList() {
                     ))
                 }
             </div>
-            <MusicPlayer song={song} imgSrc={img} autoplay={auto} />
+            <MusicPlayer song={song} imgSrc={img} autoplay={auto} volume={volume} />
         </div>
     )
 }

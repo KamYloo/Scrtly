@@ -3,7 +3,7 @@ import '../Styles/MusicPlayer.css'
 import { FaBackward, FaForward, FaHeart, FaPause, FaPlay, FaRegHeart, FaShareAlt, FaStepBackward, FaStepForward } from 'react-icons/fa'
 import { BsDownload } from 'react-icons/bs'
 
-function MusicPlayer({ song, imgSrc, auto }) {
+function MusicPlayer({ song, imgSrc, auto, volume }) {
 
     const [isLove, setLoved] = useState(false)
     const [isPlaying, setPlay] = useState(false)
@@ -19,6 +19,12 @@ function MusicPlayer({ song, imgSrc, auto }) {
         setDuration(seconds)
         progressBar.current.max = seconds
     }, [audioPlayer?.current?.loadedmetada, audioPlayer?.current?.readyState])
+
+    useEffect(() => {
+        if (audioPlayer.current) {
+            audioPlayer.current.volume = volume;  // Ustawienie głośności audioPlayera
+        }
+    }, [volume]);
 
     const changePlayPause = () => {
         const prevValue = isPlaying

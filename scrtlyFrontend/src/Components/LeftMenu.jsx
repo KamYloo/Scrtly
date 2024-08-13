@@ -8,7 +8,7 @@ import { MenuList } from './MenuList';
 import { MenuPlayList } from './MenuPlayList';
 import { TrackList } from './TrackList';
 
-function LeftMenu() {
+function LeftMenu({ onVolumeChange }) {
     return (
         <div className='LeftMenu'>
             <div className="logoBox">
@@ -23,7 +23,7 @@ function LeftMenu() {
 
             <Menu title={'Menu'} menuObject={MenuList} />
             <MenuPlayList />
-            <TrackList />
+            <TrackList onVolumeChange={onVolumeChange}/>
         </div>
     )
 }

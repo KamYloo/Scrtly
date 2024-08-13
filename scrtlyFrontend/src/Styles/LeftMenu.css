@@ -254,11 +254,10 @@
     top: 0;
     left: 0;
     background: greenyellow;
-    width: 50%;
+    width: var(--player-volume);
     height: 100%;
     border-radius: 10px;
     z-index: 2;
-    transition: width 250ms linear;
 }
 
 .trackList .bottom input::-webkit-slider-thumb {
