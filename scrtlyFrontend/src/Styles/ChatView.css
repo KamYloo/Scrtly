@@ -1,0 +1,8 @@
+.chatView {
+    height: 100vh;
+    z-index: 1;
+    flex-grow: 1;
+    background: rgba(31, 31, 31, 0.596);
+    backdrop-filter: blur(3px);
+    transition: all 0.3s ease;
+}

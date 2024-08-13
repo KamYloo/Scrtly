@@ -8,7 +8,7 @@ import { MenuList } from './MenuList';
 import { MenuPlayList } from './MenuPlayList';
 import { TrackList } from './TrackList';
 
-function LeftMenu({ onVolumeChange, currentTrack }) {
+function LeftMenu({ onVolumeChange, currentTrack, onViewChange }) {
     return (
         <div className='LeftMenu'>
             <div className="logoBox">
@@ -21,7 +21,7 @@ function LeftMenu({ onVolumeChange, currentTrack }) {
                 <i className='searchIcon'><BiSearchAlt /></i>
             </div>
 
-            <Menu title={'Menu'} menuObject={MenuList} />
+            <Menu title={'Menu'} menuObject={MenuList} onViewChange={onViewChange} />
             <MenuPlayList />
             <TrackList onVolumeChange={onVolumeChange} songName={currentTrack.songName} artist={currentTrack.artist} />
         </div>

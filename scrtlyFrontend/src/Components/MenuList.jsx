@@ -1,45 +1,47 @@
 import React from 'react'
-import {BsJournalAlbum} from 'react-icons/bs'
-import {FaRocketchat, FaHome, FaPodcast, FaMicrophoneAlt, FaBroadcastTower } from 'react-icons/fa'
-import {BiPulse} from 'react-icons/bi'
+import { BsJournalAlbum } from 'react-icons/bs'
+import { FaRocketchat, FaHome, FaPodcast, FaMicrophoneAlt, FaBroadcastTower } from 'react-icons/fa'
+import { BiPulse } from 'react-icons/bi'
 
 const MenuList = [
     {
         id: 1,
-        icon: <FaHome/>,
+        icon: <FaHome />,
         name: "Home",
+        view: 'home',
     },
     {
         id: 2,
-        icon: <FaRocketchat/>,
+        icon: <FaRocketchat />,
         name: "Chat",
+        view: 'chat',
     },
     {
         id: 3,
-        icon: <FaMicrophoneAlt/>,
+        icon: <FaMicrophoneAlt />,
         name: "Artists",
     },
     {
         id: 4,
-        icon: <BsJournalAlbum/>,
+        icon: <BsJournalAlbum />,
         name: "Album",
     },
     {
         id: 5,
-        icon: <FaPodcast/>,
+        icon: <FaPodcast />,
         name: "Podcast",
     },
     {
         id: 6,
-        icon: <FaBroadcastTower/>,
+        icon: <FaBroadcastTower />,
         name: "Radio",
     },
     {
         id: 7,
-        icon: <BiPulse/>,
+        icon: <BiPulse />,
         name: "Discover",
     },
 ]
 
-export {MenuList}
+export { MenuList }
 
