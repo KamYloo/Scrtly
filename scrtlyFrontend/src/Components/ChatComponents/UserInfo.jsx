@@ -1,10 +1,11 @@
 import React from 'react'
-import { FaUserEdit, FaEllipsisH } from "react-icons/fa";
+import { FaUserEdit, FaEllipsisH, FaAngleRight  } from "react-icons/fa";
 import { BsCameraVideoFill } from "react-icons/bs";
 
-function UserInfo() {
+function UserInfo({ toggleChatListView }) {
     return (
         <div className='userInfo'>
+            <i className='chatListBtn' onClick={toggleChatListView}><FaAngleRight  /></i>
             <div className="user">
                 <img src="#" alt="" />
                 <h2>Name Surname</h2>

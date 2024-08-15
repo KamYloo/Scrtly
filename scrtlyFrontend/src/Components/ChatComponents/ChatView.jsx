@@ -4,6 +4,8 @@ import { ChatList } from './ChatList'
 import { Chat } from './Chat'
 
 function ChatView() {
+
+    
     return (
         <div className='chatView'>
             <ChatList />

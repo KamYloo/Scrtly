@@ -9,9 +9,12 @@
 }
 
 .chatView .chat {
-    flex: 2;
+    flex: 3;
     border-left: 1px solid rgb(136, 136, 136);
     border-right: 1px solid rgb(136, 136, 136);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .chatView .chatList {
@@ -25,6 +28,14 @@
     align-items: center;
     justify-content: space-between;
     padding: 20px;
+
+    .chatListBtn {
+        display: none;
+        color: white;
+        margin-right: 15px;
+        font-size: 24px;
+        cursor: pointer;
+    }
 }
 
 .userInfo .user {
@@ -131,7 +142,7 @@
             }
 
             p {
-                font-weight: 14px;
+                font-size: 14px;
                 font-weight: 300;
                 color: white;
             }
@@ -188,6 +199,301 @@
                 color: white;
                 font-size: 16px;
             }
+        }
+    }
+
+    .center {
+        padding: 20px;
+        flex: 1;
+        overflow: scroll;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+
+        .message {
+            max-width: 70%;
+            display: flex;
+            gap: 20px;
+
+            img {
+                width: 30px;
+                height: 30px;
+                background: rgb(0, 0, 0);
+                object-fit: cover;
+            }
+
+
+        }
+
+        .text {
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+            gap: 5px;
+
+            img {
+                width: 100%;
+                height: 300px;
+                border-radius: 10px;
+                object-fit: cover;
+            }
+
+            p {
+                background: rgb(52, 52, 54);
+                padding: 20px;
+                border-radius: 10px;
+                color: white;
+            }
+
+            span {
+                color: white;
+                font-size: 13px;
+            }
+        }
+
+        .messageOwn {
+            align-self: flex-end;
+
+            .text {
+                gap: 5px;
+
+                p {
+                    background: rgb(154, 156, 156);
+                    color: black;
+                }
+            }
+        }
+    }
+
+    .bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        border-top: 1px solid rgb(136, 136, 136);
+        gap: 20px;
+        margin-top: auto;
+
+        .icons {
+            display: flex;
+            gap: 20px;
+        }
+
+        i {
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        input {
+            flex: 1;
+            background: rgba(10, 10, 10, 0.63);
+            border: none;
+            outline: none;
+            color: white;
+            padding: 20px;
+            font-size: 16px;
+            border-radius: 10px;
+        }
+
+        .emoji {
+            position: relative;
+
+            .picker {
+                position: absolute;
+                z-index: 5;
+                bottom: 35px;
+                left: -225px;
+            }
+        }
+
+        .sendButton {
+            background: rgb(51, 51, 56);
+            padding: 10px 20px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    }
+}
+
+
+@media screen and (max-width: 550px) {
+    .chatList {
+        z-index: 6;
+        background: rgb(37, 37, 37);
+    }
+
+    .chatView .chatList .userInfo {
+        padding: 10px;
+
+        .user {
+            gap: 10px;
+
+            img {
+                height: 45px;
+                width: 45px;
+            }
+
+            h2 {
+                font-size: 18px;
+            }
+        }
+
+        .icons {
+            gap: 10px;
+            margin-left: 10px;
+
+            i {
+                width: 20px;
+            }
+        }
+
+        .chatListBtn {
+            display: block;
+        }
+
+    }
+
+    .chatView .chatList.hidden {
+        width: 40px;
+        background: transparent;
+        transform: translateX(-100%);
+        transition: transform 0.2s ease-in-out;
+
+        .userInfo {
+            .chatListBtn {
+                position: absolute;
+                top: 45%;
+                left: 50px;
+            }
+
+            .user,
+            .icons {
+                display: none;
+            }
+        }
+
+        .chatUserList {
+            display: none;
+        }
+    }
+
+    .chatView .chatList.visible {
+        position: absolute;
+        transform: translateX(0);
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .chatUserList {
+        .userItem {
+            gap: 15px;
+
+            img {
+                height: 45px;
+                width: 45px;
+            }
+
+            .text {
+                gap: 5px;
+            }
+        }
+    }
+
+    .chat .top {
+        justify-content: left;
+        padding: 10px;
+
+        .user {
+            gap: 10px;
+
+            img {
+                height: 45px;
+                width: 45px;
+            }
+
+            .userData {
+                gap: 5px;
+
+                span {
+                    max-width: 150px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                p {
+                    max-width: 150px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            }
+        }
+
+        .icons {
+            gap: 10px;
+            margin-left: 20%;
+        }
+    }
+
+    .chat .center {
+        padding: 20px;
+        gap: 20px;
+
+        .message {
+            max-width: 40%;
+            gap: 10px;
+
+            img {
+                width: 30px;
+                height: 30px;
+            }
+        }
+
+        .text {
+            gap: 5px;
+
+            img {
+                width: 100%;
+                height: 300px;
+            }
+
+            p {
+                padding: 10px;
+                max-width: 72%;
+
+                word-wrap: break-word;
+
+                white-space: normal;
+
+            }
+        }
+
+        .messageOwn {
+            .text {
+                gap: 5px;
+            }
+        }
+    }
+
+    .chat .bottom {
+        gap: 10px;
+        padding: 10px;
+        justify-content: left;
+
+        .icons {
+            gap: 10px;
+        }
+
+        input {
+            padding: 15px;
+            max-width: 38%;
+        }
+
+        .sendButton {
+            padding: 10px 10px;
         }
     }
 }
