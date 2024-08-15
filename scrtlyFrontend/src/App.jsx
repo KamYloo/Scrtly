@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { LeftMenu } from './Components/LeftMenu'
 import { Middle } from './Components/Middle'
 import { RightMenu } from './Components/RightMenu'
-import { ChatView } from './Components/ChatView'
+import { ChatView } from './Components/ChatComponents/ChatView'
 
 function App() {
   const [volume, setVolume] = useState(0.5)

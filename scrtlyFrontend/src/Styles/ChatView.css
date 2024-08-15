@@ -5,4 +5,189 @@
     background: rgba(31, 31, 31, 0.596);
     backdrop-filter: blur(3px);
     transition: all 0.3s ease;
+    display: flex;
+}
+
+.chatView .chat {
+    flex: 2;
+    border-left: 1px solid rgb(136, 136, 136);
+    border-right: 1px solid rgb(136, 136, 136);
+}
+
+.chatView .chatList {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.chatView .chatList .userInfo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+}
+
+.userInfo .user {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+
+    img {
+        width: 50px;
+        height: 50px;
+        background: rgb(98, 98, 104);
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    h2 {
+        color: white;
+        font-size: 22px;
+        font-weight: bold;
+    }
+}
+
+.userInfo .icons {
+    display: flex;
+    gap: 20px;
+
+    i {
+        width: 20px;
+        color: white;
+    }
+}
+
+.chatUserList {
+    flex: 1;
+    overflow: scroll;
+
+    .search {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 20px;
+
+        .searchBar {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: rgba(10, 10, 10, 0.63);
+            border-radius: 10px;
+            padding: 10px;
+
+            input {
+                background-color: transparent;
+                outline: none;
+                border: none;
+                color: white;
+                flex: 1;
+            }
+
+            i {
+                color: white;
+            }
+        }
+
+        .addUser {
+            width: 36px;
+            height: 36px;
+            background: rgba(10, 10, 10, 0.63);
+            padding: 10;
+            border-radius: 10px;
+            cursor: pointer;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+        }
+    }
+
+    .userItem {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 20px;
+        cursor: pointer;
+        border-bottom: 1px solid rgb(136, 136, 136);
+
+        img {
+            height: 50px;
+            width: 50px;
+            background: rgb(15, 15, 15);
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .text {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+
+            span {
+                font-weight: 500;
+                color: white;
+            }
+
+            p {
+                font-weight: 14px;
+                font-weight: 300;
+                color: white;
+            }
+        }
+    }
+}
+
+
+.chat {
+    .top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px;
+        border-bottom: 1px solid rgb(136, 136, 136);
+
+        .user {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+
+            img {
+                height: 60px;
+                width: 60px;
+                border-radius: 50%;
+                background: rgb(0, 0, 0);
+                object-fit: cover;
+            }
+
+            .userData {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+
+                span {
+                    font-size: 18px;
+                    color: white;
+                    font-weight: bold;
+                }
+
+                p {
+                    font-weight: 300;
+                    font-size: 14px;
+                    color: gray;
+                }
+            }
+        }
+
+        .icons {
+            display: flex;
+            gap: 20px;
+
+            i {
+                color: white;
+                font-size: 16px;
+            }
+        }
+    }
 }
