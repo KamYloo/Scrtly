@@ -100,7 +100,7 @@
             }
         }
 
-        .addUser {
+        .addUserBtn {
             width: 36px;
             height: 36px;
             background: rgba(10, 10, 10, 0.63);
@@ -314,6 +314,75 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+        }
+    }
+}
+
+.addUser {
+    width: max-content;
+    height: max-content;
+    padding: 30px;
+    position: absolute;
+    border-radius: 10px;
+    background: rgba(19, 19, 20, 0.815);
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    margin: auto;
+
+    form {
+        display: flex;
+        gap: 20px;
+
+        input {
+            border: none;
+            outline: none;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        button {
+            padding: 15px;
+            border-radius: 10px;
+            background: rgb(53, 53, 53);
+            border: none;
+            cursor: pointer;
+            color: white;
+        }
+    }
+
+    .user {
+        margin-top: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        .detail {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+
+            img {
+                height: 50px;
+                width: 50px;
+                border-radius: 50%;
+                object-fit: cover;
+                background: black;
+            }
+
+            span {
+                color: white;
+            }
+        }
+
+        button {
+            padding: 10px;
+            border-radius: 10px;
+            background: rgb(53, 53, 53);
+            border: none;
+            cursor: pointer;
+            color: white;
         }
     }
 }
