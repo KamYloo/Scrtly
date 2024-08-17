@@ -1,7 +1,8 @@
 import React from 'react'
 import '../Styles/LeftMenu.css'
+import logo from '../img/logo.png'
 
-import { FaSpotify, FaEllipsisH } from "react-icons/fa";
+import { FaEllipsisH } from "react-icons/fa";
 import { BiSearchAlt } from "react-icons/bi";
 import { Menu } from './Menu';
 import { MenuList } from './MenuList';
@@ -12,7 +13,7 @@ function LeftMenu({ onVolumeChange, currentTrack, onViewChange }) {
     return (
         <div className='LeftMenu'>
             <div className="logoBox">
-                <i><FaSpotify /></i>
+                <img src={logo} alt="" />
                 <h2>Scrtly</h2>
                 <i><FaEllipsisH /></i>
             </div>

@@ -1,10 +1,13 @@
 
 import './App.css'
 import React, { useState } from 'react'
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { LeftMenu } from './Components/LeftMenu'
 import { Middle } from './Components/Middle'
 import { RightMenu } from './Components/RightMenu'
 import { ChatView } from './Components/ChatComponents/ChatView'
+import { Login } from './Components/AuthComponents/Login';
+import { Register } from './Components/AuthComponents/Register';
 
 function App() {
   const [volume, setVolume] = useState(0.5)
@@ -31,14 +34,31 @@ function App() {
   };
 
   return (
-    <div className='App'>
-      <LeftMenu onVolumeChange={setVolume} currentTrack={currentTrack} onViewChange={handleViewChange} />
-      {renderMiddleComponent()}
-      <RightMenu />
+    <Router>
+      <Routes>
 
+        <Route path="/login" element={
+          <div className='loginLayout'><Login />
+            <div className="background"></div>
+          </div>}
+        />
 
-      <div className="background"></div>
-    </div>
+        <Route path="/register" element={
+          <div className="loginLayout"><Register />
+            <div className="background"></div>
+          </div>
+        } />
+
+        <Route path="/" element={
+          <div className='App'>
+            <LeftMenu onVolumeChange={setVolume} currentTrack={currentTrack} onViewChange={handleViewChange} />
+            {renderMiddleComponent()}
+            <RightMenu />
+            <div className="background"></div>
+          </div>
+        } />
+      </Routes>
+    </Router>
   )
 }
 

@@ -24,12 +24,17 @@
 }
 
 .rightMenu .top i,
-.rightMenu .profile i {
+.rightMenu .profile i,
+.rightMenu .profile p {
     margin: 20px 0;
     color: white;
     text-align: center;
     font-size: 20px;
     position: relative;
+}
+
+.rightMenu .profile p {
+    font-weight: bold;
 }
 
 .rightMenu .top i p span {
