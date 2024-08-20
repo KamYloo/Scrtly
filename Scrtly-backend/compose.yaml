@@ -1,9 +1,11 @@
 services:
-  postgres:
-    image: 'postgres:latest'
+
+  db:
+    image: postgres
+    restart: always
     environment:
-      - 'POSTGRES_DB=mydb'
-      - 'POSTGRES_PASSWORD=admin'
-      - 'POSTGRES_USER=admin'
+      POSTGRES_DB: scrtlyData
+      POSTGRES_PASSWORD: netlab12
+      POSTGRES_USER: postgres
     ports:
-      - '5432'
+      - '5432:5432'
