@@ -37,7 +37,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> createUserHandler(@RequestBody User user) {
+    public ResponseEntity<AuthResponse> createUserHandler(@RequestBody User user) throws Exception {
         String email = user.getEmail();
         String password = user.getPassword();
         String fullName = user.getFullName();
@@ -45,8 +45,7 @@ public class UserController {
 
         User isEmailExist = userRepository.findByEmail(email);
         if (isEmailExist != null) {
-            //throw new Exception("Email Is Already Used With Another Account");
-
+            throw new Exception("Email Is Already Used With Another Account");
         }
         User createdUser = new User();
         createdUser.setEmail(email);
@@ -54,7 +53,6 @@ public class UserController {
         createdUser.setPassword(passwordEncoder.encode(password));
 
         User savedUser = userRepository.save(createdUser);
-        userRepository.save(savedUser);
         Authentication authentication = new UsernamePasswordAuthenticationToken(email, password);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = JwtProvider.generateToken(authentication);
@@ -70,36 +68,55 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> signin(@RequestBody User loginRequest) {
-        String username = loginRequest.getEmail();
+        String email = loginRequest.getEmail();
         String password = loginRequest.getPassword();
 
-        System.out.println(username + "-------" + password);
+        System.out.println(email + "-------" + password);
 
-        Authentication authentication = authenticate(username, password);
+        Authentication authentication = authenticate(email, password);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String token = JwtProvider.generateToken(authentication);
+        User user = userRepository.findByEmail(email);
         AuthResponse authResponse = new AuthResponse();
 
         authResponse.setMessage("Login success");
         authResponse.setJwt(token);
         authResponse.setStatus(true);
+        authResponse.setFullName(user.getFullName());
 
         return new ResponseEntity<>(authResponse, HttpStatus.OK);
     }
 
-    private Authentication authenticate(String username, String password) {
+    @GetMapping("/me")
+    public ResponseEntity<User> getCurrentUser(@RequestHeader("Authorization") String token) {
+        if (token != null && token.startsWith("Bearer ")) {
+            String email = JwtProvider.getEmailFromJwtToken(token);
 
-        System.out.println(username + "---++----" + password);
+            User user = userRepository.findByEmail(email);
 
-        UserDetails userDetails = customUserDetails.loadUserByUsername(username);
+            if (user != null) {
+                return new ResponseEntity<>(user, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } else {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    private Authentication authenticate(String email, String password) {
+
+        System.out.println(email + "---++----" + password);
+
+        UserDetails userDetails = customUserDetails.loadUserByUsername(email);
 
         System.out.println("Sig in in user details" + userDetails);
 
         if (userDetails == null) {
             System.out.println("Sign in details - null" + userDetails);
 
-            throw new BadCredentialsException("Invalid username and password");
+            throw new BadCredentialsException("Invalid email and password");
         }
         if (!passwordEncoder.matches(password, userDetails.getPassword())) {
             System.out.println("Sign in userDetails - password mismatch" + userDetails);

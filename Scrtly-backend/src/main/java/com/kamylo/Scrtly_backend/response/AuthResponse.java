@@ -10,6 +10,16 @@ public class AuthResponse {
     private String message;
     private Boolean status;
 
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    private String fullName;
+
     public String getJwt() {
         return jwt;
     }

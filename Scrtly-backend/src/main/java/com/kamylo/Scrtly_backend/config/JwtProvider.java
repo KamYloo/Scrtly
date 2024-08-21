@@ -42,11 +42,11 @@ public class JwtProvider {
 
     @SuppressWarnings("deprecation")
     public static String getEmailFromJwtToken(String jwt) {
-        jwt = jwt.substring(7); // Assuming "Bearer " is removed from the token
+        jwt = jwt.substring(7);
         try {
-            Claims claims = Jwts.parserBuilder()  // Use parserBuilder() instead of parser()
+            Claims claims = Jwts.parserBuilder()
                     .setSigningKey(key)
-                    .build()  // build() is now called on JwtParserBuilder
+                    .build()
                     .parseClaimsJws(jwt)
                     .getBody();
             String email = String.valueOf(claims.get("email"));
