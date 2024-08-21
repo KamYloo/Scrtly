@@ -9,7 +9,7 @@
 .login {
     position: relative;
     width: 420px;
-    height: 520px;
+    height: 480px;
     border-radius: 10px;
     color: white;
     background: transparent;
@@ -25,7 +25,7 @@
             right: 10px;
             top: 10px;
             font-size: 26px;
-            
+
             cursor: pointer;
 
             a {
@@ -117,4 +117,8 @@
             }
         }
     }
+}
+
+.login.r {
+    height: 590px;
 }

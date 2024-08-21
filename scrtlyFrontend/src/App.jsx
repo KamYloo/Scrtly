@@ -49,7 +49,7 @@ function App() {
           </div>
         } />
 
-        <Route path="/" element={
+        <Route path="/home" element={
           <div className='App'>
             <LeftMenu onVolumeChange={setVolume} currentTrack={currentTrack} onViewChange={handleViewChange} />
             {renderMiddleComponent()}
