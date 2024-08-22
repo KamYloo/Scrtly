@@ -80,9 +80,16 @@
     .rightMenu {
         min-width: 64px;
         width: 64px;
+
+        .profile {
+            .loginBtn {
+                font-size: 12px;
+            }
+        }
     }
 
     .rightMenu .top i p span {
         font-size: 11px;
     }
+
 }

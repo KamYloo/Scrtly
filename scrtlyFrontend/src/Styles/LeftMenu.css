@@ -283,6 +283,13 @@
     .LeftMenu {
         width: 64px;
         min-width: 64px;
+
+        .logoBox {
+            img {
+                height: 40px;
+                width: 40px;
+            }
+        }
     }
 
     .LeftMenu .searchBox {
