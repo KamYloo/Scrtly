@@ -14,9 +14,17 @@ function RightMenu() {
   }, [])
 
   const handleLogout = () => {
-    localStorage.removeItem('jwtToken') // Usuń token
-    setIsLoggedIn(false) // Zmień stan na niezalogowany
-    navigate('/login') // Przekieruj na stronę logowania
+    localStorage.removeItem('jwtToken')
+    setIsLoggedIn(false) 
+    navigate('/login') 
+  }
+
+  const handleProfileClick = () => {
+    if (isLoggedIn) {
+      navigate('/profile')
+    } else {
+      navigate('/login')
+    }
   }
 
   return (
@@ -29,7 +37,7 @@ function RightMenu() {
       <div className="profile">
         <i><FaSun /></i>
         <i><FaCogs /></i>
-        <div className="profileImg">
+        <div className="profileImg" onClick={handleProfileClick}>
           <img src="#" alt="" />
         </div>
         {isLoggedIn ? (

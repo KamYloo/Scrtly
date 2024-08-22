@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
+import { Link } from 'react-router-dom';
 
-function Menu({ title, menuObject, onViewChange }) {
+function Menu({ title, menuObject }) {
 
     useEffect(() => {
         const allLi = document.querySelector(".menuBox ul").querySelectorAll("li")
@@ -8,19 +9,16 @@ function Menu({ title, menuObject, onViewChange }) {
         function changeMenuActive() {
             allLi.forEach((n) => n.classList.remove("active"))
             this.classList.add("active")
-
-            // Wywołanie onViewChange z odpowiednim widokiem
-            const view = this.getAttribute('data-view');
-            onViewChange(view);
         }
 
         allLi.forEach((n) => n.addEventListener("click", changeMenuActive))
 
-        // Czyszczenie event listenerów po odmontowaniu komponentu
         return () => {
             allLi.forEach((n) => n.removeEventListener("click", changeMenuActive))
         };
-    }, [onViewChange])
+    }, [])
+
+
     return (
         <div className='menuBox'>
             <p className='title'>{title}</p>
@@ -28,10 +26,10 @@ function Menu({ title, menuObject, onViewChange }) {
                 {
                     menuObject && menuObject.map((menu) => (
                         <li key={menu.id} data-view={menu.view}>
-                            <a href="#">
+                            <Link to={menu.route}>
                                 <i>{menu.icon}</i>
                                 <span>{menu.name}</span>
-                            </a>
+                            </Link>
                         </li>
                     ))
                 }

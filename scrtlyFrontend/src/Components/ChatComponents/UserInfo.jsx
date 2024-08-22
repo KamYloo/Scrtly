@@ -7,18 +7,16 @@ function UserInfo({ toggleChatListView }) {
     const [user, setUser] = useState({ fullName: '', email: '' });
 
     useEffect(() => {
-        // Pobierz token JWT z localStorage lub innego miejsca, gdzie go przechowujesz
-        const token = localStorage.getItem('jwtToken');
+        
+        const token = localStorage.getItem('jwtToken')
 
-        // Jeśli token istnieje, wyślij żądanie do backendu
         if (token) {
             axios.get('http://localhost:8080/auth/me', {
                 headers: {
-                    Authorization: `Bearer ${token}`  // Dodaj token do nagłówka
+                    Authorization: `Bearer ${token}` 
                 }
             })
                 .then(response => {
-                    // Zaktualizuj stan z danymi użytkownika
                     setUser(response.data);
                 })
                 .catch(error => {
