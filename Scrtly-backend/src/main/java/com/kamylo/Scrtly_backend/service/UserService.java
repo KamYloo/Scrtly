@@ -19,5 +19,6 @@ public interface UserService {
 
     public User updateUser(Long userId, UpdateUserRequest updateUserRequest) throws UserException;
 
+    public List<User> searchUser(String query);
 
 }

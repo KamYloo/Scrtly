@@ -7,13 +7,13 @@ function UserInfo({ toggleChatListView }) {
     const [user, setUser] = useState({ fullName: '', email: '' });
 
     useEffect(() => {
-        
+
         const token = localStorage.getItem('jwtToken')
 
         if (token) {
-            axios.get('http://localhost:8080/auth/me', {
+            axios.get('http://localhost:8080/api/users/profile', {
                 headers: {
-                    Authorization: `Bearer ${token}` 
+                    Authorization: `Bearer ${token}`
                 }
             })
                 .then(response => {

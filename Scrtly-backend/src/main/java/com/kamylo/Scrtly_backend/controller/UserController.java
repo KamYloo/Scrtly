@@ -1,11 +1,13 @@
 package com.kamylo.Scrtly_backend.controller;
 
+import com.kamylo.Scrtly_backend.exception.UserException;
 import com.kamylo.Scrtly_backend.model.User;
 import com.kamylo.Scrtly_backend.repository.UserRepository;
+import com.kamylo.Scrtly_backend.request.UpdateUserRequest;
+import com.kamylo.Scrtly_backend.response.ApiResponse;
 import com.kamylo.Scrtly_backend.service.UserService;
-import com.kamylo.Scrtly_backend.response.AuthResponse;
 import com.kamylo.Scrtly_backend.service.UserServiceImplementation;
-import com.kamylo.Scrtly_backend.config.JwtProvider;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,118 +15,51 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/users")
 public class UserController {
-
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-
-    @Autowired
-    private UserServiceImplementation customUserDetails;
 
     @Autowired
     private UserService userService;
 
-    @PostMapping("/register")
-    public ResponseEntity<AuthResponse> createUserHandler(@RequestBody User user) throws Exception {
-        String email = user.getEmail();
-        String password = user.getPassword();
-        String fullName = user.getFullName();
-
-
-        User isEmailExist = userRepository.findByEmail(email);
-        if (isEmailExist != null) {
-            throw new Exception("Email Is Already Used With Another Account");
-        }
-        User createdUser = new User();
-        createdUser.setEmail(email);
-        createdUser.setFullName(fullName);
-        createdUser.setPassword(passwordEncoder.encode(password));
-
-        User savedUser = userRepository.save(createdUser);
-        Authentication authentication = new UsernamePasswordAuthenticationToken(email, password);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String token = JwtProvider.generateToken(authentication);
-
-
-        AuthResponse authResponse = new AuthResponse();
-        authResponse.setJwt(token);
-        authResponse.setMessage("Register Success");
-        authResponse.setStatus(true);
-        return new ResponseEntity<AuthResponse>(authResponse, HttpStatus.OK);
-
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<AuthResponse> signin(@RequestBody User loginRequest) {
-        String email = loginRequest.getEmail();
-        String password = loginRequest.getPassword();
-
-        System.out.println(email + "-------" + password);
-
-        Authentication authentication = authenticate(email, password);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        String token = JwtProvider.generateToken(authentication);
-        User user = userRepository.findByEmail(email);
-        AuthResponse authResponse = new AuthResponse();
-
-        authResponse.setMessage("Login success");
-        authResponse.setJwt(token);
-        authResponse.setStatus(true);
-        authResponse.setFullName(user.getFullName());
-
-        return new ResponseEntity<>(authResponse, HttpStatus.OK);
-    }
-
-    @GetMapping("/me")
-    public ResponseEntity<User> getCurrentUser(@RequestHeader("Authorization") String token) {
+    @GetMapping("/profile")
+    public ResponseEntity<User> getUserProfileHandler(@RequestHeader("Authorization") String token) throws UserException {
         if (token != null && token.startsWith("Bearer ")) {
-            String email = JwtProvider.getEmailFromJwtToken(token);
 
-            User user = userRepository.findByEmail(email);
+            User user = userService.findUserProfileByJwt(token);
+            return new ResponseEntity<User>(user, HttpStatus.ACCEPTED);
 
-            if (user != null) {
-                return new ResponseEntity<>(user, HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
         } else {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
-    private Authentication authenticate(String email, String password) {
+    @GetMapping("/{query}")
+    public ResponseEntity<List<User>> searchUserHandler(@PathVariable("query") String q) {
+        List<User> users = userService.searchUser(q);
 
-        System.out.println(email + "---++----" + password);
-
-        UserDetails userDetails = customUserDetails.loadUserByUsername(email);
-
-        System.out.println("Sig in in user details" + userDetails);
-
-        if (userDetails == null) {
-            System.out.println("Sign in details - null" + userDetails);
-
-            throw new BadCredentialsException("Invalid email and password");
-        }
-        if (!passwordEncoder.matches(password, userDetails.getPassword())) {
-            System.out.println("Sign in userDetails - password mismatch" + userDetails);
-
-            throw new BadCredentialsException("Invalid password");
-
-        }
-        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-
+        return new ResponseEntity<List<User>>(users, HttpStatus.OK);
     }
+
+    @PutMapping("/update")
+    public ResponseEntity<ApiResponse> updateUserHandler(@RequestBody UpdateUserRequest request, @RequestHeader("Authorization") String token) throws UserException {
+        User user = userService.findUserProfileByJwt(token);
+        userService.updateUser(user.getId(), request);
+
+        ApiResponse res = new ApiResponse("user updated successfully", true);
+        return new ResponseEntity<ApiResponse>(res, HttpStatus.ACCEPTED);
+    }
+
 }

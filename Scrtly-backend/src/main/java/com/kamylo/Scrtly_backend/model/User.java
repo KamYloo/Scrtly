@@ -24,15 +24,7 @@ public class User {
     private String profilePicture;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
-
-    public User(Long id, String fullName, String email, String profilePicture, String password) {
-        this.id = id;
-        this.fullName = fullName;
-        this.email = email;
-        this.profilePicture = profilePicture;
-        this.password = password;
-    }
-
+    
     public Long getId() {
         return id;
     }

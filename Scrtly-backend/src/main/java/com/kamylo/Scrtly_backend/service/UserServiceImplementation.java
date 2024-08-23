@@ -18,33 +18,13 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UserServiceImplementation implements UserDetailsService, UserService {
+public class UserServiceImplementation implements UserService {
 
     @Autowired
     private UserRepository userRepository;
 
     public UserServiceImplementation(UserRepository userRepository) {
         this.userRepository=userRepository;
-    }
-
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(username);
-        System.out.println(user);
-
-        if(user==null) {
-            throw new UsernameNotFoundException("User not found with this email"+username);
-
-        }
-
-
-        System.out.println("Loaded user: " + user.getEmail());
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        return new org.springframework.security.core.userdetails.User(
-                user.getEmail(),
-                user.getPassword(),
-                authorities);
     }
 
     @Override
@@ -94,5 +74,11 @@ public class UserServiceImplementation implements UserDetailsService, UserServic
         }
 
         return userRepository.save(user);
+    }
+
+    @Override
+    public List<User> searchUser(String query) {
+        List<User> users = userRepository.searchUser(query);
+        return users;
     }
 }
