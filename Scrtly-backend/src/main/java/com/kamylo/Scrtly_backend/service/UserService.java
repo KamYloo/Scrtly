@@ -1,6 +1,8 @@
 package com.kamylo.Scrtly_backend.service;
 
+import com.kamylo.Scrtly_backend.exception.UserException;
 import com.kamylo.Scrtly_backend.model.User;
+import com.kamylo.Scrtly_backend.request.UpdateUserRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,5 +29,8 @@ public class UserService {
         return null;
     }
 
+    public User updateUser(Integer userId, UpdateUserRequest updateUserRequest) throws UserException {
+        return null;
+    }
 
 }

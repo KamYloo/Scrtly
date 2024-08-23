@@ -39,7 +39,6 @@ public class JwtTokenValidator extends OncePerRequestFilter{
                         .getBody();
 
                 System.out.print(claims);
-                System.out.print(claims);
 
                 String email = String.valueOf(claims.get("email"));
                 System.out.print(email);

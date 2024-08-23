@@ -9,6 +9,8 @@ public class AuthResponse {
     private String jwt;
     private String message;
     private Boolean status;
+    private String fullName;
+
 
     public String getFullName() {
         return fullName;
@@ -18,7 +20,7 @@ public class AuthResponse {
         this.fullName = fullName;
     }
 
-    private String fullName;
+
 
     public String getJwt() {
         return jwt;
