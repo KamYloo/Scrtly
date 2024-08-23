@@ -8,29 +8,16 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class UserService {
-    public List<User> getAllUser() {
-        return null;
-    }
+public interface UserService {
+    public List<User> getAllUser();
 
-    public User findUserProfileByJwt(String jwt) {
-        return null;
-    }
+    public User findUserProfileByJwt(String jwt) throws UserException;
 
-    public User findUserByEmail(String email) {
-        return null;
-    }
+    public User findUserByEmail(String email);
 
-    public User findUserById(String userId) {
-        return null;
-    }
+    public User findUserById(Long userId) throws UserException;
 
-    public List<User> findAllUsers() {
-        return null;
-    }
+    public User updateUser(Long userId, UpdateUserRequest updateUserRequest) throws UserException;
 
-    public User updateUser(Integer userId, UpdateUserRequest updateUserRequest) throws UserException {
-        return null;
-    }
 
 }
