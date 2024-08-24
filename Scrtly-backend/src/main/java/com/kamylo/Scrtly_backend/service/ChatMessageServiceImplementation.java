@@ -8,7 +8,6 @@ import com.kamylo.Scrtly_backend.model.ChatRoom;
 import com.kamylo.Scrtly_backend.model.User;
 import com.kamylo.Scrtly_backend.repository.ChatMessageRepository;
 import com.kamylo.Scrtly_backend.request.SendMessageRequest;
-import org.apache.logging.log4j.message.Message;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

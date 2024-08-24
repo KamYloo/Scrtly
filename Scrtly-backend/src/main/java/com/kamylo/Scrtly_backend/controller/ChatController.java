@@ -18,8 +18,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/chats")
 public class ChatController {
-    private ChatService chatService;
-    private UserService userService;
+    private final ChatService chatService;
+    private final UserService userService;
 
     public ChatController(ChatService chatService, UserService userService) {
         this.chatService = chatService;
@@ -51,7 +51,7 @@ public class ChatController {
         return new ResponseEntity<>(chatRoomList, HttpStatus.OK);
     }
 
-    @PutMapping("/delete/{chatId}")
+    @DeleteMapping("/delete/{chatId}")
     public ResponseEntity<ApiResponse> deleteChatHandler(@PathVariable Integer chatId, @RequestHeader("Authorization")String token) throws UserException, ChatException {
         User reqUser = userService.findUserProfileByJwt(token);
 
