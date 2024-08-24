@@ -1,14 +1,9 @@
 package com.kamylo.Scrtly_backend.controller;
 
-import com.kamylo.Scrtly_backend.exception.UserException;
 import com.kamylo.Scrtly_backend.model.User;
 import com.kamylo.Scrtly_backend.repository.UserRepository;
-import com.kamylo.Scrtly_backend.request.UpdateUserRequest;
-import com.kamylo.Scrtly_backend.response.ApiResponse;
-import com.kamylo.Scrtly_backend.service.CustomUserService;
-import com.kamylo.Scrtly_backend.service.UserService;
+import com.kamylo.Scrtly_backend.service.CustomUserServiceImplementation;
 import com.kamylo.Scrtly_backend.response.AuthResponse;
-import com.kamylo.Scrtly_backend.service.UserServiceImplementation;
 import com.kamylo.Scrtly_backend.config.JwtProvider;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +30,7 @@ public class AuthController {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private CustomUserService customUserDetails;
+    private CustomUserServiceImplementation customUserDetails;
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> createUserHandler(@RequestBody User user) throws Exception {

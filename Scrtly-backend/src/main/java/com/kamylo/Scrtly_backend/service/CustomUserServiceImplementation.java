@@ -13,11 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class CustomUserService implements UserDetailsService {
+public class CustomUserServiceImplementation implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
 
-    public CustomUserService(UserRepository userRepository) {
+    public CustomUserServiceImplementation(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 

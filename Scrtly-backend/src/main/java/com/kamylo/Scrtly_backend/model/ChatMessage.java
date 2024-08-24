@@ -29,6 +29,7 @@ public class ChatMessage {
     private User user;
 
     @ManyToOne
+    @JoinColumn(name = "chatRoom_id")
     private ChatRoom chat;
 
     @PrePersist

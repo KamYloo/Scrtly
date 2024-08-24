@@ -26,6 +26,13 @@ public class GlobaleException {
         return new ResponseEntity<ErrorDetail>(errorDetail, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(ChatException.class)
+    public ResponseEntity<ErrorDetail> ChatExceptionHandler(ChatException e, WebRequest req) {
+        ErrorDetail errorDetail = new ErrorDetail(e.getMessage(), req.getDescription(false), LocalDateTime.now());
+
+        return new ResponseEntity<ErrorDetail>(errorDetail, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(NoHandlerFoundException.class)
     public ResponseEntity<ErrorDetail> handleNoHandlerFoundException(NoHandlerFoundException e, WebRequest req) {
         ErrorDetail errorDetail = new ErrorDetail("Endpoint not found", e.getMessage(), LocalDateTime.now());
