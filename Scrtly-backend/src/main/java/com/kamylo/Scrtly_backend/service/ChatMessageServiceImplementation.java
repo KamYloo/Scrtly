@@ -17,9 +17,9 @@ import java.util.Optional;
 @Service
 public class ChatMessageServiceImplementation implements ChatMessageService {
 
-    private ChatMessageRepository chatMessageRepository;
-    private UserService userService;
-    private ChatService chatService;
+    private final ChatMessageRepository chatMessageRepository;
+    private final UserService userService;
+    private final ChatService chatService;
 
     public ChatMessageServiceImplementation(ChatMessageRepository chatMessageRepository, UserService userService, ChatService chatService) {
         this.chatMessageRepository = chatMessageRepository;
@@ -59,7 +59,7 @@ public class ChatMessageServiceImplementation implements ChatMessageService {
     }
 
     @Override
-    public void deleteChatMessageById(Integer messageId, User reqUser) throws UserException, MessageException {
+    public void deleteChatMessageById(Integer messageId, User reqUser) throws MessageException {
         ChatMessage chatMessage = findChatMessageById(messageId);
 
         if (chatMessage.getUser().getId().equals(reqUser.getId())) {

@@ -6,7 +6,6 @@ import com.kamylo.Scrtly_backend.service.CustomUserServiceImplementation;
 import com.kamylo.Scrtly_backend.response.AuthResponse;
 import com.kamylo.Scrtly_backend.config.JwtProvider;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -24,13 +23,15 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/auth")
 public class AuthController {
 
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final CustomUserServiceImplementation customUserDetails;
 
-    @Autowired
-    private CustomUserServiceImplementation customUserDetails;
+    public AuthController(UserRepository userRepository, PasswordEncoder passwordEncoder, CustomUserServiceImplementation customUserDetails) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.customUserDetails = customUserDetails;
+    }
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> createUserHandler(@RequestBody User user) throws Exception {
@@ -58,7 +59,7 @@ public class AuthController {
         authResponse.setJwt(token);
         authResponse.setMessage("Register Success");
         authResponse.setStatus(true);
-        return new ResponseEntity<AuthResponse>(authResponse, HttpStatus.OK);
+        return new ResponseEntity<>(authResponse, HttpStatus.OK);
 
     }
 

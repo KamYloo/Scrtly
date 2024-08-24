@@ -5,7 +5,6 @@ import com.kamylo.Scrtly_backend.exception.UserException;
 import com.kamylo.Scrtly_backend.model.ChatRoom;
 import com.kamylo.Scrtly_backend.model.User;
 import com.kamylo.Scrtly_backend.repository.ChatRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,10 +13,10 @@ import java.util.Optional;
 @Service
 public class ChatServiceImplementation implements ChatService {
 
-    @Autowired
-    private ChatRepository chatRepository;
-    @Autowired
-    private UserService userService;
+
+    private final ChatRepository chatRepository;
+
+    private final UserService userService;
 
     public ChatServiceImplementation(ChatRepository chatRepository, UserService userService) {
         this.chatRepository = chatRepository;
@@ -54,12 +53,11 @@ public class ChatServiceImplementation implements ChatService {
     @Override
     public List<ChatRoom> findAllChatByUserId(Long userId) throws UserException {
         User user = userService.findUserById(userId);
-        List<ChatRoom> chatRooms = chatRepository.findChatRoomById(user.getId());
-        return chatRooms;
+        return chatRepository.findChatRoomById(user.getId());
     }
 
     @Override
-    public void deleteChat(Integer chatId, Long userId) throws UserException, ChatException {
+    public void deleteChat(Integer chatId, Long userId) {
         Optional<ChatRoom> chatRoom = chatRepository.findById(chatId);
         if (chatRoom.isPresent()) {
             ChatRoom chatRoomToDelete = chatRoom.get();

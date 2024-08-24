@@ -1,13 +1,9 @@
 package com.kamylo.Scrtly_backend.model;
-import java.util.List;
-import java.util.Objects;
 
+import java.util.Objects;
 import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import lombok.*;
-
-
 
 @Setter
 @Getter

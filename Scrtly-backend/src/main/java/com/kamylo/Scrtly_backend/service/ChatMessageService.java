@@ -12,11 +12,11 @@ import java.util.List;
 
 @Service
 public interface ChatMessageService {
-    public ChatMessage sendMessage(SendMessageRequest request) throws UserException, ChatException;
+     ChatMessage sendMessage(SendMessageRequest request) throws UserException, ChatException;
 
-    public List<ChatMessage> getChatsMessages(Integer chatId) throws ChatException;
+     List<ChatMessage> getChatsMessages(Integer chatId) throws ChatException;
 
-    public ChatMessage findChatMessageById(Integer messageId) throws MessageException;
+     ChatMessage findChatMessageById(Integer messageId) throws MessageException;
 
-    public void deleteChatMessageById(Integer messageId, User reqUser) throws UserException, MessageException;
+     void deleteChatMessageById(Integer messageId, User reqUser) throws UserException, MessageException;
 }

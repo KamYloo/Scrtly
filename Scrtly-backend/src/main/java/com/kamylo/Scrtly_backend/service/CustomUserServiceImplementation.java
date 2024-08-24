@@ -2,7 +2,6 @@ package com.kamylo.Scrtly_backend.service;
 
 import com.kamylo.Scrtly_backend.model.User;
 import com.kamylo.Scrtly_backend.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,8 +13,8 @@ import java.util.List;
 
 @Service
 public class CustomUserServiceImplementation implements UserDetailsService {
-    @Autowired
-    private UserRepository userRepository;
+
+    private final UserRepository userRepository;
 
     public CustomUserServiceImplementation(UserRepository userRepository) {
         this.userRepository = userRepository;

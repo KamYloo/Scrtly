@@ -9,16 +9,16 @@ import java.util.List;
 
 @Service
 public interface UserService {
-    public List<User> getAllUser();
+     List<User> getAllUser();
 
-    public User findUserProfileByJwt(String jwt) throws UserException;
+     User findUserProfileByJwt(String jwt) throws UserException;
 
-    public User findUserByEmail(String email);
+     User findUserByEmail(String email);
 
-    public User findUserById(Long userId) throws UserException;
+     User findUserById(Long userId) throws UserException;
 
-    public User updateUser(Long userId, UpdateUserRequest updateUserRequest) throws UserException;
+     User updateUser(Long userId, UpdateUserRequest updateUserRequest) throws UserException;
 
-    public List<User> searchUser(String query);
+     List<User> searchUser(String query);
 
 }

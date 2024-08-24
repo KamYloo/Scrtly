@@ -32,14 +32,14 @@ public class ChatController {
 
         ChatRoom chatRoom = chatService.createChat(reqUser, chatRoomRequest.getUserId());
 
-        return new ResponseEntity<ChatRoom>(chatRoom, HttpStatus.OK);
+        return new ResponseEntity<>(chatRoom, HttpStatus.OK);
     }
 
     @GetMapping("/{chatId}")
     public ResponseEntity<ChatRoom> findChatByIdHandler(@PathVariable Integer chatId, @RequestHeader("Authorization")String token) throws ChatException {
         ChatRoom chatRoom = chatService.findChatById(chatId);
 
-        return new ResponseEntity<ChatRoom>(chatRoom, HttpStatus.OK);
+        return new ResponseEntity<>(chatRoom, HttpStatus.OK);
     }
 
     @GetMapping("/user")

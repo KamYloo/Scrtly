@@ -19,8 +19,8 @@ import java.util.List;
 @RequestMapping("/api/messages")
 public class ChatMessageController {
 
-    private ChatMessageService chatMessageService;
-    private UserService userService;
+    private final ChatMessageService chatMessageService;
+    private final UserService userService;
 
     public ChatMessageController(ChatMessageService chatMessageService, UserService userService) {
         this.chatMessageService = chatMessageService;
@@ -46,7 +46,7 @@ public class ChatMessageController {
     }
 
     @DeleteMapping("/{messageId}")
-    public ResponseEntity<ApiResponse> deleteMessageHandler(@PathVariable Integer messageId, @RequestHeader("Authorization") String token) throws UserException, ChatException, MessageException {
+    public ResponseEntity<ApiResponse> deleteMessageHandler(@PathVariable Integer messageId, @RequestHeader("Authorization") String token) throws UserException, MessageException {
         User user = userService.findUserProfileByJwt(token);
 
         chatMessageService.deleteChatMessageById(messageId, user);
