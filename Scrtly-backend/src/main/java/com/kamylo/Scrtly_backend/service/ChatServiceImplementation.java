@@ -59,7 +59,7 @@ public class ChatServiceImplementation implements ChatService {
     }
 
     @Override
-    public void deleteChat(Integer chatId, Integer userId) throws UserException, ChatException {
+    public void deleteChat(Integer chatId, Long userId) throws UserException, ChatException {
         Optional<ChatRoom> chatRoom = chatRepository.findById(chatId);
         if (chatRoom.isPresent()) {
             ChatRoom chatRoomToDelete = chatRoom.get();

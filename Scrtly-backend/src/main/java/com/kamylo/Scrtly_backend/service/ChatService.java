@@ -12,6 +12,6 @@ public interface ChatService {
 
     public ChatRoom findChatById(Integer chatId) throws ChatException;
     public List<ChatRoom> findAllChatByUserId(Long userId) throws UserException;
-    public void deleteChat (Integer chatId, Integer userId) throws UserException, ChatException;
+    public void deleteChat (Integer chatId, Long userId) throws UserException, ChatException;
 
 }

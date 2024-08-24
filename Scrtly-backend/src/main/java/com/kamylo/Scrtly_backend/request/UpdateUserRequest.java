@@ -1,5 +1,10 @@
 package com.kamylo.Scrtly_backend.request;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class UpdateUserRequest {
     private String fullName;
     private String profilePicture;
@@ -9,19 +14,4 @@ public class UpdateUserRequest {
         this.profilePicture = profilePicture;
     }
 
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public String getProfilePicture() {
-        return profilePicture;
-    }
-
-    public void setProfilePicture(String profilePicture) {
-        this.profilePicture = profilePicture;
-    }
 }
