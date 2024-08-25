@@ -23,7 +23,7 @@ export const createChat = (chatData) => async (dispatch) => {
 export const getUsersChat = (chatData) => async (dispatch) => {
     try {
         const res = await fetch(`${BASE_API_URL}/api/chats/user`, {
-            method: "POST",
+            method: "GET",
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${chatData.token}`
