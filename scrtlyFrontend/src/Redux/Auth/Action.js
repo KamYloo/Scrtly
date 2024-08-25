@@ -1,5 +1,5 @@
 import { BASE_API_URL } from "../../config/api"
-import { REGISTER, LOGIN, REQUEST_USER, SEARCH_USER, UPDATE_USER } from "./ActionType"
+import {REGISTER, LOGIN, REQUEST_USER, SEARCH_USER, UPDATE_USER, LOGOUT} from "./ActionType"
 
 export const register = (data) => async (dispatch) => {
     try {
@@ -12,6 +12,7 @@ export const register = (data) => async (dispatch) => {
         })
 
         const resData = await res.json()
+        if (resData.jwt)localStorage.setItem("token", res.data.jwt)
         console.log("register ", resData)
         dispatch({ type: REGISTER, payload: resData })
     } catch (error) {
@@ -32,6 +33,7 @@ export const login = (data) => async (dispatch) => {
 
         const resData = await res.json()
         console.log("login ", resData)
+        if (resData.jwt)localStorage.setItem("token", resData.jwt)
         dispatch({ type: LOGIN, payload: resData })
     } catch (error) {
         console.log("catch error ", error)
@@ -40,7 +42,7 @@ export const login = (data) => async (dispatch) => {
 
 export const currentUser = (token) => async (dispatch) => {
     try {
-        const res = await fetch(`${BASE_API_URL}/users/profile`, {
+        const res = await fetch(`${BASE_API_URL}/api/users/profile`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -49,7 +51,7 @@ export const currentUser = (token) => async (dispatch) => {
         })
 
         const resData = await res.json()
-        console.log("usersProfile ", resData)
+        // console.log("usersProfile ", resData)
         dispatch({ type: REQUEST_USER, payload: resData })
     } catch (error) {
         console.log("catch error ", error)
@@ -58,7 +60,7 @@ export const currentUser = (token) => async (dispatch) => {
 
 export const searchUser = (data) => async (dispatch) => {
     try {
-        const res = await fetch(`${BASE_API_URL}/users/search?name=${data.keyword}`, {
+        const res = await fetch(`${BASE_API_URL}/api/users/search?name=${data.keyword}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -76,7 +78,7 @@ export const searchUser = (data) => async (dispatch) => {
 
 export const updateUser = (data) => async (dispatch) => {
     try {
-        const res = await fetch(`${BASE_API_URL}/users/update=${data.id}`, {
+        const res = await fetch(`${BASE_API_URL}/api/users/update=${data.id}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -90,4 +92,10 @@ export const updateUser = (data) => async (dispatch) => {
     } catch (error) {
         console.log("catch error ", error)
     }
+}
+
+export const logoutAction = () => async (dispatch) => {
+    localStorage.removeItem("token")
+    dispatch({ type: LOGOUT, payload: null})
+    dispatch({ type: REQUEST_USER, payload: null})
 }

@@ -1,29 +1,18 @@
 import React, { useEffect, useState } from 'react'
-import axios from 'axios';
 import "../../Styles/Profile.css"
 import { IoIosSettings } from "react-icons/io";
+import {currentUser} from "../../Redux/Auth/Action.js";
+import {useDispatch, useSelector} from "react-redux";
 
 function ProfileInfo() {
-    const [user, setUser] = useState({ fullName: '', email: '' });
+    const dispatch = useDispatch();
+
+    const {auth} = useSelector(store => store)
+    const token = localStorage.getItem('token')
 
     useEffect(() => {
-
-        const token = localStorage.getItem('jwtToken')
-
-        if (token) {
-            axios.get('http://localhost:8080/api/users/profile', {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            })
-                .then(response => {
-                    setUser(response.data);
-                })
-                .catch(error => {
-                    console.error("Error fetching user info:", error);
-                });
-        }
-    }, []);
+        if (token)dispatch(currentUser(token))
+    }, [dispatch, token])
 
     return (
         <div className='profileInfo'>
@@ -31,7 +20,7 @@ function ProfileInfo() {
                 <img src="" alt="" />
                 <div className="right">
                     <div className="top">
-                        <p>{user.fullName || 'Name Surname'}</p>
+                        <p>{auth.reqUser?.fullName || 'Name Surname'}</p>
                         <button>Edit Profile</button>
                         <i><IoIosSettings /></i>
                     </div>

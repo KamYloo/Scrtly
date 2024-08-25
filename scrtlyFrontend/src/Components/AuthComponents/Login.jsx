@@ -1,39 +1,40 @@
-import React, { useState } from 'react'
-import axios from 'axios'
+import React, {useEffect, useState} from 'react'
 import logo from '../../img/logo.png'
 import { FaUser, FaLock } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
 import '../../Styles/Login&Register.css'
 import { Link, useNavigate } from 'react-router-dom'
+import {currentUser, login} from "../../Redux/Auth/Action.js";
+import {useDispatch, useSelector} from "react-redux";
 
-function Login({ setFullName }) {
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    const [error, setError] = useState('')
+function Login() {
+    const [inputData, setInputData] = useState({email: "", password: ""})
+    const dispatch = useDispatch();
     const navigate = useNavigate()
+
+    const {auth} = useSelector(store => store)
+    const token = localStorage.getItem('token')
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setInputData((values)=>({...values, [name]: value}))
+    }
 
     const handleLogin = async (e) => {
         e.preventDefault()
-        try {
-            if (!email || !password) {
-                setError('Please enter both username and password.')
-                return
-            }
+        e.preventDefault()
+        dispatch(login(inputData))
+    }
 
-            const response = await axios.post('http://localhost:8080/auth/login', { email, password })
-            console.log('Login successful:', response.data)
+    useEffect(() => {
+        if (token)dispatch(currentUser(token))
+    }, [dispatch, token])
 
-            if (response.data.jwt) {
-                localStorage.setItem('jwtToken', response.data.jwt); // Zapisz token JWT
-                navigate('/home');
-            } else {
-                console.error('JWT not found in response');
-            }
-        } catch (error) {
-            console.error('Login failed:', error.response ? error.response.data : error.message)
-            setError('Invalid username or password.')
+    useEffect(() => {
+        if(auth.reqUser?.fullName) {
+            navigate("/home")
         }
-    };
+    }, [auth.reqUser, navigate])
 
     return (
         <div className='login'>
@@ -45,17 +46,16 @@ function Login({ setFullName }) {
                         <h1>Login</h1>
                     </div>
                     <div className="inputBox">
-                        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder='Email address' required />
+                        <input type="email" name="email" value={inputData.email} onChange={(e) => handleChange(e)} placeholder='Email address' required />
                         <FaUser className='icon' />
                     </div>
                     <div className="inputBox">
-                        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder='Password' required />
+                        <input type="password" name="password" value={inputData.password} onChange={(e) => handleChange(e)} placeholder='Password' required />
                         <FaLock className='icon' />
                     </div>
-                    {error && <p className="error">{error}</p>}
                     <button type='submit'>Login</button>
                     <div className="registerLink">
-                        <p>Don't have an account? <Link to="/register">Register</Link></p>
+                        <p>Don t have an account? <Link to="/register">Register</Link></p>
                     </div>
                 </form>
             </div>

@@ -2,21 +2,26 @@ import React, {useState, useEffect} from 'react'
 import { useNavigate } from 'react-router-dom';
 import '../Styles/RightMenu.css'
 import { FaBell, FaCogs, FaCrown, FaRegHeart, FaSun } from 'react-icons/fa'
+import {useDispatch} from "react-redux";
+import {logoutAction} from "../Redux/Auth/Action.js";
 
 
 function RightMenu() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+
+  const dispatch = useDispatch()
   const navigate = useNavigate()
 
+
   useEffect(() => {
-    const token = localStorage.getItem('jwtToken')
+    const token = localStorage.getItem('token')
     setIsLoggedIn(!!token) // Ustawienie stanu na podstawie obecności tokenu
   }, [])
 
   const handleLogout = () => {
-    localStorage.removeItem('jwtToken')
-    setIsLoggedIn(false) 
-    navigate('/login') 
+    dispatch(logoutAction())
+    setIsLoggedIn(false)
+    navigate('/login')
   }
 
   const handleProfileClick = () => {

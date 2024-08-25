@@ -1,36 +1,26 @@
 import React, { useEffect, useState } from 'react'
 import { FaUserEdit, FaEllipsisH, FaAngleRight } from "react-icons/fa";
 import { BsCameraVideoFill } from "react-icons/bs";
-import axios from 'axios';
+import {useDispatch, useSelector} from "react-redux";
+import {currentUser} from "../../Redux/Auth/Action.js";
 
+// eslint-disable-next-line react/prop-types
 function UserInfo({ toggleChatListView }) {
-    const [user, setUser] = useState({ fullName: '', email: '' });
+    const dispatch = useDispatch();
+
+    const {auth} = useSelector(store => store)
+    const token = localStorage.getItem('token')
 
     useEffect(() => {
-
-        const token = localStorage.getItem('jwtToken')
-
-        if (token) {
-            axios.get('http://localhost:8080/api/users/profile', {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            })
-                .then(response => {
-                    setUser(response.data);
-                })
-                .catch(error => {
-                    console.error("Error fetching user info:", error);
-                });
-        }
-    }, []);
+        if (token)dispatch(currentUser(token))
+    }, [dispatch, token])
 
     return (
         <div className='userInfo'>
             <i className='chatListBtn' onClick={toggleChatListView}><FaAngleRight /></i>
             <div className="user">
                 <img src="#" alt="" />
-                <h2>{user.fullName || 'Name Surname'}</h2>
+                <h2>{auth.reqUser?.fullName || 'Name Surname'}</h2>
             </div>
             <div className="icons">
                 <i><FaEllipsisH /></i>
