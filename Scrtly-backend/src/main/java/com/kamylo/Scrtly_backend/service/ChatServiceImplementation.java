@@ -26,8 +26,9 @@ public class ChatServiceImplementation implements ChatService {
     @Override
     public ChatRoom createChat(User reqUser, Long userId2) throws UserException {
         User user = userService.findUserById(userId2);
-        ChatRoom isChatExist = chatRepository.findSingleChatRoomById(user, reqUser);
+        ChatRoom isChatExist = chatRepository.findSingleChatRoomById(reqUser, user);
 
+        System.out.println(isChatExist);
         if (isChatExist != null) {
             return isChatExist;
         }
@@ -36,7 +37,7 @@ public class ChatServiceImplementation implements ChatService {
         chatRoom.setFirstPerson(reqUser);
         chatRoom.setSecondPerson(user);
 
-        return chatRoom;
+        return chatRepository.save(chatRoom);
     }
 
     @Override

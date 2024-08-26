@@ -2,7 +2,7 @@ import {CREATE_CHAT, GET_USERS_CHAT} from "./ActionType.js";
 
 const initialValues = {
     chats:[],
-    createdChat:null
+    createdChat:null,
 }
 
 export const chatReducer = (store=initialValues,{type,payload}) => {

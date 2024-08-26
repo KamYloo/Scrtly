@@ -12,7 +12,7 @@ export const register = (data) => async (dispatch) => {
         })
 
         const resData = await res.json()
-        if (resData.jwt)localStorage.setItem("token", res.data.jwt)
+        if (resData.jwt)localStorage.setItem("token", resData.jwt)
         console.log("register ", resData)
         dispatch({ type: REGISTER, payload: resData })
     } catch (error) {
@@ -70,7 +70,11 @@ export const searchUser = (data) => async (dispatch) => {
 
         const resData = await res.json()
         console.log("searchUser ", resData)
-        dispatch({ type: SEARCH_USER, payload: resData })
+        if (res.ok) {
+            dispatch({ type: SEARCH_USER, payload: resData });
+        } else {
+            console.error("API returned an error:", resData);
+        }
     } catch (error) {
         console.log("catch error ", error)
     }

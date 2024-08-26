@@ -3,6 +3,8 @@ import {LOGIN, REGISTER, REQUEST_USER, SEARCH_USER, UPDATE_USER} from "./ActionT
 const initialValue= {
     login:null,
     register:null,
+    reqUser:null,
+    searchResults:null,
 }
 
 export const authReducer=(store=initialValue, {type,payload})=>{
@@ -19,7 +21,7 @@ export const authReducer=(store=initialValue, {type,payload})=>{
         return {...store, updatedUser: payload}
     }
     else if (type === SEARCH_USER) {
-        return {...store, searchUser: payload}
+        return {...store, searchResults: payload}
     }
     return store
 }

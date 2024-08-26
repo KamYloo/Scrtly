@@ -1,19 +1,56 @@
-import React from 'react'
+import React, {useEffect, useState} from 'react'
+import {useDispatch, useSelector} from "react-redux";
+import {currentUser, searchUser} from "../../Redux/Auth/Action.js";
+import {createChat} from "../../Redux/Chat/Action.js";
 
 function AddUser() {
+    const [keyword, setKeyword] = useState('');
+    const dispatch = useDispatch();
+
+    const { auth } = useSelector(store => store);
+    const token = localStorage.getItem('token')
+
+    useEffect(() => {
+        if (token)dispatch(currentUser(token))
+    }, [dispatch, token])
+
+
+    const handleSearch = async (e) => {
+        e.preventDefault();
+        console.log(keyword);
+        if (keyword.trim() !== '') {
+            dispatch(searchUser({ keyword, token }));
+        }
+    }
+
+    const handleCreateChat = (user) => {
+        console.log(user);
+        dispatch(createChat({token, data: user}));
+    }
+
+
     return (
         <div className='addUser'>
-            <form>
-                <input type="text" placeholder='Username...' name='userName' />
+            <form onSubmit={handleSearch}>
+                <input type="text" placeholder='Username...' onChange={(e) => setKeyword(e.target.value)}/>
                 <button>Search</button>
             </form>
-            <div className="user">
-                <div className="detail">
-                    <img src="#" alt="" />
-                    <span>Name Surname</span>
+            {auth.searchResults && auth.searchResults.length > 0 ? (
+                <div className="userList">
+                    {auth.searchResults.map((user) => (
+                        <div className="user" key={user.id}>
+                            <div className="detail">
+                                <img src='#' alt="" />
+                                <span>{user.fullName}</span>
+                            </div>
+                            <button onClick={() => handleCreateChat(user.id)}>Add User</button>
+                        </div>
+                    ))}
                 </div>
-                <button>Add User</button>
-            </div>
+            ) : (
+                <p>No users found</p> // Informacja, gdy nie ma wyników
+            )}
+
         </div>
     )
 }
