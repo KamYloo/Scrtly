@@ -2,18 +2,27 @@ import React, { useEffect, useRef, useState } from 'react'
 import EmojiPicker from 'emoji-picker-react'
 import { FaPhoneAlt, FaInfoCircle, FaImage, FaCamera, FaMicrophone } from "react-icons/fa";
 import { BsCameraVideoFill, BsEmojiSmileFill } from "react-icons/bs";
+import {useDispatch} from "react-redux";
+import {createChatMessage} from "../../Redux/ChatMessage/Action.js";
 
 // eslint-disable-next-line react/prop-types
-function Chat({chat, auth}) {
+function Chat({chat, auth, token}) {
 
     const [open, setOpen] = useState(false)
     const [text, setText] = useState("")
 
     const endRef = useRef(null)
+    const dispatch = useDispatch();
 
     useEffect(() => {
         endRef.current?.scrollIntoView({ behaviour: "smooth" })
     })
+
+    const handleCreateNewMessage = () => {
+        console.log(chat.id)
+        dispatch(createChatMessage({token, data:{chatId: chat.id, message:text}}))
+        console.log("cretae new message")
+    }
 
     const handleEmoji = (e) => {
         setText((prev) => prev + e.emoji)
@@ -125,7 +134,13 @@ function Chat({chat, auth}) {
                     <i><FaCamera /></i>
                     <i><FaMicrophone /></i>
                 </div>
-                <input type="text" placeholder='Write message...' value={text} onChange={(e) => setText(e.target.value)} />
+                <input type="text" placeholder='Write message...' value={text} onChange={(e) => setText(e.target.value)}
+                       onKeyPress={(e)=> {
+                           if (e.key === 'Enter') {
+                               handleCreateNewMessage()
+                               setText("")
+                           }
+                }}/>
                 <div className="emoji">
                     <i onClick={() => setOpen((prev) => !prev)}><BsEmojiSmileFill /></i>
                     <div className="picker">

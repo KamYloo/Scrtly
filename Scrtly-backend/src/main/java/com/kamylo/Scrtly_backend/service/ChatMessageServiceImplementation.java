@@ -38,7 +38,7 @@ public class ChatMessageServiceImplementation implements ChatMessageService {
         chatMessage.setMessageText(request.getMessage());
         chatMessage.setTimestamp(LocalDateTime.now());
 
-        return chatMessage;
+        return chatMessageRepository.save(chatMessage);
     }
 
     @Override
