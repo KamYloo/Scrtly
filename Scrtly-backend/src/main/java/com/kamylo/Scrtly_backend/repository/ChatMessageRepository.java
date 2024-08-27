@@ -10,6 +10,5 @@ import java.util.List;
 
 @Repository
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Integer> {
-    @Query("select c from ChatMessage c join c.chat m where c.id=:chatId")
      List<ChatMessage> findByChatId(@Param("chatId") Integer chatId);
 }

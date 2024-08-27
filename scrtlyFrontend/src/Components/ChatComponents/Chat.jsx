@@ -2,14 +2,17 @@ import React, { useEffect, useRef, useState } from 'react'
 import EmojiPicker from 'emoji-picker-react'
 import { FaPhoneAlt, FaInfoCircle, FaImage, FaCamera, FaMicrophone } from "react-icons/fa";
 import { BsCameraVideoFill, BsEmojiSmileFill } from "react-icons/bs";
-import {useDispatch} from "react-redux";
-import {createChatMessage} from "../../Redux/ChatMessage/Action.js";
+import {useDispatch, useSelector} from "react-redux";
+import {createChatMessage, getAllMessages} from "../../Redux/ChatMessage/Action.js";
+import { formatDistanceToNow } from 'date-fns'
 
 // eslint-disable-next-line react/prop-types
 function Chat({chat, auth, token}) {
 
     const [open, setOpen] = useState(false)
     const [text, setText] = useState("")
+
+    const {chatMessage } = useSelector(store => store);
 
     const endRef = useRef(null)
     const dispatch = useDispatch();
@@ -18,11 +21,21 @@ function Chat({chat, auth, token}) {
         endRef.current?.scrollIntoView({ behaviour: "smooth" })
     })
 
+    useEffect(() => {
+        // eslint-disable-next-line react/prop-types
+        if(chat.id)
+            dispatch(getAllMessages({chatId:chat.id, token}))
+    }, [chat, chatMessage.newMessage]);
+
     const handleCreateNewMessage = () => {
-        console.log(chat.id)
+        // eslint-disable-next-line react/prop-types
         dispatch(createChatMessage({token, data:{chatId: chat.id, message:text}}))
-        console.log("cretae new message")
+        setText("")
     }
+
+    const formatTimeAgo = (timestamp) => {
+        return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
+    };
 
     const handleEmoji = (e) => {
         setText((prev) => prev + e.emoji)
@@ -30,6 +43,7 @@ function Chat({chat, auth, token}) {
     }
 
 
+    // eslint-disable-next-line react/prop-types
     const otherPerson = chat.firstPerson.id !== auth.reqUser.id ? chat.firstPerson : chat.secondPerson;
     return (
         <div className='chat'>
@@ -48,84 +62,16 @@ function Chat({chat, auth, token}) {
                 </div>
             </div>
             <div className="center">
-                <div className="message">
-                    <img src="#" alt="" />
-                    <div className="text">
-                        <p>How are you? fdhgafdgdafvdadraedrvdfvdafgdagdfbdafvvevadvcdagacvda</p>
-                        <span>34 min ago</span>
-                    </div>
-                </div>
-                <div className="messageOwn">
-                    <div className="text">
-                        <p>How are you? fdhgafdgdafvdadraedrvdfvdafgdagdfbdafvvevadvcdagacvda</p>
-                        <span>34 min ago</span>
-                    </div>
-                </div>
-                <div className="message">
-                    <img src="#" alt="" />
-                    <div className="text">
-                        <p>How are you? fdhgafdgdafvdadraedrvdfvdafgdagdfbdafvvevadvcdagacvda</p>
-                        <span>34 min ago</span>
-                    </div>
-                </div>
-                <div className="messageOwn">
-                    <div className="text">
-                        <p>How are you? fdhgafdgdafvdadraedrvdfvdafgdagdfbdafvvevadvcdagacvda</p>
-                        <span>34 min ago</span>
-                    </div>
-                </div>
-                <div className="message">
-                    <img src="#" alt="" />
-                    <div className="text">
-                        <p>How are you? fdhgafdgdafvdadraedrvdfvdafgdagdfbdafvvevadvcdagacvda</p>
-                        <span>34 min ago</span>
-                    </div>
-                </div>
-                <div className="messageOwn">
-                    <div className="text">
-                        <p>How are you? fdhgafdgdafvdadraedrvdfvdafgdagdfbdafvvevadvcdagacvda</p>
-                        <span>34 min ago</span>
-                    </div>
-                </div>
-                <div className="message">
-                    <img src="#" alt="" />
-                    <div className="text">
-                        <p>How are you? fdhgafdgdafvdadraedrvdfvdafgdagdfbdafvvevadvcdagacvda</p>
-                        <span>34 min ago</span>
-                    </div>
-                </div>
-                <div className="messageOwn">
-                    <div className="text">
-                        <p>How are you? fdhgafdgdafvdadraedrvdfvdafgdagdfbdafvvevadvcdagacvda</p>
-                        <span>34 min ago</span>
-                    </div>
-                </div>
-                <div className="message">
-                    <img src="#" alt="" />
-                    <div className="text">
-                        <p>How are you? fdhgafdgdafvdadraedrvdfvdafgdagdfbdafvvevadvcdagacvda</p>
-                        <span>34 min ago</span>
-                    </div>
-                </div>
-                <div className="messageOwn">
-                    <div className="text">
-                        <p>How are you? fdhgafdgdafvdadraedrvdfvdafgdagdfbdafvvevadvcdagacvda</p>
-                        <span>34 min ago</span>
-                    </div>
-                </div>
-                <div className="message">
-                    <img src="#" alt="" />
-                    <div className="text">
-                        <p>How are you? fdhgafdgdafvdadraedrvdfvdafgdagdfbdafvvevadvcdagacvda</p>
-                        <span>34 min ago</span>
-                    </div>
-                </div>
-                <div className="messageOwn">
-                    <div className="text">
-                        <p>How are you? fdhgafdgdafvdadraedrvdfvdafgdagdfbdafvvevadvcdagacvda</p>
-                        <span>34 min ago</span>
-                    </div>
-                </div>
+                { chatMessage.messages?.map((item) => (
+                    <div className={item.user.id === auth.reqUser.id ? "messageOwn" : "message"} key={item.id}>
+                        <img src="#" alt=""/>
+                        <div className="text">
+                            <p>{item.messageText}</p>
+                            <span>{formatTimeAgo(item.timestamp)}</span>
+                        </div>
+                    </div>))}
+
+
                 <div ref={endRef}></div>
             </div>
             <div className="bottom">
@@ -136,10 +82,9 @@ function Chat({chat, auth, token}) {
                 </div>
                 <input type="text" placeholder='Write message...' value={text} onChange={(e) => setText(e.target.value)}
                        onKeyPress={(e)=> {
-                           if (e.key === 'Enter') {
+                           if (e.key === 'Enter')
                                handleCreateNewMessage()
-                               setText("")
-                           }
+
                 }}/>
                 <div className="emoji">
                     <i onClick={() => setOpen((prev) => !prev)}><BsEmojiSmileFill /></i>
@@ -147,7 +92,7 @@ function Chat({chat, auth, token}) {
                         <EmojiPicker open={open} onEmojiClick={handleEmoji} />
                     </div>
                 </div>
-                <button className='sendButton'>Send</button>
+                <button className='sendButton' onClick={handleCreateNewMessage}>Send</button>
             </div>
         </div>
     )
