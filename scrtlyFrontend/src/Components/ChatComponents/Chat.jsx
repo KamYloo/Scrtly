@@ -3,7 +3,8 @@ import EmojiPicker from 'emoji-picker-react'
 import { FaPhoneAlt, FaInfoCircle, FaImage, FaCamera, FaMicrophone } from "react-icons/fa";
 import { BsCameraVideoFill, BsEmojiSmileFill } from "react-icons/bs";
 
-function Chat() {
+// eslint-disable-next-line react/prop-types
+function Chat({chat, auth}) {
 
     const [open, setOpen] = useState(false)
     const [text, setText] = useState("")
@@ -19,13 +20,15 @@ function Chat() {
         setOpen(false)
     }
 
+
+    const otherPerson = chat.firstPerson.id !== auth.reqUser.id ? chat.firstPerson : chat.secondPerson;
     return (
         <div className='chat'>
             <div className="top">
                 <div className="user">
                     <img src="" alt="" />
                     <div className="userData">
-                        <span>Name Surname</span>
+                        <span>{otherPerson.fullName}</span>
                         <p>gdafhdatgheavoriufhafjhushgebviaevbdafiukfbllyvbaelidai</p>
                     </div>
                 </div>
