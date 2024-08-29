@@ -5,6 +5,7 @@ import { BsCameraVideoFill, BsEmojiSmileFill } from "react-icons/bs";
 import {useDispatch, useSelector} from "react-redux";
 import {createChatMessage, getAllMessages} from "../../Redux/ChatMessage/Action.js";
 import { formatDistanceToNow } from 'date-fns'
+import {BASE_API_URL} from "../../config/api.js";
 
 // eslint-disable-next-line react/prop-types
 function Chat({chat, auth, token}) {
@@ -49,10 +50,10 @@ function Chat({chat, auth, token}) {
         <div className='chat'>
             <div className="top">
                 <div className="user">
-                    <img src="" alt="" />
+                    <img src={`${BASE_API_URL}/${otherPerson?.profilePicture || ''}`} alt="" />
                     <div className="userData">
                         <span>{otherPerson.fullName}</span>
-                        <p>gdafhdatgheavoriufhafjhushgebviaevbdafiukfbllyvbaelidai</p>
+                        <p>{otherPerson?.description || ''}</p>
                     </div>
                 </div>
                 <div className="icons">

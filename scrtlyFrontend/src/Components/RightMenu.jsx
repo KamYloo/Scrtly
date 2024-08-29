@@ -4,9 +4,10 @@ import '../Styles/RightMenu.css'
 import { FaBell, FaCogs, FaCrown, FaRegHeart, FaSun } from 'react-icons/fa'
 import {useDispatch} from "react-redux";
 import {logoutAction} from "../Redux/Auth/Action.js";
+import {BASE_API_URL} from "../config/api.js";
 
 
-function RightMenu() {
+function RightMenu({auth, token}) {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
 
   const dispatch = useDispatch()
@@ -43,7 +44,7 @@ function RightMenu() {
         <i><FaSun /></i>
         <i><FaCogs /></i>
         <div className="profileImg" onClick={handleProfileClick}>
-          <img src="#" alt="" />
+          <img src={`${BASE_API_URL}/${auth.reqUser?.profilePicture || ''}`} alt="" />
         </div>
         {isLoggedIn ? (
           <p className='loginBtn' onClick={handleLogout}>Logout</p>  // Przycisk Logout

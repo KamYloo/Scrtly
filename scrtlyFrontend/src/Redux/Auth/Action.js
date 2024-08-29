@@ -82,12 +82,24 @@ export const searchUser = (data) => async (dispatch) => {
 
 export const updateUser = (data) => async (dispatch) => {
     try {
-        const res = await fetch(`${BASE_API_URL}/api/users/update=${data.id}`, {
-            method: "GET",
+        const formData = new FormData();
+        formData.append("fullName", data.data.fullName);
+        if (data.data.profilePicture) {
+            formData.append("profilePicture", data.data.profilePicture);
+        }else {
+
+            formData.append("profilePicture", null);
+        }
+        formData.append("description", data.data.description);
+
+        console.log(data.data.description)
+
+        const res = await fetch(`${BASE_API_URL}/api/users/update`, {
+            method: "PUT",
             headers: {
-                "Content-Type": "application/json",
                 Authorization: `Bearer ${data.token}`
             },
+            body: formData
         })
 
         const resData = await res.json()

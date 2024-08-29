@@ -11,12 +11,14 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.Arrays;
 import java.util.Collections;
 
 @Configuration
-public class ApplicationConfig {
+public class ApplicationConfig implements WebMvcConfigurer {
 
     @SuppressWarnings("deprecation")
     @Bean
@@ -49,6 +51,12 @@ public class ApplicationConfig {
             }
         };
 
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations("file:src/main/resources/static/uploads/");
     }
 
     @Bean

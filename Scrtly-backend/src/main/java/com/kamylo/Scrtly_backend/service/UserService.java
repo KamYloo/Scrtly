@@ -4,6 +4,7 @@ import com.kamylo.Scrtly_backend.exception.UserException;
 import com.kamylo.Scrtly_backend.model.User;
 import com.kamylo.Scrtly_backend.request.UpdateUserRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -17,7 +18,7 @@ public interface UserService {
 
      User findUserById(Long userId) throws UserException;
 
-     User updateUser(Long userId, UpdateUserRequest updateUserRequest) throws UserException;
+     User updateUser(Long userId, String fullName, String profilePicturePath, String description) throws UserException;
 
      List<User> searchUser(String query);
 

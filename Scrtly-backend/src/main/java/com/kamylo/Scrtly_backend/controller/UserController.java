@@ -9,7 +9,17 @@ import com.kamylo.Scrtly_backend.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/users")
@@ -41,9 +51,18 @@ public class UserController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ApiResponse> updateUserHandler(@RequestBody UpdateUserRequest request, @RequestHeader("Authorization") String token) throws UserException {
+    public ResponseEntity<ApiResponse> updateUserHandler( @RequestPart("fullName") String fullName,
+                                                          @RequestPart("profilePicture") MultipartFile profilePicture,
+                                                          @RequestPart("description") String description,
+                                                          @RequestHeader("Authorization") String token) throws UserException, IOException {
         User user = userService.findUserProfileByJwt(token);
-        userService.updateUser(user.getId(), request);
+
+        String fileName = UUID.randomUUID().toString() + "_" + profilePicture.getOriginalFilename();
+        Path filePath = Paths.get("src/main/resources/static/uploads").resolve(fileName);
+        Files.copy(profilePicture.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+        String relativePath = "uploads/" + fileName;
+        userService.updateUser(user.getId(), fullName, relativePath, description);
 
         ApiResponse res = new ApiResponse("user updated successfully", true);
         return new ResponseEntity<>(res, HttpStatus.ACCEPTED);

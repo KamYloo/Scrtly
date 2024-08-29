@@ -6,17 +6,15 @@ import {useDispatch, useSelector} from "react-redux";
 import {currentUser} from "../../Redux/Auth/Action.js";
 import {getUsersChat} from "../../Redux/Chat/Action.js";
 
-function ChatView() {
+function ChatView({token, auth}) {
     const [currentChat, setCurrentChat] = useState(null);
 
     const dispatch = useDispatch();
 
-    const { auth, chat, message } = useSelector(store => store);
-    const token = localStorage.getItem('token')
+    const { chat } = useSelector(store => store);
 
-    useEffect(() => {
-        if (token)dispatch(currentUser(token))
-    }, [dispatch, token])
+
+
 
     useEffect(() => {
         dispatch(getUsersChat({token}))

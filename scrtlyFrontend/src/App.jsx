@@ -1,6 +1,6 @@
 
 import './App.css'
-import React, { useState } from 'react'
+import React, {useEffect, useState} from 'react'
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { LeftMenu } from './Components/LeftMenu'
 import { Middle } from './Components/Middle'
@@ -9,8 +9,15 @@ import { ChatView } from './Components/ChatComponents/ChatView'
 import { Login } from './Components/AuthComponents/Login';
 import { Register } from './Components/AuthComponents/Register';
 import { Profile } from './Components/AuthComponents/Profile';
+import {ProfileEdit} from "./Components/AuthComponents/ProfileEdit.jsx";
+import {useDispatch, useSelector} from "react-redux";
+import {currentUser} from "./Redux/Auth/Action.js";
 
 function App() {
+  const dispatch = useDispatch();
+  const { auth } = useSelector(store => store);
+  const token = localStorage.getItem('token')
+
   const [volume, setVolume] = useState(0.5)
   const [currentTrack, setCurrentTrack] = useState({ songName: 'Default Song', artist: 'Default Artist' })
 
@@ -18,15 +25,18 @@ function App() {
     setCurrentTrack({ songName, artist })
   }
 
+  useEffect(() => {
+    if (token)dispatch(currentUser(token))
+  }, [dispatch, token])
 
   const renderLayout = (Component, props) => {
-    const { setVolume, currentTrack, volume, handleTrackChange } = props
+    const { setVolume, currentTrack, volume, handleTrackChange, auth, token} = props
 
     return (
       <div className='App'>
         <LeftMenu onVolumeChange={setVolume} currentTrack={currentTrack} />
-        <Component volume={volume} onTrackChange={handleTrackChange} />
-        <RightMenu />
+        <Component volume={volume} onTrackChange={handleTrackChange} auth={auth} token={token} />
+        <RightMenu auth={auth} token={token} />
         <div className="background"></div>
       </div>
     )
@@ -49,11 +59,11 @@ function App() {
         } />
 
         <Route path="/home" element={
-          renderLayout(Middle, { setVolume, currentTrack, volume, handleTrackChange })
+          renderLayout(Middle, { setVolume, currentTrack, volume, handleTrackChange,auth,token })
         } />
 
         <Route path="/chat" element={
-          renderLayout(ChatView, { setVolume, currentTrack })
+          renderLayout(ChatView, { setVolume, currentTrack , auth, token})
         } />
 
         <Route path="/artists" element={
@@ -61,9 +71,12 @@ function App() {
         } />
 
         <Route path="/profile" element={
-          renderLayout(Profile, { setVolume, currentTrack })
+          renderLayout(Profile, { setVolume, currentTrack, auth, token})
         } />
 
+        <Route path="/profile/edit" element={
+          renderLayout(ProfileEdit, { setVolume, currentTrack, auth, token })
+        } />
 
         {/* Default Route */}
         <Route path="/" element={<Navigate to="/home" />} />

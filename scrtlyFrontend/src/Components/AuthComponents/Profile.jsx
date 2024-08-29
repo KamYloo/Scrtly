@@ -2,10 +2,10 @@ import React from 'react'
 import "../../Styles/Profile.css"
 import { ProfileInfo } from './ProfileInfo'
 
-function Profile() {
+function Profile({auth, token}) {
     return (
         <div className='profileSite'>
-            <ProfileInfo />
+            <ProfileInfo auth={auth} token={token} />
             <hr />
             <div className="posts">
                 <div className="post">

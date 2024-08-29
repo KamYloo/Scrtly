@@ -7,8 +7,11 @@ import com.kamylo.Scrtly_backend.model.User;
 import com.kamylo.Scrtly_backend.request.UpdateUserRequest;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,16 +60,22 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public User updateUser(Long userId, UpdateUserRequest updateUserRequest) throws UserException {
+    public User updateUser(Long userId, String fullName, String profilePicturePath, String decription) throws UserException {
         User user = findUserById(userId);
 
-        if (updateUserRequest.getFullName() != null) {
-            user.setFullName(updateUserRequest.getFullName());
-        }
-        if (updateUserRequest.getProfilePicture() != null) {
-            user.setProfilePicture(updateUserRequest.getProfilePicture());
+        String currentProfilePicture = user.getProfilePicture();
+
+        if (currentProfilePicture != null && !currentProfilePicture.isEmpty()) {
+            Path oldFilePath = Paths.get("src/main/resources/static").resolve(currentProfilePicture);
+            File oldFile = oldFilePath.toFile();
+            if (oldFile.exists()) {
+                oldFile.delete();
+            }
         }
 
+        user.setFullName(fullName);
+        user.setProfilePicture(profilePicturePath);
+        user.setDescription(decription);
         return userRepository.save(user);
     }
 

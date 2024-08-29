@@ -5,6 +5,7 @@ const initialValue= {
     register:null,
     reqUser:null,
     searchResults:null,
+    updateUser:null,
 }
 
 export const authReducer=(store=initialValue, {type,payload})=>{
@@ -18,7 +19,7 @@ export const authReducer=(store=initialValue, {type,payload})=>{
         return {...store, reqUser: payload}
     }
     else if (type === UPDATE_USER) {
-        return {...store, updatedUser: payload}
+        return {...store, reqUser: payload}
     }
     else if (type === SEARCH_USER) {
         return {...store, searchResults: payload}

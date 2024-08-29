@@ -3,6 +3,7 @@ import { RiUserSearchFill } from "react-icons/ri";
 import { BsPlus } from "react-icons/bs";
 import { FaMinus } from "react-icons/fa";
 import { AddUser } from './AddUser';
+import {BASE_API_URL} from "../../config/api.js";
 
 // eslint-disable-next-line react/prop-types
 function ChatUsersList({chat, auth, onChatSelect }) {
@@ -40,7 +41,7 @@ function ChatUsersList({chat, auth, onChatSelect }) {
 
                         return (
                             <div className="userItem" key={chatItem.id} onClick={()=> onChatSelect(chatItem)}>
-                                <img src="#" alt=""/>
+                                <img src={`${BASE_API_URL}/${otherPerson?.profilePicture || ''}`} alt=""/>
                                 <div className="text">
                                     <span>{otherPerson.fullName}</span>
                                     <p>afdsafdsgad</p>
