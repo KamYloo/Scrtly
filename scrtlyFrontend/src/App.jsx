@@ -1,6 +1,6 @@
 
 import './App.css'
-import React, {useEffect, useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { LeftMenu } from './Components/LeftMenu'
 import { Middle } from './Components/Middle'
@@ -9,9 +9,11 @@ import { ChatView } from './Components/ChatComponents/ChatView'
 import { Login } from './Components/AuthComponents/Login';
 import { Register } from './Components/AuthComponents/Register';
 import { Profile } from './Components/AuthComponents/Profile';
-import {ProfileEdit} from "./Components/AuthComponents/ProfileEdit.jsx";
-import {useDispatch, useSelector} from "react-redux";
-import {currentUser} from "./Redux/Auth/Action.js";
+import { Artists } from './Components/Artists/Artists.jsx'
+import { Discover } from './Components/DiscoverComponents/Discover.jsx'
+import { ProfileEdit } from "./Components/AuthComponents/ProfileEdit.jsx";
+import { useDispatch, useSelector } from "react-redux";
+import { currentUser } from "./Redux/Auth/Action.js";
 
 function App() {
   const dispatch = useDispatch();
@@ -26,11 +28,11 @@ function App() {
   }
 
   useEffect(() => {
-    if (token)dispatch(currentUser(token))
+    if (token) dispatch(currentUser(token))
   }, [dispatch, token])
 
   const renderLayout = (Component, props) => {
-    const { setVolume, currentTrack, volume, handleTrackChange, auth, token} = props
+    const { setVolume, currentTrack, volume, handleTrackChange, auth, token } = props
 
     return (
       <div className='App'>
@@ -59,19 +61,23 @@ function App() {
         } />
 
         <Route path="/home" element={
-          renderLayout(Middle, { setVolume, currentTrack, volume, handleTrackChange,auth,token })
+          renderLayout(Middle, { setVolume, currentTrack, volume, handleTrackChange, auth, token })
         } />
 
         <Route path="/chat" element={
-          renderLayout(ChatView, { setVolume, currentTrack , auth, token})
+          renderLayout(ChatView, { setVolume, currentTrack, auth, token })
         } />
 
         <Route path="/artists" element={
-          renderLayout(() => <div>Artists Content</div>, { setVolume, currentTrack })
+          renderLayout(Artists, { setVolume, currentTrack, auth, token })
+        } />
+
+        <Route path="/discover" element={
+          renderLayout(Discover, { setVolume, currentTrack, auth, token })
         } />
 
         <Route path="/profile" element={
-          renderLayout(Profile, { setVolume, currentTrack, auth, token})
+          renderLayout(Profile, { setVolume, currentTrack, auth, token })
         } />
 
         <Route path="/profile/edit" element={

@@ -1,0 +1,175 @@
+.artistsView {
+    height: 100vh;
+    width: 100vh;
+    z-index: 1;
+    flex-grow: 1;
+    background: rgba(7, 7, 7, 0.575);
+    backdrop-filter: blur(3px);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+
+    .banner {
+        height: 26vh;
+        position: relative;
+
+        img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(100);
+        }
+
+        .bottom {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 5rem;
+            background-image: linear-gradient(transparent, rgb(0, 0, 0));
+        }
+    }
+
+    .searchBox {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 30px;
+        margin-top: 3vh;
+        height: 6vh;
+        margin-bottom: 3vh;
+
+        .search {
+            width: 20%;
+            height: 45px;
+            position: relative;
+            color: aliceblue;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.384);
+
+            input {
+                width: 100%;
+                height: 100%;
+                outline: none;
+                border: none;
+                background: rgba(255, 255, 255, 0.63);
+                padding-left: 45px;
+                color: black;
+                font-size: 14px;
+                font-weight: bold;
+
+            }
+
+            .searchIcon {
+                position: absolute;
+                color: aliceblue;
+                top: 0;
+                left: 0;
+                width: 45px;
+                height: 45px;
+                text-align: center;
+                line-height: 45px;
+                font-size: 20px;
+            }
+        }
+
+        button {
+            outline: none;
+            border: none;
+            padding: 10px 15px;
+            background: aqua;
+            color: black;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+    }
+
+    .artists {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        width: 100%;
+        height: 62vh;
+        padding: 5vh;
+        gap: 5vh;
+        overflow: scroll;
+
+        .artist {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            align-items: center;
+            height: 25vh;
+            width: 25vh;
+            border: 2px solid rgba(255, 255, 255, 0.452);
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.466);
+            cursor: pointer;
+            transition: 0.3s;
+
+            .imgPic {
+                position: relative;
+                width: 80%;
+                height: 18vh;
+
+                img {
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(5, 5, 5, 0.507);
+                    object-fit: cover;
+                    border-radius: 10px;
+                }
+
+                .check {
+                    height: 4vh;
+                    width: 4vh;
+                    position: absolute;
+                    right: 1vh;
+                    bottom: 1vh;
+                }
+            }
+
+            p {
+                text-align: center;
+                width: 100%;
+                height: 3vh;
+                font-size: 28px;
+                font-weight: bold;
+                font-family: 'Times New Roman', Times, serif;
+                color: white;
+                padding: 0.5vh 0 0 0;
+            }
+        }
+
+        .artist:hover {
+            box-shadow: rgba(191, 191, 231, 0.651) 0px 13px 27px -5px,
+            rgba(0, 0, 0, 0.514) 0px 8px 16px -8px;
+            background: rgba(0, 255, 255, 0.801);
+            border: 2px solid black;
+            
+            p {
+                color: black;
+            }
+
+            
+        }
+    }
+}
+
+@media screen and (max-width: 550px) {
+    .artistsView {
+        .searchBox {
+            .search {
+                width: 60%;
+            }
+        }
+    }
+
+}
