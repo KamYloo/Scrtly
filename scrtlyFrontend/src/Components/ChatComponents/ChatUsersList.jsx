@@ -11,9 +11,9 @@ function ChatUsersList({chat, auth, onChatSelect }) {
     const [searchQuery, setSearchQuery] = useState('');
 
     // eslint-disable-next-line react/prop-types
-    const filteredChats = chat.chats.filter(chatItem => {
+    const filteredChats = chat?.chats?.filter(chatItem => {
         // eslint-disable-next-line react/prop-types
-        const isUserFirstPerson = chatItem.firstPerson.id === auth.reqUser.id
+        const isUserFirstPerson = chatItem?.firstPerson.id === auth?.reqUser.id
         const otherPerson = isUserFirstPerson ? chatItem.secondPerson : chatItem.firstPerson
 
         return otherPerson.fullName.toLowerCase().includes(searchQuery.toLowerCase())
@@ -36,8 +36,8 @@ function ChatUsersList({chat, auth, onChatSelect }) {
                 {filteredChats.length > 0 ? (
                     filteredChats.map((chatItem) => {
                         // eslint-disable-next-line react/prop-types
-                        const isUserFirstPerson = chatItem.firstPerson.id === auth.reqUser.id
-                        const otherPerson = isUserFirstPerson ? chatItem.secondPerson : chatItem.firstPerson
+                        const isUserFirstPerson = chatItem?.firstPerson.id === auth?.reqUser.id
+                        const otherPerson = isUserFirstPerson ? chatItem?.secondPerson : chatItem?.firstPerson
 
                         return (
                             <div className="userItem" key={chatItem.id} onClick={()=> onChatSelect(chatItem)}>
