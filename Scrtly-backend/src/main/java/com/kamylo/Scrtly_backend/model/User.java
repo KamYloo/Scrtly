@@ -1,16 +1,15 @@
 package com.kamylo.Scrtly_backend.model;
 
-import java.util.Objects;
+import java.util.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
-@Setter
-@Getter
+
 @Entity
 @Table(name = "users")
-@AllArgsConstructor
-@NoArgsConstructor
 @Data
 public class User {
 
@@ -24,6 +23,31 @@ public class User {
     private String description;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
+
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(
+            name = "user_followers",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "follower_id")
+    )
+    private Set<User> followers = new HashSet<User>();
+
+    @JsonIgnore
+    @ManyToMany(mappedBy = "followers")
+    private Set<User> followings = new HashSet<User>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Post> post = new ArrayList<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Like> likes = new ArrayList<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Story> stories = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {
