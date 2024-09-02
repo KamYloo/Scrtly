@@ -53,8 +53,8 @@ public class ChatServiceImplementation implements ChatService {
 
     @Override
     public List<ChatRoom> findAllChatByUserId(Long userId) throws UserException {
-        User user = userService.findUserById(userId);
-        return chatRepository.findChatRoomById(user.getId());
+
+        return chatRepository.findChatRoomById(userId);
     }
 
     @Override

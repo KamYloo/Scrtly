@@ -35,7 +35,7 @@ function ChatView() {
     return (
         <div className='chatView'>
             <ChatList chat={chat} auth={auth} onChatSelect={handleCurrentChatRoom}/>
-            {currentChat ? <Chat chat={currentChat} auth={auth} token={token}/> : <p>Select a chat to start messaging</p>
+            {currentChat ? <Chat chat={currentChat} auth={auth} token={token}/> : <p className='chatNone'>Select a chat to start messaging</p>
             }
         </div>
     )

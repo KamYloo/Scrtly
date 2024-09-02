@@ -6,9 +6,17 @@
     backdrop-filter: blur(3px);
     transition: all 0.3s ease;
     display: flex;
+
+    .chatNone {
+        flex: 3;
+        color: rgba(255, 255, 255, 0.651);
+        text-align: center;
+        margin-top: 10vh;
+        font-size: 30px;
+    }
 }
 
-.chatView .chat {
+.chatView .chat{
     flex: 3;
     border-left: 1px solid rgb(136, 136, 136);
     border-right: 1px solid rgb(136, 136, 136);
