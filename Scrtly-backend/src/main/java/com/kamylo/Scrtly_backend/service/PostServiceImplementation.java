@@ -56,6 +56,6 @@ public class PostServiceImplementation implements PostService {
 
     @Override
     public List<Post> getAllPosts() {
-        return postRepository.findAll();
+        return postRepository.findAllByOrderByCreationDateDesc();
     }
 }

@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -43,7 +44,6 @@ public class PostController {
 
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-            // Tworzenie obiektu SendPostRequest
             SendPostRequest sendPostRequest = new SendPostRequest();
             sendPostRequest.setDescription(description);
             sendPostRequest.setImage("/uploads/postImages/" + fileName);
@@ -55,5 +55,10 @@ public class PostController {
         } catch (IOException e) {
             throw new RuntimeException("Error saving image file.", e);
         }
+    }
+
+    @GetMapping("/getAll")
+    public ResponseEntity<List<Post>> getAllPosts() {
+        return new ResponseEntity<>(postService.getAllPosts(), HttpStatus.ACCEPTED);
     }
 }

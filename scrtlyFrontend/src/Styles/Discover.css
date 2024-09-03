@@ -242,6 +242,7 @@
                     background: rgb(59, 59, 65);
                     border-radius: 50%;
                     object-fit: cover;
+                    border: 2px solid aqua;
                 }
 
                 .userData {
