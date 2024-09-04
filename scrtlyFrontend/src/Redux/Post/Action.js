@@ -1,6 +1,12 @@
 
 import {BASE_API_URL} from "../../config/api.js";
-import {GET_ALL_POSTS_ERROR, GET_ALL_POSTS_REQUEST, POST_CREATE_REQUEST} from "./ActionType.js";
+import {
+    GET_ALL_POSTS_ERROR,
+    GET_ALL_POSTS_REQUEST,
+    POST_CREATE_REQUEST,
+    POST_DELETE_ERROR,
+    POST_DELETE_REQUEST
+} from "./ActionType.js";
 
 export const createPost = (formData) => async (dispatch) => {
 
@@ -23,12 +29,11 @@ export const createPost = (formData) => async (dispatch) => {
 
 export const getAllPosts = () => async (dispatch) => {
     try {
-        const token = localStorage.getItem('token');
         const response = await fetch(`${BASE_API_URL}/api/posts/getAll`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
             },
         });
 
@@ -38,5 +43,24 @@ export const getAllPosts = () => async (dispatch) => {
     } catch (error) {
         console.log('catch error', error);
         dispatch({ type: GET_ALL_POSTS_ERROR, payload: error.message });
+    }
+};
+
+export const deletePost = (postId) => async (dispatch) => {
+    try {
+        const response = await fetch(`${BASE_API_URL}/api/posts/delete/${postId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            },
+        });
+
+        const res = await response.json();
+        console.log("Deleted Post", res)
+        dispatch({ type: POST_DELETE_REQUEST, payload: res });
+    } catch (error) {
+        console.log('catch error', error);
+        dispatch({ type: POST_DELETE_ERROR, payload: error.message });
     }
 };

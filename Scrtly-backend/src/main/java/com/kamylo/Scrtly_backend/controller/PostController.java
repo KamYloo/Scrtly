@@ -1,8 +1,10 @@
 package com.kamylo.Scrtly_backend.controller;
 
+import com.kamylo.Scrtly_backend.exception.PostException;
 import com.kamylo.Scrtly_backend.exception.UserException;
 import com.kamylo.Scrtly_backend.model.Post;
 import com.kamylo.Scrtly_backend.model.User;
+import com.kamylo.Scrtly_backend.repository.PostRepository;
 import com.kamylo.Scrtly_backend.request.SendPostRequest;
 import com.kamylo.Scrtly_backend.response.ApiResponse;
 import com.kamylo.Scrtly_backend.service.PostService;
@@ -19,6 +21,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -26,6 +29,10 @@ import java.util.UUID;
 public class PostController {
     @Autowired
     private PostService postService;
+
+    @Autowired
+    private PostRepository postRepository;
+
     @Autowired
     private UserService userService;
 
@@ -60,5 +67,35 @@ public class PostController {
     @GetMapping("/getAll")
     public ResponseEntity<List<Post>> getAllPosts() {
         return new ResponseEntity<>(postService.getAllPosts(), HttpStatus.ACCEPTED);
+    }
+
+    @DeleteMapping("/delete/{postId}")
+    public ResponseEntity<ApiResponse> deletePost(@PathVariable Long postId, @RequestHeader("Authorization") String token) throws UserException, PostException {
+        User user = userService.findUserProfileByJwt(token);
+        ApiResponse res = new ApiResponse();
+        try {
+            Optional<Post> optionalPost = postRepository.findById(postId);
+            if (optionalPost.isEmpty()) {
+                throw new PostException("Post not found");
+            }
+
+            Post post = optionalPost.get();
+            postService.deletePost(postId, user.getId());
+
+            String imagePath = "src/main/resources/static" + post.getImage();
+            Path filePath = Paths.get(imagePath);
+            if (Files.exists(filePath)) {
+                Files.delete(filePath);
+            }
+
+            res.setMessage("Post and associated image deleted successfully");
+            return new ResponseEntity<>(res, HttpStatus.OK);
+        } catch (UserException | PostException e) {
+            res.setMessage(e.getMessage());
+            return new ResponseEntity<>(res, HttpStatus.FORBIDDEN);
+        } catch (IOException e) {
+            res.setMessage("Error deleting the image file.");
+            return new ResponseEntity<>(res, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

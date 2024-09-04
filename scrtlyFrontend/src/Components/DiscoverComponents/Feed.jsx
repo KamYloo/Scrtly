@@ -4,7 +4,7 @@ import { TfiCommentAlt } from "react-icons/tfi";
 import { FaEllipsisH } from "react-icons/fa";
 import { Post } from './Post';
 import {useDispatch, useSelector} from "react-redux";
-import {getAllPosts} from "../../Redux/Post/Action.js";
+import {deletePost, getAllPosts} from "../../Redux/Post/Action.js";
 import {BASE_API_URL} from "../../config/api.js";
 import { formatDistanceToNow } from 'date-fns'
 
@@ -20,8 +20,19 @@ function Feed() {
     setPostDetail((prev) => !prev);
   };
 
+  const handleMenuToggle = (postId) => {
+    setMenuPost((prev) => (prev === postId ? null : postId))
+  };
+
   const formatTimeAgo = (timestamp) => {
     return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
+  };
+
+  const handleDeletePost = (postId) => {
+    const confirmDelete = window.confirm('Are you sure you want to delete this post?');
+    if (confirmDelete) {
+      dispatch(deletePost(postId));
+    }
   };
 
   useEffect(() => {
@@ -52,15 +63,15 @@ function Feed() {
               <p>{item.user.fullName}</p>
               <span>{formatTimeAgo(item.creationDate)}</span>
             </div>
-            <i onClick={() => setMenuPost(((prev) => !prev))}><FaEllipsisH/></i>
-            {menuPost && <ul className="list">
+            <i  onClick={() => handleMenuToggle(item.id)}><FaEllipsisH/></i>
+            {menuPost === item.id && ( <ul className="list">
               <li className="option">
                 <span>Edit</span>
               </li>
-              <li className="option">
+              <li className="option" onClick={() => handleDeletePost(item.id)}>
                 <span>Delete</span>
               </li>
-            </ul>}
+            </ul>)}
           </div>
           <div className="middle">
             <img
