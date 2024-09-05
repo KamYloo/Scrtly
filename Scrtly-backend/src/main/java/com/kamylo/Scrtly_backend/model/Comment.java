@@ -24,7 +24,7 @@ public class Comment {
     private User user;
 
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL)
-    private Set<User> likes =  new HashSet<>();
+    private Set<Like> likes =  new HashSet<>();
 
     @PrePersist
     protected void onCreate() {

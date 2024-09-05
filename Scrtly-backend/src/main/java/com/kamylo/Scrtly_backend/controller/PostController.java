@@ -31,10 +31,13 @@ public class PostController {
     private PostService postService;
 
     @Autowired
+    private PostRepository postRepository;
+
+    @Autowired
     private UserService userService;
 
     @PostMapping("/create")
-    public ResponseEntity<ApiResponse> createPostHandler(@RequestParam("file") MultipartFile file,
+    public ResponseEntity<ApiResponse> createPost(@RequestParam("file") MultipartFile file,
                                                   @RequestParam("description") String description,
                                                   @RequestHeader("Authorization") String token) throws UserException {
         if (file.isEmpty()) {
@@ -62,21 +65,23 @@ public class PostController {
     }
 
     @GetMapping("/getAll")
-    public ResponseEntity<List<Post>> getAllPostsHandler() {
+    public ResponseEntity<List<Post>> getAllPosts() {
         return new ResponseEntity<>(postService.getAllPosts(), HttpStatus.ACCEPTED);
     }
 
     @DeleteMapping("/delete/{postId}")
-    public ResponseEntity<ApiResponse> deletePostHandler(@PathVariable Long postId, @RequestHeader("Authorization") String token) throws UserException, PostException {
+    public ResponseEntity<ApiResponse> deletePost(@PathVariable Long postId, @RequestHeader("Authorization") String token) throws UserException, PostException {
         User user = userService.findUserProfileByJwt(token);
         ApiResponse res = new ApiResponse();
         try {
-            Post post = postService.findPostById(postId);
-            if (post == null) {
+            Optional<Post> optionalPost = postRepository.findById(postId);
+            if (optionalPost.isEmpty()) {
                 throw new PostException("Post not found");
             }
 
+            Post post = optionalPost.get();
             postService.deletePost(postId, user.getId());
+
             String imagePath = "src/main/resources/static" + post.getImage();
             Path filePath = Paths.get(imagePath);
             if (Files.exists(filePath)) {

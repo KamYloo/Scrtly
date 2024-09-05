@@ -7,7 +7,6 @@ import com.kamylo.Scrtly_backend.model.User;
 import com.kamylo.Scrtly_backend.repository.PostRepository;
 import com.kamylo.Scrtly_backend.request.SendPostRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -22,9 +21,6 @@ public class PostServiceImplementation implements PostService {
 
     @Autowired
     private UserService userService;
-    @Qualifier("postService")
-    @Autowired
-    private PostService postService;
 
     @Override
     public Post createPost(SendPostRequest sendPostRequest) throws UserException {
@@ -45,19 +41,13 @@ public class PostServiceImplementation implements PostService {
 
     @Override
     public void deletePost(Long postId, Long userId) throws UserException, PostException {
-        Post post = postService.findPostById(postId);
+        Optional<Post> post = postRepository.findById(postId);
 
-        if (!userId.equals(post.getUser().getId())) {
+        if (!userId.equals(post.get().getUser().getId())) {
             throw new UserException("You can't delete another user's post");
         }
         postRepository.deleteById(postId);
     }
-
-    @Override
-    public Post findPostById(Long postId) throws PostException {
-        return postRepository.findById(postId).orElseThrow(() -> new PostException("Post not found with id: " + postId));
-    }
-
 
     @Override
     public List<Post> getAllPostsByUser(Long userId) throws UserException {

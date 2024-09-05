@@ -4,10 +4,12 @@ import com.kamylo.Scrtly_backend.exception.CommentException;
 import com.kamylo.Scrtly_backend.exception.PostException;
 import com.kamylo.Scrtly_backend.exception.UserException;
 import com.kamylo.Scrtly_backend.model.Comment;
+import com.kamylo.Scrtly_backend.model.Like;
 import com.kamylo.Scrtly_backend.model.Post;
 import com.kamylo.Scrtly_backend.model.User;
 import com.kamylo.Scrtly_backend.repository.CommentRepository;
 
+import com.kamylo.Scrtly_backend.repository.LikeRepository;
 import com.kamylo.Scrtly_backend.repository.PostRepository;
 import com.kamylo.Scrtly_backend.request.SendCommentRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CommentServiceImplementation implements CommentService{
@@ -27,18 +30,21 @@ public class CommentServiceImplementation implements CommentService{
     private UserService userService;
     @Autowired
     private PostRepository postRepository;
+    @Autowired
+    private LikeRepository likeRepository;
 
     @Override
     public Comment createComment(SendCommentRequest sendCommentRequest) throws UserException, PostException {
         User user = userService.findUserById(sendCommentRequest.getUser().getId());
-        Post post = postService.findPostById(sendCommentRequest.getPostId());
+        Optional<Post> post = postRepository.findById(sendCommentRequest.getPostId());
+
         Comment comment = new Comment();
         comment.setUser(user);
-        comment.setPost(post);
+        comment.setPost(post.get());
         comment.setComment(sendCommentRequest.getComment());
         Comment createdComment = commentRepository.save(comment);
-        post.getComments().add(createdComment);
-        postRepository.save(post);
+        post.get().getComments().add(createdComment);
+        postRepository.save(post.get());
         return createdComment;
     }
 
@@ -56,7 +62,11 @@ public class CommentServiceImplementation implements CommentService{
     public Comment likeComment(Long commentId, Long userId) throws CommentException, UserException {
        User user = userService.findUserById(userId);
        Comment comment = findCommentById(commentId);
-       comment.getLikes().add(user);
+        Like like = new Like();
+        like.setUser(user);
+        like.setComment(comment);
+        likeRepository.save(like);
+       comment.getLikes().add(like);
 
        return commentRepository.save(comment);
     }
@@ -65,7 +75,11 @@ public class CommentServiceImplementation implements CommentService{
     public Comment unLikeComment(Long commentId, Long userId) throws CommentException, UserException {
         User user = userService.findUserById(userId);
         Comment comment = findCommentById(commentId);
-        comment.getLikes().remove(user);
+        Like like = new Like();
+        like.setUser(user);
+        like.setComment(comment);
+        likeRepository.save(like);
+        comment.getLikes().remove(like);
 
         return commentRepository.save(comment);
     }
