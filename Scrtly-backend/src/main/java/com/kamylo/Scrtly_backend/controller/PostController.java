@@ -34,7 +34,7 @@ public class PostController {
     private UserService userService;
 
     @PostMapping("/create")
-    public ResponseEntity<ApiResponse> createPost(@RequestParam("file") MultipartFile file,
+    public ResponseEntity<ApiResponse> createPostHandler(@RequestParam("file") MultipartFile file,
                                                   @RequestParam("description") String description,
                                                   @RequestHeader("Authorization") String token) throws UserException {
         if (file.isEmpty()) {
@@ -62,12 +62,12 @@ public class PostController {
     }
 
     @GetMapping("/getAll")
-    public ResponseEntity<List<Post>> getAllPosts() {
+    public ResponseEntity<List<Post>> getAllPostsHandler() {
         return new ResponseEntity<>(postService.getAllPosts(), HttpStatus.ACCEPTED);
     }
 
     @DeleteMapping("/delete/{postId}")
-    public ResponseEntity<ApiResponse> deletePost(@PathVariable Long postId, @RequestHeader("Authorization") String token) throws UserException, PostException {
+    public ResponseEntity<ApiResponse> deletePostHandler(@PathVariable Long postId, @RequestHeader("Authorization") String token) throws UserException, PostException {
         User user = userService.findUserProfileByJwt(token);
         ApiResponse res = new ApiResponse();
         try {
