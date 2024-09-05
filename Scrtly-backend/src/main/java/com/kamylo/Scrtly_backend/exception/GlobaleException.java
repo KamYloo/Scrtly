@@ -26,8 +26,23 @@ public class GlobaleException {
         return new ResponseEntity<ErrorDetail>(errorDetail, HttpStatus.BAD_REQUEST);
     }
 
+
     @ExceptionHandler(ChatException.class)
     public ResponseEntity<ErrorDetail> ChatExceptionHandler(ChatException e, WebRequest req) {
+        ErrorDetail errorDetail = new ErrorDetail(e.getMessage(), req.getDescription(false), LocalDateTime.now());
+
+        return new ResponseEntity<ErrorDetail>(errorDetail, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(PostException.class)
+    public ResponseEntity<ErrorDetail> PostExceptionHandler(PostException e, WebRequest req) {
+        ErrorDetail errorDetail = new ErrorDetail(e.getMessage(), req.getDescription(false), LocalDateTime.now());
+
+        return new ResponseEntity<ErrorDetail>(errorDetail, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(CommentException.class)
+    public ResponseEntity<ErrorDetail> CommentExceptionHandler(ChatException e, WebRequest req) {
         ErrorDetail errorDetail = new ErrorDetail(e.getMessage(), req.getDescription(false), LocalDateTime.now());
 
         return new ResponseEntity<ErrorDetail>(errorDetail, HttpStatus.BAD_REQUEST);

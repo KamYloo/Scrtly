@@ -26,7 +26,6 @@ public class Post {
     private User user;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-    @ToString.Exclude
     private Set<Like> likes =  new HashSet<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)

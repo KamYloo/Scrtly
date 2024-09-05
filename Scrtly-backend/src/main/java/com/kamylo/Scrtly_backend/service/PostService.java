@@ -14,6 +14,7 @@ public interface PostService {
     Post createPost(SendPostRequest sendPostRequest) throws UserException;
     Post updatePost(Long postId) throws UserException, PostException;
     void deletePost(Long postId, Long userId) throws UserException, PostException;
+    Post findPostById(Long postId) throws PostException;
     List<Post> getAllPostsByUser(Long userId) throws UserException;
     List<Post> getAllPosts() ;
 }

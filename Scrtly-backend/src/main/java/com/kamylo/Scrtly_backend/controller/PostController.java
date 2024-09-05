@@ -31,9 +31,6 @@ public class PostController {
     private PostService postService;
 
     @Autowired
-    private PostRepository postRepository;
-
-    @Autowired
     private UserService userService;
 
     @PostMapping("/create")
@@ -74,14 +71,12 @@ public class PostController {
         User user = userService.findUserProfileByJwt(token);
         ApiResponse res = new ApiResponse();
         try {
-            Optional<Post> optionalPost = postRepository.findById(postId);
-            if (optionalPost.isEmpty()) {
+            Post post = postService.findPostById(postId);
+            if (post == null) {
                 throw new PostException("Post not found");
             }
 
-            Post post = optionalPost.get();
             postService.deletePost(postId, user.getId());
-
             String imagePath = "src/main/resources/static" + post.getImage();
             Path filePath = Paths.get(imagePath);
             if (Files.exists(filePath)) {
