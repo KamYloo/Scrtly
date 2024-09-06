@@ -9,15 +9,17 @@ import {BASE_API_URL} from "../../config/api.js";
 import { formatDistanceToNow } from 'date-fns'
 
 function Feed() {
-  const [postDetail, setPostDetail] = useState(false)
+  const [selectedPost, setSelectedPost] = useState(false)
+  const [postDetail, setPostDetail] = useState(null)
   const [menuPost, setMenuPost] = useState(false)
   const [allPosts, setAllPosts] = useState([])
 
   const dispatch = useDispatch()
   const { post } = useSelector(store => store);
 
-  const togglePost = () => {
-    setPostDetail((prev) => !prev);
+  const togglePost = (post = null) => {
+    setPostDetail(post)
+    setSelectedPost((prev) => !prev);
   };
 
   const handleMenuToggle = (postId) => {
@@ -86,7 +88,7 @@ function Feed() {
               <i><AiOutlineLike/></i>
               <span>78 likes</span>
             </div>
-            <div className="comments" onClick={togglePost}>
+            <div className="comments" onClick={() => togglePost(item)}>
               <i><TfiCommentAlt/></i>
               <span>28 Comments</span>
             </div>
@@ -94,7 +96,7 @@ function Feed() {
         </div>))}
 
       </div>
-      {postDetail && <Post onClose={togglePost} />}
+      {selectedPost && <Post post={postDetail} onClose={togglePost} />}
     </div>
   )
 }

@@ -1,91 +1,60 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import { AiOutlineLike } from "react-icons/ai";
 import { AddComment } from './AddComment';
+import {BASE_API_URL} from "../../config/api.js";
+import {useDispatch, useSelector} from "react-redux";
+import {getAllPostComments} from "../../Redux/Comment/Action.js";
+import {formatDistanceToNow} from "date-fns";
 
-function Comments() {
-    
+// eslint-disable-next-line react/prop-types
+function Comments({post}) {
+    const { comment } = useSelector(store => store)
+    const dispatch = useDispatch()
+
+    const formatTimeAgo = (timestamp) => {
+        return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
+    };
+
+    useEffect(() => {
+
+            dispatch(getAllPostComments({postId: post.id}))
+
+    }, [dispatch, post])
+
   return (
     <div className='commentsSection'>
         <div className="up">
-            <img src="" alt="" />
-            <p>Name Surname</p>
+            <img src={`${BASE_API_URL}/${post.user?.profilePicture || ''}`} alt="" />
+            <p>{post.user.fullName}</p>
         </div>
         <hr />
         <div className="comments">
             <div className="comment Own">
-            <img src="" alt="" />
+            <img src={`${BASE_API_URL}/${post.user?.profilePicture || ''}`} alt="" />
                 <div className="context">
-                    <p>Name Surname</p>
-                    <span>fdsgadddgfdgdafgdabdabddfffffffbabkkkkkkkkkkkkfbdffffffffffffffffffffddddddddddddddddbdabdfffffffffdfffgfbdaafdddddddddddddf</span>
+                    <p>{post.user.fullName}</p>
+                    <span>{post.description}</span>
                     <div className="info">
-                        <span>23 min</span>
+                        <span>{formatTimeAgo(post.creationDate)}</span>
                     </div>
                 </div>
-               
             </div>
-            <div className="comment">
-                <img src="" alt="" />
+            {comment.comments.map((item) => (
+                <div className="comment" key={item.id}>
+                <img src={`${BASE_API_URL}/${item.user?.profilePicture || ''}`} alt=""/>
                 <div className="context">
-                    <p>Name Surname</p>
-                    <span>fdsgadddgfdgdafgdabdabddfffffffbabkkkkkkkkkkkkfbdffffffffffffffffffffddddddddddddddddbdabdfffffffffdfffgfbdaafdddddddddddddf</span>
+                    <p>{item.user.fullName}</p>
+                    <span>{item.comment}</span>
                     <div className="info">
-                        <span>23 min</span>
-                        <span>12 likes</span>
-                    </div>
-                </div>
-                <i><AiOutlineLike/></i>
-            </div>
-            <div className="comment">
-                <img src="" alt="" />
-                <div className="context">
-                    <p>Name Surname</p>
-                    <span>fdsgadddgfdgdafgdabdabddfffffffbabkkkkkkkkkkkkfbdffffffffffffffffffffddddddddddddddddbdabdfffffffffdfffgfbdaafdddddddddddddf</span>
-                    <div className="info">
-                        <span>23 min</span>
-                        <span>12 likes</span>
+                        <span>{formatTimeAgo(item.creationDate)}</span>
+                        <span>{comment.likes?.length| 0} likes</span>
                     </div>
                 </div>
                 <i><AiOutlineLike/></i>
-            </div>
-            <div className="comment">
-                <img src="" alt="" />
-                <div className="context">
-                    <p>Name Surname</p>
-                    <span>fdsgadddgfdgdafgdabdabddfffffffbabkkkkkkkkkkkkfbdffffffffffffffffffffddddddddddddddddbdabdfffffffffdfffgfbdaafdddddddddddddf</span>
-                    <div className="info">
-                        <span>23 min</span>
-                        <span>12 likes</span>
-                    </div>
-                </div>
-                <i><AiOutlineLike/></i>
-            </div>
-            <div className="comment">
-                <img src="" alt="" />
-                <div className="context">
-                    <p>Name Surname</p>
-                    <span>fdsgadddgfdgdafgdabdabddfffffffbabkkkkkkkkkkkkfbdffffffffffffffffffffddddddddddddddddbdabdfffffffffdfffgfbdaafdddddddddddddf</span>
-                    <div className="info">
-                        <span>23 min</span>
-                        <span>12 likes</span>
-                    </div>
-                </div>
-                <i><AiOutlineLike/></i>
-            </div>
-            <div className="comment">
-                <img src="" alt="" />
-                <div className="context">
-                    <p>Name Surname</p>
-                    <span>fdsgadddgfdgdafgdabdabddfffffffbabkkkkkkkkkkkkfbdffffffffffffffffffffddddddddddddddddbdabdfffffffffdfffgfbdaafdddddddddddddf</span>
-                    <div className="info">
-                        <span>23 min</span>
-                        <span>12 likes</span>
-                    </div>
-                </div>
-                <i><AiOutlineLike/></i>
-            </div>
+            </div>))}
         </div>
         <hr />
-        <AddComment/>
+        <AddComment post={post}/>
     </div>
   )
 }

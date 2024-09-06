@@ -407,10 +407,13 @@
             }
 
             i {
+                position: absolute;
+                right: 3vh;
                 font-size: 25px;
                 color: white;
                 margin-left: 2vh;
                 margin-top: 1vh;
+                cursor: pointer;
             }
         }
 
