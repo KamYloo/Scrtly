@@ -42,21 +42,6 @@ public class CommentController {
         return new ResponseEntity<>(comments, HttpStatus.OK);
     }
 
-    @PutMapping("/like/{commentId}")
-    public ResponseEntity<Comment> likeCommentHandler(@PathVariable Long commentId, @RequestHeader("Authorization") String token) throws UserException, CommentException {
-        User user = userService.findUserProfileByJwt(token);
-        Comment comment = commentService.likeComment(commentId, user.getId());
-
-        return new ResponseEntity<>(comment, HttpStatus.OK);
-    }
-
-    @PutMapping("/unlike/{commentId}")
-    public ResponseEntity<Comment> unlikeCommentHandler(@PathVariable Long commentId, @RequestHeader("Authorization") String token) throws UserException, CommentException {
-        User user = userService.findUserProfileByJwt(token);
-        Comment comment = commentService.unLikeComment(commentId, user.getId());
-
-        return new ResponseEntity<>(comment, HttpStatus.OK);
-    }
 
     @DeleteMapping("/delete/{commentId}")
     public ResponseEntity<ApiResponse> deleteCommentHandler(@PathVariable Long commentId, @RequestHeader("Authorization") String token) throws UserException, CommentException {

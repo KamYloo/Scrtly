@@ -24,14 +24,12 @@ public class CommentServiceImplementation implements CommentService{
 
     @Autowired
     private CommentRepository commentRepository;
-    @Autowired
-    private PostService postService;
+
     @Autowired
     private UserService userService;
+
     @Autowired
     private PostRepository postRepository;
-    @Autowired
-    private LikeRepository likeRepository;
 
     @Override
     public Comment createComment(SendCommentRequest sendCommentRequest) throws UserException, PostException {
@@ -56,32 +54,6 @@ public class CommentServiceImplementation implements CommentService{
     @Override
     public List<Comment> getAllCommentsByPostId(Long postId) throws PostException {
         return commentRepository.findCommentByPostId(postId);
-    }
-
-    @Override
-    public Comment likeComment(Long commentId, Long userId) throws CommentException, UserException {
-       User user = userService.findUserById(userId);
-       Comment comment = findCommentById(commentId);
-        Like like = new Like();
-        like.setUser(user);
-        like.setComment(comment);
-        likeRepository.save(like);
-       comment.getLikes().add(like);
-
-       return commentRepository.save(comment);
-    }
-
-    @Override
-    public Comment unLikeComment(Long commentId, Long userId) throws CommentException, UserException {
-        User user = userService.findUserById(userId);
-        Comment comment = findCommentById(commentId);
-        Like like = new Like();
-        like.setUser(user);
-        like.setComment(comment);
-        likeRepository.save(like);
-        comment.getLikes().remove(like);
-
-        return commentRepository.save(comment);
     }
 
     @Override

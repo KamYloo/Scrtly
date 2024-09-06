@@ -17,9 +17,5 @@ public interface CommentService {
 
     List<Comment> getAllCommentsByPostId(Long postId) throws PostException;
 
-    Comment likeComment(Long commentId, Long userId) throws CommentException, UserException;
-
-    Comment unLikeComment(Long commentId, Long userId) throws CommentException, UserException;
-
     void deleteComment(Long commentId, Long userId) throws CommentException, UserException;
 }
