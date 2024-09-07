@@ -1,5 +1,7 @@
 package com.kamylo.Scrtly_backend.controller;
 
+import com.kamylo.Scrtly_backend.dto.LikeDto;
+import com.kamylo.Scrtly_backend.dto.mapper.LikeDtoMapper;
 import com.kamylo.Scrtly_backend.exception.CommentException;
 import com.kamylo.Scrtly_backend.exception.PostException;
 import com.kamylo.Scrtly_backend.exception.UserException;
@@ -24,32 +26,39 @@ public class LikeController {
     private UserService userService;
 
     @PostMapping("/post/{postId}/like")
-    public ResponseEntity<Like> likePost (@PathVariable Long postId, @RequestHeader("Authorization") String token) throws UserException, PostException {
+    public ResponseEntity<LikeDto> likePost (@PathVariable Long postId, @RequestHeader("Authorization") String token) throws UserException, PostException {
         User user = userService.findUserProfileByJwt(token);
         Like like = likeService.likePost(postId, user);
+        LikeDto likeDto = LikeDtoMapper.toLikePostDto(like,user);
 
-        return new ResponseEntity<>(like, HttpStatus.CREATED);
+        return new ResponseEntity<>(likeDto, HttpStatus.CREATED);
     }
 
     @PostMapping("/comment/{commentId}/like")
-    public ResponseEntity<Like> likeComment (@PathVariable Long commentId, @RequestHeader("Authorization") String token) throws UserException, CommentException {
+    public ResponseEntity<LikeDto> likeComment (@PathVariable Long commentId, @RequestHeader("Authorization") String token) throws UserException, CommentException {
         User user = userService.findUserProfileByJwt(token);
         Like like = likeService.likeComment(commentId, user);
+        LikeDto likeDto = LikeDtoMapper.toLikeCommentDto(like,user);
 
-        return new ResponseEntity<>(like, HttpStatus.CREATED);
+        return new ResponseEntity<>(likeDto, HttpStatus.CREATED);
     }
 
     @GetMapping("/post/{postId}/likes")
-    public ResponseEntity<List<Like>> getAllPostLikes (@PathVariable Long postId, @RequestHeader("Authorization") String token) throws PostException {
+    public ResponseEntity<List<LikeDto>> getAllPostLikes (@PathVariable Long postId, @RequestHeader("Authorization") String token) throws PostException, UserException {
+        User user = userService.findUserProfileByJwt(token);
         List<Like> likes = likeService.getLikesByPost(postId);
 
-        return new ResponseEntity<>(likes, HttpStatus.OK);
+        List<LikeDto> likeDtos = LikeDtoMapper.toLikePostList(likes, user);
+
+        return new ResponseEntity<>(likeDtos, HttpStatus.OK);
     }
 
-    @GetMapping("/post/{commentId}/likes")
-    public ResponseEntity<List<Like>> getAllCommentLikes (@PathVariable Long commentId, @RequestHeader("Authorization") String token) throws CommentException {
+    @GetMapping("/comment/{commentId}/likes")
+    public ResponseEntity<List<LikeDto>> getAllCommentLikes (@PathVariable Long commentId, @RequestHeader("Authorization") String token) throws CommentException, UserException {
+        User user = userService.findUserProfileByJwt(token);
         List<Like> likes = likeService.getLikesByComment(commentId);
 
-        return new ResponseEntity<>(likes, HttpStatus.OK);
+        List<LikeDto> likeDtos = LikeDtoMapper.toLikeCommentList(likes, user);
+        return new ResponseEntity<>(likeDtos, HttpStatus.OK);
     }
 }

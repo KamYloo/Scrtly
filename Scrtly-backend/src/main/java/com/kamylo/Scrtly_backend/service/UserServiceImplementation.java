@@ -60,6 +60,23 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
+    public User followUser(Long userId, User user) throws UserException {
+        User followToUser = findUserById(userId);
+
+        if (user.getFollowings().contains(followToUser) && followToUser.getFollowers().contains(user)) {
+            user.getFollowings().remove(followToUser);
+            followToUser.getFollowers().remove(user);
+        }
+        else {
+            user.getFollowings().add(followToUser);
+            followToUser.getFollowers().add(user);
+        }
+        userRepository.save(followToUser);
+        userRepository.save(user);
+        return followToUser;
+    }
+
+    @Override
     public User updateUser(Long userId, String fullName, String profilePicturePath, String decription) throws UserException {
         User user = findUserById(userId);
 
@@ -78,6 +95,8 @@ public class UserServiceImplementation implements UserService {
         user.setDescription(decription);
         return userRepository.save(user);
     }
+
+
 
     @Override
     public List<User> searchUser(String query) {

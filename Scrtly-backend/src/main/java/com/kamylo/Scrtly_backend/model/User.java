@@ -31,27 +31,19 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "follower_id")
     )
-    @ToString.Exclude
     private Set<User> followers = new HashSet<User>();
 
     @JsonIgnore
     @ManyToMany(mappedBy = "followers")
-    @ToString.Exclude
     private Set<User> followings = new HashSet<User>();
 
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    @ToString.Exclude
     private List<Post> post = new ArrayList<>();
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    @ToString.Exclude
-    private List<Like> likes = new ArrayList<>();
 
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    @ToString.Exclude
     private List<Story> stories = new ArrayList<>();
 
     @Override

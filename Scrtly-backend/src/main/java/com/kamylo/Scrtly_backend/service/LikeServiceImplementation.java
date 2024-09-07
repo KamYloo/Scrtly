@@ -37,7 +37,7 @@ public class LikeServiceImplementation implements LikeService{
 
        if (islikeExistPost != null) {
            likeRepository.deleteById(islikeExistPost.getId());
-           return likeRepository.save(islikeExistPost);
+           return islikeExistPost;
        }
 
         Post post = postRepository.findById(postId).get();
@@ -56,13 +56,15 @@ public class LikeServiceImplementation implements LikeService{
 
        if (islikeExistComment != null) {
            likeRepository.deleteById(islikeExistComment.getId());
-           return likeRepository.save(islikeExistComment);
+           return islikeExistComment;
        }
 
        Comment comment = commentService.findCommentById(commentId);
+       System.out.println("Wazne" + comment.getComment());
        Like like = new Like();
        like.setUser(user);
        like.setComment(comment);
+       like.setPost(comment.getPost());
        Like savedLike = likeRepository.save(like);
        comment.getLikes().add(savedLike);
        commentRepository.save(comment);

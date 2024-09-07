@@ -1,10 +1,17 @@
 
-import {CREATE_COMMENT_REQUEST, DELETE_COMMENT_REQUEST, GET_POST_COMMENT_REQUEST} from "./ActionType.js";
+import {
+    CREATE_COMMENT_REQUEST,
+    DELETE_COMMENT_REQUEST,
+    GET_POST_COMMENT_REQUEST,
+    Like_COMMENT_REQUEST
+} from "./ActionType.js";
+
 
 const initialValue = {
     createdComment:null,
     comments: [],
     deletedComment:null,
+    likeComment:null,
 }
 
 export const commentReducer=(store=initialValue, {type,payload})=>{
@@ -16,6 +23,9 @@ export const commentReducer=(store=initialValue, {type,payload})=>{
     }
     else if(type === DELETE_COMMENT_REQUEST) {
         return {...store, deletedComment: payload}
+    }
+    else if(type === Like_COMMENT_REQUEST) {
+        return {...store, likeComment: payload}
     }
 
     return store

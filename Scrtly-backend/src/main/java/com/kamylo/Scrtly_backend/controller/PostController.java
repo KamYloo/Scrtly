@@ -1,5 +1,7 @@
 package com.kamylo.Scrtly_backend.controller;
 
+import com.kamylo.Scrtly_backend.dto.PostDto;
+import com.kamylo.Scrtly_backend.dto.mapper.PostDtoMapper;
 import com.kamylo.Scrtly_backend.exception.PostException;
 import com.kamylo.Scrtly_backend.exception.UserException;
 import com.kamylo.Scrtly_backend.model.Post;
@@ -37,9 +39,9 @@ public class PostController {
     private UserService userService;
 
     @PostMapping("/create")
-    public ResponseEntity<ApiResponse> createPost(@RequestParam("file") MultipartFile file,
-                                                  @RequestParam("description") String description,
-                                                  @RequestHeader("Authorization") String token) throws UserException {
+    public ResponseEntity<PostDto> createPost(@RequestParam("file") MultipartFile file,
+                                              @RequestParam("description") String description,
+                                              @RequestHeader("Authorization") String token) throws UserException {
         if (file.isEmpty()) {
             throw new RuntimeException("Image file not uploaded.");
         }
@@ -55,18 +57,22 @@ public class PostController {
             sendPostRequest.setDescription(description);
             sendPostRequest.setImage("/uploads/postImages/" + fileName);
             sendPostRequest.setUser(user);
-            postService.createPost(sendPostRequest);
+            Post post = postService.createPost(sendPostRequest);
 
-            ApiResponse res = new ApiResponse("Post created successfully", true);
-            return new ResponseEntity<>(res, HttpStatus.ACCEPTED);
+            PostDto postDto = PostDtoMapper.toPostDto(post, user);
+            return new ResponseEntity<>(postDto, HttpStatus.CREATED);
         } catch (IOException e) {
             throw new RuntimeException("Error saving image file.", e);
         }
     }
 
     @GetMapping("/getAll")
-    public ResponseEntity<List<Post>> getAllPosts() {
-        return new ResponseEntity<>(postService.getAllPosts(), HttpStatus.ACCEPTED);
+    public ResponseEntity<List<PostDto>> getAllPosts(@RequestHeader("Authorization") String token) throws UserException, PostException {
+        User user = userService.findUserProfileByJwt(token);
+        List<Post> posts = postRepository.findAllByOrderByCreationDateDesc();
+        List<PostDto> postDtos = PostDtoMapper.toPostDtoList(posts, user);
+        return new ResponseEntity<>(postDtos, HttpStatus.OK);
+
     }
 
     @DeleteMapping("/delete/{postId}")

@@ -1,6 +1,7 @@
 package com.kamylo.Scrtly_backend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,7 +24,6 @@ public class Post {
     private LocalDateTime updateDate;
 
     @ManyToOne
-    @ToString.Exclude
     private User user;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
@@ -31,8 +31,12 @@ public class Post {
 
     @JsonIgnore
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-    @ToString.Exclude
     private List<Comment> comments =  new ArrayList<>();
+
+    @JsonProperty("commentsCount")
+    public int getCommentsCount() {
+        return comments.size();
+    }
 
     @PrePersist
     protected void onCreate() {

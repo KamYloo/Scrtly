@@ -1,6 +1,8 @@
 package com.kamylo.Scrtly_backend.controller;
 
 
+import com.kamylo.Scrtly_backend.dto.CommentDto;
+import com.kamylo.Scrtly_backend.dto.mapper.CommentDtoMapper;
 import com.kamylo.Scrtly_backend.exception.CommentException;
 import com.kamylo.Scrtly_backend.exception.PostException;
 import com.kamylo.Scrtly_backend.exception.UserException;
@@ -27,19 +29,21 @@ public class CommentController {
     private UserService userService;
 
     @PostMapping("/create/{postId}")
-    public ResponseEntity<Comment> createCommentHandler(@RequestBody SendCommentRequest sendCommentRequest, @RequestHeader("Authorization") String token) throws UserException, PostException {
+    public ResponseEntity<CommentDto> createCommentHandler(@RequestBody SendCommentRequest sendCommentRequest, @RequestHeader("Authorization") String token) throws UserException, PostException {
         User user = userService.findUserProfileByJwt(token);
         sendCommentRequest.setUser(user);
         Comment comment = commentService.createComment(sendCommentRequest);
+        CommentDto commentDto = CommentDtoMapper.commentDto(comment,user);
 
-        return new  ResponseEntity<>(comment, HttpStatus.OK);
+        return new  ResponseEntity<>(commentDto, HttpStatus.OK);
     }
 
     @GetMapping("/get/{postId}")
-    public ResponseEntity<List<Comment>> getAllCommentsByPostIdHandler(@PathVariable Long postId, @RequestHeader("Authorization") String token) throws UserException, PostException {
+    public ResponseEntity<List<CommentDto>> getAllCommentsByPostIdHandler(@PathVariable Long postId, @RequestHeader("Authorization") String token) throws UserException, PostException {
+        User user = userService.findUserProfileByJwt(token);
         List<Comment> comments = commentService.getAllCommentsByPostId(postId);
-
-        return new ResponseEntity<>(comments, HttpStatus.OK);
+        List<CommentDto> commentDtos = CommentDtoMapper.commentDtoList(comments, user);
+        return new ResponseEntity<>(commentDtos, HttpStatus.OK);
     }
 
 

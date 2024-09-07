@@ -90,7 +90,7 @@ function Feed() {
             </div>
             <div className="comments" onClick={() => togglePost(item)}>
               <i><TfiCommentAlt/></i>
-              <span>28 Comments</span>
+              <span>{item?.totalComments| 0} comments</span>
             </div>
           </div>
         </div>))}

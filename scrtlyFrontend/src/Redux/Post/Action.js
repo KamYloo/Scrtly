@@ -39,6 +39,7 @@ export const getAllPosts = () => async (dispatch) => {
 
 
         const posts = await response.json();
+        console.log("getAllPosts", posts);
         dispatch({ type: GET_ALL_POSTS_REQUEST, payload: posts });
     } catch (error) {
         console.log('catch error', error);

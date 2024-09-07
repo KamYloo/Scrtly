@@ -1,9 +1,9 @@
 import React, {useEffect} from 'react'
-import { AiOutlineLike } from "react-icons/ai";
+import { AiOutlineLike,  AiFillLike } from "react-icons/ai";
 import { AddComment } from './AddComment';
 import {BASE_API_URL} from "../../config/api.js";
 import {useDispatch, useSelector} from "react-redux";
-import {getAllPostComments} from "../../Redux/Comment/Action.js";
+import {getAllPostComments, likeComment} from "../../Redux/Comment/Action.js";
 import {formatDistanceToNow} from "date-fns";
 
 // eslint-disable-next-line react/prop-types
@@ -14,6 +14,10 @@ function Comments({post}) {
     const formatTimeAgo = (timestamp) => {
         return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
     };
+
+    const likeCommentHandler = (commentId) => {
+        dispatch(likeComment(commentId))
+    }
 
     useEffect(() => {
 
@@ -47,10 +51,10 @@ function Comments({post}) {
                     <span>{item.comment}</span>
                     <div className="info">
                         <span>{formatTimeAgo(item.creationDate)}</span>
-                        <span>{comment.likes?.length| 0} likes</span>
+                        <span>{item.likes?.length| 0} likes</span>
                     </div>
                 </div>
-                <i><AiOutlineLike/></i>
+                <i onClick={() => likeCommentHandler(item.id)}><AiOutlineLike/></i>
             </div>))}
         </div>
         <hr />

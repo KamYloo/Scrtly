@@ -3,6 +3,8 @@ package com.kamylo.Scrtly_backend.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Objects;
+
 @Entity
 @Data
 @Table(name = "user_likes")

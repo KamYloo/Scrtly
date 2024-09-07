@@ -18,6 +18,8 @@ public interface UserService {
 
      User findUserById(Long userId) throws UserException;
 
+     User followUser(Long userId, User user) throws UserException;
+
      User updateUser(Long userId, String fullName, String profilePicturePath, String description) throws UserException;
 
      List<User> searchUser(String query);

@@ -3,7 +3,7 @@ import {
     CREATE_COMMENT_FAIL,
     CREATE_COMMENT_REQUEST, DELETE_COMMENT_FAIL, DELETE_COMMENT_REQUEST,
     GET_POST_COMMENT_REQUEST,
-    GET_POST_COMMENTS_FAIL
+    GET_POST_COMMENTS_FAIL, Like_COMMENT_FAIL, Like_COMMENT_REQUEST,
 } from "./ActionType.js";
 
 export const createComment = (data) => async (dispatch) => {
@@ -44,6 +44,26 @@ export const getAllPostComments = (reqData) => async (dispatch) => {
     } catch (error) {
         console.log("catch error ", error)
         dispatch({ type: GET_POST_COMMENTS_FAIL, payload: error.message });
+    }
+}
+
+export const likeComment = (commentId) => async (dispatch) => {
+    try {
+        const res = await fetch(`${BASE_API_URL}/api/comment/${commentId}/like`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify(commentId)
+        })
+
+        const like = await res.json()
+        console.log("LikeComment ", like)
+        dispatch({ type: Like_COMMENT_REQUEST, payload: like })
+    } catch (error) {
+        console.log("catch error ", error)
+        dispatch({ type: Like_COMMENT_FAIL, payload: error.message });
     }
 }
 
