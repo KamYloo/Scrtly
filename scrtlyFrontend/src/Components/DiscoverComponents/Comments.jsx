@@ -23,7 +23,7 @@ function Comments({post}) {
 
             dispatch(getAllPostComments({postId: post.id}))
 
-    }, [dispatch, post])
+    }, [dispatch, post, comment.likeComment, comment.createdComment, comment.deletedComment])
 
   return (
     <div className='commentsSection'>
@@ -51,10 +51,10 @@ function Comments({post}) {
                     <span>{item.comment}</span>
                     <div className="info">
                         <span>{formatTimeAgo(item.creationDate)}</span>
-                        <span>{item.likes?.length| 0} likes</span>
+                        <span>{item.totalLikes} likes</span>
                     </div>
                 </div>
-                <i onClick={() => likeCommentHandler(item.id)}><AiOutlineLike/></i>
+                <i onClick={() => likeCommentHandler(item.id)}>{item.liked ? <AiFillLike /> : <AiOutlineLike />}</i>
             </div>))}
         </div>
         <hr />

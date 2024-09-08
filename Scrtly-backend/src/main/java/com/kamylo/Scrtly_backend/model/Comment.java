@@ -1,5 +1,6 @@
 package com.kamylo.Scrtly_backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,7 +28,7 @@ public class Comment {
     @ToString.Exclude
     private User user;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @JsonIgnore
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL)
     @ToString.Exclude
     private Set<Like> likes =  new HashSet<>();

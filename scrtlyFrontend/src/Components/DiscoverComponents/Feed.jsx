@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from 'react'
-import { AiOutlineLike } from "react-icons/ai";
+import {AiFillLike, AiOutlineLike} from "react-icons/ai";
 import { TfiCommentAlt } from "react-icons/tfi";
 import { FaEllipsisH } from "react-icons/fa";
 import { Post } from './Post';
 import {useDispatch, useSelector} from "react-redux";
-import {deletePost, getAllPosts} from "../../Redux/Post/Action.js";
+import {deletePost, getAllPosts, likePost} from "../../Redux/Post/Action.js";
 import {BASE_API_URL} from "../../config/api.js";
 import { formatDistanceToNow } from 'date-fns'
 
@@ -15,7 +15,7 @@ function Feed() {
   const [allPosts, setAllPosts] = useState([])
 
   const dispatch = useDispatch()
-  const { post } = useSelector(store => store);
+  const { post, comment } = useSelector(store => store);
 
   const togglePost = (post = null) => {
     setPostDetail(post)
@@ -37,27 +37,18 @@ function Feed() {
     }
   };
 
+  const likePostHandler = (postId) => {
+    dispatch(likePost(postId));
+  }
+
   useEffect(() => {
-    const fetchPosts = () => {
       dispatch(getAllPosts())
-    };
-
-    fetchPosts()
-
-
-    const interval = setInterval(fetchPosts, 10000)
-
-    return () => clearInterval(interval)
-  }, [dispatch])
-
-  useEffect(() => {
-    setAllPosts(post.posts)
-  }, [post.posts])
+  }, [dispatch, post.likedPost, post.createdPost, post.deletedPost, comment.createdComment,comment.deletedComment])
 
   return (
     <div className='feed'>
       <div className="posts">
-        { allPosts.map((item) => (
+        { post.posts.map((item) => (
             <div className="post" key={item.id}>
           <div className="up">
             <img src={`${BASE_API_URL}/${item.user?.profilePicture || ''}`} alt=""/>
@@ -85,8 +76,8 @@ function Feed() {
           </div>
           <div className="bottom">
             <div className="likes">
-              <i><AiOutlineLike/></i>
-              <span>78 likes</span>
+              <i onClick={() => likePostHandler(item.id)}>{item.liked ? <AiFillLike /> : <AiOutlineLike />}</i>
+              <span>{item.totalLikes}</span>
             </div>
             <div className="comments" onClick={() => togglePost(item)}>
               <i><TfiCommentAlt/></i>

@@ -59,7 +59,7 @@ export const likeComment = (commentId) => async (dispatch) => {
         })
 
         const like = await res.json()
-        console.log("LikeComment ", like)
+        console.log("LikedComment ", like)
         dispatch({ type: Like_COMMENT_REQUEST, payload: like })
     } catch (error) {
         console.log("catch error ", error)

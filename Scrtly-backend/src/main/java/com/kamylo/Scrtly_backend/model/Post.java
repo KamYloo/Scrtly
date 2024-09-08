@@ -37,11 +37,6 @@ public class Post {
     @ToString.Exclude
     private List<Comment> comments =  new ArrayList<>();
 
-    @JsonProperty("commentsCount")
-    public int getCommentsCount() {
-        return comments.size();
-    }
-
     @PrePersist
     protected void onCreate() {
         creationDate = LocalDateTime.now();

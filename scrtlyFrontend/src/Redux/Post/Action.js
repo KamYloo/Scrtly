@@ -2,11 +2,12 @@
 import {BASE_API_URL} from "../../config/api.js";
 import {
     GET_ALL_POSTS_ERROR,
-    GET_ALL_POSTS_REQUEST,
+    GET_ALL_POSTS_REQUEST, LIKE_POST_ERROR, LIKE_POST_REQUEST,
     POST_CREATE_REQUEST,
     POST_DELETE_ERROR,
     POST_DELETE_REQUEST
 } from "./ActionType.js";
+import {Like_COMMENT_FAIL, Like_COMMENT_REQUEST} from "../Comment/ActionType.js";
 
 export const createPost = (formData) => async (dispatch) => {
 
@@ -46,6 +47,26 @@ export const getAllPosts = () => async (dispatch) => {
         dispatch({ type: GET_ALL_POSTS_ERROR, payload: error.message });
     }
 };
+
+export const likePost = (postId) => async (dispatch) => {
+    try {
+        const res = await fetch(`${BASE_API_URL}/api/post/${postId}/like`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify(postId)
+        })
+
+        const like = await res.json()
+        console.log("LikedPost ", like)
+        dispatch({ type: LIKE_POST_REQUEST, payload: like })
+    } catch (error) {
+        console.log("catch error ", error)
+        dispatch({ type: LIKE_POST_ERROR, payload: error.message });
+    }
+}
 
 export const deletePost = (postId) => async (dispatch) => {
     try {
