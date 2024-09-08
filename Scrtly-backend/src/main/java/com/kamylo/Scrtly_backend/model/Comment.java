@@ -20,19 +20,18 @@ public class Comment {
     private LocalDateTime creationDate;
 
     @ManyToOne
+    @ToString.Exclude
     private Post post;
 
     @ManyToOne
+    @ToString.Exclude
     private User user;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private Set<Like> likes =  new HashSet<>();
 
-    @JsonProperty("likesCount")
-    public int getLikesCount() {
-        return likes.size();
-    }
 
     @PrePersist
     protected void onCreate() {

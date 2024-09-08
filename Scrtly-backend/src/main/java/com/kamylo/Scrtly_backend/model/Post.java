@@ -24,13 +24,17 @@ public class Post {
     private LocalDateTime updateDate;
 
     @ManyToOne
+    @ToString.Exclude
     private User user;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private Set<Like> likes =  new HashSet<>();
 
     @JsonIgnore
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<Comment> comments =  new ArrayList<>();
 
     @JsonProperty("commentsCount")
