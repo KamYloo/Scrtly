@@ -10,7 +10,7 @@ function Discover({auth, token}) {
     <div className='discoverView'>
         <div className="discover">
         <Stories/>
-        <AddPost auth={auth} token={token} />
+        <AddPost/>
         <Feed/>
         </div>
     </div>

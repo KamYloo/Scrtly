@@ -8,6 +8,12 @@ import {createComment} from "../../Redux/Comment/Action.js";
 function AddComment({post}) {
     const dispatch = useDispatch()
     const [commentText, setCommentText] = useState('')
+    const [openEmoji, setOpenEmoji] = useState(false)
+
+    const handleEmoji = (e) => {
+        setCommentText((prev) => prev + e.emoji)
+        setOpenEmoji(false)
+    }
 
     const handleCommentCreation = () => {
         dispatch(createComment({postId: post.id, comment: commentText}))
@@ -17,9 +23,9 @@ function AddComment({post}) {
   return (
     <div className='addComment'>
         <div className="emoji">
-            <i><BsEmojiSmileFill /></i>
+            <i onClick={() => setOpenEmoji((prev) => !prev)}><BsEmojiSmileFill /></i>
             <div className="picker">
-              {/* <EmojiPicker /> */}
+               <EmojiPicker open={openEmoji} onEmojiClick={handleEmoji}/>
             </div>
           </div>
           <textarea type="text" value={commentText}

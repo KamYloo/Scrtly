@@ -15,7 +15,7 @@ export const createPost = (formData) => async (dispatch) => {
         const response = await fetch(`${BASE_API_URL}/api/posts/create`,  {
             method: 'POST',
             headers : {
-                Authorization: `Bearer ${formData.get('token')}`
+                Authorization: `Bearer ${localStorage.getItem('token')}`
             },
             body: formData
         })

@@ -15,7 +15,7 @@ function Feed() {
   const [allPosts, setAllPosts] = useState([])
 
   const dispatch = useDispatch()
-  const { post, comment } = useSelector(store => store);
+  const {auth, post, comment } = useSelector(store => store);
 
   const togglePost = (post = null) => {
     setPostDetail(post)
@@ -56,15 +56,21 @@ function Feed() {
               <p>{item.user.fullName}</p>
               <span>{formatTimeAgo(item.creationDate)}</span>
             </div>
-            <i  onClick={() => handleMenuToggle(item.id)}><FaEllipsisH/></i>
-            {menuPost === item.id && ( <ul className="list">
-              <li className="option">
-                <span>Edit</span>
-              </li>
-              <li className="option" onClick={() => handleDeletePost(item.id)}>
-                <span>Delete</span>
-              </li>
-            </ul>)}
+            {auth.reqUser.id === item.user.id && (
+                <>
+                  <i onClick={() => handleMenuToggle(item.id)}><FaEllipsisH /></i>
+                  {menuPost === item.id && (
+                      <ul className="list">
+                        <li className="option">
+                          <span>Edit</span>
+                        </li>
+                        <li className="option" onClick={() => handleDeletePost(item.id)}>
+                          <span>Delete</span>
+                        </li>
+                      </ul>
+                  )}
+                </>
+            )}
           </div>
           <div className="middle">
             <img

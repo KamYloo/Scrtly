@@ -155,9 +155,15 @@
             .emoji {
                 cursor: pointer;
                 color: rgba(255, 255, 255, 0.836);
-
+                position: relative;
                 i {
                     font-size: 20px;
+                }
+
+                .picker {
+                    position: absolute;
+                    right: 1vh;
+                    top: 4vh;
                 }
             }
         }
@@ -424,11 +430,20 @@
             width: 100%;
             justify-content: space-between;
             gap: 1vh;
-            i {
-                color: white;
-                font-size: 20px;
-            }
 
+            .emoji {
+                i {
+                    color: white;
+                    font-size: 20px;
+                    cursor: pointer;
+                }
+
+                .picker{
+                    position: absolute;
+                    right: 1vh;
+                    bottom: 10vh;
+                }
+            }
             button {
                 outline: none;
                 border: none;
