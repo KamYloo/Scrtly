@@ -44,6 +44,7 @@ public class User {
 
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<Story> stories = new ArrayList<>();
 
     @Override
