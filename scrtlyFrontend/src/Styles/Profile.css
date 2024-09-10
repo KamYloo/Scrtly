@@ -242,7 +242,6 @@
         color: black;
         font-size: 13px;
         font-weight: bold;
-        border-radius: 10px;
         cursor: pointer;
         transition: 0.3s;
     }

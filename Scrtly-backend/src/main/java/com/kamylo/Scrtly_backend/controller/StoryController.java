@@ -11,8 +11,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/stories")
@@ -24,10 +31,26 @@ public class StoryController {
     private UserService userService;
 
     @PostMapping("/create")
-    public ResponseEntity<Story> createStoryHandler(@RequestBody Story story, @RequestHeader("Authorization") String token) throws UserException {
+    public ResponseEntity<Story> createStoryHandler(@RequestParam("file") MultipartFile file, @RequestHeader("Authorization") String token) throws UserException {
+
+        if (file.isEmpty()) {
+            throw new RuntimeException("Image file not uploaded.");
+        }
+
         User user = userService.findUserProfileByJwt(token);
-        Story createdStory = storyService.createStory(story,user.getId());
-        return new ResponseEntity<>(createdStory, HttpStatus.CREATED);
+        try {
+            String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+            Path filePath = Paths.get("src/main/resources/static/uploads/storyImages").resolve(fileName);
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            Story story = new Story();
+            story.setImage("/uploads/storyImages/" + fileName);
+            Story createdStory = storyService.createStory(story,user.getId());
+            return new ResponseEntity<>(createdStory, HttpStatus.CREATED);
+
+        }catch (IOException e) {
+            throw new RuntimeException("Error saving image file.", e);
+        }
     }
 
     @GetMapping("/{userId}")
@@ -48,11 +71,20 @@ public class StoryController {
                 throw new StoryException("Story not found with id " + storyId);
             }
             storyService.deleteStory(storyId, user.getId());
+            String imagePath = "src/main/resources/static" + story.getImage();
+            Path filePath = Paths.get(imagePath);
+            if (Files.exists(filePath)) {
+                Files.delete(filePath);
+            }
+
             response.setMessage("Story deleted successfully");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (StoryException | UserException e) {
             response.setMessage(e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        } catch (IOException e) {
+            response.setMessage("Error deleting the image file.");
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

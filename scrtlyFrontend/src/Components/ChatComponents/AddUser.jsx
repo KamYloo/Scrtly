@@ -48,7 +48,7 @@ function AddUser() {
                     ))}
                 </div>
             ) : (
-                <p>No users found</p> // Informacja, gdy nie ma wyników
+                <p>No users found</p>
             )}
 
         </div>

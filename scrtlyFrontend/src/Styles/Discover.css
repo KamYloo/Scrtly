@@ -21,20 +21,54 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        position: relative;
+
+        .scroll-button {
+            height: 5vh;
+            width: 3vh;
+            border: none;
+            outline: none;
+            align-items: center;
+            border-radius: 10px;
+            background: rgba(15, 15, 15, 0.651);
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .scroll-button:hover {
+            background: rgba(15, 15, 15, 0.511);
+        }
+
+        .scroll-button.left {
+            margin-right: 2vh;
+        }
+
+        .scroll-button.right {
+            margin-left: 2vh;
+        }
 
         .box {
             display: flex;
-            flex-wrap: nowrap;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            white-space: nowrap;
             background: rgba(15, 15, 15, 0.651);
             border-radius: 10px;
             box-shadow: rgba(0, 0, 0, 0.699) 0px 13px 27px -5px,
                 rgba(2, 2, 2, 0.671) 0px 8px 16px -8px;
             width: 80%;
             height: 15vh;
-            overflow-x: auto;
-            overflow-y: hidden;
             gap: 32px;
             padding: 2vh;
+
+            .story.add-story {
+
+                img:hover {
+                    filter: contrast(0.5);
+                }
+            }
 
             .story {
                 display: flex;
@@ -48,7 +82,8 @@
                     background: rgb(59, 59, 65);
                     border-radius: 50%;
                     object-fit: cover;
-                    border: 1px solid rgb(1, 247, 1);
+                    border: 2px solid aqua;
+                    transition: 0.3s ease;
                 }
 
                 span {
@@ -57,6 +92,89 @@
                 }
             }
         }
+    }
+
+    .addStory {
+        border: 2px solid white;
+        border-radius: 10px;
+        background: rgba(0, 0, 0, 0.411);
+        width: max-content;
+        height: max-content;
+        padding: 30px;
+        position: absolute;
+        top: 35vh;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        margin: auto;
+        z-index: 8;
+
+        .title {
+            padding: 20px;
+            text-align: center;
+
+            h2 {
+                font-size: xx-large;
+                color: white;
+                font-family: cursive;
+                text-shadow: 5px 0 20px black;
+            }
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            .pickImage {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 20px;
+                margin: 20px;
+                border-radius: 10px;
+                background: rgba(54, 54, 54, 0.644);
+
+                input {
+                    display: none;
+                }
+
+                button {
+                    outline: none;
+                    border: none;
+                    padding: 10px;
+                    background: aqua;
+                    color: black;
+                    font-size: 13px;
+                    font-weight: bold;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    transition: 0.3s;
+                }
+
+                button:hover {
+                    background: rgb(4, 214, 214);
+                }
+
+            }
+            .submit {
+                outline: none;
+                border: none;
+                padding: 10px 40px;
+                border-radius: 10px;
+                background: aqua;
+                color: black;
+                font-size: 13px;
+                font-weight: bold;
+                cursor: pointer;
+                transition: 0.3s;
+            }
+
+            .submit:hover {
+                background: rgb(4, 214, 214);
+            }
+        }
+
     }
 
     .addPost {
@@ -311,6 +429,15 @@
     }
 }
 
+.cancel {
+    position: absolute;
+    right: 1vh;
+    top: 1vh;
+    font-size: 24px;
+    color: wheat;
+    cursor: pointer;
+}
+
 .postView {
     width: 90%;
     max-width: 1200px;
@@ -326,15 +453,6 @@
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
-
-    .cancel {
-        position: absolute;
-        right: 1vh;
-        top: 1vh;
-        font-size: 24px;
-        color: wheat;
-        cursor: pointer;
-    }
 
     .imgPost {
         flex: 5;
