@@ -65,7 +65,6 @@
         .right {
             display: flex;
             flex-direction: column;
-
             .top,
             .stats,
             .description {
@@ -78,7 +77,7 @@
 
             .top {
                 align-items: center;
-
+                height: 6vh;
                 p {
                     font-size: 27px;
                     font-weight: bold;
@@ -94,6 +93,17 @@
                     font-size: 12px;
                     font-weight: 600;
                     cursor: pointer;
+                    transition: all 0.1s;
+                }
+
+                .followBtn {
+                    background: aqua;
+                    color: black;
+                }
+                .followBtn:hover {
+                    background: transparent;
+                    border-block: 2px solid aqua;
+                    color: aqua;
                 }
 
                 i {

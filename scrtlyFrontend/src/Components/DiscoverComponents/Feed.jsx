@@ -7,6 +7,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {deletePost, getAllPosts, likePost} from "../../Redux/Post/Action.js";
 import {BASE_API_URL} from "../../config/api.js";
 import { formatDistanceToNow } from 'date-fns'
+import {useNavigate} from "react-router-dom";
 
 function Feed() {
   const [selectedPost, setSelectedPost] = useState(false)
@@ -16,6 +17,11 @@ function Feed() {
 
   const dispatch = useDispatch()
   const {auth, post, comment } = useSelector(store => store);
+  const navigate = useNavigate();
+
+  const handleProfileClick = (userId) => {
+    navigate(`/profile/${userId}`); // Redirect to the specific user's profile
+  };
 
   const togglePost = (post = null) => {
     setPostDetail(post)
@@ -51,7 +57,8 @@ function Feed() {
         { post.posts.map((item) => (
             <div className="post" key={item.id}>
           <div className="up">
-            <img src={`${BASE_API_URL}/${item.user?.profilePicture || ''}`} alt=""/>
+            <img src={`${BASE_API_URL}/${item.user?.profilePicture || ''}`} alt=""
+                 onClick={() => handleProfileClick(item.user.id)}/>
             <div className="userData">
               <p>{item.user.fullName}</p>
               <span>{formatTimeAgo(item.creationDate)}</span>

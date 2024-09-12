@@ -1,5 +1,14 @@
 import { BASE_API_URL } from "../../config/api"
-import {REGISTER, LOGIN, REQUEST_USER, SEARCH_USER, UPDATE_USER, LOGOUT} from "./ActionType"
+import {
+    REGISTER,
+    LOGIN,
+    REQUEST_USER,
+    SEARCH_USER,
+    UPDATE_USER,
+    LOGOUT,
+    FIND_USER_BY_ID_REQUEST,
+    FIND_USER_BY_ID_ERROR
+} from "./ActionType"
 
 export const register = (data) => async (dispatch) => {
     try {
@@ -55,6 +64,25 @@ export const currentUser = (token) => async (dispatch) => {
         dispatch({ type: REQUEST_USER, payload: resData })
     } catch (error) {
         console.log("catch error ", error)
+    }
+}
+
+export const findUserById = (userId) => async (dispatch) => {
+    try {
+        const res = await fetch(`${BASE_API_URL}/api/users/${userId}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem('token')}`
+            },
+        })
+
+        const resData = await res.json()
+        console.log("LikedComment ", resData)
+        dispatch({ type: FIND_USER_BY_ID_REQUEST, payload: resData })
+    } catch (error) {
+        console.log("catch error ", error)
+        dispatch({ type: FIND_USER_BY_ID_ERROR, payload: error.message });
     }
 }
 

@@ -76,7 +76,7 @@ function App() {
           renderLayout(Discover, { setVolume, currentTrack, auth, token })
         } />
 
-        <Route path="/profile" element={
+        <Route path="/profile/:userId" element={
           renderLayout(Profile, { setVolume, currentTrack, auth, token })
         } />
 

@@ -27,7 +27,7 @@ function RightMenu({auth, token}) {
 
   const handleProfileClick = () => {
     if (isLoggedIn) {
-      navigate('/profile')
+      navigate(`/profile/${auth.reqUser.id}`)
     } else {
       navigate('/login')
     }
