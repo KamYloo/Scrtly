@@ -1,4 +1,12 @@
-import {FIND_USER_BY_ID_REQUEST, LOGIN, REGISTER, REQUEST_USER, SEARCH_USER, UPDATE_USER} from "./ActionType.js";
+import {
+    FIND_USER_BY_ID_REQUEST,
+    FOLLOW_USER_REQUEST,
+    LOGIN,
+    REGISTER,
+    REQUEST_USER,
+    SEARCH_USER,
+    UPDATE_USER
+} from "./ActionType.js";
 
 const initialValue= {
     login:null,
@@ -26,6 +34,9 @@ export const authReducer=(store=initialValue, {type,payload})=>{
         return {...store, searchResults: payload}
     }
     else if (type === FIND_USER_BY_ID_REQUEST) {
+        return {...store, findUser: payload}
+    }
+    else if (type === FOLLOW_USER_REQUEST) {
         return {...store, findUser: payload}
     }
     return store

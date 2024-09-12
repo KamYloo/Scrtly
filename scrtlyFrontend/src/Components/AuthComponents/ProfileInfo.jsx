@@ -3,7 +3,7 @@ import "../../Styles/Profile.css"
 import { IoIosSettings } from "react-icons/io";
 import {useNavigate, useParams} from 'react-router-dom';
 import {BASE_API_URL} from "../../config/api.js";
-import {findUserById} from "../../Redux/Auth/Action.js";
+import {findUserById, followUser} from "../../Redux/Auth/Action.js";
 import {useDispatch} from "react-redux";
 
 
@@ -23,10 +23,11 @@ function ProfileInfo({auth, token}) {
                 <div className="right">
                     <div className="top">
                         <p>{auth.findUser?.fullName || 'Name Surname'}</p>
-                        <button className="followBtn" onClick={() => {
-                            navigate("/profile/edit")
+                        {!auth.findUser?.req_user &&
+                            (<button className={auth.findUser?.followed ? 'following' : 'follow'} onClick={() => {
+                           dispatch(followUser(userId))
                         }}>Follow
-                        </button>
+                        </button>)}
                         <button onClick={() => {
                             navigate("/profile/edit")
                         }}>Edit Profile
@@ -35,8 +36,8 @@ function ProfileInfo({auth, token}) {
                     </div>
                     <div className="stats">
                         <p>Posts: 45</p>
-                        <p>99 followers</p>
-                        <p>Following: 155</p>
+                        <p>{auth.findUser?.followers.length} Followers</p>
+                        <p>Following: {auth.findUser?.following.length}</p>
                     </div>
                     <div className="description">
                         <p>{auth.findUser?.fullName || 'Name'}</p>

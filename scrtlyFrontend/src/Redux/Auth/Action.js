@@ -7,7 +7,7 @@ import {
     UPDATE_USER,
     LOGOUT,
     FIND_USER_BY_ID_REQUEST,
-    FIND_USER_BY_ID_ERROR
+    FIND_USER_BY_ID_ERROR, FOLLOW_USER_REQUEST, FOLLOW_USER_ERROR
 } from "./ActionType"
 
 export const register = (data) => async (dispatch) => {
@@ -78,11 +78,30 @@ export const findUserById = (userId) => async (dispatch) => {
         })
 
         const resData = await res.json()
-        console.log("LikedComment ", resData)
+        console.log("Find user ", resData)
         dispatch({ type: FIND_USER_BY_ID_REQUEST, payload: resData })
     } catch (error) {
         console.log("catch error ", error)
         dispatch({ type: FIND_USER_BY_ID_ERROR, payload: error.message });
+    }
+}
+
+export const followUser = (userId) => async (dispatch) => {
+    try {
+        const res = await fetch(`${BASE_API_URL}/api/users/${userId}/follow`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem('token')}`
+            },
+        })
+
+        const resData = await res.json()
+        console.log("followUser ", resData)
+        dispatch({ type: FOLLOW_USER_REQUEST, payload: resData })
+    } catch (error) {
+        console.log("catch error ", error)
+        dispatch({ type: FOLLOW_USER_ERROR, payload: error.message });
     }
 }
 

@@ -96,11 +96,11 @@
                     transition: all 0.1s;
                 }
 
-                .followBtn {
+                .follow {
                     background: aqua;
                     color: black;
                 }
-                .followBtn:hover {
+                .follow:hover, .following {
                     background: transparent;
                     border-block: 2px solid aqua;
                     color: aqua;
