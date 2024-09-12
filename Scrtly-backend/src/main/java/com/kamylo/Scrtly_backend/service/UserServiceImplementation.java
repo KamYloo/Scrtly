@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class UserServiceImplementation implements UserService {
@@ -99,7 +100,7 @@ public class UserServiceImplementation implements UserService {
 
 
     @Override
-    public List<User> searchUser(String query) {
+    public Set<User> searchUser(String query) {
         return userRepository.searchUser(query);
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public interface UserService {
@@ -22,6 +23,6 @@ public interface UserService {
 
      User updateUser(Long userId, String fullName, String profilePicturePath, String description) throws UserException;
 
-     List<User> searchUser(String query);
+     Set<User> searchUser(String query);
 
 }

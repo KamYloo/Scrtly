@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
@@ -13,5 +14,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     User findByEmail(String email);
 
     @Query("select u from User u where u.fullName like %:query% or u.email like %:query%")
-    List<User> searchUser(@Param("query") String query);
+    Set<User> searchUser(@Param("query") String query);
 }

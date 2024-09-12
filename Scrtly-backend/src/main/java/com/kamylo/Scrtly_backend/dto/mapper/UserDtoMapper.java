@@ -20,7 +20,7 @@ public class UserDtoMapper {
         return userDto;
     }
 
-    private static Set<UserDto> toUserDtos(Set<User> followers) {
+    public static Set<UserDto> toUserDtos(Set<User> followers) {
         Set<UserDto> userDtos = new HashSet<>();
         for (User user : followers) {
             UserDto userDto = new UserDto();
