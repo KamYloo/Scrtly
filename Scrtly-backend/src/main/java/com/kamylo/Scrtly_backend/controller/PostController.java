@@ -67,13 +67,23 @@ public class PostController {
     }
 
     @GetMapping("/getAll")
-    public ResponseEntity<List<PostDto>> getAllPosts(@RequestHeader("Authorization") String token) throws UserException, PostException {
+    public ResponseEntity<List<PostDto>> getAllPosts(@RequestHeader("Authorization") String token) throws UserException {
         User user = userService.findUserProfileByJwt(token);
-        List<Post> posts = postRepository.findAllByOrderByCreationDateDesc();
+        List<Post> posts = postService.getAllPosts();
         List<PostDto> postDtos = PostDtoMapper.toPostDtoList(posts, user);
         return new ResponseEntity<>(postDtos, HttpStatus.OK);
 
     }
+
+    @GetMapping("/all/{userId}")
+    public ResponseEntity<List<PostDto>> getAllPostsByUserHandler(@PathVariable Long userId, @RequestHeader("Authorization") String token) throws UserException {
+        User user = userService.findUserProfileByJwt(token);
+        List<Post> posts = postService.getAllPostsByUser(userId);
+        List<PostDto> postDtos = PostDtoMapper.toPostDtoList(posts, user);
+        return new ResponseEntity<>(postDtos, HttpStatus.OK);
+
+    }
+
 
     @DeleteMapping("/delete/{postId}")
     public ResponseEntity<ApiResponse> deletePost(@PathVariable Long postId, @RequestHeader("Authorization") String token) throws UserException, PostException {

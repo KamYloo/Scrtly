@@ -10,7 +10,7 @@
     display: flex;
     flex-direction: column;
 
-    hr {
+    .lineP {
         margin: 0 180px;
     }
 }
@@ -29,6 +29,7 @@
         border: 1px solid yellow;
         height: 320px;
         width: 280px;
+        cursor: pointer;
 
         img {
             width: 100%;
@@ -265,7 +266,7 @@
 
 @media screen and (max-width: 550px) {
     .profileSite {
-        hr {
+        .lineP {
             margin: 0px;
         }
     }

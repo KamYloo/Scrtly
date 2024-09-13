@@ -13,7 +13,6 @@ function Feed() {
   const [selectedPost, setSelectedPost] = useState(false)
   const [postDetail, setPostDetail] = useState(null)
   const [menuPost, setMenuPost] = useState(false)
-  const [allPosts, setAllPosts] = useState([])
 
   const dispatch = useDispatch()
   const {auth, post, comment } = useSelector(store => store);

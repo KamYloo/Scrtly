@@ -440,6 +440,7 @@
                     border-radius: 50%;
                     object-fit: cover;
                     border: 2px solid aqua;
+                    cursor: pointer;
                 }
 
                 .userData {
@@ -567,7 +568,8 @@
             gap: 2vh;
         }
 
-        hr {
+        .line {
+            display: block;
             margin-top: 1.5vh;
         }
 

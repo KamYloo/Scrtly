@@ -31,7 +31,7 @@ function Comments({post}) {
             <img src={`${BASE_API_URL}/${post.user?.profilePicture || ''}`} alt="" />
             <p>{post.user.fullName}</p>
         </div>
-        <hr />
+        <hr className="line" />
         <div className="comments">
             <div className="comment Own">
             <img src={`${BASE_API_URL}/${post.user?.profilePicture || ''}`} alt="" />
@@ -57,7 +57,7 @@ function Comments({post}) {
                 <i onClick={() => likeCommentHandler(item.id)}>{item.liked ? <AiFillLike /> : <AiOutlineLike />}</i>
             </div>))}
         </div>
-        <hr />
+        <hr className="line" />
         <AddComment post={post}/>
     </div>
   )

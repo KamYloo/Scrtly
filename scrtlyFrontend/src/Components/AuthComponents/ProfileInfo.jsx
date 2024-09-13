@@ -4,13 +4,15 @@ import { IoIosSettings } from "react-icons/io";
 import {useNavigate, useParams} from 'react-router-dom';
 import {BASE_API_URL} from "../../config/api.js";
 import {findUserById, followUser} from "../../Redux/Auth/Action.js";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 
 
-function ProfileInfo({auth, token}) {
+function ProfileInfo() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const {userId} = useParams();
+
+    const {auth} = useSelector(store => store);
 
     useEffect(() => {
         console.log(userId)
@@ -26,12 +28,14 @@ function ProfileInfo({auth, token}) {
                         {!auth.findUser?.req_user &&
                             (<button className={auth.findUser?.followed ? 'following' : 'follow'} onClick={() => {
                            dispatch(followUser(userId))
-                        }}>Follow
+                        }}>{auth.findUser?.followed ? 'unFollow' : 'Follow'}
                         </button>)}
+                        {auth.findUser?.req_user &&
+                            (
                         <button onClick={() => {
                             navigate("/profile/edit")
                         }}>Edit Profile
-                        </button>
+                        </button>)}
                         <i><IoIosSettings/></i>
                     </div>
                     <div className="stats">
