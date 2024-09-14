@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class StoryServiceImplementation implements StoryService {
@@ -45,6 +47,13 @@ public class StoryServiceImplementation implements StoryService {
             throw new StoryException("user doesn't have any stories");
         }
         return stories;
+    }
+
+    @Override
+    public Map<User, List<Story>> getGroupedStoriesByFollowedUsers(Long userId) {
+        List<Story> stories = storyRepository.getStoriesByFollowedUsers(userId);
+        return stories.stream()
+                .collect(Collectors.groupingBy(Story::getUser));
     }
 
     @Override

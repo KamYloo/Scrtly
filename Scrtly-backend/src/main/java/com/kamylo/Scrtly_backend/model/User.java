@@ -31,10 +31,12 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "follower_id")
     )
+    @ToString.Exclude
     private Set<User> followers = new HashSet<User>();
 
     @JsonIgnore
     @ManyToMany(mappedBy = "followers")
+    @ToString.Exclude
     private Set<User> followings = new HashSet<User>();
 
     @JsonIgnore

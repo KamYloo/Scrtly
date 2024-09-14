@@ -19,6 +19,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -58,6 +59,13 @@ public class StoryController {
         User user = userService.findUserProfileByJwt(token);
         List<Story> stories = storyService.getStoriesByUserId(user.getId());
         return new ResponseEntity<>(stories, HttpStatus.OK);
+    }
+
+    @GetMapping("/followed")
+    public ResponseEntity<Map<User, List<Story>>> getStoriesByFollowedUsersHandler(@RequestHeader("Authorization") String token) throws UserException {
+        User user = userService.findUserProfileByJwt(token);
+        Map<User, List<Story>> groupedStories = storyService.getGroupedStoriesByFollowedUsers(user.getId());
+        return new ResponseEntity<>(groupedStories, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{storyId}")

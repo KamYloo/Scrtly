@@ -12,4 +12,7 @@ import java.util.List;
 public interface StoryRepository extends JpaRepository<Story, Long> {
     @Query("select s from Story s where s.user.id = :userId")
     List<Story> getAllStoriesByUserId(@Param("userId") Long userId);
+
+    @Query("select s from Story s where s.user in (select u from User u join u.followers f where f.id = :userId)")
+    List<Story> getStoriesByFollowedUsers(@Param("userId") Long userId);
 }

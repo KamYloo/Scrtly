@@ -226,6 +226,20 @@
         position: relative;
         justify-content: center;
         gap: 20px;
+
+        img {
+            object-fit: cover;
+            border-radius: 10px;
+            max-width: 80%;
+            max-height: 80%;
+        }
+
+        p {
+            font-size: xx-large;
+            font-weight: bold;
+            font-family: cursive;
+            color: white;
+        }
     }
 
     .progress-bar {
@@ -242,12 +256,7 @@
         transition: width 0.1s linear;
     }
 
-    .story-content img {
-        object-fit: cover;
-        border-radius: 10px;
-        max-width: 80%;
-        max-height: 80%;
-    }
+
 
 
     .addPost {

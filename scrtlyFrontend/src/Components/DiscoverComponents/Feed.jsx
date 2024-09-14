@@ -19,7 +19,7 @@ function Feed() {
   const navigate = useNavigate();
 
   const handleProfileClick = (userId) => {
-    navigate(`/profile/${userId}`); // Redirect to the specific user's profile
+    navigate(`/profile/${userId}`)
   };
 
   const togglePost = (post = null) => {

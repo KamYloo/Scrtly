@@ -86,6 +86,5 @@ public class UserController {
         UserDto userDto = UserDtoMapper.toUserDto(user);
         userDto.setFollowed(UserUtil.isFollowedByReqUser(reqUser, user));
         return new ResponseEntity<>(userDto, HttpStatus.ACCEPTED);
-
     }
 }

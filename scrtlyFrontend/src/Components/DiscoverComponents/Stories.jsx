@@ -1,39 +1,22 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import { FaChevronRight, FaChevronLeft } from "react-icons/fa";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {BASE_API_URL} from "../../config/api.js";
 import {AddStory} from "./AddStory.jsx";
 import {StoryViewer} from "./StoryViewer.jsx";
+
+import {getFollowedUsersStory} from "../../Redux/Story/Action.js";
 
 function Stories() {
 
   const storyBoxRef = useRef(null)
   const [addStory, setAddStory] = useState(false)
   const [showViewer, setShowViewer] = useState(false);
-    const [currentUserIndex, setCurrentUserIndex] = useState(0);
+  const [currentUserIndex, setCurrentUserIndex] = useState(0);
+  const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
+  const dispatch = useDispatch()
 
-  const {auth} = useSelector(store => store);
-
-    const stories = [
-        {
-            id: 1,
-            username: "Oscar",
-            storyImages: [
-                "https://i.insider.com/5ddc0ddcfd9db217f85f4c1a?width=1000&format=jpeg&auto=webp",
-                "https://www.gannett-cdn.com/presto/2021/03/22/NRCD/9d9dd9e4-e84a-402e-ba8f-daa659e6e6c5-PhotoWord_003.JPG?crop=1999,1125,x0,y78&width=2560",
-                "https://example.com/image3.jpg"
-            ]
-        },
-        {
-            id: 2,
-            username: "Alice",
-            storyImages: [
-                "https://www.gannett-cdn.com/presto/2021/03/22/NRCD/9d9dd9e4-e84a-402e-ba8f-daa659e6e6c5-PhotoWord_003.JPG?crop=1999,1125,x0,y78&width=2560",
-                "https://i.insider.com/5ddc0ddcfd9db217f85f4c1a?width=1000&format=jpeg&auto=webp"
-            ]
-        },
-    ];
-
+  const {auth, story} = useSelector(store => store);
 
     const handleScrollLeft = () => {
     storyBoxRef.current.scrollBy({
@@ -50,10 +33,15 @@ function Stories() {
     })
   }
 
-    const handleStoryClick = (index) => {
-        setCurrentUserIndex(index)
+    const handleStoryClick = (userIndex, storyIndex) => {
+        setCurrentUserIndex(userIndex)
+        setCurrentStoryIndex(storyIndex)
         setShowViewer(true)
     };
+
+    useEffect(() => {
+        dispatch(getFollowedUsersStory())
+    }, [])
 
   return (
       <div className='stories'>
@@ -65,10 +53,10 @@ function Stories() {
             <img src={`${BASE_API_URL}/${auth.reqUser?.profilePicture || ''}`} alt="Add story" />
             <span>+ Story</span>
           </div>
-            {stories.map((story, index) => (
-                <div className="story" key={story.id} onClick={() => handleStoryClick(index)}>
-                    <img src={story.image} alt={story.username} />
-                    <span>{story.username}</span>
+            {Object.entries(story.stories).map(([user, stories], userIndex) => (
+                <div className="story" key={userIndex} onClick={() => handleStoryClick(userIndex, 0)}>
+                    <img src={`${BASE_API_URL}/${stories[0]?.user?.profilePicture || ''}`} alt={stories[0]?.user?.fullName || ''} />
+                    <span>{stories[0]?.user?.fullName || ''}</span>
                 </div>
             ))}
         </div>
@@ -78,8 +66,9 @@ function Stories() {
           {addStory && <AddStory onClose={() => setAddStory(((prev) => !prev))}/>}
           {showViewer && (
               <StoryViewer
-                  stories={stories}
+                  stories={story.stories}
                   currentUserIndex={currentUserIndex}
+                  currentStoryIndex={currentStoryIndex}
                   onClose={() => setShowViewer(false)}
               />
           )}
