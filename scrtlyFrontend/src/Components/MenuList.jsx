@@ -26,7 +26,7 @@ const MenuList = [
         id: 4,
         icon: <BsJournalAlbum />,
         name: "Album",
-        route: "/album",
+        route: "/albums",
     },
     {
         id: 5,
