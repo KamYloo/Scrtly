@@ -1,5 +1,6 @@
 package com.kamylo.Scrtly_backend.controller;
 
+import com.kamylo.Scrtly_backend.model.Artist;
 import com.kamylo.Scrtly_backend.model.User;
 import com.kamylo.Scrtly_backend.repository.UserRepository;
 import com.kamylo.Scrtly_backend.service.CustomUserServiceImplementation;
@@ -38,16 +39,28 @@ public class AuthController {
         String email = user.getEmail();
         String password = user.getPassword();
         String fullName = user.getFullName();
+        String role = user.getRole();
 
 
         User isEmailExist = userRepository.findByEmail(email);
         if (isEmailExist != null) {
             throw new Exception("Email Is Already Used With Another Account");
         }
-        User createdUser = new User();
-        createdUser.setEmail(email);
-        createdUser.setFullName(fullName);
-        createdUser.setPassword(passwordEncoder.encode(password));
+        User createdUser;
+        if ("Artist".equalsIgnoreCase(role)) {
+            Artist artist = new Artist();
+            artist.setEmail(email);
+            artist.setFullName(fullName);
+            artist.setPassword(passwordEncoder.encode(password));
+            artist.setRole("ARTIST");
+            createdUser = artist;
+        } else {
+            createdUser = new User();
+            createdUser.setEmail(email);
+            createdUser.setFullName(fullName);
+            createdUser.setPassword(passwordEncoder.encode(password));
+            createdUser.setRole("USER");
+        }
 
         User savedUser = userRepository.save(createdUser);
         Authentication authentication = new UsernamePasswordAuthenticationToken(email, password);

@@ -11,6 +11,8 @@ import lombok.*;
 @Entity
 @Table(name = "users")
 @Data
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE) // Dziedziczenie w jednej tabeli
+@DiscriminatorColumn(name = "role", discriminatorType = DiscriminatorType.STRING)
 public class User {
 
     @Id
@@ -21,6 +23,10 @@ public class User {
     private String email;
     private String profilePicture;
     private String description;
+
+    @Column(name = "role", insertable = false, updatable = false)
+    private String role;
+
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 

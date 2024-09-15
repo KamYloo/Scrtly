@@ -9,7 +9,7 @@ import {currentUser, register} from "../../Redux/Auth/Action.js";
 
 
 function Register() {
-    const [inputData, setInputData] = useState({fullName: "",email: "", password: "", confirmPassword: ""})
+    const [inputData, setInputData] = useState({fullName: "",email: "", password: "", confirmPassword: "", role: ""})
     const {auth} = useSelector(store => store)
     const token = localStorage.getItem('token')
     const dispatch = useDispatch();
@@ -64,6 +64,13 @@ function Register() {
                                onChange={(e) => handleChange(e)} placeholder='Confirm Password' required/>
                         <FaLock className='icon'/>
                     </div>
+                    <div className="inputBox">
+                        <select  value={inputData.role} onChange={(e) => handleChange(e)} name="role">
+                            <option value="User">User</option>
+                            <option value="Artist">Artist</option>
+                        </select>
+                    </div>
+
 
                     <button type='submit'>Register</button>
                 </form>
