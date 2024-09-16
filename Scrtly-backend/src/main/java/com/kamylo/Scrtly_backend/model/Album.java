@@ -3,6 +3,7 @@ package com.kamylo.Scrtly_backend.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -12,10 +13,10 @@ import java.util.List;
 public class Album {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     private String title;
-    private Date releaseDate;
+    private LocalDate releaseDate;
     private String coverImage;
 
     @ManyToOne

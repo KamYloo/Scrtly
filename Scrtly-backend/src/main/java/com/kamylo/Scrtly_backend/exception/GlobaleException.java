@@ -19,6 +19,13 @@ public class GlobaleException {
         return new ResponseEntity<ErrorDetail>(errorDetail, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(ArtistException.class)
+    public ResponseEntity<ErrorDetail> ArtistExceptionHandler(ArtistException e, WebRequest req) {
+        ErrorDetail errorDetail = new ErrorDetail(e.getMessage(), req.getDescription(false), LocalDateTime.now());
+
+        return new ResponseEntity<ErrorDetail>(errorDetail, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(MessageException.class)
     public ResponseEntity<ErrorDetail> MessageExceptionHandler(MessageException e, WebRequest req) {
         ErrorDetail errorDetail = new ErrorDetail(e.getMessage(), req.getDescription(false), LocalDateTime.now());
@@ -50,6 +57,13 @@ public class GlobaleException {
 
     @ExceptionHandler(StoryException.class)
     public ResponseEntity<ErrorDetail> StoryExceptionHandler(StoryException e, WebRequest req) {
+        ErrorDetail errorDetail = new ErrorDetail(e.getMessage(), req.getDescription(false), LocalDateTime.now());
+
+        return new ResponseEntity<ErrorDetail>(errorDetail, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(AlbumException.class)
+    public ResponseEntity<ErrorDetail> AlbumExceptionHandler(AlbumException e, WebRequest req) {
         ErrorDetail errorDetail = new ErrorDetail(e.getMessage(), req.getDescription(false), LocalDateTime.now());
 
         return new ResponseEntity<ErrorDetail>(errorDetail, HttpStatus.BAD_REQUEST);

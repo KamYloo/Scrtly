@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public interface CommentService {
+public interface    CommentService {
     Comment createComment(SendCommentRequest sendCommentRequest) throws UserException, PostException;
 
     Comment findCommentById(Long commentId) throws CommentException;
