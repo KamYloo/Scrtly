@@ -1,0 +1,52 @@
+.albumDetail {
+    height: 100vh;
+    width: 100vh;
+    z-index: 1;
+    flex-grow: 1;
+    background: rgba(7, 7, 7, 0.575);
+    backdrop-filter: blur(3px);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+
+    .topSection {
+        background: rgba(0, 0, 0, 0.329);
+        display: flex;
+        width: 100%;
+        height: 35vh;
+        padding: 5vh 10vh;
+        gap: 5vh;
+        color: white;
+
+        img {
+            width: 25vh;
+            height: 25vh;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .albumData {
+            height: 25vh;
+            align-content: end;
+
+            .albumName {
+                font-size: 10vh;
+                font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+                letter-spacing: 2vh;
+                word-spacing: 2vh;
+            }
+
+            p {
+                font-size: 16px;
+            }
+
+            .stats {
+                margin-top: 1vh;
+            }
+
+            span {
+                color: rgb(175, 177, 177);
+            }
+        }
+    }
+}

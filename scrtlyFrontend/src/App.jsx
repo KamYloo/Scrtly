@@ -15,6 +15,7 @@ import { ProfileEdit } from "./Components/AuthComponents/ProfileEdit.jsx";
 import { useDispatch, useSelector } from "react-redux";
 import { currentUser } from "./Redux/Auth/Action.js";
 import {AlbumsView} from "./Components/AlbumComponents/AlbumsView.jsx";
+import {Album} from "./Components/AlbumComponents/Album.jsx";
 
 function App() {
   const dispatch = useDispatch();
@@ -75,6 +76,10 @@ function App() {
 
         <Route path="/albums" element={
           renderLayout(AlbumsView, { setVolume, currentTrack, auth, token })
+        } />
+
+        <Route path="/album" element={
+          renderLayout(Album, { setVolume, currentTrack, volume, handleTrackChange, auth, token })
         } />
 
         <Route path="/discover" element={
