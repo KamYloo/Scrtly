@@ -3,11 +3,8 @@ import com.kamylo.Scrtly_backend.config.JwtProvider;
 import com.kamylo.Scrtly_backend.exception.UserException;
 import com.kamylo.Scrtly_backend.repository.UserRepository;
 import com.kamylo.Scrtly_backend.model.User;
-
-import com.kamylo.Scrtly_backend.request.UpdateUserRequest;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -96,8 +93,6 @@ public class UserServiceImplementation implements UserService {
         user.setDescription(decription);
         return userRepository.save(user);
     }
-
-
 
     @Override
     public Set<User> searchUser(String query) {
