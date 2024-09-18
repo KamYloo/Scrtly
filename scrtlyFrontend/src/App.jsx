@@ -74,6 +74,10 @@ function App() {
           renderLayout(Artists, { setVolume, currentTrack, auth, token })
         } />
 
+        <Route path="/artist/:artistId" element={
+          renderLayout(Middle, { setVolume, currentTrack, volume, handleTrackChange, auth, token })
+        } />
+
         <Route path="/albums" element={
           renderLayout(AlbumsView, { setVolume, currentTrack, auth, token })
         } />

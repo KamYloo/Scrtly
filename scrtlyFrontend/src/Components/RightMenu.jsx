@@ -16,7 +16,7 @@ function RightMenu({auth, token}) {
 
   useEffect(() => {
     const token = localStorage.getItem('token')
-    setIsLoggedIn(!!token) // Ustawienie stanu na podstawie obecności tokenu
+    setIsLoggedIn(!!token)
   }, [])
 
   const handleLogout = () => {
@@ -47,9 +47,9 @@ function RightMenu({auth, token}) {
           <img src={`${BASE_API_URL}/${auth.reqUser?.profilePicture || ''}`} alt="" />
         </div>
         {isLoggedIn ? (
-          <p className='loginBtn' onClick={handleLogout}>Logout</p>  // Przycisk Logout
+          <p className='loginBtn' onClick={handleLogout}>Logout</p>
         ) : (
-          <p className='loginBtn' onClick={() => navigate('/login')}>Login</p> // Przycisk Login
+          <p className='loginBtn' onClick={() => navigate('/login')}>Login</p>
         )}
       </div>
     </div>

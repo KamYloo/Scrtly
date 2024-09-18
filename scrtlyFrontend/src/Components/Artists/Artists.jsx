@@ -1,13 +1,23 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import "../../Styles/AlbumsView&&ArtistsView.css"
 import ArtistBanner from '../../img/ArtistsBanner.png'
 import Verification from '../../img/check.png'
 import { BiSearchAlt } from "react-icons/bi";
 import { FaHeadphones } from "react-icons/fa";
-import ArtistPic from '../../img/timber.jpg'
-import {FaCirclePlay} from "react-icons/fa6";
+import {useDispatch, useSelector} from "react-redux";
+import {useNavigate} from "react-router-dom";
+import {getAllArtists} from "../../Redux/Artist/Action.js";
+import {BASE_API_URL} from "../../config/api.js";
 
 function Artists() {
+    const dispatch = useDispatch()
+    const {artist} = useSelector(store => store);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        dispatch(getAllArtists())
+    }, [dispatch])
+
     return (
         <div className='artistsView'>
             <div className="banner">
@@ -24,96 +34,17 @@ function Artists() {
                 <button>Search</button>
             </div>
             <div className="artists">
-                <div className="artist">
+                { artist.artists.map((item) => (
+                <div className="artist" key={item.id} onClick={() => navigate(`/artist/${item.id}`)}>
                     <i className="listen"><FaHeadphones/></i>
                     <div className="imgPic">
-                        <img src={ArtistPic} alt=""/>
+                        <img src={`${BASE_API_URL}/${item.artistPic || ''}`} alt=""/>
                         <img className='check' src={Verification} alt=""/>
                     </div>
-                    <p>Pitbull</p>
+                    <p>{item.artistName}</p>
                 </div>
-                <div className="artist">
-                    <i className="listen"><FaHeadphones/></i>
-                    <div className="imgPic">
-                        <img src={ArtistPic} alt=""/>
-                        <img className='check' src={Verification} alt=""/>
-                    </div>
-                    <p>Pitbull</p>
-                </div>
-                <div className="artist">
-                    <i className="listen"><FaHeadphones/></i>
-                    <div className="imgPic">
-                        <img src={ArtistPic} alt=""/>
-                        <img className='check' src={Verification} alt=""/>
-                    </div>
-                    <p>Pitbull</p>
-                </div>
-                <div className="artist">
-                    <i className="listen"><FaHeadphones/></i>
-                    <div className="imgPic">
-                        <img src={ArtistPic} alt=""/>
-                        <img className='check' src={Verification} alt=""/>
-                    </div>
-                    <p>Pitbull</p>
-                </div>
-                <div className="artist">
-                    <i className="listen"><FaHeadphones/></i>
-                    <div className="imgPic">
-                        <img src={ArtistPic} alt=""/>
-                        <img className='check' src={Verification} alt=""/>
-                    </div>
-                    <p>Pitbull</p>
-                </div>
-                <div className="artist">
-                    <i className="listen"><FaHeadphones/></i>
-                    <div className="imgPic">
-                        <img src={ArtistPic} alt=""/>
-                        <img className='check' src={Verification} alt=""/>
-                    </div>
-                    <p>Pitbull</p>
-                </div>
-                <div className="artist">
-                    <i className="listen"><FaHeadphones/></i>
-                    <div className="imgPic">
-                        <img src={ArtistPic} alt=""/>
-                        <img className='check' src={Verification} alt=""/>
-                    </div>
-                    <p>Pitbull</p>
-                </div>
-                <div className="artist">
-                    <i className="listen"><FaHeadphones/></i>
-                    <div className="imgPic">
-                        <img src={ArtistPic} alt=""/>
-                        <img className='check' src={Verification} alt=""/>
-                    </div>
-                    <p>Pitbull</p>
-                </div>
-                <div className="artist">
-                    <i className="listen"><FaHeadphones/></i>
-                    <div className="imgPic">
-                        <img src={ArtistPic} alt=""/>
-                        <img className='check' src={Verification} alt=""/>
-                    </div>
-                    <p>Pitbull</p>
-                </div>
-                <div className="artist">
-                    <i className="listen"><FaHeadphones/></i>
-                    <div className="imgPic">
-                        <img src={ArtistPic} alt=""/>
-                        <img className='check' src={Verification} alt=""/>
-                    </div>
-                    <p>Pitbull</p>
-                </div>
-                <div className="artist">
-                    <i className="listen"><FaHeadphones/></i>
-                    <div className="imgPic">
-                        <img src={ArtistPic} alt=""/>
-                        <img className='check' src={Verification} alt=""/>
-                    </div>
-                    <p>Pitbull</p>
-                </div>
+                ))}
             </div>
-
         </div>
     )
 }

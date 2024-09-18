@@ -9,7 +9,8 @@
 .login {
     position: relative;
     width: 420px;
-    height: 480px;
+    max-height: 480px;
+    min-height: 480px;
     border-radius: 10px;
     color: white;
     background: transparent;
@@ -131,5 +132,6 @@
 }
 
 .login.r {
-    height: 680px;
+    min-height: 690px;
+    max-height: 750px;
 }

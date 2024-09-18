@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import logo from '../../img/logo.png'
-import { FaUser, FaLock, FaEnvelope } from "react-icons/fa";
+import {FaUser, FaLock, FaEnvelope, FaMusic} from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
 import '../../Styles/Login&Register.css'
 import { Link, useNavigate } from 'react-router-dom'
@@ -9,7 +9,7 @@ import {currentUser, register} from "../../Redux/Auth/Action.js";
 
 
 function Register() {
-    const [inputData, setInputData] = useState({fullName: "",email: "", password: "", confirmPassword: "", role: ""})
+    const [inputData, setInputData] = useState({fullName: "",email: "", password: "", confirmPassword: "", role: "", artistName: ""})
     const {auth} = useSelector(store => store)
     const token = localStorage.getItem('token')
     const dispatch = useDispatch();
@@ -65,12 +65,18 @@ function Register() {
                         <FaLock className='icon'/>
                     </div>
                     <div className="inputBox">
-                        <select  value={inputData.role} onChange={(e) => handleChange(e)} name="role">
+                        <select value={inputData.role} onChange={(e) => handleChange(e)} name="role">
                             <option value="User">User</option>
                             <option value="Artist">Artist</option>
                         </select>
                     </div>
-
+                    {inputData.role === "Artist" && (
+                        <div className="inputBox">
+                            <input type="text" value={inputData.artistName} name="artistName"
+                                   onChange={(e) => handleChange(e)} placeholder='Artist Name' required />
+                            <FaMusic className='icon'/>
+                        </div>
+                    )}
 
                     <button type='submit'>Register</button>
                 </form>

@@ -20,7 +20,7 @@ function ProfileEdit({auth, token}) {
     e.preventDefault()
 
     dispatch(updateUser({token, data:{fullName: fullName, profilePicture:profilePicture, description:description.trim() || ""}}))
-    navigate("/profile")
+    navigate(`/profile/${auth.reqUser.id}`)
     window.location.reload()
   }
 

@@ -3,6 +3,7 @@ package com.kamylo.Scrtly_backend.controller;
 import com.kamylo.Scrtly_backend.model.Artist;
 import com.kamylo.Scrtly_backend.model.User;
 import com.kamylo.Scrtly_backend.repository.UserRepository;
+import com.kamylo.Scrtly_backend.request.UserRequest;
 import com.kamylo.Scrtly_backend.service.CustomUserServiceImplementation;
 import com.kamylo.Scrtly_backend.response.AuthResponse;
 import com.kamylo.Scrtly_backend.config.JwtProvider;
@@ -35,38 +36,33 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> createUserHandler(@RequestBody User user) throws Exception {
-        String email = user.getEmail();
-        String password = user.getPassword();
-        String fullName = user.getFullName();
-        String role = user.getRole();
-
-
-        User isEmailExist = userRepository.findByEmail(email);
+    public ResponseEntity<AuthResponse> createUserHandler(@RequestBody UserRequest userRequest) throws Exception {
+        String role = userRequest.getRole();
+        User isEmailExist = userRepository.findByEmail(userRequest.getEmail());
         if (isEmailExist != null) {
             throw new Exception("Email Is Already Used With Another Account");
         }
         User createdUser;
         if ("Artist".equalsIgnoreCase(role)) {
             Artist artist = new Artist();
-            artist.setEmail(email);
-            artist.setFullName(fullName);
-            artist.setPassword(passwordEncoder.encode(password));
+            artist.setEmail(userRequest.getEmail());
+            artist.setFullName(userRequest.getFullName());
+            artist.setPassword(passwordEncoder.encode(userRequest.getPassword()));
+            artist.setArtistName(userRequest.getArtistName());
             artist.setRole("ARTIST");
             createdUser = artist;
         } else {
             createdUser = new User();
-            createdUser.setEmail(email);
-            createdUser.setFullName(fullName);
-            createdUser.setPassword(passwordEncoder.encode(password));
+            createdUser.setEmail(userRequest.getEmail());
+            createdUser.setFullName(userRequest.getFullName());
+            createdUser.setPassword(passwordEncoder.encode(userRequest.getPassword()));
             createdUser.setRole("USER");
         }
 
         User savedUser = userRepository.save(createdUser);
-        Authentication authentication = new UsernamePasswordAuthenticationToken(email, password);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userRequest.getEmail(), userRequest.getPassword());
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = JwtProvider.generateToken(authentication);
-
 
         AuthResponse authResponse = new AuthResponse();
         authResponse.setJwt(token);

@@ -6,9 +6,11 @@ import {chatMessageReducer} from "./ChatMessage/Reducer.js";
 import {postReducer} from "./Post/Reducer.js"
 import {commentReducer} from "./Comment/Reducer.js";
 import {storyReducer} from "./Story/Reducer.js";
+import {artistReducer} from "./Artist/Reducer.js";
 
 const rootReducer = combineReducers({
     auth: authReducer,
+    artist: artistReducer,
     chat: chatReducer,
     chatMessage: chatMessageReducer,
     post: postReducer,
