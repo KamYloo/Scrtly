@@ -13,8 +13,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/artists")
@@ -39,5 +46,32 @@ public class ArtistController {
        List<Artist> artists = artistService.getAllArtists();
        List<ArtistDto> artistDtos = ArtistDtoMapper.toArtistDtos(artists);
        return new ResponseEntity<>(artistDtos, HttpStatus.OK);
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<ArtistDto> updateArtistHandler(@RequestPart("bannerImg") MultipartFile bannerImg,
+                                                         @RequestPart("artistBio") String artistBio,
+                                                         @RequestHeader("Authorization") String token) throws ArtistException, UserException, IOException {
+        Artist artist = (Artist) userService.findUserProfileByJwt(token);
+
+        try {
+            Path folderPath = Paths.get("src/main/resources/static/uploads/artistsBannerImages");
+
+            if (!Files.exists(folderPath)) {
+                Files.createDirectories(folderPath);
+            }
+
+            String fileName = UUID.randomUUID().toString() + "_" + bannerImg.getOriginalFilename();
+            Path filePath = folderPath.resolve(fileName);
+            Files.copy(bannerImg.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            String relativePath = "uploads/artistsBannerImages/" + fileName;
+            artistService.updateArtist(artist.getId(), relativePath, artistBio);
+            ArtistDto artistDto = ArtistDtoMapper.toArtistDto(artist);
+            return new ResponseEntity<>(artistDto, HttpStatus.ACCEPTED);
+
+        } catch (IOException e) {
+            throw new RuntimeException("Error saving image file.", e);
+        }
     }
 }

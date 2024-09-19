@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
 import '../Styles/Middle.css'
+import '../Styles/form.css'
 import { Banner } from './Banner'
 import { FaUsers } from 'react-icons/fa'
 import { AudioList } from './AudioList'

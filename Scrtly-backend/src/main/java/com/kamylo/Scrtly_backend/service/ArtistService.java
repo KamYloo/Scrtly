@@ -12,4 +12,5 @@ public interface ArtistService {
     List<Artist> getAllArtists();
     Artist getArtistById(Long artistId) throws ArtistException;
     Set<Artist> searchArtistsByName(String artistName) throws ArtistException;
+    Artist updateArtist(Long artistId, String bannerImg, String artistBio) throws ArtistException;
 }

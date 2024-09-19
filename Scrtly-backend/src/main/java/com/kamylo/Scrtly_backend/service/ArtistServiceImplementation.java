@@ -6,6 +6,9 @@ import com.kamylo.Scrtly_backend.repository.ArtistRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Set;
 
@@ -28,5 +31,23 @@ public class ArtistServiceImplementation implements ArtistService {
     @Override
     public Set<Artist> searchArtistsByName(String artistName) throws ArtistException {
         return artistRepository.findByArtistName(artistName);
+    }
+
+    @Override
+    public Artist updateArtist(Long artistId, String bannerImg, String artistBio) throws ArtistException {
+       Artist artist = getArtistById(artistId);
+
+       String currentBannerImg = artist.getBannerImg();
+
+       if(currentBannerImg != null && !currentBannerImg.isEmpty()){
+           Path oldFilePath = Paths.get("src/main/resources/static").resolve(currentBannerImg);
+           File oldFile = oldFilePath.toFile();
+           if (oldFile.exists()) {
+               oldFile.delete();
+           }
+       }
+       artist.setBannerImg(bannerImg);
+       artist.setArtistBio(artistBio);
+       return artistRepository.save(artist);
     }
 }

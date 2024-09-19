@@ -46,3 +46,23 @@ export const getAllArtists = () => async (dispatch) => {
         dispatch({ type: GET_ALL_ARTISTS_ERROR, payload: error.message });
     }
 };
+
+export const updateArtist = (formData) => async (dispatch) => {
+    try {
+        const response = await fetch(`${BASE_API_URL}/api/artists/update`, {
+            method: 'PUT',
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+            body: formData
+        });
+
+
+        const artist = await response.json();
+        console.log("updateArtist", artist);
+        dispatch({ type: FIND_ARTIST_BY_ID_REQUEST, payload: artist });
+    } catch (error) {
+        console.log('catch error', error);
+        dispatch({ type: FIND_ARTIST_BY_ID_ERROR, payload: error.message });
+    }
+};

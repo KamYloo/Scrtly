@@ -3,6 +3,7 @@ import {FIND_ARTIST_BY_ID_REQUEST, GET_ALL_ARTISTS_REQUEST} from "./ActionType.j
 const initialValue= {
     findArtist:null,
     artists: [],
+    updateArtist: null,
 }
 
 export const artistReducer=(store=initialValue, {type,payload})=>{
