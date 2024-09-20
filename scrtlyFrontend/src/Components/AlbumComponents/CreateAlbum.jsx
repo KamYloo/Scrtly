@@ -1,35 +1,36 @@
 import React, {useEffect, useState} from 'react'
 import {MdCancel} from "react-icons/md";
 import {useDispatch} from "react-redux";
+import {createAlbum} from "../../Redux/Album/Action.js";
 
 function CreateAlbum({onClose}) {
     const [title, setTitle] = useState()
-    const [songImg, setSongImg] = useState(null)
+    const [albumImg, setAlbumImg] = useState(null)
     const [preview, setPreview] = useState('');
     const dispatch = useDispatch()
 
     const handleFileChange = (e) => {
-        setSongImg(e.target.files[0])
+        setAlbumImg(e.target.files[0])
     };
 
     const createAlbumHandler = () => {
         const formData = new FormData()
-        formData.append('coverImage', songImg)
+        formData.append('file', albumImg)
         formData.append('title', title)
-        // dispatch(updateArtist(formData))
-        setSongImg(null)
+        dispatch(createAlbum(formData))
+        setAlbumImg(null)
         onClose()
     }
 
     useEffect(() => {
-        if (songImg) {
-            const previewUrl = URL.createObjectURL(songImg)
+        if (albumImg) {
+            const previewUrl = URL.createObjectURL(albumImg)
             setPreview(previewUrl)
             return () => {
                 URL.revokeObjectURL(previewUrl)
             }
         }
-    }, [songImg])
+    }, [albumImg])
 
     return (
         <div className='createAlbum'>
@@ -41,7 +42,7 @@ function CreateAlbum({onClose}) {
                 <div className="editPic">
                     <div className="left">
                         <img className="trackImg" src={preview} alt=""/>
-                        <span>{songImg?.name}</span>
+                        <span>{albumImg?.name}</span>
                     </div>
                     <div className="right">
                         <input type="file" onChange={handleFileChange}/>

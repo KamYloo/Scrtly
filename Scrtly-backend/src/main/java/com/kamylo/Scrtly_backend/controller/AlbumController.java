@@ -1,5 +1,7 @@
 package com.kamylo.Scrtly_backend.controller;
 
+import com.kamylo.Scrtly_backend.dto.AlbumDto;
+import com.kamylo.Scrtly_backend.dto.mapper.AlbumDtoMapper;
 import com.kamylo.Scrtly_backend.exception.AlbumException;
 import com.kamylo.Scrtly_backend.exception.ArtistException;
 import com.kamylo.Scrtly_backend.exception.UserException;
@@ -36,9 +38,9 @@ public class AlbumController {
     private UserService userService;
 
     @PostMapping("/create")
-    public ResponseEntity<Album> createAlbumHandler(@RequestParam("file") MultipartFile file,
-                                                    @RequestParam("title") String title,
-                                                    @RequestHeader("Authorization") String token) throws ArtistException, UserException {
+    public ResponseEntity<AlbumDto> createAlbumHandler(@RequestParam("file") MultipartFile file,
+                                                       @RequestParam("title") String title,
+                                                       @RequestHeader("Authorization") String token) throws ArtistException, UserException {
         if (file.isEmpty()) {
             throw new RuntimeException("Image file not uploaded.");
         }
@@ -59,7 +61,8 @@ public class AlbumController {
             albumRequest.setArtist(artist);
             albumRequest.setCoverImage("/uploads/albumImages/" + fileName);
             Album album = albumService.createAlbum(albumRequest);
-            return new ResponseEntity<>(album, HttpStatus.CREATED);
+            AlbumDto albumDto = AlbumDtoMapper.toAlbumDto(album);
+            return new ResponseEntity<>(albumDto, HttpStatus.CREATED);
         }
         catch (IOException e) {
             throw new RuntimeException("Error saving image file.", e);
@@ -67,9 +70,10 @@ public class AlbumController {
     }
 
     @GetMapping("/getAll")
-    public ResponseEntity<List<Album>> getAllAlbumsHandler() {
+    public ResponseEntity<List<AlbumDto>> getAllAlbumsHandler() {
         List<Album> albums = albumService.getAllAlbums();
-        return new ResponseEntity<>(albums, HttpStatus.OK);
+        List<AlbumDto> albumDtos = AlbumDtoMapper.toAlbumDtos(albums);
+        return new ResponseEntity<>(albumDtos, HttpStatus.OK);
     }
 
     @GetMapping("/{albumId}/tracks")

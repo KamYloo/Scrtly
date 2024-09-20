@@ -7,6 +7,7 @@ import {postReducer} from "./Post/Reducer.js"
 import {commentReducer} from "./Comment/Reducer.js";
 import {storyReducer} from "./Story/Reducer.js";
 import {artistReducer} from "./Artist/Reducer.js";
+import {albumReducer} from "./Album/Reducer.js";
 
 const rootReducer = combineReducers({
     auth: authReducer,
@@ -16,6 +17,7 @@ const rootReducer = combineReducers({
     post: postReducer,
     comment: commentReducer,
     story : storyReducer,
+    album : albumReducer,
 })
 
 export const store = legacy_createStore(rootReducer, applyMiddleware(thunk))

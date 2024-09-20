@@ -35,7 +35,6 @@ export const getAllArtists = () => async (dispatch) => {
             },
         });
 
-
         const artists = await response.json();
         console.log("getAllArtists", artists);
         dispatch({ type: GET_ALL_ARTISTS_REQUEST, payload: artists });

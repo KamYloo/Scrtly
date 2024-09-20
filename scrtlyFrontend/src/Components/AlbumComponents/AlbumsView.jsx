@@ -1,11 +1,21 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import "../../Styles/AlbumsView&&ArtistsView.css"
 import AlbumBanner from '../../img/albumBanner.png'
 import { BiSearchAlt } from "react-icons/bi";
 import AlbumPic from '../../img/album.jpg'
 import { FaCirclePlay } from "react-icons/fa6";
+import {useDispatch, useSelector} from "react-redux";
+import {getAllAlbums} from "../../Redux/Album/Action.js";
+import {BASE_API_URL} from "../../config/api.js";
 
 function AlbumsView() {
+    const dispatch = useDispatch()
+    const {album} = useSelector(store => store);
+
+    useEffect(() => {
+        dispatch(getAllAlbums())
+    }, [dispatch])
+
     return (
         <div className='albumsView'>
             <div className="banner">
@@ -22,78 +32,14 @@ function AlbumsView() {
                 <button>Search</button>
             </div>
             <div className="albums">
-                <div className="album">
+                { album.albums.map((item) => (
+                <div className="album" key={item.id}>
                     <i className="play"><FaCirclePlay/></i>
-                    <img src={AlbumPic} alt=""/>
-                    <span>Pitbull</span>
-                    <p>Last Day</p>
+                    <img src={`${BASE_API_URL}${item?.albumImage || ''}`} alt=""/>
+                    <span>{item?.artist.artistName}</span>
+                    <p>{item?.title}</p>
                 </div>
-                <div className="album">
-                    <i className="play"><FaCirclePlay/></i>
-                    <img src={AlbumPic} alt=""/>
-                    <span>Pitbull</span>
-                    <p>Last Day</p>
-                </div>
-                <div className="album">
-                    <i className="play"><FaCirclePlay/></i>
-                    <img src={AlbumPic} alt=""/>
-                    <span>Pitbull</span>
-                    <p>Last Day</p>
-                </div>
-                <div className="album">
-                    <i className="play"><FaCirclePlay/></i>
-                    <img src={AlbumPic} alt=""/>
-                    <span>Pitbull</span>
-                    <p>Last Day</p>
-                </div>
-                <div className="album">
-                    <i className="play"><FaCirclePlay/></i>
-                    <img src={AlbumPic} alt=""/>
-                    <span>Pitbull</span>
-                    <p>Last Day</p>
-                </div>
-                <div className="album">
-                    <i className="play"><FaCirclePlay/></i>
-                    <img src={AlbumPic} alt=""/>
-                    <span>Pitbull</span>
-                    <p>Last Day</p>
-                </div>
-                <div className="album">
-                    <i className="play"><FaCirclePlay/></i>
-                    <img src={AlbumPic} alt=""/>
-                    <span>Pitbull</span>
-                    <p>Last Day</p>
-                </div>
-                <div className="album">
-                    <i className="play"><FaCirclePlay/></i>
-                    <img src={AlbumPic} alt=""/>
-                    <span>Pitbull</span>
-                    <p>Last Day</p>
-                </div>
-                <div className="album">
-                    <i className="play"><FaCirclePlay/></i>
-                    <img src={AlbumPic} alt=""/>
-                    <span>Pitbull</span>
-                    <p>Last Day</p>
-                </div>
-                <div className="album">
-                    <i className="play"><FaCirclePlay/></i>
-                    <img src={AlbumPic} alt=""/>
-                    <span>Pitbull</span>
-                    <p>Last Day</p>
-                </div>
-                <div className="album">
-                    <i className="play"><FaCirclePlay/></i>
-                    <img src={AlbumPic} alt=""/>
-                    <span>Pitbull</span>
-                    <p>Last Day</p>
-                </div>
-                <div className="album">
-                    <i className="play"><FaCirclePlay/></i>
-                    <img src={AlbumPic} alt=""/>
-                    <span>Pitbull</span>
-                    <p>Last Day</p>
-                </div>
+                ))}
             </div>
         </div>
     )
