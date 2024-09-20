@@ -42,9 +42,7 @@ public class AlbumController {
         if (file.isEmpty()) {
             throw new RuntimeException("Image file not uploaded.");
         }
-        User user = userService.findUserProfileByJwt(token);
-        Artist artist = (Artist) user;
-
+        Artist artist = (Artist) userService.findUserProfileByJwt(token);
         try {
 
             Path folderPath = Paths.get("src/main/resources/static/uploads/albumImages");
@@ -82,8 +80,7 @@ public class AlbumController {
 
     @DeleteMapping("/delete/{albumId}")
     public ResponseEntity<ApiResponse> deleteAlbumHandler(@PathVariable Integer albumId , @RequestHeader("Authorization") String token) throws UserException, AlbumException, ArtistException {
-        User user = userService.findUserProfileByJwt(token);
-        Artist artist = (Artist) user;
+        Artist artist = (Artist) userService.findUserProfileByJwt(token);
         ApiResponse res = new ApiResponse();
 
         try {

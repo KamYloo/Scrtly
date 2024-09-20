@@ -5,8 +5,6 @@ import {
     GET_ALL_ARTISTS_ERROR,
     GET_ALL_ARTISTS_REQUEST
 } from "./ActionType.js";
-import {GET_ALL_POSTS_ERROR, GET_ALL_POSTS_REQUEST} from "../Post/ActionType.js";
-
 
 export const findArtistById = (artistId) => async (dispatch) => {
     try {

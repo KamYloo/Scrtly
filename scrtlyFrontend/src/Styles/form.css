@@ -2,11 +2,12 @@
     position: absolute;
     right: 1vh;
     top: 5vh;
-    width: 7vh;
+    width: 12vh;
     background: white;
     list-style: none;
     padding: 5px;
     border-radius: 10px;
+    z-index: 10;
 
     .option {
         display: flex;
@@ -14,7 +15,7 @@
         width: 100%;
         height: 3vh;
         background: #fff;
-        padding: 0 1vh;
+        padding: 0 5vh;
         border-radius: 5px;
         cursor: pointer;
         transition: 0.3s;
@@ -29,7 +30,13 @@
     }
 }
 
-.editArtist {
+
+
+.editArtist, .createAlbum {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
     border: 2px solid white;
     border-radius: 10px;
     background: rgba(0, 0, 0, 0.411);
@@ -42,121 +49,152 @@
     right: 0;
     left: 0;
     margin: auto;
-    z-index: 8;
+    z-index: 5;
 
 
-            .title {
-                width: 65vh;
-                padding: 20px;
-                text-align: center;
+    .title {
+        width: 65vh;
+        padding: 20px;
+        text-align: center;
 
-                h2 {
-                    font-size: xx-large;
-                    color: white;
-                    font-family: cursive;
-                    text-shadow: 5px 0 20px black;
-                }
-            }
+        h2 {
+            font-size: xx-large;
+            color: white;
+            font-family: cursive;
+            text-shadow: 5px 0 20px black;
+        }
+    }
 
-            .editPic {
+    form {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        .editPic {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 10px;
+            background: rgba(54, 54, 54, 0.644);
+
+            .left {
                 display: flex;
-                justify-content: space-between;
                 align-items: center;
-                padding: 20px;
-                margin: 20px;
-                border-radius: 10px;
-                background: rgba(54, 54, 54, 0.644);
+                gap: 20px;
 
-                .left {
-                    display: flex;
-                    align-items: center;
-                    gap: 20px;
-
-                    img {
-                        width: 140px;
-                        height: 70px;
-                        background: rgb(29, 29, 31);
-                        border-radius: 10px;
-                        object-fit: cover;
-                    }
-
-                    p {
-                        font-size: 20px;
-                        font-weight: bold;
-                        color: white;
-                    }
+                img {
+                    width: 140px;
+                    height: 70px;
+                    background: rgb(29, 29, 31);
+                    border-radius: 10px;
+                    object-fit: cover;
                 }
 
-                .right {
-                    input {
-                        display: none;
-                    }
-                    button {
-                        outline: none;
-                        border: none;
-                        padding: 10px;
-                        background: aqua;
-                        color: black;
-                        font-size: 13px;
-                        font-weight: bold;
-                        border-radius: 10px;
-                        cursor: pointer;
-                        transition: 0.3s;
-                    }
-
-                    button:hover {
-                        background: rgb(4, 214, 214);
-                    }
+                .trackImg {
+                    width: 70px;
                 }
-            }
 
-            .editLongText {
-                display: flex;
-                flex-direction: column;
-                padding: 20px;
-                margin: 20px;
-                border-radius: 10px;
-                background: rgba(54, 54, 54, 0.644);
-                gap: 10px;
-
-                h4 {
-                    font-size: 18px;
+                span {
+                    font-size: 12px;
                     font-weight: bold;
                     color: white;
-                }
+                    max-width: 20vh;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
 
-                textarea, input {
-                    border: none;
-                    outline: none;
-                    border-radius: 10px;
-                    padding: 10px;
-                    height: 12vh;
-                    background: rgba(0, 0, 0, 0.404);
-                    color: rgb(184, 179, 179);
-                    font-size: 14px;
                 }
+            }
 
+            .right {
                 input {
-                    height: 3vh;
+                    display: none;
+                }
+
+                button {
+                    outline: none;
+                    border: none;
+                    padding: 10px;
+                    background: aqua;
+                    color: black;
+                    font-size: 13px;
+                    font-weight: bold;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    transition: 0.3s;
+                }
+
+                button:hover {
+                    background: rgb(4, 214, 214);
                 }
             }
         }
 
-        .submit {
-            outline: none;
-            border: none;
-            margin-left: 27vh;
-            padding: 10px 40px;
+        .editLongText, .editShortText {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            margin: 20px;
             border-radius: 10px;
-            background: aqua;
-            color: black;
-            font-size: 13px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
+            background: rgba(54, 54, 54, 0.644);
+            gap: 10px;
 
-        .submit:hover {
-            background: rgb(4, 214, 214);
-        }
+            h4 {
+                font-size: 18px;
+                font-weight: bold;
+                color: white;
+            }
 
+            textarea, input {
+                border: none;
+                outline: none;
+                border-radius: 10px;
+                padding: 10px;
+                height: 12vh;
+                background: rgba(0, 0, 0, 0.404);
+                color: rgb(184, 179, 179);
+                font-size: 14px;
+            }
+
+            input {
+                height: 3vh;
+            }
+        }
+    }
+
+    .submit {
+        outline: none;
+        border: none;
+        padding: 10px 40px;
+        border-radius: 10px;
+        background: aqua;
+        color: black;
+        font-size: 13px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .submit:hover {
+        background: rgb(4, 214, 214);
+    }
+}
+
+.createAlbum {
+    width: 50vh;
+}
+
+@media screen and (max-width : 550px) {
+    .createAlbum, .editArtist {
+        background: rgba(0, 0, 0, 0.77);
+        top: 40vh;
+    }
+
+    .editArtist {
+        width: 50vh;
+    }
+}
