@@ -82,7 +82,7 @@ function App() {
           renderLayout(AlbumsView, { setVolume, currentTrack, auth, token })
         } />
 
-        <Route path="/album" element={
+        <Route path="/album/:albumId" element={
           renderLayout(Album, { setVolume, currentTrack, volume, handleTrackChange, auth, token })
         } />
 

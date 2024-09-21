@@ -2,15 +2,16 @@ import React, {useEffect} from 'react'
 import "../../Styles/AlbumsView&&ArtistsView.css"
 import AlbumBanner from '../../img/albumBanner.png'
 import { BiSearchAlt } from "react-icons/bi";
-import AlbumPic from '../../img/album.jpg'
 import { FaCirclePlay } from "react-icons/fa6";
 import {useDispatch, useSelector} from "react-redux";
 import {getAllAlbums} from "../../Redux/Album/Action.js";
 import {BASE_API_URL} from "../../config/api.js";
+import {useNavigate} from "react-router-dom";
 
 function AlbumsView() {
     const dispatch = useDispatch()
     const {album} = useSelector(store => store);
+    const navigate = useNavigate();
 
     useEffect(() => {
         dispatch(getAllAlbums())
@@ -33,7 +34,7 @@ function AlbumsView() {
             </div>
             <div className="albums">
                 { album.albums.map((item) => (
-                <div className="album" key={item.id}>
+                <div className="album" key={item.id} onClick={() => navigate(`/album/${item.id}`)}>
                     <i className="play"><FaCirclePlay/></i>
                     <img src={`${BASE_API_URL}${item?.albumImage || ''}`} alt=""/>
                     <span>{item?.artist.artistName}</span>

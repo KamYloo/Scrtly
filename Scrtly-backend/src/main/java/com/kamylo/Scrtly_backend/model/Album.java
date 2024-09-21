@@ -2,6 +2,7 @@ package com.kamylo.Scrtly_backend.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -20,8 +21,10 @@ public class Album {
     private String coverImage;
 
     @ManyToOne
+    @ToString.Exclude
     private Artist artist;
 
     @OneToMany(mappedBy = "album", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<Song> songs = new ArrayList<>();
 }

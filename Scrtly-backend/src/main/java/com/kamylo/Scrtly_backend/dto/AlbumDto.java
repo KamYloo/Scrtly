@@ -14,4 +14,5 @@ public class AlbumDto {
     private String albumImage;
 
     private ArtistDto artist;
+    private boolean isReqArtistAlbum;
 }

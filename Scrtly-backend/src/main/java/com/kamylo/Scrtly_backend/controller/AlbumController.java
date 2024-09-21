@@ -61,7 +61,7 @@ public class AlbumController {
             albumRequest.setArtist(artist);
             albumRequest.setCoverImage("/uploads/albumImages/" + fileName);
             Album album = albumService.createAlbum(albumRequest);
-            AlbumDto albumDto = AlbumDtoMapper.toAlbumDto(album);
+            AlbumDto albumDto = AlbumDtoMapper.toAlbumDto(album, artist);
             return new ResponseEntity<>(albumDto, HttpStatus.CREATED);
         }
         catch (IOException e) {
@@ -70,10 +70,19 @@ public class AlbumController {
     }
 
     @GetMapping("/getAll")
-    public ResponseEntity<List<AlbumDto>> getAllAlbumsHandler() {
+    public ResponseEntity<List<AlbumDto>> getAllAlbumsHandler(@RequestHeader("Authorization") String token) throws ArtistException, UserException {
+        Artist artist = (Artist) userService.findUserProfileByJwt(token);
         List<Album> albums = albumService.getAllAlbums();
-        List<AlbumDto> albumDtos = AlbumDtoMapper.toAlbumDtos(albums);
+        List<AlbumDto> albumDtos = AlbumDtoMapper.toAlbumDtos(albums, artist);
         return new ResponseEntity<>(albumDtos, HttpStatus.OK);
+    }
+
+    @GetMapping("/{albumId}")
+    public ResponseEntity<AlbumDto> getAlbumHandler(@PathVariable Integer albumId, @RequestHeader("Authorization") String token) throws UserException, ArtistException, AlbumException {
+        Artist artist = (Artist) userService.findUserProfileByJwt(token);
+        Album album = albumService.getAlbum(albumId);
+        AlbumDto albumDto = AlbumDtoMapper.toAlbumDto(album, artist);
+        return new ResponseEntity<>(albumDto, HttpStatus.ACCEPTED);
     }
 
     @GetMapping("/{albumId}/tracks")

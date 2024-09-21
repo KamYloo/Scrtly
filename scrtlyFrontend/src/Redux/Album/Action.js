@@ -1,7 +1,7 @@
 import {BASE_API_URL} from "../../config/api.js";
 import {
     CREATE_ALBUM_ERROR,
-    CREATE_ALBUM_REQUEST,
+    CREATE_ALBUM_REQUEST, FIND_ALBUM_ERROR, FIND_ALBUM_REQUEST,
     GET_ALL_ALBUMS_ERROR,
     GET_ALL_ALBUMS_REQUEST
 } from "./ActionType.js";
@@ -44,3 +44,22 @@ export const getAllAlbums = () => async (dispatch) => {
         dispatch({ type: GET_ALL_ALBUMS_ERROR, payload: error.message });
     }
 };
+
+export const getAlbum = (albumId) => async (dispatch) => {
+    try {
+        const res = await fetch(`${BASE_API_URL}/api/albums/${albumId}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem('token')}`
+            },
+        })
+
+        const resData = await res.json()
+        console.log("Find album ", resData)
+        dispatch({ type: FIND_ALBUM_REQUEST, payload: resData })
+    } catch (error) {
+        console.log("catch error ", error)
+        dispatch({ type: FIND_ALBUM_ERROR, payload: error.message });
+    }
+}
