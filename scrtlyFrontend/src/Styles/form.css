@@ -32,7 +32,7 @@
 
 
 
-.editArtist, .createAlbum {
+.editArtist, .createAlbum, .addSong {
     display: flex;
     justify-content: center;
     flex-direction: column;
@@ -188,13 +188,18 @@
     width: 50vh;
 }
 
+.addSong {
+    top: 12vh;
+}
+
 @media screen and (max-width : 550px) {
-    .createAlbum, .editArtist {
+    .createAlbum, .editArtist, .addSong {
         background: rgba(0, 0, 0, 0.77);
         top: 40vh;
     }
 
-    .editArtist {
+    .editArtist, .addSong {
+        top: 10vh;
         width: 50vh;
     }
 }

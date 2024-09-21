@@ -16,7 +16,6 @@ public class Song {
 
     private String title;
     private int duration;
-    private String genre;
     private String imageSong;
 
     @ManyToOne

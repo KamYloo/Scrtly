@@ -48,5 +48,69 @@
                 color: rgb(175, 177, 177);
             }
         }
+
+        .addSongBtn {
+            width: 10vh;
+            height: 4vh;
+            align-self: flex-end;
+            position: absolute;
+            right: 2vh;
+            text-align: center;
+            outline: none;
+            border: none;
+            padding: 10px;
+            background: aqua;
+            color: black;
+            font-size: 13px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .addSongBtn:hover {
+            background: rgb(4, 214, 214);
+        }
+    }
+}
+
+@media screen and (max-width : 550px) {
+    .albumDetail {
+        .topSection {
+            height: 28vh;
+            padding: 5vh 2vh;
+            gap: 4vh;
+
+            img {
+                width: 15vh;
+                height: 15vh;
+            }
+
+            .albumData {
+                align-content: flex-start;
+
+                .albumName {
+                    font-size: 5vh;
+                }
+
+                p {
+                    font-size: 12px;
+                }
+
+            }
+
+            .addSongBtn {
+                width: 8vh;
+                height: 4vh;
+                top: 6vh;
+                right: 2vh;
+                padding: 5px;
+                font-size: 10px;
+            }
+
+        }
+        .audioList .songsBox {
+            height: 370px;
+        }
     }
 }
