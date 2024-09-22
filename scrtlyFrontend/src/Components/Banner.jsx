@@ -9,17 +9,10 @@ import {EditArtist} from "./Artists/EditArtist.jsx";
 import {BASE_API_URL} from "../config/api.js";
 import {CreateAlbum} from "./AlbumComponents/CreateAlbum.jsx";
 
-function Banner() {
-    const {artistId} = useParams();
-    const dispatch = useDispatch();
-    const {artist} = useSelector(store => store);
+function Banner({artist}) {
     const [menu, setMenu] = useState(false)
     const [editArtist, setEditArtist] = useState(false)
     const [createAlbum, setCreateAlbum] = useState(false)
-
-    useEffect(() => {
-        dispatch(findArtistById(artistId))
-    }, [artistId])
 
     return (
         <div className='banner'>

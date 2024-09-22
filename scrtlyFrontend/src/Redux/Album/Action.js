@@ -18,7 +18,7 @@ export const createAlbum = (formData) => async (dispatch) => {
         })
 
         const album = await response.json()
-        console.log("created Post", album)
+        console.log("created Album", album)
         dispatch({type: CREATE_ALBUM_REQUEST, payload: album})
     }catch(err) {
         console.log("catch error " + err)
@@ -37,7 +37,7 @@ export const getAllAlbums = () => async (dispatch) => {
         });
 
         const albums = await response.json();
-        console.log("getAllArtists", albums);
+        console.log("getAllAlbums", albums);
         dispatch({ type: GET_ALL_ALBUMS_REQUEST, payload: albums });
     } catch (error) {
         console.log('catch error', error);

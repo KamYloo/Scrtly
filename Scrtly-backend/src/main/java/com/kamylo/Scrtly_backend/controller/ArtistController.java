@@ -1,10 +1,14 @@
 package com.kamylo.Scrtly_backend.controller;
 
 import com.kamylo.Scrtly_backend.dto.ArtistDto;
+import com.kamylo.Scrtly_backend.dto.SongDto;
 import com.kamylo.Scrtly_backend.dto.mapper.ArtistDtoMapper;
+import com.kamylo.Scrtly_backend.dto.mapper.SongDtoMapper;
+import com.kamylo.Scrtly_backend.exception.AlbumException;
 import com.kamylo.Scrtly_backend.exception.ArtistException;
 import com.kamylo.Scrtly_backend.exception.UserException;
 import com.kamylo.Scrtly_backend.model.Artist;
+import com.kamylo.Scrtly_backend.model.Song;
 import com.kamylo.Scrtly_backend.model.User;
 import com.kamylo.Scrtly_backend.service.ArtistService;
 import com.kamylo.Scrtly_backend.service.UserService;
@@ -73,5 +77,13 @@ public class ArtistController {
         } catch (IOException e) {
             throw new RuntimeException("Error saving image file.", e);
         }
+    }
+
+    @GetMapping("/{artistId}/tracks")
+    public ResponseEntity<List<SongDto>> getArtistTracksHandler(@RequestHeader("Authorization") String token) throws UserException, ArtistException {
+        Artist artist = (Artist) userService.findUserProfileByJwt(token);
+        List<Song> songs = artistService.getArtistTracks(artist.getId());
+        List<SongDto> songDtos = SongDtoMapper.toSongDtoList(songs,artist);
+        return new ResponseEntity<>(songDtos, HttpStatus.OK);
     }
 }

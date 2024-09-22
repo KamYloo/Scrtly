@@ -20,7 +20,7 @@ function Album({ volume, onTrackChange}) {
 
     useEffect(() => {
         dispatch(getAlbumTracks(albumId))
-    }, [albumId]);
+    }, [albumId, album.uploadSong]);
 
     return (
         <div className='albumDetail'>

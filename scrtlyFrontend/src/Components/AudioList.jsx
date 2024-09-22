@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { FaHeadphones, FaHeart, FaRegClock, FaRegHeart } from 'react-icons/fa'
-import { Songs } from './Songs'
 import { MusicPlayer } from './MusicPlayer.jsx'
 import {BASE_API_URL} from "../config/api.js";
 
@@ -33,8 +32,10 @@ function AudioList({ volume, onTrackChange, initialSongs  }) {
     }
 
     const setMainSong = (songSrc, imgSrc, songName, songArtist) => {
-        setSong(songSrc)
-        setImage(imgSrc)
+        const encodedSongSrc = encodeURI(songSrc)
+        const encodedImgSrc = encodeURI(imgSrc)
+        setSong(encodedSongSrc)
+        setImage(encodedImgSrc)
         setAuto(true)
         onTrackChange(songName, songArtist)
     }
@@ -48,7 +49,7 @@ function AudioList({ volume, onTrackChange, initialSongs  }) {
     return (
         <div className='audioList'>
             <h2 className="title">
-                The List <span>{Songs.length} songs</span>
+                The List <span>{initialSongs?.length} songs</span>
             </h2>
             <div className="songsBox">
                 {

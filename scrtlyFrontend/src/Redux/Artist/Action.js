@@ -3,7 +3,7 @@ import {
     FIND_ARTIST_BY_ID_ERROR,
     FIND_ARTIST_BY_ID_REQUEST,
     GET_ALL_ARTISTS_ERROR,
-    GET_ALL_ARTISTS_REQUEST
+    GET_ALL_ARTISTS_REQUEST, GET_ARTIST_TRACKS_ERROR, GET_ARTIST_TRACKS_REQUEST
 } from "./ActionType.js";
 
 export const findArtistById = (artistId) => async (dispatch) => {
@@ -63,3 +63,22 @@ export const updateArtist = (formData) => async (dispatch) => {
         dispatch({ type: FIND_ARTIST_BY_ID_ERROR, payload: error.message });
     }
 };
+
+export const getArtistTracks = (artistId) => async (dispatch) => {
+    try {
+        const res = await fetch(`${BASE_API_URL}/api/artists/${artistId}/tracks`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem('token')}`
+            },
+        })
+
+        const resData = await res.json()
+        console.log("Find tracks ", resData)
+        dispatch({ type: GET_ARTIST_TRACKS_REQUEST, payload: resData })
+    } catch (error) {
+        console.log("catch error ", error)
+        dispatch({ type: GET_ARTIST_TRACKS_ERROR, payload: error.message });
+    }
+}

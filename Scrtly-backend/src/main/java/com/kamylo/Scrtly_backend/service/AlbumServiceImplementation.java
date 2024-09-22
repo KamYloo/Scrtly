@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -51,10 +52,7 @@ public class AlbumServiceImplementation implements AlbumService{
     public List<Song> getAlbumTracks(Integer albumId) throws AlbumException {
         Album album = getAlbum(albumId);
         List<Song> songs = album.getSongs();
-        if (songs.isEmpty()) {
-            throw new AlbumException("Album does not contain any songs");
-        }
-        return songs;
+        return (songs != null) ? songs : new ArrayList<>();
     }
 
     @Override
