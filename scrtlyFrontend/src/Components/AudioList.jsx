@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react'
 import { FaHeadphones, FaHeart, FaRegClock, FaRegHeart } from 'react-icons/fa'
 import { Songs } from './Songs'
 import { MusicPlayer } from './MusicPlayer.jsx'
+import {BASE_API_URL} from "../config/api.js";
 
-function AudioList({ volume, onTrackChange }) {
-    const [songs, setSongs] = useState(Songs)
-    const [song, setSong] = useState(songs[0].song)
-    const [img, setImage] = useState(songs[0].imgSrc)
+// eslint-disable-next-line react/prop-types
+function AudioList({ volume, onTrackChange, initialSongs  }) {
+    const [songs, setSongs] = useState(initialSongs);
+    const [song, setSong] = useState(songs[0]?.track)
+    const [img, setImage] = useState(songs[0]?.imageSong)
     const [auto, setAuto] = useState(false);
 
     useEffect(() => {
@@ -22,8 +24,8 @@ function AudioList({ volume, onTrackChange }) {
 
 
     const changeFavourite = (id) => {
-        Songs.forEach((song) => {
-            if (song.id == id) {
+        songs.map((song) => {
+            if (song.id === id) {
                 song.favourite = !song.favourite
             }
         })
@@ -37,6 +39,12 @@ function AudioList({ volume, onTrackChange }) {
         onTrackChange(songName, songArtist)
     }
 
+    function formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+    }
+
     return (
         <div className='audioList'>
             <h2 className="title">
@@ -44,17 +52,18 @@ function AudioList({ volume, onTrackChange }) {
             </h2>
             <div className="songsBox">
                 {
-                    Songs && Songs.map((song, index) => (
-                        <div className="songs" key={song?.id} onClick={() => setMainSong(song?.song, song?.imgSrc, song?.songName, song?.artist)}>
+                    // eslint-disable-next-line react/prop-types
+                    initialSongs.map((song, index) => (
+                        <div className="songs" key={song?.id} onClick={() => setMainSong(`${BASE_API_URL}${song?.track || ''}`, `${BASE_API_URL}${song?.imageSong || ''}`, song?.title, song?.artist.artistName)}>
                             <div className="count">#{index + 1}</div>
                             <div className="song">
                                 <div className="imgBox">
-                                    <img src={song?.imgSrc} alt="" />
+                                    <img src={`${BASE_API_URL}${song?.imageSong || ''}`} alt="" />
                                 </div>
                                 <div className="section">
                                     <p className="songName">
-                                        {song?.songName}
-                                        <span className='spanArtist'>{song?.artist}</span>
+                                        {song?.title}
+                                        <span className='spanArtist'>{song?.artist.artistName}</span>
                                     </p>
                                     <div className="hits">
                                         <p className="hit">
@@ -64,7 +73,7 @@ function AudioList({ volume, onTrackChange }) {
 
                                         <p className="duration">
                                             <i><FaRegClock /></i>
-                                            02.47
+                                            {formatTime(song?.duration)}
                                         </p>
 
                                         <div className="favourite" onClick={() => changeFavourite(song?.id)}>
@@ -82,7 +91,7 @@ function AudioList({ volume, onTrackChange }) {
                     ))
                 }
             </div>
-            <MusicPlayer song={song} imgSrc={img} autoplay={auto} volume={volume} />
+            {<MusicPlayer song={song} imgSrc={img} autoplay={auto} volume={volume} />}
         </div>
     )
 }

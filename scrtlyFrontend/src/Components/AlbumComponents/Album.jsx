@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react'
 import "../../Styles/Album.css"
-import AlbumPic from '../../img/album.jpg'
 import { AudioList } from '../AudioList'
 import {useParams} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
@@ -35,7 +34,7 @@ function Album({ volume, onTrackChange}) {
                 <button className="addSongBtn" onClick={() =>
                     setAddSong(((prev) => !prev))}>Add Song</button>
             </div>
-            <AudioList volume={volume} onTrackChange={onTrackChange}/>
+            <AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={album.songs} />
             {addSong && <AddSong onClose={() => setAddSong(((prev) => !prev))} albumId={albumId} />}
         </div>
     )

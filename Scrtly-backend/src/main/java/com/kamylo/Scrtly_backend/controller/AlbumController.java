@@ -1,7 +1,9 @@
 package com.kamylo.Scrtly_backend.controller;
 
 import com.kamylo.Scrtly_backend.dto.AlbumDto;
+import com.kamylo.Scrtly_backend.dto.SongDto;
 import com.kamylo.Scrtly_backend.dto.mapper.AlbumDtoMapper;
+import com.kamylo.Scrtly_backend.dto.mapper.SongDtoMapper;
 import com.kamylo.Scrtly_backend.exception.AlbumException;
 import com.kamylo.Scrtly_backend.exception.ArtistException;
 import com.kamylo.Scrtly_backend.exception.UserException;
@@ -86,9 +88,11 @@ public class AlbumController {
     }
 
     @GetMapping("/{albumId}/tracks")
-    public ResponseEntity<List<Song>> getAlbumTracksHandler(@PathVariable Integer albumId) throws AlbumException {
+    public ResponseEntity<List<SongDto>> getAlbumTracksHandler(@PathVariable Integer albumId, @RequestHeader("Authorization") String token) throws AlbumException, UserException {
+        Artist artist = (Artist) userService.findUserProfileByJwt(token);
         List<Song> songs = albumService.getAlbumTracks(albumId);
-        return new ResponseEntity<>(songs, HttpStatus.OK);
+        List<SongDto> songDtos = SongDtoMapper.toSongDtoList(songs,artist);
+        return new ResponseEntity<>(songDtos, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{albumId}")

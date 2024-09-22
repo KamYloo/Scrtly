@@ -25,7 +25,7 @@ public class Album {
     @ToString.Exclude
     private Artist artist;
 
-    @OneToMany(mappedBy = "album", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "album", cascade = CascadeType.REMOVE, orphanRemoval = true)
     @JsonManagedReference
     @ToString.Exclude
     private List<Song> songs = new ArrayList<>();

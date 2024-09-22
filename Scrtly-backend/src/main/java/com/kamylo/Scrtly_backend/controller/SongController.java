@@ -1,5 +1,7 @@
 package com.kamylo.Scrtly_backend.controller;
 
+import com.kamylo.Scrtly_backend.dto.SongDto;
+import com.kamylo.Scrtly_backend.dto.mapper.SongDtoMapper;
 import com.kamylo.Scrtly_backend.exception.AlbumException;
 import com.kamylo.Scrtly_backend.exception.UserException;
 import com.kamylo.Scrtly_backend.model.Album;
@@ -28,17 +30,18 @@ public class SongController {
     UserService userService;
 
     @PostMapping("/upload")
-    public ResponseEntity<Song> createSongHandler( @RequestParam("title") String title,
-                                                   @RequestParam("albumId") Integer albumId,
-                                                   @RequestParam("imageSong") MultipartFile imageFile,
-                                                   @RequestParam("audioFile") MultipartFile audioFile,
-                                                   @RequestHeader("Authorization") String token) throws UserException, AlbumException, UnsupportedAudioFileException, IOException {
+    public ResponseEntity<SongDto> createSongHandler(@RequestParam("title") String title,
+                                                     @RequestParam("albumId") Integer albumId,
+                                                     @RequestParam("imageSong") MultipartFile imageFile,
+                                                     @RequestParam("audioFile") MultipartFile audioFile,
+                                                     @RequestHeader("Authorization") String token) throws UserException, AlbumException, UnsupportedAudioFileException, IOException {
         if (imageFile.isEmpty() || audioFile.isEmpty()) {
             throw new RuntimeException("Image file not uploaded.");
         }
         Artist artist = (Artist) userService.findUserProfileByJwt(token);
         Album album = albumService.getAlbum(albumId);
         Song song = songService.createSong(title, album, artist, imageFile, audioFile);
-        return new ResponseEntity<>(song, HttpStatus.CREATED);
+        SongDto songDto = SongDtoMapper.toSongDto(song, artist);
+        return new ResponseEntity<>(songDto, HttpStatus.CREATED);
     }
 }

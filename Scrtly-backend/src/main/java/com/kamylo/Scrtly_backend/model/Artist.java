@@ -23,12 +23,12 @@ public class Artist extends User {
     private String artistBio;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "artist")
+    @OneToMany(mappedBy = "artist", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private List<Album> albums = new ArrayList<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "artist", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "artist", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private List<Song> songs = new ArrayList<>();
 }
