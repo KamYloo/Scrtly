@@ -1,5 +1,6 @@
 package com.kamylo.Scrtly_backend.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.ToString;
@@ -15,16 +16,17 @@ public class Song {
     private Long id;
 
     private String title;
+    private String track;
     private int duration;
     private String imageSong;
 
     @ManyToOne
     @JoinColumn(name = "album_id", nullable = false)
-    @ToString.Exclude
+    @JsonBackReference
     private Album album;
 
     @ManyToOne
-    @ToString.Exclude
+    @JsonBackReference
     private Artist artist;
 
 //    @ManyToMany(mappedBy = "songs")

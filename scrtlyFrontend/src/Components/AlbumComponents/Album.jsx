@@ -4,9 +4,8 @@ import AlbumPic from '../../img/album.jpg'
 import { AudioList } from '../AudioList'
 import {useParams} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
-import {getAlbum} from "../../Redux/Album/Action.js";
+import {getAlbum, getAlbumTracks} from "../../Redux/Album/Action.js";
 import {BASE_API_URL} from "../../config/api.js";
-import {CreateAlbum} from "./CreateAlbum.jsx";
 import {AddSong} from "../SongComponents/addSong.jsx";
 
 // eslint-disable-next-line react/prop-types
@@ -18,6 +17,10 @@ function Album({ volume, onTrackChange}) {
 
     useEffect(() => {
         dispatch(getAlbum(albumId))
+    }, [albumId]);
+
+    useEffect(() => {
+        dispatch(getAlbumTracks(albumId))
     }, [albumId]);
 
     return (
@@ -33,7 +36,7 @@ function Album({ volume, onTrackChange}) {
                     setAddSong(((prev) => !prev))}>Add Song</button>
             </div>
             <AudioList volume={volume} onTrackChange={onTrackChange}/>
-            {addSong && <AddSong onClose={() => setAddSong(((prev) => !prev))} />}
+            {addSong && <AddSong onClose={() => setAddSong(((prev) => !prev))} albumId={albumId} />}
         </div>
     )
 }

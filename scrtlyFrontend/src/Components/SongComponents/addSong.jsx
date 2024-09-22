@@ -1,26 +1,31 @@
 import React, {useEffect, useState} from 'react'
 import {MdCancel} from "react-icons/md";
 import {useDispatch} from "react-redux";
-import {createAlbum} from "../../Redux/Album/Action.js";
+import {uploadSong} from "../../Redux/Album/Action.js";
 import "../../Styles/form.css"
 
-function AddSong({onClose}) {
+// eslint-disable-next-line react/prop-types
+function AddSong({onClose, albumId}) {
     const [title, setTitle] = useState()
     const [songImg, setSongImg] = useState(null)
+    const [audio, setAudio] = useState(null)
     const [preview, setPreview] = useState('');
+
     const dispatch = useDispatch()
 
-    const handleFileChange = (e) => {
-        setSongImg(e.target.files[0])
-    };
-
-    const createSongHandler = () => {
+    const createSongHandler = (e) => {
+        e.preventDefault();
         const formData = new FormData()
-        formData.append('file', songImg)
+        formData.append('imageSong', songImg)
+        formData.append('audioFile', audio)
         formData.append('title', title)
-        dispatch(createAlbum(formData))
-        setSongImg(null)
+        formData.append('albumId', albumId)
+        dispatch(uploadSong(formData))
+        setSongImg(null);
+        setAudio(null);
+        setTitle('');
         onClose()
+
     }
 
     useEffect(() => {
@@ -46,10 +51,22 @@ function AddSong({onClose}) {
                         <span>{songImg?.name}</span>
                     </div>
                     <div className="right">
-                        <input type="file" onChange={handleFileChange}/>
+                        <input type="file" accept="image/*" onChange={(e)=> setSongImg(e.target.files[0])}/>
                         <button type="button"
-                                onClick={() => document.querySelector('input[type="file"]').click()}>
+                                onClick={() => document.querySelector('input[type="file"][accept="image/*"]').click()}>
                             Select Img
+                        </button>
+                    </div>
+                </div>
+                <div className="editAudio">
+                    <div className="left">
+                        <span>{audio?.name}</span>
+                    </div>
+                    <div className="right">
+                        <input type="file" accept="audio/*" onChange={(e) => setAudio(e.target.files[0])}/>
+                        <button type="button"
+                                onClick={() => document.querySelector('input[type="file"][accept="audio/*"]').click()}>
+                            Select Audio
                         </button>
                     </div>
                 </div>
