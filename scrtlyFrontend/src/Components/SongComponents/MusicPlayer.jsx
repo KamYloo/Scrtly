@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import '../Styles/MusicPlayer.css'
+import '../../Styles/MusicPlayer.css'
 import { FaBackward, FaForward, FaHeart, FaPause, FaPlay, FaRegHeart, FaShareAlt, FaStepBackward, FaStepForward } from 'react-icons/fa'
 import { BsDownload } from 'react-icons/bs'
 

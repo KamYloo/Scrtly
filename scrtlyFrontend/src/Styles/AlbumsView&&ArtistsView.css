@@ -1,4 +1,4 @@
-.albumsView, .artistsView{
+.albumsView, .artistsView, .artistAlbums{
     height: 100vh;
     width: 100vh;
     z-index: 1;
@@ -194,6 +194,16 @@
                 margin-top: 1vh;
             }
         }
+    }
+}
+
+.artistAlbums {
+    width: 100%;
+    background: none;
+    backdrop-filter: blur(0px);
+
+    .albums {
+        margin-top: 1vh;
     }
 }
 

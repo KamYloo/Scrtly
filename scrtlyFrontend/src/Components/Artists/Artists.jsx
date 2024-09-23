@@ -35,7 +35,7 @@ function Artists() {
             </div>
             <div className="artists">
                 { artist.artists.map((item) => (
-                <div className="artist" key={item.id} onClick={() => navigate(`/artist/${item.id}`)}>
+                <div className="artist" key={item.id} onClick={() => navigate(`/artist/${item.id}/popular`)}>
                     <i className="listen"><FaHeadphones/></i>
                     <div className="imgPic">
                         <img src={`${BASE_API_URL}/${item.artistPic || ''}`} alt=""/>

@@ -1,10 +1,10 @@
 import React, {useState} from 'react'
 
-import Verification from '../img/check.png'
+import Verification from '../../img/check.png'
 import { FaEllipsisH, FaHeadphones, FaCheck } from 'react-icons/fa'
-import {EditArtist} from "./Artists/EditArtist.jsx";
-import {BASE_API_URL} from "../config/api.js";
-import {CreateAlbum} from "./AlbumComponents/CreateAlbum.jsx";
+import {EditArtist} from "./EditArtist.jsx";
+import {BASE_API_URL} from "../../config/api.js";
+import {CreateAlbum} from "../AlbumComponents/CreateAlbum.jsx";
 
 // eslint-disable-next-line react/prop-types
 function Banner({artist}) {

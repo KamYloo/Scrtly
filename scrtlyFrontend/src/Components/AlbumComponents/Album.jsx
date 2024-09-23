@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import "../../Styles/Album.css"
-import { AudioList } from '../AudioList'
+import { AudioList } from '../SongComponents/AudioList.jsx'
 import {useParams} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {getAlbum, getAlbumTracks} from "../../Redux/Album/Action.js";

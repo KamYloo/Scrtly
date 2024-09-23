@@ -1,15 +1,18 @@
 import React, { useEffect } from 'react'
-import '../Styles/Middle.css'
-import '../Styles/form.css'
-import { Banner } from './Banner'
+import '../../Styles/Middle.css'
+import '../../Styles/form.css'
+import { Banner } from './Banner.jsx'
 import { FaUsers } from 'react-icons/fa'
-import { AudioList } from './AudioList'
+import { AudioList } from '../SongComponents/AudioList.jsx'
 import {useDispatch, useSelector} from "react-redux";
-import {Link, useParams} from "react-router-dom";
-import {findArtistById, getArtistTracks} from "../Redux/Artist/Action.js";
+import {Link, Route, Routes, useParams} from "react-router-dom";
+import {findArtistById, getArtistTracks} from "../../Redux/Artist/Action.js";
+import {ArtistAlbums} from "./ArtistAlbums.jsx";
+import {Fans} from "./Fans.jsx";
+import {AboutArtist} from "./AboutArtist.jsx";
 
 
-function Middle({ volume, onTrackChange}) {
+function Artist({ volume, onTrackChange}) {
   const {artistId} = useParams();
   const dispatch = useDispatch();
   const {artist} = useSelector(store => store);
@@ -47,9 +50,15 @@ function Middle({ volume, onTrackChange}) {
         </ul>
         <p><i><FaUsers/></i>12.3M <span>Followers</span></p>
       </div>
-      <AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={artist.songs}/>
+      <Routes>
+        <Route path="popular" element={<AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={artist.songs} />} />
+        <Route path="albums" element={<ArtistAlbums artistId={artistId} />} />
+        <Route path="songs" element={<AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={artist.songs} />} />
+        <Route path="fans" element={<Fans artistId={artistId} />} />
+        <Route path="about" element={<AboutArtist artist={artist} />} />
+      </Routes>
     </div>
   )
 }
 
-export {Middle}
+export {Artist}

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { FaHeadphones, FaHeart, FaRegClock, FaRegHeart } from 'react-icons/fa'
 import { MusicPlayer } from './MusicPlayer.jsx'
-import {BASE_API_URL} from "../config/api.js";
+import {BASE_API_URL} from "../../config/api.js";
 
 // eslint-disable-next-line react/prop-types
 function AudioList({ volume, onTrackChange, initialSongs  }) {

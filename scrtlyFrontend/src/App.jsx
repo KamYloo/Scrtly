@@ -3,7 +3,7 @@ import './App.css'
 import React, { useEffect, useState } from 'react'
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { LeftMenu } from './Components/LeftMenu'
-import { Middle } from './Components/Middle'
+import { Artist } from './Components/Artists/Artist.jsx'
 import { RightMenu } from './Components/RightMenu'
 import { ChatView } from './Components/ChatComponents/ChatView'
 import { Login } from './Components/AuthComponents/Login';
@@ -63,7 +63,7 @@ function App() {
         } />
 
         <Route path="/home" element={
-          renderLayout(Middle, { setVolume, currentTrack, volume, handleTrackChange, auth, token })
+          renderLayout(Artist, { setVolume, currentTrack, volume, handleTrackChange, auth, token })
         } />
 
         <Route path="/chat" element={
@@ -74,8 +74,8 @@ function App() {
           renderLayout(Artists, { setVolume, currentTrack, auth, token })
         } />
 
-        <Route path="/artist/:artistId" element={
-          renderLayout(Middle, { setVolume, currentTrack, volume, handleTrackChange, auth, token })
+        <Route path="/artist/:artistId/*" element={
+          renderLayout(Artist, { setVolume, currentTrack, volume, handleTrackChange, auth, token })
         } />
 
         <Route path="/albums" element={
