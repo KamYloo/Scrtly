@@ -13,5 +13,4 @@ public class AlbumDto {
     private LocalDate releaseDate;
     private String albumImage;
     private ArtistDto artist;
-    private boolean isReqArtistAlbum;
 }

@@ -7,6 +7,7 @@ import com.kamylo.Scrtly_backend.exception.UserException;
 import com.kamylo.Scrtly_backend.model.Album;
 import com.kamylo.Scrtly_backend.model.Artist;
 import com.kamylo.Scrtly_backend.model.Song;
+import com.kamylo.Scrtly_backend.model.User;
 import com.kamylo.Scrtly_backend.service.AlbumService;
 import com.kamylo.Scrtly_backend.service.SongService;
 import com.kamylo.Scrtly_backend.service.UserService;
@@ -38,10 +39,10 @@ public class SongController {
         if (imageFile.isEmpty() || audioFile.isEmpty()) {
             throw new RuntimeException("Image file not uploaded.");
         }
-        Artist artist = (Artist) userService.findUserProfileByJwt(token);
+        User user = (User) userService.findUserProfileByJwt(token);
         Album album = albumService.getAlbum(albumId);
-        Song song = songService.createSong(title, album, artist, imageFile, audioFile);
-        SongDto songDto = SongDtoMapper.toSongDto(song, artist);
+        Song song = songService.createSong(title, album, (Artist) user , imageFile, audioFile);
+        SongDto songDto = SongDtoMapper.toSongDto(song, user);
         return new ResponseEntity<>(songDto, HttpStatus.CREATED);
     }
 }

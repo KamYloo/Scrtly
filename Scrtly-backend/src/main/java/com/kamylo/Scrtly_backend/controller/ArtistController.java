@@ -40,15 +40,15 @@ public class ArtistController {
     public ResponseEntity<ArtistDto> getArtist(@PathVariable Long artistId, @RequestHeader("Authorization") String token) throws UserException, ArtistException {
         User reqUser = userService.findUserProfileByJwt(token);
         Artist artist = artistService.getArtistById(artistId);
-        ArtistDto artistDto = ArtistDtoMapper.toArtistDto(artist);
-        artistDto.setReq_artist(ArtistUtil.isReqArtist(reqUser, artist));
+        ArtistDto artistDto = ArtistDtoMapper.toArtistDto(artist, reqUser);
         return new ResponseEntity<>(artistDto, HttpStatus.ACCEPTED);
     }
 
     @GetMapping("/")
-    public ResponseEntity<List<ArtistDto>> getAllArtists() {
+    public ResponseEntity<List<ArtistDto>> getAllArtists(@RequestHeader("Authorization") String token) throws UserException {
+       User reqUser = userService.findUserProfileByJwt(token);
        List<Artist> artists = artistService.getAllArtists();
-       List<ArtistDto> artistDtos = ArtistDtoMapper.toArtistDtos(artists);
+       List<ArtistDto> artistDtos = ArtistDtoMapper.toArtistDtos(artists, reqUser);
        return new ResponseEntity<>(artistDtos, HttpStatus.OK);
     }
 
@@ -71,7 +71,7 @@ public class ArtistController {
 
             String relativePath = "uploads/artistsBannerImages/" + fileName;
             artistService.updateArtist(artist.getId(), relativePath, artistBio);
-            ArtistDto artistDto = ArtistDtoMapper.toArtistDto(artist);
+            ArtistDto artistDto = ArtistDtoMapper.toArtistDto(artist, artist);
             return new ResponseEntity<>(artistDto, HttpStatus.ACCEPTED);
 
         } catch (IOException e) {
@@ -80,10 +80,10 @@ public class ArtistController {
     }
 
     @GetMapping("/{artistId}/tracks")
-    public ResponseEntity<List<SongDto>> getArtistTracksHandler(@RequestHeader("Authorization") String token) throws UserException, ArtistException {
-        Artist artist = (Artist) userService.findUserProfileByJwt(token);
-        List<Song> songs = artistService.getArtistTracks(artist.getId());
-        List<SongDto> songDtos = SongDtoMapper.toSongDtoList(songs,artist);
+    public ResponseEntity<List<SongDto>> getArtistTracksHandler(@PathVariable Long artistId, @RequestHeader("Authorization") String token) throws UserException, ArtistException {
+        User user = userService.findUserProfileByJwt(token);
+        List<Song> songs = artistService.getArtistTracks(artistId);
+        List<SongDto> songDtos = SongDtoMapper.toSongDtoList(songs, user);
         return new ResponseEntity<>(songDtos, HttpStatus.OK);
     }
 }

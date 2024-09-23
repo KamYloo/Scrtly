@@ -31,8 +31,8 @@ function Album({ volume, onTrackChange}) {
                     <h1 className='albumName'>{album.findAlbum?.title}</h1>
                     <p className='stats'>{album.findAlbum?.artist.artistName} • 12 Songs <span>• {album.findAlbum?.releaseDate} • 1h 24min</span> </p>
                 </div>
-                <button className="addSongBtn" onClick={() =>
-                    setAddSong(((prev) => !prev))}>Add Song</button>
+                {album.findAlbum?.artist.req_artist && (<button className="addSongBtn" onClick={() =>
+                    setAddSong(((prev) => !prev))}>Add Song</button>)}
             </div>
             <AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={album.songs} />
             {addSong && <AddSong onClose={() => setAddSong(((prev) => !prev))} albumId={albumId} />}

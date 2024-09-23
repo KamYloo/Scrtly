@@ -15,6 +15,7 @@ import com.kamylo.Scrtly_backend.request.AlbumRequest;
 import com.kamylo.Scrtly_backend.response.ApiResponse;
 import com.kamylo.Scrtly_backend.service.AlbumService;
 import com.kamylo.Scrtly_backend.service.UserService;
+import com.kamylo.Scrtly_backend.util.AlbumUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,7 +47,7 @@ public class AlbumController {
         if (file.isEmpty()) {
             throw new RuntimeException("Image file not uploaded.");
         }
-        Artist artist = (Artist) userService.findUserProfileByJwt(token);
+        User user = userService.findUserProfileByJwt(token);
         try {
 
             Path folderPath = Paths.get("src/main/resources/static/uploads/albumImages");
@@ -60,10 +61,10 @@ public class AlbumController {
 
             AlbumRequest albumRequest = new AlbumRequest();
             albumRequest.setTitle(title);
-            albumRequest.setArtist(artist);
+            albumRequest.setArtist((Artist) user);
             albumRequest.setCoverImage("/uploads/albumImages/" + fileName);
             Album album = albumService.createAlbum(albumRequest);
-            AlbumDto albumDto = AlbumDtoMapper.toAlbumDto(album, artist);
+            AlbumDto albumDto = AlbumDtoMapper.toAlbumDto(album, user);
             return new ResponseEntity<>(albumDto, HttpStatus.CREATED);
         }
         catch (IOException e) {
@@ -72,26 +73,26 @@ public class AlbumController {
     }
 
     @GetMapping("/getAll")
-    public ResponseEntity<List<AlbumDto>> getAllAlbumsHandler(@RequestHeader("Authorization") String token) throws ArtistException, UserException {
-        Artist artist = (Artist) userService.findUserProfileByJwt(token);
+    public ResponseEntity<List<AlbumDto>> getAllAlbumsHandler(@RequestHeader("Authorization") String token) throws UserException {
+        User user = userService.findUserProfileByJwt(token);
         List<Album> albums = albumService.getAllAlbums();
-        List<AlbumDto> albumDtos = AlbumDtoMapper.toAlbumDtos(albums, artist);
+        List<AlbumDto> albumDtos = AlbumDtoMapper.toAlbumDtos(albums, user);
         return new ResponseEntity<>(albumDtos, HttpStatus.OK);
     }
 
     @GetMapping("/{albumId}")
-    public ResponseEntity<AlbumDto> getAlbumHandler(@PathVariable Integer albumId, @RequestHeader("Authorization") String token) throws UserException, ArtistException, AlbumException {
-        Artist artist = (Artist) userService.findUserProfileByJwt(token);
+    public ResponseEntity<AlbumDto> getAlbumHandler(@PathVariable Integer albumId, @RequestHeader("Authorization") String token) throws AlbumException, UserException {
+        User user = userService.findUserProfileByJwt(token);
         Album album = albumService.getAlbum(albumId);
-        AlbumDto albumDto = AlbumDtoMapper.toAlbumDto(album, artist);
+        AlbumDto albumDto = AlbumDtoMapper.toAlbumDto(album, user);
         return new ResponseEntity<>(albumDto, HttpStatus.ACCEPTED);
     }
 
     @GetMapping("/{albumId}/tracks")
     public ResponseEntity<List<SongDto>> getAlbumTracksHandler(@PathVariable Integer albumId, @RequestHeader("Authorization") String token) throws AlbumException, UserException {
-        Artist artist = (Artist) userService.findUserProfileByJwt(token);
+        User user = userService.findUserProfileByJwt(token);
         List<Song> songs = albumService.getAlbumTracks(albumId);
-        List<SongDto> songDtos = SongDtoMapper.toSongDtoList(songs,artist);
+        List<SongDto> songDtos = SongDtoMapper.toSongDtoList(songs,user);
         return new ResponseEntity<>(songDtos, HttpStatus.OK);
     }
 
