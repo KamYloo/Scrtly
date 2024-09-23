@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import "../../Styles/Profile.css"
 import { IoIosSettings } from "react-icons/io";
 import {useNavigate, useParams} from 'react-router-dom';
