@@ -47,7 +47,6 @@ public class SongServiceImplementation implements SongService {
             int duration = getAudioDuration(new File("src/main/resources/static/uploads/audio/" + audioPath));
             song.setDuration(duration);
         }
-
         return songRepository.save(song);
     }
 

@@ -14,6 +14,7 @@ import java.util.List;
 public interface AlbumService {
     Album createAlbum(AlbumRequest albumRequest) throws UserException, ArtistException;
     List<Album> getAllAlbums();
+    List<Album> getAlbumsByArtist(Long artistId) throws UserException, ArtistException;
     List<Song> getAlbumTracks(Integer albumId) throws AlbumException;
     Album getAlbum(Integer albumId) throws AlbumException;
     void deleteAlbum(Integer albumId, Long artistId) throws AlbumException, ArtistException;

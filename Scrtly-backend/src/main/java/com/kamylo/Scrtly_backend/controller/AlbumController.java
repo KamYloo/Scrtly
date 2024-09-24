@@ -80,6 +80,14 @@ public class AlbumController {
         return new ResponseEntity<>(albumDtos, HttpStatus.OK);
     }
 
+    @GetMapping("/artist/{artistId}")
+    public ResponseEntity<List<AlbumDto>> getAlbumsByArtistHandler(@PathVariable("artistId") Long artistId, @RequestHeader("Authorization") String token) throws UserException, ArtistException {
+        User user = userService.findUserProfileByJwt(token);
+        List<Album> albums = albumService.getAlbumsByArtist(artistId);
+        List<AlbumDto> albumDtos = AlbumDtoMapper.toAlbumDtos(albums, user);
+        return new ResponseEntity<>(albumDtos, HttpStatus.OK);
+    }
+
     @GetMapping("/{albumId}")
     public ResponseEntity<AlbumDto> getAlbumHandler(@PathVariable Integer albumId, @RequestHeader("Authorization") String token) throws AlbumException, UserException {
         User user = userService.findUserProfileByJwt(token);

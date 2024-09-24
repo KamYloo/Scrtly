@@ -35,7 +35,6 @@ public class AlbumServiceImplementation implements AlbumService{
             album.setTitle(albumRequest.getTitle());
             album.setCoverImage(albumRequest.getCoverImage());
             album.setReleaseDate(LocalDate.now());
-
             return albumRepository.save(album);
         }
         else {
@@ -46,6 +45,13 @@ public class AlbumServiceImplementation implements AlbumService{
     @Override
     public List<Album> getAllAlbums() {
        return albumRepository.findAllByOrderByIdDesc();
+    }
+
+    @Override
+    public List<Album> getAlbumsByArtist(Long artistId) throws UserException {
+        Artist artist = (Artist) userService.findUserById(artistId);
+        List<Album> albums = artist.getAlbums();
+        return (albums != null) ? albums : new ArrayList<>();
     }
 
     @Override
