@@ -55,7 +55,7 @@ function Artist({ volume, onTrackChange}) {
         <Route path="albums" element={<ArtistAlbums artistId={artistId} />} />
         <Route path="songs" element={<AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={artist.songs} />} />
         <Route path="fans" element={<Fans artistId={artistId}  fans={artist.findArtist?.fans}/>} />
-        <Route path="about" element={<AboutArtist artist={artist} />} />
+        <Route path="about" element={<AboutArtist artist={artist} artistBio={artist.findArtist?.artistBio} />} />
       </Routes>
     </div>
   )
