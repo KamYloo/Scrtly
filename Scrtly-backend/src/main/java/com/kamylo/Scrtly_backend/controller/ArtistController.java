@@ -52,6 +52,7 @@ public class ArtistController {
        return new ResponseEntity<>(artistDtos, HttpStatus.OK);
     }
 
+
     @PutMapping("/update")
     public ResponseEntity<ArtistDto> updateArtistHandler(@RequestPart("bannerImg") MultipartFile bannerImg,
                                                          @RequestPart("artistBio") String artistBio,

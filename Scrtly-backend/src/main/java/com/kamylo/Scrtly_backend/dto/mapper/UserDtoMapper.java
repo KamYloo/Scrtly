@@ -25,7 +25,7 @@ public class UserDtoMapper {
         for (User user : followers) {
             UserDto userDto = new UserDto();
             userDto.setId(user.getId());
-            userDto.setEmail(user.getEmail());
+            userDto.setProfilePicture(user.getProfilePicture());
             userDto.setFullName(user.getFullName());
             userDtos.add(userDto);
         }

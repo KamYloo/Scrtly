@@ -9,7 +9,7 @@ import { ChatView } from './Components/ChatComponents/ChatView'
 import { Login } from './Components/AuthComponents/Login';
 import { Register } from './Components/AuthComponents/Register';
 import { Profile } from './Components/AuthComponents/Profile';
-import { Artists } from './Components/Artists/Artists.jsx'
+import { ArtistsView } from './Components/Artists/ArtistsView.jsx'
 import { Discover } from './Components/DiscoverComponents/Discover.jsx'
 import { ProfileEdit } from "./Components/AuthComponents/ProfileEdit.jsx";
 import { useDispatch, useSelector } from "react-redux";
@@ -71,7 +71,7 @@ function App() {
         } />
 
         <Route path="/artists" element={
-          renderLayout(Artists, { setVolume, currentTrack, auth, token })
+          renderLayout(ArtistsView, { setVolume, currentTrack, auth, token })
         } />
 
         <Route path="/artist/:artistId/*" element={

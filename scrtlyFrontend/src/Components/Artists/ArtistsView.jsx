@@ -9,7 +9,7 @@ import {useNavigate} from "react-router-dom";
 import {getAllArtists} from "../../Redux/Artist/Action.js";
 import {BASE_API_URL} from "../../config/api.js";
 
-function Artists() {
+function ArtistsView() {
     const dispatch = useDispatch()
     const {artist} = useSelector(store => store);
     const navigate = useNavigate();
@@ -41,7 +41,7 @@ function Artists() {
                         <img src={`${BASE_API_URL}/${item.artistPic || ''}`} alt=""/>
                         <img className='check' src={Verification} alt=""/>
                     </div>
-                    <p>{item.artistName}</p>
+                    <p>{item?.artistName}</p>
                 </div>
                 ))}
             </div>
@@ -49,4 +49,4 @@ function Artists() {
     )
 }
 
-export { Artists }
+export { ArtistsView }

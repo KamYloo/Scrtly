@@ -26,6 +26,9 @@ public class AlbumServiceImplementation implements AlbumService{
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private ArtistService artistService;
+
     @Override
     public Album createAlbum(AlbumRequest albumRequest) throws ArtistException, UserException {
         User user = userService.findUserById(albumRequest.getArtist().getId());
@@ -48,8 +51,8 @@ public class AlbumServiceImplementation implements AlbumService{
     }
 
     @Override
-    public List<Album> getAlbumsByArtist(Long artistId) throws UserException {
-        Artist artist = (Artist) userService.findUserById(artistId);
+    public List<Album> getAlbumsByArtist(Long artistId) throws ArtistException {
+        Artist artist = artistService.getArtistById(artistId);
         List<Album> albums = artist.getAlbums();
         return (albums != null) ? albums : new ArrayList<>();
     }

@@ -4,6 +4,7 @@ import com.kamylo.Scrtly_backend.exception.AlbumException;
 import com.kamylo.Scrtly_backend.exception.ArtistException;
 import com.kamylo.Scrtly_backend.model.Artist;
 import com.kamylo.Scrtly_backend.model.Song;
+import com.kamylo.Scrtly_backend.model.User;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

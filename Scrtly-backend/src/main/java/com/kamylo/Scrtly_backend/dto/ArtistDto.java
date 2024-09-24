@@ -1,6 +1,10 @@
 package com.kamylo.Scrtly_backend.dto;
 
+import com.kamylo.Scrtly_backend.model.User;
 import lombok.Data;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 public class ArtistDto {
@@ -9,6 +13,7 @@ public class ArtistDto {
     private String bannerImg;
     private String artistBio;
     private String artistPic;
-
     private boolean req_artist;
+
+    private Set<UserDto> fans = new HashSet<>();
 }
