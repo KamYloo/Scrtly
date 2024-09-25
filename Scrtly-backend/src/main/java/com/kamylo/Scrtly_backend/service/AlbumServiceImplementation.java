@@ -11,6 +11,7 @@ import com.kamylo.Scrtly_backend.repository.AlbumRepository;
 import com.kamylo.Scrtly_backend.request.AlbumRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -29,14 +30,20 @@ public class AlbumServiceImplementation implements AlbumService{
     @Autowired
     private ArtistService artistService;
 
+    @Autowired
+    private FileServiceImplementation fileService;
+
     @Override
-    public Album createAlbum(AlbumRequest albumRequest) throws ArtistException, UserException {
+    public Album createAlbum(AlbumRequest albumRequest, MultipartFile albumImage) throws ArtistException, UserException {
         User user = userService.findUserById(albumRequest.getArtist().getId());
         if(user instanceof Artist artist) {
             Album album = new Album();
             album.setArtist(artist);
             album.setTitle(albumRequest.getTitle());
-            album.setCoverImage(albumRequest.getCoverImage());
+            if (!albumImage.isEmpty()) {
+                String imagePath = fileService.saveImage(albumImage, "/uploads/albumImages");
+                album.setCoverImage("/uploads/albumImages/" + imagePath);
+            }
             album.setReleaseDate(LocalDate.now());
             return albumRepository.save(album);
         }
@@ -76,5 +83,6 @@ public class AlbumServiceImplementation implements AlbumService{
             throw new ArtistException("Artist id mismatch");
         }
         albumRepository.deleteById(albumId);
+        fileService.deleteImage(album.getCoverImage());
     }
 }

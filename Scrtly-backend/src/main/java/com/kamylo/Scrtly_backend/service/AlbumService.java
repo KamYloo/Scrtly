@@ -7,12 +7,13 @@ import com.kamylo.Scrtly_backend.model.Album;
 import com.kamylo.Scrtly_backend.model.Song;
 import com.kamylo.Scrtly_backend.request.AlbumRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 @Service
 public interface AlbumService {
-    Album createAlbum(AlbumRequest albumRequest) throws UserException, ArtistException;
+    Album createAlbum(AlbumRequest albumRequest, MultipartFile albumImage) throws UserException, ArtistException;
     List<Album> getAllAlbums();
     List<Album> getAlbumsByArtist(Long artistId) throws UserException, ArtistException;
     List<Song> getAlbumTracks(Integer albumId) throws AlbumException;

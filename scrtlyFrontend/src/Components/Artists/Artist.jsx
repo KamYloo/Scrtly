@@ -20,12 +20,12 @@ function Artist({ volume, onTrackChange}) {
   useEffect(() => {
     const allLi = document.querySelector(".menuList").querySelectorAll("li")
 
-    function changeManeuActive() {
+    function changeManuActive() {
       allLi.forEach((n) => n.classList.remove("active"))
       this.classList.add("active")
     }
 
-    allLi.forEach((n) => n.addEventListener("click", changeManeuActive))
+    allLi.forEach((n) => n.addEventListener("click", changeManuActive))
   }, [])
 
   useEffect(() => {

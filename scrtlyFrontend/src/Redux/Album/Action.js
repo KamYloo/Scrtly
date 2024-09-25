@@ -1,10 +1,20 @@
 import {BASE_API_URL} from "../../config/api.js";
 import {
     CREATE_ALBUM_ERROR,
-    CREATE_ALBUM_REQUEST, FIND_ALBUM_ERROR, FIND_ALBUM_REQUEST, GET_ALBUM_TRACKS_ERROR, GET_ALBUM_TRACKS_REQUEST,
+    CREATE_ALBUM_REQUEST, DELETE_ALBUM_ERROR,
+    DELETE_ALBUM_REQUEST,
+    FIND_ALBUM_ERROR,
+    FIND_ALBUM_REQUEST,
+    GET_ALBUM_TRACKS_ERROR,
+    GET_ALBUM_TRACKS_REQUEST,
     GET_ALL_ALBUMS_ERROR,
-    GET_ALL_ALBUMS_REQUEST, GET_ARTIST_ALBUMS_ERROR, GET_ARTIST_ALBUMS_REQUEST, UPLOAD_SONG_ERROR, UPLOAD_SONG_REQUEST
+    GET_ALL_ALBUMS_REQUEST,
+    GET_ARTIST_ALBUMS_ERROR,
+    GET_ARTIST_ALBUMS_REQUEST,
+    UPLOAD_SONG_ERROR,
+    UPLOAD_SONG_REQUEST
 } from "./ActionType.js";
+import {POST_DELETE_ERROR, POST_DELETE_REQUEST} from "../Post/ActionType.js";
 
 export const createAlbum = (formData) => async (dispatch) => {
 
@@ -121,3 +131,22 @@ export const uploadSong = (formData) => async (dispatch) => {
         dispatch({ type: UPLOAD_SONG_ERROR, payload: err.message });
     }
 }
+
+export const deleteAlbum = (albumId) => async (dispatch) => {
+    try {
+        const response = await fetch(`${BASE_API_URL}/api/albums/delete/${albumId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            },
+        });
+
+        const res = await response.json();
+        console.log("Deleted Album", res)
+        dispatch({ type: DELETE_ALBUM_REQUEST, payload: res });
+    } catch (error) {
+        console.log('catch error', error);
+        dispatch({ type: DELETE_ALBUM_ERROR, payload: error.message });
+    }
+};

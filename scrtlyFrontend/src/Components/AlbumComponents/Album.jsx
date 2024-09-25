@@ -3,7 +3,7 @@ import "../../Styles/Album.css"
 import { AudioList } from '../SongComponents/AudioList.jsx'
 import {useParams} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
-import {getAlbum, getAlbumTracks} from "../../Redux/Album/Action.js";
+import {deleteAlbum, getAlbum, getAlbumTracks} from "../../Redux/Album/Action.js";
 import {BASE_API_URL} from "../../config/api.js";
 import {AddSong} from "../SongComponents/addSong.jsx";
 
@@ -13,6 +13,13 @@ function Album({ volume, onTrackChange}) {
     const dispatch = useDispatch();
     const {album} = useSelector(store => store);
     const [addSong, setAddSong] = useState(false)
+
+    const albumDeleteHandler = () => {
+        const confirmDelete = window.confirm('Are you sure you want to delete this album?');
+        if (confirmDelete) {
+            dispatch(deleteAlbum(albumId));
+        }
+    };
 
     useEffect(() => {
         dispatch(getAlbum(albumId))
@@ -31,8 +38,12 @@ function Album({ volume, onTrackChange}) {
                     <h1 className='albumName'>{album.findAlbum?.title}</h1>
                     <p className='stats'>{album.findAlbum?.artist.artistName} • 12 Songs <span>• {album.findAlbum?.releaseDate} • 1h 24min</span> </p>
                 </div>
-                {album.findAlbum?.artist.req_artist && (<button className="addSongBtn" onClick={() =>
-                    setAddSong(((prev) => !prev))}>Add Song</button>)}
+                <div className="buttons">
+                    {album.findAlbum?.artist.req_artist && (<button className="addSongBtn" onClick={() =>
+                        setAddSong(((prev) => !prev))}>Add Song</button>)}
+                    <button className="delteAlbumBtn" onClick={() => albumDeleteHandler()}>Delete Album</button>
+                </div>
+
             </div>
             <AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={album.songs} />
             {addSong && <AddSong onClose={() => setAddSong(((prev) => !prev))} albumId={albumId} />}

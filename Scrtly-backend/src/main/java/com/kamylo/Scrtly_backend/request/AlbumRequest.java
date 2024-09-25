@@ -14,6 +14,5 @@ import java.util.Date;
 @NoArgsConstructor
 public class AlbumRequest {
     private String title;
-    private String coverImage;
     private Artist artist;
 }

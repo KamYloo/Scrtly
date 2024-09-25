@@ -48,28 +48,12 @@ public class AlbumController {
             throw new RuntimeException("Image file not uploaded.");
         }
         User user = userService.findUserProfileByJwt(token);
-        try {
-
-            Path folderPath = Paths.get("src/main/resources/static/uploads/albumImages");
-
-            if (!Files.exists(folderPath)) {
-                Files.createDirectories(folderPath);
-            }
-            String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-            Path filePath = folderPath.resolve(fileName);
-            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-            AlbumRequest albumRequest = new AlbumRequest();
-            albumRequest.setTitle(title);
-            albumRequest.setArtist((Artist) user);
-            albumRequest.setCoverImage("/uploads/albumImages/" + fileName);
-            Album album = albumService.createAlbum(albumRequest);
-            AlbumDto albumDto = AlbumDtoMapper.toAlbumDto(album, user);
-            return new ResponseEntity<>(albumDto, HttpStatus.CREATED);
-        }
-        catch (IOException e) {
-            throw new RuntimeException("Error saving image file.", e);
-        }
+        AlbumRequest albumRequest = new AlbumRequest();
+        albumRequest.setTitle(title);
+        albumRequest.setArtist((Artist) user);
+        Album album = albumService.createAlbum(albumRequest, file);
+        AlbumDto albumDto = AlbumDtoMapper.toAlbumDto(album, user);
+        return new ResponseEntity<>(albumDto, HttpStatus.CREATED);
     }
 
     @GetMapping("/getAll")
