@@ -94,11 +94,6 @@ public class AlbumController {
         ApiResponse res = new ApiResponse();
 
         try {
-            Album album = albumService.getAlbum(albumId);
-            if (album == null) {
-                throw new AlbumException("Album not found with id " + albumId);
-            }
-
             albumService.deleteAlbum(albumId, artist.getId());
             res.setMessage("Album deleted successfully.");
             return new ResponseEntity<>(res, HttpStatus.OK);

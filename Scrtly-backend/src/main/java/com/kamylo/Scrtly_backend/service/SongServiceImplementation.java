@@ -1,5 +1,8 @@
 package com.kamylo.Scrtly_backend.service;
 
+import com.kamylo.Scrtly_backend.exception.AlbumException;
+import com.kamylo.Scrtly_backend.exception.ArtistException;
+import com.kamylo.Scrtly_backend.exception.SongException;
 import com.kamylo.Scrtly_backend.model.Album;
 import com.kamylo.Scrtly_backend.model.Artist;
 import com.kamylo.Scrtly_backend.model.Song;
@@ -29,6 +32,9 @@ public class SongServiceImplementation implements SongService {
     @Autowired
     private SongRepository songRepository;
 
+    @Autowired
+    private FileServiceImplementation fileService;
+
     @Override
     public Song createSong(String title, Album album, Artist artist, MultipartFile imageSong, MultipartFile audioFile) throws IOException, UnsupportedAudioFileException {
        Song song = new Song();
@@ -37,12 +43,12 @@ public class SongServiceImplementation implements SongService {
        song.setArtist(artist);
 
        if (!imageSong.isEmpty()) {
-           String imagePath = saveImage(imageSong);
+           String imagePath = fileService.saveFile(imageSong, "/uploads/songImages");
            song.setImageSong("/uploads/songImages/" + imagePath);
        }
 
         if (!audioFile.isEmpty()) {
-            String audioPath = saveAudio(audioFile);
+            String audioPath = fileService.saveFile(audioFile, "/uploads/audio");
             song.setTrack("/uploads/audio/" + audioPath);
             int duration = getAudioDuration(new File("src/main/resources/static/uploads/audio/" + audioPath));
             song.setDuration(duration);
@@ -50,37 +56,24 @@ public class SongServiceImplementation implements SongService {
         return songRepository.save(song);
     }
 
-    private String saveImage(MultipartFile imageSong) throws IOException {
-        try {
-
-            Path folderPath = Paths.get("src/main/resources/static/uploads/songImages");
-
-            if (!Files.exists(folderPath)) {
-                Files.createDirectories(folderPath);
-            }
-            String fileName = UUID.randomUUID().toString() + "_" + imageSong.getOriginalFilename();
-            Path filePath = folderPath.resolve(fileName);
-            Files.copy(imageSong.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-            return fileName;
-        } catch (IOException e) {
-            throw new RuntimeException("Error saving image file.", e);
-        }
+    @Override
+    public Song findSongById(Long songId) throws SongException {
+        return songRepository.findById(songId).orElseThrow(() -> new SongException("Song not found with id " + songId));
     }
 
-    private String saveAudio(MultipartFile audioFile) throws IOException {
-        try {
-            Path folderPath = Paths.get("src/main/resources/static/uploads/audio");
-
-            if (!Files.exists(folderPath)) {
-                Files.createDirectories(folderPath);
-            }
-            String fileName = UUID.randomUUID().toString() + "_" + audioFile.getOriginalFilename();
-            Path filePath = folderPath.resolve(fileName);
-            Files.copy(audioFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-            return fileName;
-        } catch (IOException e) {
-            throw new RuntimeException("Error saving audio file.", e);
+    @Override
+    public void deleteSong(Long songId, Long artistId) throws SongException, ArtistException {
+        Song song = findSongById(songId);
+        if (song == null) {
+            throw new SongException("Song not found with id " + songId);
         }
+
+        if(!artistId.equals(song.getArtist().getId())) {
+            throw new ArtistException("Artist id mismatch");
+        }
+        songRepository.deleteById(songId);
+        fileService.deleteFile(song.getImageSong());
+        fileService.deleteFile(song.getTrack());
     }
 
     private int getAudioDuration(File file) throws IOException, UnsupportedAudioFileException {

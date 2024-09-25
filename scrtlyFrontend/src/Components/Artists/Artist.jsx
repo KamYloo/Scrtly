@@ -15,7 +15,7 @@ import {AboutArtist} from "./AboutArtist.jsx";
 function Artist({ volume, onTrackChange}) {
   const {artistId} = useParams();
   const dispatch = useDispatch();
-  const {artist} = useSelector(store => store);
+  const {artist, song} = useSelector(store => store);
 
   useEffect(() => {
     const allLi = document.querySelector(".menuList").querySelectorAll("li")
@@ -34,7 +34,7 @@ function Artist({ volume, onTrackChange}) {
 
   useEffect(() => {
     dispatch(getArtistTracks(artistId))
-  }, [artistId]);
+  }, [artistId, song.deletedSong]);
 
   return (
     <div className='mainBox'>
@@ -51,7 +51,7 @@ function Artist({ volume, onTrackChange}) {
         <p><i><FaUsers/></i>12.3M <span>Followers</span></p>
       </div>
       <Routes>
-        <Route path="popular" element={<AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={artist.songs} />} />
+        <Route path="popular" element={<AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={artist.songs} req_artist={artist.findArtist?.req_artist} />} />
         <Route path="albums" element={<ArtistAlbums artistId={artistId} />} />
         <Route path="songs" element={<AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={artist.songs} />} />
         <Route path="fans" element={<Fans artistId={artistId}  fans={artist.findArtist?.fans}/>} />

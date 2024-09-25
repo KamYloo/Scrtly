@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @Service
 public class FileServiceImplementation {
-    public String saveImage(MultipartFile image, String directory) {
+    public String saveFile(MultipartFile image, String directory) {
         try {
 
             Path folderPath = Paths.get("src/main/resources/static" + directory);
@@ -29,7 +29,7 @@ public class FileServiceImplementation {
         }
     }
 
-    public void deleteImage(String directory) {
+    public void deleteFile(String directory) {
         try {
 
             String imagePath = "src/main/resources/static" + directory;

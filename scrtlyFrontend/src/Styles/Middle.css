@@ -299,7 +299,8 @@
 }
 
 .songsBox .songs .song .section .hits .hit,
-.songsBox .songs .song .section .hits .duration {
+.songsBox .songs .song .section .hits .duration,
+.songsBox .songs .song .section .hits .favourite{
     margin-right: 15px;
 }
 
@@ -307,6 +308,14 @@
 .songsBox .songs .song .section .hits .duration i {
     font-size: 12px;
     margin-right: 5px;
+}
+
+.songsBox .songs .song .section .hits .deleteSong {
+    transition: 0.3s;
+}
+
+.songsBox .songs .song .section .hits .deleteSong:hover {
+    color: red;
 }
 
 

@@ -2,13 +2,19 @@ import React, { useState, useEffect } from 'react'
 import { FaHeadphones, FaHeart, FaRegClock, FaRegHeart } from 'react-icons/fa'
 import { MusicPlayer } from './MusicPlayer.jsx'
 import {BASE_API_URL} from "../../config/api.js";
+import {BsTrash } from 'react-icons/bs'
+import {useDispatch} from "react-redux";
+import {deleteSong} from "../../Redux/Song/Action.js";
+
 
 // eslint-disable-next-line react/prop-types
-function AudioList({ volume, onTrackChange, initialSongs  }) {
+function AudioList({ volume, onTrackChange, initialSongs , req_artist}) {
     const [songs, setSongs] = useState(initialSongs);
     const [song, setSong] = useState(songs[0]?.track)
     const [img, setImage] = useState(songs[0]?.imageSong)
     const [auto, setAuto] = useState(false);
+    const dispatch = useDispatch();
+
 
     useEffect(() => {
         const songs = document.querySelectorAll(".songs")
@@ -45,6 +51,13 @@ function AudioList({ volume, onTrackChange, initialSongs  }) {
         const remainingSeconds = seconds % 60;
         return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
     }
+
+    const songDeleteHandler = (songId) => {
+        const confirmDelete = window.confirm('Are you sure you want to delete this song?');
+        if (confirmDelete) {
+            dispatch(deleteSong(songId));
+        }
+    };
 
     return (
         <div className='audioList'>
@@ -85,6 +98,7 @@ function AudioList({ volume, onTrackChange, initialSongs  }) {
                                                     <i><FaRegHeart /></i>
                                             }
                                         </div>
+                                        {req_artist && <i className="deleteSong" onClick={() => songDeleteHandler(song.id)}><BsTrash/></i>}
                                     </div>
                                 </div>
                             </div>

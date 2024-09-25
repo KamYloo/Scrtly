@@ -1,5 +1,8 @@
 package com.kamylo.Scrtly_backend.service;
 
+import com.kamylo.Scrtly_backend.exception.AlbumException;
+import com.kamylo.Scrtly_backend.exception.ArtistException;
+import com.kamylo.Scrtly_backend.exception.SongException;
 import com.kamylo.Scrtly_backend.model.Album;
 import com.kamylo.Scrtly_backend.model.Artist;
 import com.kamylo.Scrtly_backend.model.Song;
@@ -12,4 +15,6 @@ import java.io.IOException;
 @Service
 public interface SongService {
  Song createSong(String title, Album album, Artist artist, MultipartFile imageSong, MultipartFile audioFile) throws IOException, UnsupportedAudioFileException;
+ Song findSongById(Long songId) throws SongException;
+ void deleteSong(Long songId, Long artistId) throws SongException, ArtistException;
 }

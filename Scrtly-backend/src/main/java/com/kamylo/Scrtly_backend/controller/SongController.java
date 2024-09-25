@@ -3,11 +3,14 @@ package com.kamylo.Scrtly_backend.controller;
 import com.kamylo.Scrtly_backend.dto.SongDto;
 import com.kamylo.Scrtly_backend.dto.mapper.SongDtoMapper;
 import com.kamylo.Scrtly_backend.exception.AlbumException;
+import com.kamylo.Scrtly_backend.exception.ArtistException;
+import com.kamylo.Scrtly_backend.exception.SongException;
 import com.kamylo.Scrtly_backend.exception.UserException;
 import com.kamylo.Scrtly_backend.model.Album;
 import com.kamylo.Scrtly_backend.model.Artist;
 import com.kamylo.Scrtly_backend.model.Song;
 import com.kamylo.Scrtly_backend.model.User;
+import com.kamylo.Scrtly_backend.response.ApiResponse;
 import com.kamylo.Scrtly_backend.service.AlbumService;
 import com.kamylo.Scrtly_backend.service.SongService;
 import com.kamylo.Scrtly_backend.service.UserService;
@@ -45,4 +48,20 @@ public class SongController {
         SongDto songDto = SongDtoMapper.toSongDto(song, user);
         return new ResponseEntity<>(songDto, HttpStatus.CREATED);
     }
+
+    @DeleteMapping("/delete/{songId}")
+    public ResponseEntity<ApiResponse> deleteSongHandler(@PathVariable Long songId, @RequestHeader("Authorization") String token) throws UserException {
+        Artist artist = (Artist) userService.findUserProfileByJwt(token);
+        ApiResponse res = new ApiResponse();
+        try {
+            songService.deleteSong(songId, artist.getId());
+            res.setMessage("Song deleted successfully.");
+            return new ResponseEntity<>(res, HttpStatus.OK);
+        }
+        catch (ArtistException | SongException e) {
+            res.setMessage(e.getMessage());
+            return new ResponseEntity<>(res, HttpStatus.FORBIDDEN);
+        }
+    }
+
 }

@@ -14,9 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -41,7 +39,7 @@ public class AlbumServiceImplementation implements AlbumService{
             album.setArtist(artist);
             album.setTitle(albumRequest.getTitle());
             if (!albumImage.isEmpty()) {
-                String imagePath = fileService.saveImage(albumImage, "/uploads/albumImages");
+                String imagePath = fileService.saveFile(albumImage, "/uploads/albumImages");
                 album.setCoverImage("/uploads/albumImages/" + imagePath);
             }
             album.setReleaseDate(LocalDate.now());
@@ -79,10 +77,13 @@ public class AlbumServiceImplementation implements AlbumService{
     @Override
     public void deleteAlbum(Integer albumId, Long artistId) throws AlbumException, ArtistException {
         Album album = getAlbum(albumId);
+        if (album == null) {
+            throw new AlbumException("Album not found with id " + albumId);
+        }
         if (!artistId.equals(album.getArtist().getId())) {
             throw new ArtistException("Artist id mismatch");
         }
         albumRepository.deleteById(albumId);
-        fileService.deleteImage(album.getCoverImage());
+        fileService.deleteFile(album.getCoverImage());
     }
 }

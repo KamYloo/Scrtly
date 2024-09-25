@@ -8,6 +8,7 @@ import {commentReducer} from "./Comment/Reducer.js";
 import {storyReducer} from "./Story/Reducer.js";
 import {artistReducer} from "./Artist/Reducer.js";
 import {albumReducer} from "./Album/Reducer.js";
+import {songReducer} from "./Song/Reducer.js";
 
 const rootReducer = combineReducers({
     auth: authReducer,
@@ -18,6 +19,7 @@ const rootReducer = combineReducers({
     comment: commentReducer,
     story : storyReducer,
     album : albumReducer,
+    song: songReducer,
 })
 
 export const store = legacy_createStore(rootReducer, applyMiddleware(thunk))
