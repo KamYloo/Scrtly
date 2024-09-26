@@ -30,7 +30,7 @@ function Artist({ volume, onTrackChange}) {
 
   useEffect(() => {
     dispatch(findArtistById(artistId))
-  }, [artistId])
+  }, [artistId, artist.findArtist])
 
   useEffect(() => {
     dispatch(getArtistTracks(artistId))
@@ -51,9 +51,9 @@ function Artist({ volume, onTrackChange}) {
         <p><i><FaUsers/></i>12.3M <span>Followers</span></p>
       </div>
       <Routes>
-        <Route path="popular" element={<AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={artist.songs} req_artist={artist.findArtist?.req_artist} />} />
+        <Route path="popular" element={<AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={artist?.songs} req_artist={artist.findArtist?.req_artist} />} />
         <Route path="albums" element={<ArtistAlbums artistId={artistId} />} />
-        <Route path="songs" element={<AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={artist.songs} />} />
+        <Route path="songs" element={<AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={artist?.songs} />} />
         <Route path="fans" element={<Fans artistId={artistId}  fans={artist.findArtist?.fans}/>} />
         <Route path="about" element={<AboutArtist artist={artist} artistBio={artist.findArtist?.artistBio} />} />
       </Routes>

@@ -109,7 +109,7 @@
     align-items: center;
 }
 
-.banner .content .artist .right a {
+.banner .content .artist .right button {
     text-decoration: none;
     display: flex;
     align-items: center;
@@ -121,28 +121,29 @@
     font-weight: bold;
     text-align: center;
     transition: 0.3s;
+    cursor: pointer;
 }
 
-.banner .content .artist .right a i {
+.banner .content .artist .right button i {
     margin-right: 10px;
     font-size: 12px;
 }
 
 
-.banner .content .artist .right a:nth-child(1) {
-    background: rgb(74, 189, 28);
-    margin-left: 0;
-}
-
-.banner .content .artist .right a:nth-child(2) {
+.banner .content .artist .right button {
     background: rgba(0, 0, 0, 0.589);
     margin-right: 0;
     border: 1px solid rgba(255, 255, 255, 0.11);
 }
 
 
-.banner .content .artist .right a:hover {
+.banner .content .artist .right button:hover {
     box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.411);
+}
+
+.banner .content .artist .right .follow {
+    background: aqua;
+    color: black;
 }
 
 .mainBox .menuList {

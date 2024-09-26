@@ -14,6 +14,7 @@ public class ArtistDto {
     private String artistBio;
     private String artistPic;
     private boolean req_artist;
+    private boolean followed;
 
     private Set<UserDto> fans = new HashSet<>();
 }

@@ -5,12 +5,15 @@ import { FaEllipsisH, FaHeadphones, FaCheck } from 'react-icons/fa'
 import {EditArtist} from "./EditArtist.jsx";
 import {BASE_API_URL} from "../../config/api.js";
 import {CreateAlbum} from "../AlbumComponents/CreateAlbum.jsx";
+import {useDispatch} from "react-redux";
+import {followUser} from "../../Redux/Auth/Action.js";
 
 // eslint-disable-next-line react/prop-types
 function Banner({artist}) {
     const [menu, setMenu] = useState(false)
     const [editArtist, setEditArtist] = useState(false)
     const [createAlbum, setCreateAlbum] = useState(false)
+    const dispatch = useDispatch()
 
     return (
         <div className='banner'>
@@ -44,8 +47,8 @@ function Banner({artist}) {
                         <p><i><FaHeadphones/></i> 12,132,5478 <span>Monthly listeners</span></p>
                     </div>
                     <div className="right">
-                        <a href="#">Play</a>
-                        {!artist.findArtist?.req_artist && <a href="#"><i><FaCheck/></i>Following</a>}
+                        {!artist.findArtist?.req_artist && <button className={artist.findArtist?.followed ? 'following' : 'follow'}
+                        onClick={() => dispatch(followUser(artist.findArtist?.id))}><i><FaCheck/></i>{artist.findArtist?.followed ? 'Following': 'Follow'}</button>}
                     </div>
                 </div>
             </div>

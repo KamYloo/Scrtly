@@ -15,7 +15,6 @@ function ProfileInfo() {
     const {auth} = useSelector(store => store);
 
     useEffect(() => {
-        console.log(userId)
         dispatch(findUserById(userId))
     }, [userId]);
     return (
