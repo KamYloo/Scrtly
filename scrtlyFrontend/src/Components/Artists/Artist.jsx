@@ -30,7 +30,7 @@ function Artist({ volume, onTrackChange}) {
 
   useEffect(() => {
     dispatch(findArtistById(artistId))
-  }, [artistId, artist.findArtist])
+  }, [artistId, artist.follow])
 
   useEffect(() => {
     dispatch(getArtistTracks(artistId))

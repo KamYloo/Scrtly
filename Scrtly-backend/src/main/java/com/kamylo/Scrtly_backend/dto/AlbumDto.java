@@ -13,4 +13,6 @@ public class AlbumDto {
     private LocalDate releaseDate;
     private String albumImage;
     private ArtistDto artist;
+    private int totalSongs;
+    private int totalDuration;
 }

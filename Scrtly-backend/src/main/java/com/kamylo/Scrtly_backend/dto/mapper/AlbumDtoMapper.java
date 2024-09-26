@@ -4,6 +4,7 @@ import com.kamylo.Scrtly_backend.dto.AlbumDto;
 import com.kamylo.Scrtly_backend.dto.ArtistDto;
 import com.kamylo.Scrtly_backend.model.Album;
 import com.kamylo.Scrtly_backend.model.Artist;
+import com.kamylo.Scrtly_backend.model.Song;
 import com.kamylo.Scrtly_backend.model.User;
 import com.kamylo.Scrtly_backend.util.AlbumUtil;
 
@@ -19,6 +20,9 @@ public class AlbumDtoMapper {
         albumDto.setArtist(artist);
         albumDto.setTitle(album.getTitle());
         albumDto.setReleaseDate(album.getReleaseDate());
+        albumDto.setTotalSongs(album.getSongs().size());
+        int totalDuration = album.getSongs().stream().mapToInt(Song::getDuration).sum();
+        albumDto.setTotalDuration(totalDuration);
         return albumDto;
     }
     public static List<AlbumDto> toAlbumDtos(List<Album> albums, User user) {

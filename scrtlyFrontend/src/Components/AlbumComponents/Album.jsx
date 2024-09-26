@@ -23,6 +23,19 @@ function Album({ volume, onTrackChange}) {
         }
     };
 
+    function formatTime(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const remainingSeconds = seconds % 60;
+
+        const hoursDisplay = hours > 0 ? `${hours}h ` : '';
+        const minutesDisplay = minutes > 0 ? `${minutes}min ` : '';
+        const secondsDisplay = remainingSeconds > 0 ? `${remainingSeconds}s` : '';
+
+        return `${hoursDisplay}${minutesDisplay}${secondsDisplay}`.trim();
+    }
+
+
     useEffect(() => {
         dispatch(getAlbum(albumId))
     }, [albumId]);
@@ -38,7 +51,7 @@ function Album({ volume, onTrackChange}) {
                 <div className="albumData">
                     <p>Album</p>
                     <h1 className='albumName'>{album.findAlbum?.title}</h1>
-                    <p className='stats'>{album.findAlbum?.artist.artistName} • 12 Songs <span>• {album.findAlbum?.releaseDate} • 1h 24min</span> </p>
+                    <p className='stats'>{album.findAlbum?.artist.artistName} • {album.findAlbum?.totalSongs} Songs <span>• {album.findAlbum?.releaseDate} • {formatTime(album.findAlbum?.totalDuration)}</span> </p>
                 </div>
                 {album.findAlbum?.artist.req_artist && (
                 <div className="buttons">
