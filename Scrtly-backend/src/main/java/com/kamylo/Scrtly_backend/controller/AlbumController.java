@@ -15,21 +15,15 @@ import com.kamylo.Scrtly_backend.request.AlbumRequest;
 import com.kamylo.Scrtly_backend.response.ApiResponse;
 import com.kamylo.Scrtly_backend.service.AlbumService;
 import com.kamylo.Scrtly_backend.service.UserService;
-import com.kamylo.Scrtly_backend.util.AlbumUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.sound.midi.Track;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
-import java.util.UUID;
+import java.util.Set;
+
 
 @RestController
 @RequestMapping("/api/albums")
@@ -84,7 +78,7 @@ public class AlbumController {
     public ResponseEntity<List<SongDto>> getAlbumTracksHandler(@PathVariable Integer albumId, @RequestHeader("Authorization") String token) throws AlbumException, UserException {
         User user = userService.findUserProfileByJwt(token);
         List<Song> songs = albumService.getAlbumTracks(albumId);
-        List<SongDto> songDtos = SongDtoMapper.toSongDtoList(songs,user);
+        List<SongDto> songDtos = SongDtoMapper.toSongDtoListArrayList(songs,user);
         return new ResponseEntity<>(songDtos, HttpStatus.OK);
     }
 

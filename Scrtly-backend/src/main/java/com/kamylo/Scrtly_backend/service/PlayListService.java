@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 @Service
-public interface playListService {
+public interface PlayListService {
     PlayList createPlayList(PlayListRequest playListRequest, MultipartFile playListImage) throws UserException;
     PlayList getPlayList(Integer playListId) throws PlayListException;
     List<PlayList> getPlayLists();

@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 @Service
-public class playListServiceImplementation implements playListService {
+public class PlayListServiceImplementation implements PlayListService {
     @Autowired
     private UserService userService;
 

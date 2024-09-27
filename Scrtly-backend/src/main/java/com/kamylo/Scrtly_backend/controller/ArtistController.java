@@ -4,7 +4,6 @@ import com.kamylo.Scrtly_backend.dto.ArtistDto;
 import com.kamylo.Scrtly_backend.dto.SongDto;
 import com.kamylo.Scrtly_backend.dto.mapper.ArtistDtoMapper;
 import com.kamylo.Scrtly_backend.dto.mapper.SongDtoMapper;
-import com.kamylo.Scrtly_backend.exception.AlbumException;
 import com.kamylo.Scrtly_backend.exception.ArtistException;
 import com.kamylo.Scrtly_backend.exception.UserException;
 import com.kamylo.Scrtly_backend.model.Artist;
@@ -12,7 +11,6 @@ import com.kamylo.Scrtly_backend.model.Song;
 import com.kamylo.Scrtly_backend.model.User;
 import com.kamylo.Scrtly_backend.service.ArtistService;
 import com.kamylo.Scrtly_backend.service.UserService;
-import com.kamylo.Scrtly_backend.util.ArtistUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @RestController
@@ -84,7 +83,7 @@ public class ArtistController {
     public ResponseEntity<List<SongDto>> getArtistTracksHandler(@PathVariable Long artistId, @RequestHeader("Authorization") String token) throws UserException, ArtistException {
         User user = userService.findUserProfileByJwt(token);
         List<Song> songs = artistService.getArtistTracks(artistId);
-        List<SongDto> songDtos = SongDtoMapper.toSongDtoList(songs, user);
+        List<SongDto> songDtos = SongDtoMapper.toSongDtoListArrayList(songs, user);
         return new ResponseEntity<>(songDtos, HttpStatus.OK);
     }
 }
