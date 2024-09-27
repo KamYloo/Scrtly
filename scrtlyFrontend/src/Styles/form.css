@@ -32,7 +32,7 @@
 
 
 
-.editArtist, .createAlbum, .addSong {
+.editArtist, .createAlbum, .addSong, .createPlayList{
     display: flex;
     justify-content: center;
     flex-direction: column;
@@ -184,7 +184,15 @@
     }
 }
 
-.createAlbum {
+.createPlayList {
+
+}
+
+.createPlayList {
+    top: 0;
+}
+
+.createAlbum, .createPlayList {
     width: 50vh;
 }
 
@@ -193,7 +201,7 @@
 }
 
 @media screen and (max-width : 550px) {
-    .createAlbum, .editArtist, .addSong {
+    .createAlbum, .editArtist, .addSong, .createPlayList {
         background: rgba(0, 0, 0, 0.77);
         top: 40vh;
     }

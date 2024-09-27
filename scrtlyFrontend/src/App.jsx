@@ -16,11 +16,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { currentUser } from "./Redux/Auth/Action.js";
 import {AlbumsView} from "./Components/AlbumComponents/AlbumsView.jsx";
 import {Album} from "./Components/AlbumComponents/Album.jsx";
+import {AddPlayList} from "./Components/PlayListComponents/AddPlayList.jsx";
+import {getUserPlayLists} from "./Redux/PlayList/Action.js";
+import {PlayList} from "./Components/PlayListComponents/PlayList.jsx";
 
 function App() {
   const dispatch = useDispatch();
-  const { auth } = useSelector(store => store);
+  const { auth, playList } = useSelector(store => store);
   const token = localStorage.getItem('token')
+  const [createPlayList, setCreatePlayList] = useState(false)
 
   const [volume, setVolume] = useState(0.5)
   const [currentTrack, setCurrentTrack] = useState({ songName: 'Default Song', artist: 'Default Artist' })
@@ -30,17 +34,25 @@ function App() {
   }
 
   useEffect(() => {
-    if (token) dispatch(currentUser(token))
-  }, [dispatch, token])
+    dispatch(currentUser())
+  }, [dispatch])
+
+  useEffect(() => {
+    if (auth.reqUser?.req_user) {
+      dispatch(getUserPlayLists());
+    }
+  }, [dispatch, auth.reqUser?.req_user, playList.createPlayList, playList.deletePlayList]);
+
 
   const renderLayout = (Component, props) => {
     const { setVolume, currentTrack, volume, handleTrackChange, auth, token } = props
 
     return (
       <div className='App'>
-        <LeftMenu onVolumeChange={setVolume} currentTrack={currentTrack} />
+        <LeftMenu onVolumeChange={setVolume} currentTrack={currentTrack} setCreatePlayList={setCreatePlayList} />
         <Component volume={volume} onTrackChange={handleTrackChange} auth={auth} token={token} />
         <RightMenu auth={auth} token={token} />
+        {createPlayList && <AddPlayList onClose={() => setCreatePlayList(((prev) => !prev))} />}
         <div className="background"></div>
       </div>
     )
@@ -84,6 +96,10 @@ function App() {
 
         <Route path="/album/:albumId" element={
           renderLayout(Album, { setVolume, currentTrack, volume, handleTrackChange, auth, token })
+        } />
+
+        <Route path="/playList/:playListId" element={
+          renderLayout(PlayList, { setVolume, currentTrack, volume, handleTrackChange, auth, token })
         } />
 
         <Route path="/discover" element={

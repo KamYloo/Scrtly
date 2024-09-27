@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react'
-import "../../Styles/Album.css"
+import "../../Styles/Album&&PlayList.css"
 import { AudioList } from '../SongComponents/AudioList.jsx'
 import {useNavigate, useParams} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
@@ -57,12 +57,12 @@ function Album({ volume, onTrackChange}) {
                 <div className="buttons">
                     <button className="addSongBtn" onClick={() =>
                         setAddSong(((prev) => !prev))}>Add Song</button>
-                    <button className="delteAlbumBtn" onClick={() => albumDeleteHandler()
+                    <button className="deleteAlbumBtn" onClick={() => albumDeleteHandler()
                     }>Delete Album</button>
                 </div>)}
 
             </div>
-            <AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={album.songs} req_artist={album.findAlbum?.artist.req_artist}/>
+            <AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={album?.songs} req_artist={album.findAlbum?.artist.req_artist}/>
             {addSong && <AddSong onClose={() => setAddSong(((prev) => !prev))} albumId={albumId} />}
         </div>
     )

@@ -49,18 +49,18 @@ export const login = (data) => async (dispatch) => {
     }
 }
 
-export const currentUser = (token) => async (dispatch) => {
+export const currentUser = () => async (dispatch) => {
     try {
         const res = await fetch(`${BASE_API_URL}/api/users/profile`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
             },
         })
 
         const resData = await res.json()
-        // console.log("usersProfile ", resData)
+        console.log("usersProfile ", resData)
         dispatch({ type: REQUEST_USER, payload: resData })
     } catch (error) {
         console.log("catch error ", error)

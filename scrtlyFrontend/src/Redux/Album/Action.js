@@ -14,7 +14,6 @@ import {
     UPLOAD_SONG_ERROR,
     UPLOAD_SONG_REQUEST
 } from "./ActionType.js";
-import {POST_DELETE_ERROR, POST_DELETE_REQUEST} from "../Post/ActionType.js";
 
 export const createAlbum = (formData) => async (dispatch) => {
 

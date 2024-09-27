@@ -6,10 +6,10 @@ import { FaEllipsisH } from "react-icons/fa";
 import { BiSearchAlt } from "react-icons/bi";
 import { Menu } from './Menu';
 import { MenuList } from './MenuList';
-import { MenuPlayList } from './MenuPlayList';
+import { MenuPlayList } from './PlayListComponents/MenuPlayList.jsx';
 import { TrackList } from './TrackList';
 
-function LeftMenu({ onVolumeChange, currentTrack}) {
+function LeftMenu({ onVolumeChange, currentTrack, setCreatePlayList}) {
     return (
         <div className='LeftMenu'>
             <div className="logoBox">
@@ -23,7 +23,7 @@ function LeftMenu({ onVolumeChange, currentTrack}) {
             </div>
 
             <Menu title={'Menu'} menuObject={MenuList}/>
-            <MenuPlayList />
+            <MenuPlayList setCreatePlayList={setCreatePlayList}/>
             <TrackList onVolumeChange={onVolumeChange} songName={currentTrack.songName} artist={currentTrack.artist} />
         </div>
     )

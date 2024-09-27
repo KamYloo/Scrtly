@@ -15,7 +15,7 @@ function AlbumsView() {
 
     useEffect(() => {
         dispatch(getAllAlbums())
-    }, [dispatch])
+    }, [dispatch, album.deleteAlbum])
 
     return (
         <div className='albumsView'>

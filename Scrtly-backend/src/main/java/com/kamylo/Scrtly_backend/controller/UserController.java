@@ -33,7 +33,6 @@ public class UserController {
     @GetMapping("/profile")
     public ResponseEntity<UserDto> getUserProfileHandler(@RequestHeader("Authorization") String token) throws UserException {
         if (token != null && token.startsWith("Bearer ")) {
-
             User user = userService.findUserProfileByJwt(token);
             UserDto userDto = UserDtoMapper.toUserDto(user);
             userDto.setReq_user(true);

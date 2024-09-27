@@ -8,7 +8,6 @@ import java.util.Set;
 public class UserDto {
     private Long id;
     private String fullName;
-    private String email;
     private String profilePicture;
     private String description;
     private String role;

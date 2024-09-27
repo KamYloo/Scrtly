@@ -19,7 +19,7 @@ function ArtistAlbums() {
     return (
         <div className='artistAlbums'>
             <div className="albums">
-                { album.albums.map((item) => (
+                { album?.albums.map((item) => (
                     <div className="album" key={item.id} onClick={() => navigate(`/album/${item.id}`)}>
                         <i className="play"><FaCirclePlay/></i>
                         <img src={`${BASE_API_URL}${item?.albumImage || ''}`} alt=""/>
