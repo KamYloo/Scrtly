@@ -55,6 +55,11 @@ public class User {
     @ToString.Exclude
     private List<Story> stories = new ArrayList<>();
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private List<PlayList> playlists = new ArrayList<>();
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

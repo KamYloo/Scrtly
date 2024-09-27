@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.ToString;
 
 import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "songs")
@@ -29,7 +30,7 @@ public class Song {
     @JsonBackReference
     private Artist artist;
 
-//    @ManyToMany(mappedBy = "songs")
-   // @ToString.Exclude
-//    private Set<Playlist> playlists = new HashSet<>();
+    @ManyToMany(mappedBy = "songs")
+    @ToString.Exclude
+    private Set<PlayList> playlists = new HashSet<>();
 }
