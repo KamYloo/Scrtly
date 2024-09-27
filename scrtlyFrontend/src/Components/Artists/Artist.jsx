@@ -48,12 +48,12 @@ function Artist({ volume, onTrackChange}) {
           <li><Link to={`/artist/${artistId}/fans`}>Fans</Link></li>
           <li><Link to={`/artist/${artistId}/about`}>About</Link></li>
         </ul>
-        <p><i><FaUsers/></i>12.3M <span>Followers</span></p>
+        <p><i><FaUsers/></i>{artist.findArtist?.totalFans}<span>Followers</span></p>
       </div>
       <Routes>
         <Route path="popular" element={<AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={artist?.songs} req_artist={artist.findArtist?.req_artist} />} />
         <Route path="albums" element={<ArtistAlbums artistId={artistId} />} />
-        <Route path="songs" element={<AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={artist?.songs} />} />
+        <Route path="songs" element={<AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={artist?.songs} req_artist={artist.findArtist?.req_artist} />} />
         <Route path="fans" element={<Fans artistId={artistId}  fans={artist.findArtist?.fans}/>} />
         <Route path="about" element={<AboutArtist artist={artist} artistBio={artist.findArtist?.artistBio} />} />
       </Routes>

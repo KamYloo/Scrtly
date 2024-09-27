@@ -16,6 +16,9 @@ public class UserDto {
     private boolean req_user;
     private boolean followed;
 
+    private int totalFollowers;
+    private int totalFollowing;
     private Set<UserDto> followers = new HashSet<>();
     private Set<UserDto> following = new HashSet<>();
+
 }

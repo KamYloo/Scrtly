@@ -67,7 +67,7 @@ function AudioList({ volume, onTrackChange, initialSongs , req_artist}) {
             <div className="songsBox">
                 {
                     // eslint-disable-next-line react/prop-types
-                    initialSongs?.map((song, index) => (
+                    initialSongs.map((song, index) => (
                         <div className="songs" key={song?.id} onClick={() => setMainSong(`${BASE_API_URL}${song?.track || ''}`, `${BASE_API_URL}${song?.imageSong || ''}`, song?.title, song?.artist.artistName)}>
                             <div className="count">#{index + 1}</div>
                             <div className="song">

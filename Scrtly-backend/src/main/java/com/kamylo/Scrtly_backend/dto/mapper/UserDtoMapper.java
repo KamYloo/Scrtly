@@ -14,6 +14,8 @@ public class UserDtoMapper {
         userDto.setFullName(user.getFullName());
         userDto.setDescription(user.getDescription());
         userDto.setProfilePicture(user.getProfilePicture());
+        userDto.setTotalFollowers(user.getFollowers().size());
+        userDto.setTotalFollowing(user.getFollowings().size());
         userDto.setFollowers(toUserDtos(user.getFollowers()));
         userDto.setFollowing(toUserDtos(user.getFollowings()));
 

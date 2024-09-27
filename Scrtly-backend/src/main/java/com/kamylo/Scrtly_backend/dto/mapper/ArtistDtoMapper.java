@@ -22,6 +22,7 @@ public class ArtistDtoMapper {
         artistDto.setArtistPic(artist.getProfilePicture());
         artistDto.setBannerImg(artist.getBannerImg());
         artistDto.setReq_artist(ArtistUtil.isReqArtist(reqUser, artist));
+        artistDto.setTotalFans(artist.getFollowers().size());
         artistDto.setFollowed(UserUtil.isFollowedByReqUser(reqUser, artist));
         artistDto.setFans(UserDtoMapper.toUserDtos(artist.getFollowers()));
         return artistDto;

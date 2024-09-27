@@ -39,8 +39,8 @@ function ProfileInfo() {
                     </div>
                     <div className="stats">
                         <p>Posts: 45</p>
-                        <p>{auth.findUser?.followers.length} Followers</p>
-                        <p>Following: {auth.findUser?.following.length}</p>
+                        <p>{auth.findUser?.totalFollowers} Followers</p>
+                        <p>Following: {auth.findUser?.totalFollowing}</p>
                     </div>
                     <div className="description">
                         <p>{auth.findUser?.fullName || 'Name'}</p>
