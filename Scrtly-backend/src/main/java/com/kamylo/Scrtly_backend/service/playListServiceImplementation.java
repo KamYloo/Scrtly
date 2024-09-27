@@ -1,0 +1,81 @@
+package com.kamylo.Scrtly_backend.service;
+
+import com.kamylo.Scrtly_backend.exception.PlayListException;
+import com.kamylo.Scrtly_backend.exception.UserException;
+import com.kamylo.Scrtly_backend.model.PlayList;
+import com.kamylo.Scrtly_backend.model.Song;
+import com.kamylo.Scrtly_backend.model.User;
+import com.kamylo.Scrtly_backend.repository.PlayListRepository;
+import com.kamylo.Scrtly_backend.request.PlayListRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+@Service
+public class playListServiceImplementation implements playListService {
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private FileServiceImplementation fileService;
+
+    @Autowired
+    private PlayListRepository playListRepository;
+
+    @Override
+    public PlayList createPlayList(PlayListRequest playListRequest, MultipartFile playListImage) throws UserException {
+        User user = userService.findUserById(playListRequest.getUser().getId());
+        PlayList playList = new PlayList();
+        playList.setUser(user);
+        playList.setTitle(playListRequest.getTitle());
+        if (!playListImage.isEmpty()) {
+            String imagePath = fileService.saveFile(playListImage, "/uploads/playListImages");
+            playList.setCoverImage("/uploads/playListImages/" + imagePath);
+        }
+        playList.setCreationDate(LocalDate.now());
+        return playListRepository.save(playList);
+    }
+
+    @Override
+    public PlayList getPlayList(Integer playListId) throws PlayListException {
+        return playListRepository.findById(playListId).orElseThrow(() -> new PlayListException("PlayList not found with id: " + playListId));
+    }
+
+    @Override
+    public List<PlayList> getPlayLists() {
+        return playListRepository.findAllByOrderByIdDesc();
+    }
+
+    @Override
+    public List<PlayList> getPlayListsByUser(Long userId) throws UserException {
+        User user = userService.findUserById(userId);
+        List<PlayList> playLists = user.getPlaylists();
+        return (playLists != null) ? playLists : new ArrayList<>();
+    }
+
+    @Override
+    public Set<Song> getPlayListTracks(Integer playListId) throws PlayListException {
+        PlayList playList = getPlayList(playListId);
+        Set<Song> songs = playList.getSongs();
+        return (songs != null) ? songs : new HashSet<>();
+    }
+
+    @Override
+    public void deletePlayList(Integer playListId, Long userId) throws PlayListException, UserException {
+        PlayList playList = getPlayList(playListId);
+        if (playList == null) {
+            throw new PlayListException("PlayList not found with id: " + playListId);
+        }
+        if (!userId.equals(playList.getUser().getId())) {
+            throw new UserException("You do not have permission to delete this playlist");
+        }
+        playListRepository.deleteById(playListId);
+        fileService.deleteFile(playList.getCoverImage());
+    }
+}

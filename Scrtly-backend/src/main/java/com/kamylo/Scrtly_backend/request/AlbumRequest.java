@@ -1,17 +1,9 @@
 package com.kamylo.Scrtly_backend.request;
 
 import com.kamylo.Scrtly_backend.model.Artist;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-import java.util.Date;
-
-@Setter
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor
+@Data
 public class AlbumRequest {
     private String title;
     private Artist artist;
