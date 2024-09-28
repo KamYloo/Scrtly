@@ -200,6 +200,85 @@
     top: 12vh;
 }
 
+.searchSong {
+    width: max-content;
+    height: max-content;
+    padding: 30px;
+    position: absolute;
+    border-radius: 10px;
+    background: rgba(19, 19, 20, 0.815);
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    margin: auto;
+
+    form {
+        display: flex;
+        gap: 20px;
+
+        input {
+            border: none;
+            outline: none;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        button {
+            padding: 15px;
+            border-radius: 10px;
+            background: rgb(53, 53, 53);
+            border: none;
+            cursor: pointer;
+            color: white;
+        }
+    }
+
+    .song {
+        margin-top: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        .detail {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+
+            img {
+                height: 50px;
+                width: 50px;
+                border-radius: 10%;
+                object-fit: cover;
+                background: black;
+            }
+
+            .songData {
+                span {
+                    color: white;
+                    font-size: 16px;
+                }
+
+                p {
+                    color: rgba(255, 255, 255, 0.53);
+                    font-size: 11px;
+                }
+            }
+
+        }
+
+        button {
+            padding: 10px;
+            border-radius: 10px;
+            background: rgb(53, 53, 53);
+            border: none;
+            cursor: pointer;
+            color: white;
+        }
+    }
+}
+
+
 @media screen and (max-width : 550px) {
     .createAlbum, .editArtist, .addSong, .createPlayList {
         background: rgba(0, 0, 0, 0.77);

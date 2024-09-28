@@ -22,6 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/songs")
@@ -47,6 +49,14 @@ public class SongController {
         Song song = songService.createSong(title, album, (Artist) user , imageFile, audioFile);
         SongDto songDto = SongDtoMapper.toSongDto(song, user);
         return new ResponseEntity<>(songDto, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Set<SongDto>> searchSongHandler(@RequestParam("title") String title,  @RequestHeader("Authorization") String token) throws UserException {
+        User user = userService.findUserProfileByJwt(token);
+        Set<Song> songs = songService.searchSongByTitle(title);
+        Set<SongDto> songDtoSet = SongDtoMapper.toSongDtoListHashSet(songs, user);
+        return new ResponseEntity<>(songDtoSet, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{songId}")

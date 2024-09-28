@@ -2,10 +2,13 @@ package com.kamylo.Scrtly_backend.service;
 
 import com.kamylo.Scrtly_backend.exception.AlbumException;
 import com.kamylo.Scrtly_backend.exception.ArtistException;
+import com.kamylo.Scrtly_backend.exception.PlayListException;
 import com.kamylo.Scrtly_backend.exception.SongException;
 import com.kamylo.Scrtly_backend.model.Album;
 import com.kamylo.Scrtly_backend.model.Artist;
+import com.kamylo.Scrtly_backend.model.PlayList;
 import com.kamylo.Scrtly_backend.model.Song;
+import com.kamylo.Scrtly_backend.repository.PlayListRepository;
 import com.kamylo.Scrtly_backend.repository.SongRepository;
 import javazoom.jl.decoder.Bitstream;
 import javazoom.jl.decoder.BitstreamException;
@@ -21,11 +24,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.UUID;
+import java.util.Set;
 
 @Service
 public class SongServiceImplementation implements SongService {
@@ -59,6 +58,11 @@ public class SongServiceImplementation implements SongService {
     @Override
     public Song findSongById(Long songId) throws SongException {
         return songRepository.findById(songId).orElseThrow(() -> new SongException("Song not found with id " + songId));
+    }
+
+    @Override
+    public Set<Song> searchSongByTitle(String title) {
+        return songRepository.findByTitle(title);
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.kamylo.Scrtly_backend.dto.SongDto;
 import com.kamylo.Scrtly_backend.dto.mapper.PlayListDtoMapper;
 import com.kamylo.Scrtly_backend.dto.mapper.SongDtoMapper;
 import com.kamylo.Scrtly_backend.exception.PlayListException;
+import com.kamylo.Scrtly_backend.exception.SongException;
 import com.kamylo.Scrtly_backend.exception.UserException;
 import com.kamylo.Scrtly_backend.model.PlayList;
 import com.kamylo.Scrtly_backend.model.Song;
@@ -77,6 +78,13 @@ public class PlayListController {
         Set<Song> songs = playListService.getPlayListTracks(playListId);
         Set<SongDto> songDtos = SongDtoMapper.toSongDtoListHashSet(songs,user);
         return new ResponseEntity<>(songDtos, HttpStatus.OK);
+    }
+
+    @PutMapping("/{playListId}/addSong/{songId}")
+    public ResponseEntity<PlayListDto> addSongToPlayListHandler(@PathVariable("playListId") Integer playListId, @PathVariable("songId") Long songId) throws PlayListException, SongException {
+        PlayList playList = playListService.addSongToPlayList(songId,playListId);
+        PlayListDto playListDto = PlayListDtoMapper.toPlayListDto(playList);
+        return new ResponseEntity<>(playListDto, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{playListId}")

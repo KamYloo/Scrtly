@@ -1,6 +1,7 @@
 package com.kamylo.Scrtly_backend.service;
 
 import com.kamylo.Scrtly_backend.exception.PlayListException;
+import com.kamylo.Scrtly_backend.exception.SongException;
 import com.kamylo.Scrtly_backend.exception.UserException;
 import com.kamylo.Scrtly_backend.model.PlayList;
 import com.kamylo.Scrtly_backend.model.Song;
@@ -17,6 +18,7 @@ public interface PlayListService {
     PlayList getPlayList(Integer playListId) throws PlayListException;
     List<PlayList> getPlayLists();
     List<PlayList> getPlayListsByUser(Long userId) throws UserException;
+    PlayList addSongToPlayList(Long songId, Integer playListId) throws SongException, PlayListException;
     Set<Song> getPlayListTracks (Integer playListId) throws PlayListException;
     void deletePlayList(Integer playListId, Long userId) throws PlayListException, UserException;
 }

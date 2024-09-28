@@ -6,6 +6,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {BASE_API_URL} from "../../config/api.js";
 import {AddSong} from "../SongComponents/addSong.jsx";
 import {getPlayList, getPlayListTracks} from "../../Redux/PlayList/Action.js";
+import {AddSongToPlayList} from "./AddSongToPlayList.jsx";
 
 // eslint-disable-next-line react/prop-types
 function PlayList({ volume, onTrackChange}) {
@@ -30,11 +31,11 @@ function PlayList({ volume, onTrackChange}) {
 
     useEffect(() => {
         dispatch(getPlayList(playListId))
-    }, [playListId]);
+    }, [playListId, playList.uploadSong]);
 
     useEffect(() => {
         dispatch(getPlayListTracks(playListId))
-    }, [playListId]);
+    }, [playListId, playList.uploadSong]);
 
     return (
         <div className='playListDetail'>
@@ -49,11 +50,11 @@ function PlayList({ volume, onTrackChange}) {
                         <button className="addSongBtn" onClick={() =>
                             setAddSong(((prev) => !prev))}>Add Song</button>
                         <button className="deletePlayListBtn"
-                        >Delete Album</button>
+                        >Delete PlayList</button>
                     </div>
             </div>
             <AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={playList?.songs} req_artist={playList.findPlayList?.user.req_user}/>
-            {addSong && <AddSong onClose={() => setAddSong(((prev) => !prev))} playListId={playListId} />}
+            {addSong && <AddSongToPlayList onClose={() => setAddSong(((prev) => !prev))} playListId={playListId} />}
         </div>
     )
 }

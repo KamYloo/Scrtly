@@ -1,6 +1,7 @@
 package com.kamylo.Scrtly_backend.service;
 
 import com.kamylo.Scrtly_backend.exception.PlayListException;
+import com.kamylo.Scrtly_backend.exception.SongException;
 import com.kamylo.Scrtly_backend.exception.UserException;
 import com.kamylo.Scrtly_backend.model.PlayList;
 import com.kamylo.Scrtly_backend.model.Song;
@@ -27,6 +28,9 @@ public class PlayListServiceImplementation implements PlayListService {
 
     @Autowired
     private PlayListRepository playListRepository;
+
+    @Autowired
+    private SongService songService;
 
     @Override
     public PlayList createPlayList(PlayListRequest playListRequest, MultipartFile playListImage) throws UserException {
@@ -57,6 +61,17 @@ public class PlayListServiceImplementation implements PlayListService {
         User user = userService.findUserById(userId);
         List<PlayList> playLists = user.getPlaylists();
         return (playLists != null) ? playLists : new ArrayList<>();
+    }
+
+    @Override
+    public PlayList addSongToPlayList(Long songId, Integer playListId) throws SongException, PlayListException {
+        Song song = songService.findSongById(songId);
+        PlayList playList = getPlayList(playListId);
+        if (playList.getSongs().contains(song)) {
+            throw new SongException("Song already exists");
+        }
+        playList.getSongs().add(song);
+        return playListRepository.save(playList);
     }
 
     @Override

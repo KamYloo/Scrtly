@@ -3,6 +3,7 @@ package com.kamylo.Scrtly_backend.model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.util.HashSet;
@@ -11,6 +12,7 @@ import java.util.Set;
 @Entity
 @Table(name = "songs")
 @Data
+@EqualsAndHashCode(exclude = {"playlists", "artist", "album"})
 public class Song {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -7,14 +7,9 @@ import {
     GET_PLAYLIST_TRACK_ERROR,
     GET_PLAYLIST_TRACKS_REQUEST,
     GET_USER_PLAYLISTS_ERROR,
-    GET_USER_PLAYLISTS_REQUEST
+    GET_USER_PLAYLISTS_REQUEST, UPLOAD_SONG_TO_PLAYLIST_ERROR, UPLOAD_SONG_TO_PLAYLIST_REQUEST
 } from "./ActionType.js";
-import {
-    FIND_ALBUM_ERROR,
-    FIND_ALBUM_REQUEST, GET_ALBUM_TRACKS_ERROR, GET_ALBUM_TRACKS_REQUEST,
-    GET_ARTIST_ALBUMS_ERROR,
-    GET_ARTIST_ALBUMS_REQUEST
-} from "../Album/ActionType.js";
+
 
 export const createPlayList = (formData) => async (dispatch) => {
 
@@ -89,5 +84,25 @@ export const getPlayListTracks = (playListId) => async (dispatch) => {
     } catch (error) {
         console.log("catch error ", error)
         dispatch({ type: GET_PLAYLIST_TRACK_ERROR, payload: error.message });
+    }
+}
+
+export const addSongToPlayList = (data) => async (dispatch) => {
+    try {
+        const res = await fetch(`${BASE_API_URL}/api/playLists/${data.playListId}/addSong/${data.songId}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify(data),
+        })
+
+        const resData = await res.json()
+        console.log("addSongToPlayList ", resData)
+        dispatch({ type: UPLOAD_SONG_TO_PLAYLIST_REQUEST, payload: resData })
+    } catch (error) {
+        console.log("catch error ", error)
+        dispatch({ type: UPLOAD_SONG_TO_PLAYLIST_ERROR, payload: error.message });
     }
 }
