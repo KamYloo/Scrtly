@@ -87,6 +87,20 @@ public class PlayListController {
         return new ResponseEntity<>(playListDto, HttpStatus.OK);
     }
 
+    @DeleteMapping("/{playListId}/deleteSong/{songId}")
+    public ResponseEntity<ApiResponse> deleteSongFromPlayListHandler(@PathVariable("playListId") Integer playListId, @PathVariable("songId") Long songId) throws PlayListException, SongException {
+        ApiResponse apiResponse = new ApiResponse();
+        try {
+            playListService.removeSongFromPlayList(songId,playListId);
+            apiResponse.setMessage("Song deleted successfully.");
+            return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+        }
+        catch (PlayListException | SongException e) {
+            apiResponse.setMessage(e.getMessage());
+            return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @DeleteMapping("/delete/{playListId}")
     public ResponseEntity<ApiResponse> deletePlayListHandler(@PathVariable Integer playListId, @RequestHeader("Authorization") String token) throws UserException {
         User user = userService.findUserProfileByJwt(token);

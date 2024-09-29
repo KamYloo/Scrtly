@@ -1,7 +1,7 @@
 import {BASE_API_URL} from "../../config/api.js";
 import {
     CREATE_PLAYLIST_ERROR,
-    CREATE_PLAYLIST_REQUEST,
+    CREATE_PLAYLIST_REQUEST, DELETE_SONG_FROM_PLAYLIST_ERROR, DELETE_SONG_FROM_PLAYLIST_REQUEST,
     GET_PLAYLIST_ERROR,
     GET_PLAYLIST_REQUEST,
     GET_PLAYLIST_TRACK_ERROR,
@@ -104,5 +104,25 @@ export const addSongToPlayList = (data) => async (dispatch) => {
     } catch (error) {
         console.log("catch error ", error)
         dispatch({ type: UPLOAD_SONG_TO_PLAYLIST_ERROR, payload: error.message });
+    }
+}
+
+export const deleteSongFromPlayList = (data) => async (dispatch) => {
+    try {
+        const res = await fetch(`${BASE_API_URL}/api/playLists/${data.playListId}/deleteSong/${data.songId}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify(data),
+        })
+
+        const resData = await res.json()
+        console.log("deleteSongFromPlayList ", resData)
+        dispatch({ type: DELETE_SONG_FROM_PLAYLIST_REQUEST, payload: resData })
+    } catch (error) {
+        console.log("catch error ", error)
+        dispatch({ type: DELETE_SONG_FROM_PLAYLIST_ERROR, payload: error.message });
     }
 }

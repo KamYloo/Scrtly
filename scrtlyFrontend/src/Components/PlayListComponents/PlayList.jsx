@@ -31,11 +31,11 @@ function PlayList({ volume, onTrackChange}) {
 
     useEffect(() => {
         dispatch(getPlayList(playListId))
-    }, [playListId, playList.uploadSong]);
+    }, [playListId, playList.uploadSong, playList.deletedSong]);
 
     useEffect(() => {
         dispatch(getPlayListTracks(playListId))
-    }, [playListId, playList.uploadSong]);
+    }, [playListId, playList.uploadSong, playList.deletedSong]);
 
     return (
         <div className='playListDetail'>
@@ -53,7 +53,7 @@ function PlayList({ volume, onTrackChange}) {
                         >Delete PlayList</button>
                     </div>
             </div>
-            <AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={playList?.songs} req_artist={playList.findPlayList?.user.req_user}/>
+            <AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={playList?.songs} isplayListSongs={true} playListId={playListId}/>
             {addSong && <AddSongToPlayList onClose={() => setAddSong(((prev) => !prev))} playListId={playListId} />}
         </div>
     )

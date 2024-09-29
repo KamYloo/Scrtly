@@ -5,10 +5,11 @@ import {BASE_API_URL} from "../../config/api.js";
 import {BsTrash } from 'react-icons/bs'
 import {useDispatch} from "react-redux";
 import {deleteSong} from "../../Redux/Song/Action.js";
+import {deleteSongFromPlayList} from "../../Redux/PlayList/Action.js";
 
 
 // eslint-disable-next-line react/prop-types
-function AudioList({ volume, onTrackChange, initialSongs , req_artist}) {
+function AudioList({ volume, onTrackChange, initialSongs , req_artist, isplayListSongs, playListId}) {
     const [songs, setSongs] = useState(initialSongs);
     const [song, setSong] = useState(songs[0]?.track)
     const [img, setImage] = useState(songs[0]?.imageSong)
@@ -52,12 +53,19 @@ function AudioList({ volume, onTrackChange, initialSongs , req_artist}) {
         return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
     }
 
-    const songDeleteHandler = (songId) => {
+    const songDeleteFromAlbumHandler = (songId) => {
         const confirmDelete = window.confirm('Are you sure you want to delete this song?');
         if (confirmDelete) {
             dispatch(deleteSong(songId));
         }
     };
+
+    const songDeleteFromPlayListHandler = (songId) => {
+        const confirmDelete = window.confirm('Are you sure you want to delete this song?');
+        if (confirmDelete) {
+            dispatch(deleteSongFromPlayList({playListId, songId}));
+        }
+    }
 
     return (
         <div className='audioList'>
@@ -98,7 +106,11 @@ function AudioList({ volume, onTrackChange, initialSongs , req_artist}) {
                                                     <i><FaRegHeart /></i>
                                             }
                                         </div>
-                                        {req_artist && <i className="deleteSong" onClick={() => songDeleteHandler(song.id)}><BsTrash/></i>}
+                                        {req_artist || isplayListSongs && <i className="deleteSong" onClick={() => {
+                                            if (isplayListSongs)
+                                                songDeleteFromPlayListHandler(song.id)
+                                            else
+                                                songDeleteFromAlbumHandler(song.id)}}><BsTrash/></i>}
                                     </div>
                                 </div>
                             </div>

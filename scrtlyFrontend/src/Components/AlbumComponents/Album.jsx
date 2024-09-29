@@ -62,7 +62,7 @@ function Album({ volume, onTrackChange}) {
                 </div>)}
 
             </div>
-            <AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={album?.songs} req_artist={album.findAlbum?.artist.req_artist}/>
+            <AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={album?.songs} req_artist={album.findAlbum?.artist.req_artist}  isplayListSongs={false}/>
             {addSong && <AddSong onClose={() => setAddSong(((prev) => !prev))} albumId={albumId} />}
         </div>
     )

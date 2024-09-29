@@ -19,6 +19,7 @@ public interface PlayListService {
     List<PlayList> getPlayLists();
     List<PlayList> getPlayListsByUser(Long userId) throws UserException;
     PlayList addSongToPlayList(Long songId, Integer playListId) throws SongException, PlayListException;
+    void removeSongFromPlayList(Long songId, Integer playListId) throws SongException, PlayListException;
     Set<Song> getPlayListTracks (Integer playListId) throws PlayListException;
     void deletePlayList(Integer playListId, Long userId) throws PlayListException, UserException;
 }

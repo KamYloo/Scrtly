@@ -75,6 +75,19 @@ public class PlayListServiceImplementation implements PlayListService {
     }
 
     @Override
+    public void removeSongFromPlayList(Long songId, Integer playListId) throws SongException, PlayListException {
+        Song song = songService.findSongById(songId);
+        PlayList playList = getPlayList(playListId);
+        if(playList.getSongs().contains(song)) {
+            playList.getSongs().remove(song);
+        }
+        else {
+            throw new SongException("Song does not exist");
+        }
+        playListRepository.save(playList);
+    }
+
+    @Override
     public Set<Song> getPlayListTracks(Integer playListId) throws PlayListException {
         PlayList playList = getPlayList(playListId);
         Set<Song> songs = playList.getSongs();
