@@ -183,6 +183,11 @@
 
 .playListBox .scrollBox .playList .trash {
     margin-left: auto;
+    transition: 0.3s;
+}
+
+.playListBox .scrollBox .playList .trash:hover {
+    color: red;
 }
 
 .playListBox .scrollBox .playList i {

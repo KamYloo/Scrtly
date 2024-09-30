@@ -1,15 +1,19 @@
 import {BASE_API_URL} from "../../config/api.js";
 import {
     CREATE_PLAYLIST_ERROR,
-    CREATE_PLAYLIST_REQUEST, DELETE_SONG_FROM_PLAYLIST_ERROR, DELETE_SONG_FROM_PLAYLIST_REQUEST,
+    CREATE_PLAYLIST_REQUEST, DELETE_PLAYLIST_ERROR,
+    DELETE_PLAYLIST_REQUEST,
+    DELETE_SONG_FROM_PLAYLIST_ERROR,
+    DELETE_SONG_FROM_PLAYLIST_REQUEST,
     GET_PLAYLIST_ERROR,
     GET_PLAYLIST_REQUEST,
     GET_PLAYLIST_TRACK_ERROR,
     GET_PLAYLIST_TRACKS_REQUEST,
     GET_USER_PLAYLISTS_ERROR,
-    GET_USER_PLAYLISTS_REQUEST, UPLOAD_SONG_TO_PLAYLIST_ERROR, UPLOAD_SONG_TO_PLAYLIST_REQUEST
+    GET_USER_PLAYLISTS_REQUEST,
+    UPLOAD_SONG_TO_PLAYLIST_ERROR,
+    UPLOAD_SONG_TO_PLAYLIST_REQUEST
 } from "./ActionType.js";
-
 
 export const createPlayList = (formData) => async (dispatch) => {
 
@@ -126,3 +130,22 @@ export const deleteSongFromPlayList = (data) => async (dispatch) => {
         dispatch({ type: DELETE_SONG_FROM_PLAYLIST_ERROR, payload: error.message });
     }
 }
+
+export const deletePlayList = (playListId) => async (dispatch) => {
+    try {
+        const response = await fetch(`${BASE_API_URL}/api/playLists/delete/${playListId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            },
+        });
+
+        const res = await response.json();
+        console.log("Deleted Album", res)
+        dispatch({ type: DELETE_PLAYLIST_REQUEST, payload: res });
+    } catch (error) {
+        console.log('catch error', error);
+        dispatch({ type: DELETE_PLAYLIST_ERROR, payload: error.message });
+    }
+};

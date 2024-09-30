@@ -4,7 +4,6 @@ import { AudioList } from '../SongComponents/AudioList.jsx'
 import {useNavigate, useParams} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {BASE_API_URL} from "../../config/api.js";
-import {AddSong} from "../SongComponents/addSong.jsx";
 import {getPlayList, getPlayListTracks} from "../../Redux/PlayList/Action.js";
 import {AddSongToPlayList} from "./AddSongToPlayList.jsx";
 
@@ -49,8 +48,6 @@ function PlayList({ volume, onTrackChange}) {
                     <div className="buttons">
                         <button className="addSongBtn" onClick={() =>
                             setAddSong(((prev) => !prev))}>Add Song</button>
-                        <button className="deletePlayListBtn"
-                        >Delete PlayList</button>
                     </div>
             </div>
             <AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={playList?.songs} isplayListSongs={true} playListId={playListId}/>

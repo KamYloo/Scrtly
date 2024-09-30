@@ -1,12 +1,21 @@
 import React from 'react'
 import { FaPlus } from 'react-icons/fa'
 import { BsMusicNoteList, BsTrash } from 'react-icons/bs'
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {useNavigate} from "react-router-dom";
+import {deletePlayList} from "../../Redux/PlayList/Action.js";
 
 function MenuPlayList({setCreatePlayList}) {
+    const dispatch = useDispatch();
     const { playList} = useSelector(store => store);
     const navigate = useNavigate();
+
+    const deletePlayListHandler = (playListId) => {
+        const confirmDelete = window.confirm('Are you sure you want to delete this playList?');
+        if (confirmDelete) {
+            dispatch(deletePlayList(playListId));
+        }
+    }
 
     return (
         <div className='playListBox'>
@@ -23,7 +32,7 @@ function MenuPlayList({setCreatePlayList}) {
                          onClick={() => navigate(`/playList/${playList.id}`)}>
                         <i className='iconP'><BsMusicNoteList /></i>
                         <p>{playList?.title}</p>
-                        <i className='trash'><BsTrash /></i>
+                        <i className='trash' onClick={() => deletePlayListHandler(playList.id)}><BsTrash /></i>
                     </div>
                     ))
                 }
