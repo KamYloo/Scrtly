@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import "../../Styles/Album&&PlayList.css"
 import { AudioList } from '../SongComponents/AudioList.jsx'
-import {useNavigate, useParams} from "react-router-dom";
+import {useParams} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {BASE_API_URL} from "../../config/api.js";
 import {getPlayList, getPlayListTracks} from "../../Redux/PlayList/Action.js";
@@ -11,7 +11,7 @@ import {AddSongToPlayList} from "./AddSongToPlayList.jsx";
 function PlayList({ volume, onTrackChange}) {
     const {playListId} = useParams();
     const dispatch = useDispatch();
-    const {playList, song} = useSelector(store => store);
+    const {playList} = useSelector(store => store);
     const [addSong, setAddSong] = useState(false)
     //const navigate = useNavigate();
 

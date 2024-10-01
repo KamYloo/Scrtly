@@ -19,11 +19,11 @@ import {Album} from "./Components/AlbumComponents/Album.jsx";
 import {AddPlayList} from "./Components/PlayListComponents/AddPlayList.jsx";
 import {getUserPlayLists} from "./Redux/PlayList/Action.js";
 import {PlayList} from "./Components/PlayListComponents/PlayList.jsx";
+import {Home} from "./Components/Home.jsx";
 
 function App() {
   const dispatch = useDispatch();
   const { auth, playList } = useSelector(store => store);
-  const token = localStorage.getItem('token')
   const [createPlayList, setCreatePlayList] = useState(false)
 
   const [volume, setVolume] = useState(0.5)
@@ -45,13 +45,13 @@ function App() {
 
 
   const renderLayout = (Component, props) => {
-    const { setVolume, currentTrack, volume, handleTrackChange, auth, token } = props
+    const { setVolume, currentTrack, volume, handleTrackChange} = props
 
     return (
       <div className='App'>
         <LeftMenu onVolumeChange={setVolume} currentTrack={currentTrack} setCreatePlayList={setCreatePlayList} />
-        <Component volume={volume} onTrackChange={handleTrackChange} auth={auth} token={token} />
-        <RightMenu auth={auth} token={token} />
+        <Component volume={volume} onTrackChange={handleTrackChange}/>
+        <RightMenu/>
         {createPlayList && <AddPlayList onClose={() => setCreatePlayList(((prev) => !prev))} />}
         <div className="background"></div>
       </div>
@@ -75,43 +75,43 @@ function App() {
         } />
 
         <Route path="/home" element={
-          renderLayout(Artist, { setVolume, currentTrack, volume, handleTrackChange, auth, token })
+          renderLayout(Home, { setVolume, currentTrack, volume, handleTrackChange})
         } />
 
         <Route path="/chat" element={
-          renderLayout(ChatView, { setVolume, currentTrack, auth, token })
+          renderLayout(ChatView, { setVolume, currentTrack})
         } />
 
         <Route path="/artists" element={
-          renderLayout(ArtistsView, { setVolume, currentTrack, auth, token })
+          renderLayout(ArtistsView, { setVolume, currentTrack})
         } />
 
         <Route path="/artist/:artistId/*" element={
-          renderLayout(Artist, { setVolume, currentTrack, volume, handleTrackChange, auth, token })
+          renderLayout(Artist, { setVolume, currentTrack, volume, handleTrackChange})
         } />
 
         <Route path="/albums" element={
-          renderLayout(AlbumsView, { setVolume, currentTrack, auth, token })
+          renderLayout(AlbumsView, { setVolume, currentTrack})
         } />
 
         <Route path="/album/:albumId" element={
-          renderLayout(Album, { setVolume, currentTrack, volume, handleTrackChange, auth, token })
+          renderLayout(Album, { setVolume, currentTrack, volume, handleTrackChange})
         } />
 
         <Route path="/playList/:playListId" element={
-          renderLayout(PlayList, { setVolume, currentTrack, volume, handleTrackChange, auth, token })
+          renderLayout(PlayList, { setVolume, currentTrack, volume, handleTrackChange})
         } />
 
         <Route path="/discover" element={
-          renderLayout(Discover, { setVolume, currentTrack, auth, token })
+          renderLayout(Discover, { setVolume, currentTrack})
         } />
 
         <Route path="/profile/:userId" element={
-          renderLayout(Profile, { setVolume, currentTrack, auth, token })
+          renderLayout(Profile, { setVolume, currentTrack})
         } />
 
         <Route path="/profile/edit" element={
-          renderLayout(ProfileEdit, { setVolume, currentTrack, auth, token })
+          renderLayout(ProfileEdit, { setVolume, currentTrack})
         } />
 
         {/* Default Route */}

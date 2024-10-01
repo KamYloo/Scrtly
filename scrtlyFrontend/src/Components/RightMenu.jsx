@@ -2,14 +2,14 @@ import React, {useState, useEffect} from 'react'
 import { useNavigate } from 'react-router-dom';
 import '../Styles/RightMenu.css'
 import { FaBell, FaCogs, FaCrown, FaRegHeart, FaSun } from 'react-icons/fa'
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {logoutAction} from "../Redux/Auth/Action.js";
 import {BASE_API_URL} from "../config/api.js";
 
 
-function RightMenu({auth, token}) {
+function RightMenu() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
-
+  const {auth} = useSelector(store => store);
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
