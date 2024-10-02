@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { FaHeadphones, FaHeart, FaRegClock, FaRegHeart } from 'react-icons/fa'
+import { FaRegSquarePlus } from "react-icons/fa6";
 import { MusicPlayer } from './MusicPlayer.jsx'
 import {BASE_API_URL} from "../../config/api.js";
 import {BsTrash } from 'react-icons/bs'
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {deleteSong} from "../../Redux/Song/Action.js";
-import {deleteSongFromPlayList} from "../../Redux/PlayList/Action.js";
+import {addSongToPlayList, deleteSongFromPlayList} from "../../Redux/PlayList/Action.js";
 
 
 // eslint-disable-next-line react/prop-types
@@ -14,8 +15,9 @@ function AudioList({ volume, onTrackChange, initialSongs , req_artist, isplayLis
     const [song, setSong] = useState(songs[0]?.track)
     const [img, setImage] = useState(songs[0]?.imageSong)
     const [auto, setAuto] = useState(false);
+    const [addToPlayList, setAddToPlayList] = useState(false)
     const dispatch = useDispatch();
-
+    const {playList} = useSelector(store => store);
 
     useEffect(() => {
         const songs = document.querySelectorAll(".songs")
@@ -53,6 +55,10 @@ function AudioList({ volume, onTrackChange, initialSongs , req_artist, isplayLis
         return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
     }
 
+    const handleAddToPLayListToggle = (songId) => {
+        setAddToPlayList((prev) => (prev === songId ? null : songId))
+    };
+
     const songDeleteFromAlbumHandler = (songId) => {
         const confirmDelete = window.confirm('Are you sure you want to delete this song?');
         if (confirmDelete) {
@@ -65,6 +71,10 @@ function AudioList({ volume, onTrackChange, initialSongs , req_artist, isplayLis
         if (confirmDelete) {
             dispatch(deleteSongFromPlayList({playListId, songId}));
         }
+    }
+
+    const handleAddSong = (playListId, songId) => {
+        dispatch(addSongToPlayList({playListId, songId}));
     }
 
     return (
@@ -106,11 +116,22 @@ function AudioList({ volume, onTrackChange, initialSongs , req_artist, isplayLis
                                                     <i><FaRegHeart /></i>
                                             }
                                         </div>
-                                        {req_artist || isplayListSongs && <i className="deleteSong" onClick={() => {
+                                        {(req_artist || isplayListSongs) && <i className="deleteSong" onClick={() => {
                                             if (isplayListSongs)
                                                 songDeleteFromPlayListHandler(song.id)
                                             else
                                                 songDeleteFromAlbumHandler(song.id)}}><BsTrash/></i>}
+
+                                        {!isplayListSongs && <div className="addToPlayList">
+                                            <i className="addToPlayListBtn"
+                                               onClick={() => handleAddToPLayListToggle(song.id)}><FaRegSquarePlus/></i>
+                                            {addToPlayList === song.id && (
+                                                <div className="playLists">
+                                                    {playList?.playLists.map((playList) => (<p key={playList.id}
+                                                                                               onClick={() => handleAddSong(playList.id, song.id)}>{playList?.title}</p>))}
+                                                </div>)}
+                                        </div>}
+
                                     </div>
                                 </div>
                             </div>

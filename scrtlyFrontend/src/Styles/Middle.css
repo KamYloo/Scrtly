@@ -301,7 +301,8 @@
 
 .songsBox .songs .song .section .hits .hit,
 .songsBox .songs .song .section .hits .duration,
-.songsBox .songs .song .section .hits .favourite{
+.songsBox .songs .song .section .hits .favourite,
+.songsBox .songs .song .section .hits .deleteSong{
     margin-right: 15px;
 }
 
@@ -311,19 +312,45 @@
     margin-right: 5px;
 }
 
-.songsBox .songs .song .section .hits .deleteSong {
-    transition: 0.3s;
-}
-
 .songsBox .songs .song .section .hits .deleteSong:hover {
     color: red;
 }
 
-
-
 .songsBox .songs .song .section .hits .favourite i {
     color: rgb(74, 189, 28);
     filter: drop-shadow(0px 0px 4px rgb(74, 189, 28));
+}
+
+.songsBox .songs .song .section .hits .addToPlayList {
+    position: relative;
+    .playLists {
+        overflow-y: auto;
+        color: black;
+        position: absolute;
+        background: white;
+        width: 15vh;
+        height: 7vh;
+        right: 0;
+        padding: 0.5vh;
+        font-weight: bold;
+        border-radius: 10px;
+        top: 2.5vh;
+        z-index: 10;
+
+        p {
+            transition: 0.3s;
+            border-radius: 10px;
+            padding: 0.5vh;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        p:hover {
+            color: aqua;
+            background: black;
+        }
+    }
 }
 
 .aboutArtist {
