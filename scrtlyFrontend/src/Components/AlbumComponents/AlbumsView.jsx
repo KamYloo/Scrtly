@@ -33,13 +33,13 @@ function AlbumsView() {
                 <button>Search</button>
             </div>
             <div className="albums">
-                { album.albums.map((item) => (
-                <div className="album" key={item.id} onClick={() => navigate(`/album/${item.id}`)}>
-                    <i className="play"><FaCirclePlay/></i>
-                    <img src={`${BASE_API_URL}${item?.albumImage || ''}`} alt=""/>
-                    <span>{item?.artist.artistName}</span>
-                    <p>{item?.title}</p>
-                </div>
+                {album.albums.map((item) => (
+                    <div className="album" key={item.id} onClick={() => navigate(`/album/${item.id}`)}>
+                        <i className="play"><FaCirclePlay/></i>
+                        <img src={`${BASE_API_URL}${item?.albumImage || ''}`} alt=""/>
+                        <span>{item?.artist.artistName}</span>
+                        <p>{item?.title}</p>
+                    </div>
                 ))}
             </div>
         </div>

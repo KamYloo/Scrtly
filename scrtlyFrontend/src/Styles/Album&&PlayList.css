@@ -85,25 +85,125 @@
     }
 }
 
-@media screen and (max-width : 550px) {
+@media screen and (max-width: 1400px){
     .albumDetail, .playListDetail {
         .topSection {
-            height: 25vh;
+            height: 30vh;
+            img {
+                width: 20vh;
+                height: 20vh;
+            }
+
+            .albumData, .playListData {
+                height: 20vh;
+
+                .albumName, .playListName {
+                    font-size: 8vh;
+                }
+
+                p {
+                    font-size: 15px;
+                }
+            }
+
+            .buttons {
+                .addSongBtn, .deleteAlbumBtn {
+                    width: 8vh;
+                    height: 3vh;
+                    padding: 5px;
+                    font-size: 11px;
+                }
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 1200px){
+    .albumDetail, .playListDetail {
+        .topSection {
+            height: 26vh;
+            padding: 5vh 6vh;
+            gap: 4vh;
+            img {
+                width: 15vh;
+                height: 15vh;
+            }
+
+            .albumData, .playListData {
+                height: 15vh;
+
+                .albumName, .playListName {
+                    font-size: 7vh;
+                }
+
+                p {
+                    font-size: 14px;
+                }
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 1000px){
+    .albumDetail, .playListDetail {
+        .topSection {
+            height: 24vh;
+            padding: 5vh 4vh;
+            gap: 2vh;
+            img {
+                width: 13vh;
+                height: 13vh;
+            }
+
+            .albumData, .playListData {
+                height: 13vh;
+
+                .albumName, .playListName {
+                    font-size: 6vh;
+                }
+
+                p {
+                    font-size: 13px;
+                }
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 840px){
+    .albumDetail, .playListDetail {
+        .topSection {
+            height: 22vh;
             padding: 5vh 2vh;
             gap: 2vh;
-
             img {
-                width:10vh;
+                width: 10vh;
                 height: 10vh;
             }
 
             .albumData, .playListData {
-                align-content: flex-start;
+                height: 10vh;
 
                 .albumName, .playListName {
                     font-size: 4vh;
                     letter-spacing: 1vh;
                 }
+
+                p {
+                    font-size: 13px;
+                }
+
+            }
+        }
+    }
+}
+
+@media screen and (max-width : 550px) {
+    .albumDetail, .playListDetail {
+        .topSection {
+
+            .albumData, .playListData {
+                align-content: flex-start;
 
                 p {
                     font-size: 12px;
