@@ -111,7 +111,7 @@ export const searchUser = (data) => async (dispatch) => {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${data.token}`
+                Authorization: `Bearer ${localStorage.getItem('token')}`
             },
         })
 
@@ -144,7 +144,7 @@ export const updateUser = (data) => async (dispatch) => {
         const res = await fetch(`${BASE_API_URL}/api/users/update`, {
             method: "PUT",
             headers: {
-                Authorization: `Bearer ${data.token}`
+                Authorization: `Bearer ${localStorage.getItem('token')}`
             },
             body: formData
         })

@@ -1,6 +1,7 @@
 package com.kamylo.Scrtly_backend.controller;
 
 import com.kamylo.Scrtly_backend.model.Artist;
+import com.kamylo.Scrtly_backend.model.PlayList;
 import com.kamylo.Scrtly_backend.model.User;
 import com.kamylo.Scrtly_backend.repository.UserRepository;
 import com.kamylo.Scrtly_backend.request.UserRequest;
@@ -58,7 +59,6 @@ public class AuthController {
             createdUser.setPassword(passwordEncoder.encode(userRequest.getPassword()));
             createdUser.setRole("USER");
         }
-
         User savedUser = userRepository.save(createdUser);
         Authentication authentication = new UsernamePasswordAuthenticationToken(userRequest.getEmail(), userRequest.getPassword());
         SecurityContextHolder.getContext().setAuthentication(authentication);

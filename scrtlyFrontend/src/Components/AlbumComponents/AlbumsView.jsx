@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 import "../../Styles/AlbumsView&&ArtistsView.css"
 import AlbumBanner from '../../img/albumBanner.png'
 import { BiSearchAlt } from "react-icons/bi";
@@ -12,6 +12,11 @@ function AlbumsView() {
     const dispatch = useDispatch()
     const {album} = useSelector(store => store);
     const navigate = useNavigate();
+    const [searchQuery, setSearchQuery] = useState('');
+
+    const filteredAlbums = album.albums.filter(albumItem =>
+        albumItem.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     useEffect(() => {
         dispatch(getAllAlbums())
@@ -27,13 +32,14 @@ function AlbumsView() {
 
             <div className="searchBox">
                 <div className="search">
-                    <input type="text" placeholder='Search Album...' />
+                    <input type="text" placeholder='Search Album...'
+                           value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}/>
                     <i className='searchIcon'><BiSearchAlt /></i>
                 </div>
                 <button>Search</button>
             </div>
             <div className="albums">
-                {album.albums.map((item) => (
+                {filteredAlbums.map((item) => (
                     <div className="album" key={item.id} onClick={() => navigate(`/album/${item.id}`)}>
                         <i className="play"><FaCirclePlay/></i>
                         <img src={`${BASE_API_URL}${item?.albumImage || ''}`} alt=""/>

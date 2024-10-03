@@ -1,16 +1,19 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import { BASE_API_URL } from "../../config/api"
 import "../../Styles/Profile.css"
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {updateUser} from "../../Redux/Auth/Action.js";
 import {useNavigate} from "react-router-dom";
 
-function ProfileEdit({auth, token}) {
+function ProfileEdit() {
   const dispatch = useDispatch()
+  const {auth} = useSelector(store => store);
   const [fullName, setFullName] = useState(auth.reqUser?.fullName || "")
   const [description, setDescription] = useState(auth.reqUser?.description || "")
   const [profilePicture, setProfilePicture] = useState(null)
+  const [preview, setPreview] = useState('');
   const navigate = useNavigate()
+
 
   const handleFileChange = (e) => {
     setProfilePicture(e.target.files[0])
@@ -19,10 +22,20 @@ function ProfileEdit({auth, token}) {
   const handleSubmit = (e) => {
     e.preventDefault()
 
-    dispatch(updateUser({token, data:{fullName: fullName, profilePicture:profilePicture, description:description.trim() || ""}}))
+    dispatch(updateUser({data:{fullName: fullName, profilePicture:profilePicture, description:description.trim() || ""}}))
     navigate(`/profile/${auth.reqUser.id}`)
     window.location.reload()
   }
+
+  useEffect(() => {
+    if (profilePicture) {
+      const previewUrl = URL.createObjectURL(profilePicture)
+      setPreview(previewUrl)
+      return () => {
+        URL.revokeObjectURL(previewUrl)
+      }
+    }
+  }, [profilePicture])
 
   return (
     <div className='profileEdit'>
@@ -34,7 +47,7 @@ function ProfileEdit({auth, token}) {
           <form onSubmit={handleSubmit}>
             <div className="editAvatar">
               <div className="left">
-                <img src={`${BASE_API_URL}/${auth.reqUser?.profilePicture || ''}`} alt=""/>
+                <img src={preview} alt=""/>
                 <p>{auth.reqUser?.fullName || 'Name Surname'}</p>
               </div>
               <div className="right">

@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 import "../../Styles/AlbumsView&&ArtistsView.css"
 import ArtistBanner from '../../img/ArtistsBanner.png'
 import Verification from '../../img/check.png'
@@ -13,6 +13,12 @@ function ArtistsView() {
     const dispatch = useDispatch()
     const {artist} = useSelector(store => store);
     const navigate = useNavigate();
+    const [searchQuery, setSearchQuery] = useState('');
+
+
+    const filteredArtists = artist.artists.filter(artistItem =>
+        artistItem.artistName.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     useEffect(() => {
         dispatch(getAllArtists())
@@ -28,13 +34,14 @@ function ArtistsView() {
 
             <div className="searchBox">
                 <div className="search">
-                    <input type="text" placeholder='Search Artist...' />
+                    <input type="text" placeholder='Search Artist...'
+                           value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}/>
                     <i className='searchIcon'><BiSearchAlt /></i>
                 </div>
                 <button>Search</button>
             </div>
             <div className="artists">
-                { artist.artists.map((item) => (
+                { filteredArtists.map((item) => (
                 <div className="artist" key={item.id} onClick={() => navigate(`/artist/${item.id}/popular`)}>
                     <i className="listen"><FaHeadphones/></i>
                     <div className="imgPic">
