@@ -76,7 +76,7 @@
     object-fit: cover;
 }
 
-@media screen and (max-width: 550px) {
+@media screen and (max-width: 748px) {
     .rightMenu {
         min-width: 64px;
         width: 64px;

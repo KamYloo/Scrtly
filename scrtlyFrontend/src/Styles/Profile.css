@@ -19,16 +19,16 @@
     display: flex;
     width: 100%;
     height: 100%;
-    padding: 30px 180px;
+    padding: 2vh 16vh;
     flex-wrap: wrap;
-    gap: 20px;
+    gap: 2vh;
     overflow: scroll;
     margin-top: 30px;
 
     .post {
         border: 1px solid yellow;
-        height: 320px;
-        width: 280px;
+        height: 34vh;
+        width: 31vh;
         cursor: pointer;
 
         img {
@@ -262,9 +262,57 @@
     }
 }
 
+@media screen and (max-width: 1300px) {
+    .profileInfo {
+        .userData {
+            gap: 40px;
+        }
+    }
+    .profileSite .posts {
+        justify-content: center;
+        padding: 2vh 1vh;
+    }
+}
+
+@media screen and (max-width: 1100px) {
+    .profileInfo {
+        height: 300px;
+
+        .userData {
+            gap: 20px;
+            padding: 10px;
+
+            img {
+                width: 130px;
+                height: 130px;
+            }
+
+            .right {
+                .top,
+                .stats,
+                .description {
+                    gap: 10px;
+                    padding: 10px;
+                }
+
+                .top {
+                    p {
+                        font-size: 24px;
+                    }
+                }
+            }
+        }
+    }
+    .profileSite .posts {
+       .post {
+           width: 25vh;
+           height: 28vh;
+       }
+    }
+}
 
 
-@media screen and (max-width: 550px) {
+@media screen and (max-width: 748px) {
     .profileSite {
         .lineP {
             margin: 0px;
@@ -284,7 +332,7 @@
 
     .profileInfo {
         height: 300px;
-        justify-content: left;
+
 
         .userData {
             gap: 20px;

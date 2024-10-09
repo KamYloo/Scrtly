@@ -368,7 +368,7 @@
     }
 }
 
-@media screen and (max-width : 550px) {
+@media screen and (max-width : 748px) {
     .mainBox {
         min-width: 380px;
     }
