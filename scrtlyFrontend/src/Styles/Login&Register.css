@@ -135,3 +135,25 @@
     min-height: 690px;
     max-height: 750px;
 }
+
+@media screen and (max-height: 800px) {
+    .login.r {
+        min-height: 600px;
+        max-height: 680px;
+        .formBox {
+            padding: 20px 40px;
+
+            .title {
+                padding: 5px;
+            }
+
+            .inputBox {
+                margin: 15px 0;
+            }
+
+            .registerLink {
+                margin: 20px 0 5px;
+            }
+        }
+    }
+}

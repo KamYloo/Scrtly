@@ -159,7 +159,13 @@
             }
         }
 
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
         .editAvatar {
+            width: 80%;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -212,7 +218,7 @@
         }
 
         .editDescription, .editFullName {
-            display: flex;
+            width: 80%;
             flex-direction: column;
             padding: 20px;
             margin: 20px;
@@ -224,9 +230,11 @@
                 font-size: 18px;
                 font-weight: bold;
                 color: white;
+                margin-bottom: 5px;
             }
 
             textarea, input {
+                width: 100%;
                 border: none;
                 outline: none;
                 border-radius: 10px;
@@ -241,13 +249,13 @@
                 height: 3vh;
             }
         }
-    }
+
 
     .submit {
         outline: none;
         border: none;
-        margin-left: 27vh;
-        padding: 10px 40px;
+
+        padding: 10px 30px;
         border-radius: 10px;
         background: aqua;
         color: black;
@@ -260,6 +268,47 @@
     .submit:hover {
         background: rgb(4, 214, 214);
     }
+    }
+    }
+}
+
+@media screen and (max-height: 1000px) {
+    .profileEdit .editDiv {
+
+        .edit {
+            height: auto;
+            padding-bottom: 2vh;
+
+            form {
+
+                .title {
+                    padding: 10px;
+                }
+
+                .editAvatar {
+                    padding: 15px;
+                    margin: 5px 20px;
+
+                    .left {
+                        gap: 25px;
+                    }
+                }
+
+                .editDescription, .editFullName {
+                    padding: 15px;
+                    margin: 10px 20px;
+                    gap: 5px;
+                }
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 1400px) {
+    .profileSite .posts {
+        justify-content: center;
+        padding: 2vh 1vh;
+    }
 }
 
 @media screen and (max-width: 1300px) {
@@ -267,10 +316,6 @@
         .userData {
             gap: 40px;
         }
-    }
-    .profileSite .posts {
-        justify-content: center;
-        padding: 2vh 1vh;
     }
 }
 
@@ -383,39 +428,38 @@
         .edit {
             height: 76vh;
             width: 45vh;
-    
-            .title {
-                width: 45vh;
-            
-                h2 {
-                    font-size: xx-large;
+
+                .title {
+                    width: 45vh;
+
+                    h2 {
+                        font-size: xx-large;
+                    }
                 }
+            form {
+
+                .editAvatar {
+                    .left {
+                        img {
+                            width: 50px;
+                            height: 50px;
+                        }
+
+                        p {
+                            font-size: 16px;
+                        }
+                    }
+
+                    .right {
+                        button {
+                            padding: 5px;
+                            font-size: 11px;
+                        }
+                    }
+                }
+
             }
-    
-            .editAvatar {
-                .left {
-                    img {
-                        width: 50px;
-                        height: 50px;
-                    }
-    
-                    p {
-                        font-size: 16px;
-                    }
-                }
-    
-                .right {
-                    button {
-                        padding: 5px;
-                        font-size: 11px;
-                    }
-                }
-            }
-        }
-    
-        .submit {
-            margin-left: 17vh;
-            padding: 10px 30px;
         }
     }
 }
+

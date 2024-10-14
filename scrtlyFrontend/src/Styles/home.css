@@ -286,7 +286,7 @@
 
 .favouriteArtists {
     width: 100%;
-    height: 30vh;
+    height: auto;
     margin-top: 3vh;
     gap: 20px;
     padding: 20px;
@@ -618,6 +618,16 @@
         .artists {
             align-items: center;
             flex-direction: column;
+        }
+    }
+}
+
+@media screen and (max-height: 760px) {
+    .favouriteArtists {
+        .artists {
+            .item:nth-child(5) {
+                display: block;
+            }
         }
     }
 }

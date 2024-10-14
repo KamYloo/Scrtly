@@ -85,6 +85,9 @@
     }
 }
 
+
+
+
 @media screen and (max-width: 1400px){
     .albumDetail, .playListDetail {
         .topSection {
@@ -144,6 +147,8 @@
     }
 }
 
+
+
 @media screen and (max-width: 1000px){
     .albumDetail, .playListDetail {
         .topSection {
@@ -164,6 +169,25 @@
 
                 p {
                     font-size: 13px;
+                }
+            }
+        }
+    }
+}
+
+@media screen and (max-height: 1000px){
+    .albumDetail, .playListDetail {
+        .topSection {
+
+            .buttons {
+
+                .addSongBtn, .deleteAlbumBtn {
+                    width: 10vh;
+                    height: 5vh;
+                }
+
+                .deleteAlbumBtn {
+                    height: 5vh;
                 }
             }
         }
@@ -228,3 +252,4 @@
         }
     }
 }
+

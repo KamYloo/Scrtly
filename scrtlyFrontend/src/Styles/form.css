@@ -1,8 +1,8 @@
 .list {
     position: absolute;
-    right: 1vh;
-    top: 5vh;
-    width: 12vh;
+    right: 10px;
+    top: 40px;
+    width: 120px;
     background: white;
     list-style: none;
     padding: 5px;
@@ -44,7 +44,7 @@
     height: max-content;
     padding: 30px;
     position: absolute;
-    top: 35vh;
+    top: 350px;
     bottom: 0;
     right: 0;
     left: 0;

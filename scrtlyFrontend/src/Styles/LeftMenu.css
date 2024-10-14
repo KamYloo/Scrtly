@@ -325,3 +325,14 @@
         margin-left: 20px;
     }
 }
+
+@media screen and (max-height: 760px) {
+
+    .LeftMenu .searchBox {
+        display: none;
+    }
+    .playListBox .scrollBox {
+        height: 70px;
+
+    }
+}
