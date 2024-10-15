@@ -34,36 +34,6 @@ function Profile() {
                         <img src={`${BASE_API_URL}${item.image}`} alt=""/>
                     </div>
                 ))}
-                <div className="post">
-                    <img
-                        src="https://st2.depositphotos.com/1105977/9877/i/450/depositphotos_98775856-stock-photo-retro-film-production-accessories-still.jpg"
-                        alt=""/>
-                </div>
-                <div className="post">
-                    <img
-                        src="https://st2.depositphotos.com/1105977/9877/i/450/depositphotos_98775856-stock-photo-retro-film-production-accessories-still.jpg"
-                        alt=""/>
-                </div>
-                <div className="post">
-                    <img
-                        src="https://st2.depositphotos.com/1105977/9877/i/450/depositphotos_98775856-stock-photo-retro-film-production-accessories-still.jpg"
-                        alt=""/>
-                </div>
-                <div className="post">
-                    <img
-                        src="https://st2.depositphotos.com/1105977/9877/i/450/depositphotos_98775856-stock-photo-retro-film-production-accessories-still.jpg"
-                        alt=""/>
-                </div>
-                <div className="post">
-                    <img
-                        src="https://st2.depositphotos.com/1105977/9877/i/450/depositphotos_98775856-stock-photo-retro-film-production-accessories-still.jpg"
-                        alt=""/>
-                </div>
-                <div className="post">
-                    <img
-                        src="https://st2.depositphotos.com/1105977/9877/i/450/depositphotos_98775856-stock-photo-retro-film-production-accessories-still.jpg"
-                        alt=""/>
-                </div>
             </div>
             {selectedPost && <Post post={postDetail} onClose={togglePost}/>}
         </div>
