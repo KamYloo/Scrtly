@@ -9,31 +9,52 @@ import {currentUser, register} from "../../Redux/Auth/Action.js";
 
 
 function Register() {
-    const [inputData, setInputData] = useState({fullName: "",email: "", password: "", confirmPassword: "", role: "", artistName: ""})
-    const {auth} = useSelector(store => store)
-    const token = localStorage.getItem('token')
+    const [inputData, setInputData] = useState({
+        fullName: "", email: "", password: "", confirmPassword: "", role: "User", artistName: ""
+    });
+    const [errors, setErrors] = useState({});
+    const {auth} = useSelector(store => store);
+    const token = localStorage.getItem('token');
     const dispatch = useDispatch();
-    const navigate = useNavigate()
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setInputData((values)=>({...values, [name]: value}))
-    }
+        setInputData((values) => ({ ...values, [name]: value }));
+    };
+
+    const validate = () => {
+        const newErrors = {};
+        if (!inputData.fullName) newErrors.fullName = "Full Name is required.";
+        if (!inputData.email) newErrors.email = "Email is required.";
+        if (!/^\S+@\S+\.\S+$/.test(inputData.email)) newErrors.email = "Invalid email format.";
+        if (!inputData.password) newErrors.password = "Password is required.";
+        if (inputData.password.length < 6) newErrors.password = "Password must be at least 6 characters.";
+        if (inputData.password !== inputData.confirmPassword) newErrors.confirmPassword = "Passwords do not match.";
+        if (inputData.role === "Artist" && !inputData.artistName) newErrors.artistName = "Artist Name is required.";
+
+        return newErrors;
+    };
 
     const handleSignup = async (e) => {
-        e.preventDefault()
-        dispatch(register(inputData))
+        e.preventDefault();
+        const formErrors = validate();
+        if (Object.keys(formErrors).length === 0) {
+            dispatch(register(inputData));
+        } else {
+            setErrors(formErrors);
+        }
     };
 
     useEffect(() => {
-        if (token)dispatch(currentUser(token))
-    }, [token])
+        if (token) dispatch(currentUser(token));
+    }, [token, dispatch]);
 
     useEffect(() => {
-        if(auth.reqUser?.fullName) {
-            navigate("/login")
+        if (auth.reqUser?.fullName) {
+            navigate("/login");
         }
-    }, [auth.reqUser])
+    }, [auth.reqUser, navigate]);
 
     return (
         <div className='login r'>
@@ -46,23 +67,27 @@ function Register() {
                     </div>
                     <div className="inputBox">
                         <input type="text" value={inputData.fullName} name="fullName"
-                               onChange={(e) => handleChange(e)} placeholder='fullName' required/>
+                               onChange={(e) => handleChange(e)} placeholder='Full Name' required/>
                         <FaUser className='icon'/>
+                        {errors.fullName && <p className="error">{errors.fullName}</p>}
                     </div>
                     <div className="inputBox">
                         <input type="email" value={inputData.email} name="email"
                                onChange={(e) => handleChange(e)} placeholder='Email' required/>
                         <FaEnvelope className='icon'/>
+                        {errors.email && <p className="error">{errors.email}</p>}
                     </div>
                     <div className="inputBox">
                         <input type="password" value={inputData.password} name="password"
                                onChange={(e) => handleChange(e)} placeholder='Password' required/>
                         <FaLock className='icon'/>
+                        {errors.password && <p className="error">{errors.password}</p>}
                     </div>
                     <div className="inputBox">
                         <input type="password" value={inputData.confirmPassword} name="confirmPassword"
                                onChange={(e) => handleChange(e)} placeholder='Confirm Password' required/>
                         <FaLock className='icon'/>
+                        {errors.confirmPassword && <p className="error">{errors.confirmPassword}</p>}
                     </div>
                     <div className="inputBox">
                         <select value={inputData.role} onChange={(e) => handleChange(e)} name="role">
@@ -75,6 +100,7 @@ function Register() {
                             <input type="text" value={inputData.artistName} name="artistName"
                                    onChange={(e) => handleChange(e)} placeholder='Artist Name' required />
                             <FaMusic className='icon'/>
+                            {errors.artistName && <p className="error">{errors.artistName}</p>}
                         </div>
                     )}
 
@@ -85,7 +111,7 @@ function Register() {
                 </div>
             </div>
         </div>
-    )
+    );
 }
 
-export {Register}
+export {Register};
