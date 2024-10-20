@@ -19,9 +19,7 @@ function ProfileEdit() {
     setProfilePicture(e.target.files[0])
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-
+  const handleSubmit = () => {
     dispatch(updateUser({data:{fullName: fullName, profilePicture:profilePicture, description:description.trim() || ""}}))
     navigate(`/profile/${auth.reqUser.id}`)
   }

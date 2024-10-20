@@ -39,19 +39,8 @@ public class StoryController {
         }
 
         User user = userService.findUserProfileByJwt(token);
-        try {
-            String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-            Path filePath = Paths.get("src/main/resources/static/uploads/storyImages").resolve(fileName);
-            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-            Story story = new Story();
-            story.setImage("/uploads/storyImages/" + fileName);
-            Story createdStory = storyService.createStory(story,user.getId());
-            return new ResponseEntity<>(createdStory, HttpStatus.CREATED);
-
-        }catch (IOException e) {
-            throw new RuntimeException("Error saving image file.", e);
-        }
+        Story createdStory = storyService.createStory(user.getId(), file);
+        return new ResponseEntity<>(createdStory, HttpStatus.CREATED);
     }
 
     @GetMapping("/{userId}")
@@ -79,20 +68,12 @@ public class StoryController {
                 throw new StoryException("Story not found with id " + storyId);
             }
             storyService.deleteStory(storyId, user.getId());
-            String imagePath = "src/main/resources/static" + story.getImage();
-            Path filePath = Paths.get(imagePath);
-            if (Files.exists(filePath)) {
-                Files.delete(filePath);
-            }
 
             response.setMessage("Story deleted successfully");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (StoryException | UserException e) {
             response.setMessage(e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        } catch (IOException e) {
-            response.setMessage("Error deleting the image file.");
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

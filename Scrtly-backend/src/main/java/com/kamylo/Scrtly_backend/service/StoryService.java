@@ -5,13 +5,14 @@ import com.kamylo.Scrtly_backend.exception.UserException;
 import com.kamylo.Scrtly_backend.model.Story;
 import com.kamylo.Scrtly_backend.model.User;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
 
 @Service
 public interface StoryService {
-    Story createStory(Story story, Long userId) throws UserException;
+    Story createStory(Long userId, MultipartFile storyImage) throws UserException;
     Story findStoryById(Long storyId) throws StoryException;
     List<Story> getStoriesByUserId(Long userId) throws UserException, StoryException;
     Map<User, List<Story>> getGroupedStoriesByFollowedUsers(Long userId);

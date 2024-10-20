@@ -67,12 +67,7 @@ public class UserController {
                                                           @RequestHeader("Authorization") String token) throws UserException, IOException {
         User user = userService.findUserProfileByJwt(token);
 
-        String fileName = UUID.randomUUID().toString() + "_" + profilePicture.getOriginalFilename();
-        Path filePath = Paths.get("src/main/resources/static/uploads").resolve(fileName);
-        Files.copy(profilePicture.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-        String relativePath = "uploads/" + fileName;
-        userService.updateUser(user.getId(), fullName, relativePath, description);
+        userService.updateUser(user.getId(), fullName, description, profilePicture);
         UserDto userDto = UserDtoMapper.toUserDto(user);
 
         return new ResponseEntity<>(userDto, HttpStatus.ACCEPTED);

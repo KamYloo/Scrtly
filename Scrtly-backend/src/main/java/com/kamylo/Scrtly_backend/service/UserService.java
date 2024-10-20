@@ -21,7 +21,7 @@ public interface UserService {
 
      User followUser(Long userId, User user) throws UserException;
 
-     User updateUser(Long userId, String fullName, String profilePicturePath, String description) throws UserException;
+     User updateUser(Long userId, String fullName, String description, MultipartFile userImage) throws UserException;
 
      Set<User> searchUser(String query);
 

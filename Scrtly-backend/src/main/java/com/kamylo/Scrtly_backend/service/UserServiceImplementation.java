@@ -3,8 +3,10 @@ import com.kamylo.Scrtly_backend.config.JwtProvider;
 import com.kamylo.Scrtly_backend.exception.UserException;
 import com.kamylo.Scrtly_backend.repository.UserRepository;
 import com.kamylo.Scrtly_backend.model.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -16,11 +18,11 @@ import java.util.Set;
 @Service
 public class UserServiceImplementation implements UserService {
 
-    private final UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
 
-    public UserServiceImplementation(UserRepository userRepository) {
-        this.userRepository=userRepository;
-    }
+    @Autowired
+    private FileServiceImplementation fileService;
 
     @Override
     public List<User> getAllUser() {
@@ -75,22 +77,17 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public User updateUser(Long userId, String fullName, String profilePicturePath, String decription) throws UserException {
+    public User updateUser(Long userId, String fullName, String description, MultipartFile userImage) throws UserException {
         User user = findUserById(userId);
-
         String currentProfilePicture = user.getProfilePicture();
 
         if (currentProfilePicture != null && !currentProfilePicture.isEmpty()) {
-            Path oldFilePath = Paths.get("src/main/resources/static").resolve(currentProfilePicture);
-            File oldFile = oldFilePath.toFile();
-            if (oldFile.exists()) {
-                oldFile.delete();
-            }
+            String imagePath = fileService.updateFile(userImage, "/"+currentProfilePicture, "/uploads/userImages");
+            user.setProfilePicture("uploads/userImages/" + imagePath);
         }
 
         user.setFullName(fullName);
-        user.setProfilePicture(profilePicturePath);
-        user.setDescription(decription);
+        user.setDescription(description);
         return userRepository.save(user);
     }
 

@@ -5,11 +5,10 @@ import com.kamylo.Scrtly_backend.exception.UserException;
 import com.kamylo.Scrtly_backend.model.Story;
 import com.kamylo.Scrtly_backend.model.User;
 import com.kamylo.Scrtly_backend.repository.StoryRepository;
-import com.kamylo.Scrtly_backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -23,13 +22,19 @@ public class StoryServiceImplementation implements StoryService {
     private UserService userService;
 
     @Autowired
-    private UserRepository userRepository;
+    private FileServiceImplementation fileService;
 
     @Override
-    public Story createStory(Story story, Long userId) throws UserException {
+    public Story createStory(Long userId, MultipartFile storyImage) throws UserException {
         User user = userService.findUserById(userId);
+        Story story = new Story();
         story.setUser(user);
-        story.setTimestamp(LocalDateTime.now());
+
+        if (!storyImage.isEmpty()) {
+            String imagePath = fileService.saveFile(storyImage, "/uploads/storyImages");
+            story.setImage("/uploads/storyImages/" + imagePath);
+        }
+
         user.getStories().add(story);
         return storyRepository.save(story);
     }
@@ -63,5 +68,6 @@ public class StoryServiceImplementation implements StoryService {
             throw new UserException("user doesn't belong to this story");
         }
         storyRepository.deleteById(storyId);
+        fileService.deleteFile(story.getImage());
     }
 }

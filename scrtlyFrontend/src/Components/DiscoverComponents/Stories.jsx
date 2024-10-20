@@ -41,7 +41,7 @@ function Stories() {
 
     useEffect(() => {
         dispatch(getFollowedUsersStory())
-    }, [])
+    }, [dispatch, story.createdStory])
 
   return (
       <div className='stories'>
