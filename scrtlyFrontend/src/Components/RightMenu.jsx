@@ -8,25 +8,19 @@ import {BASE_API_URL} from "../config/api.js";
 
 
 function RightMenu() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const {auth} = useSelector(store => store);
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
 
-  useEffect(() => {
-    const token = localStorage.getItem('token')
-    setIsLoggedIn(!!token)
-  }, [])
 
   const handleLogout = () => {
     dispatch(logoutAction())
-    setIsLoggedIn(false)
     navigate('/login')
   }
 
   const handleProfileClick = () => {
-    if (isLoggedIn) {
+    if (auth?.reqUser) {
       navigate(`/profile/${auth.reqUser.id}`)
     } else {
       navigate('/login')
@@ -46,7 +40,7 @@ function RightMenu() {
         <div className="profileImg" onClick={handleProfileClick}>
           <img src={`${BASE_API_URL}/${auth.reqUser?.profilePicture || ''}`} alt="" />
         </div>
-        {isLoggedIn ? (
+        {auth?.reqUser ? (
           <p className='loginBtn' onClick={handleLogout}>Logout</p>
         ) : (
           <p className='loginBtn' onClick={() => navigate('/login')}>Login</p>

@@ -256,9 +256,6 @@
         transition: width 0.1s linear;
     }
 
-
-
-
     .addPost {
         width: 100%;
         height: 18vh;
@@ -376,6 +373,8 @@
         align-items: center;
         justify-content: center;
 
+
+
         .posts {
             display: flex;
             flex-direction: column;
@@ -389,6 +388,55 @@
             height: 59vh;
             padding: 2vh 4vh;
             gap: 10px;
+            position: relative;
+
+            .postsSettings {
+                color: white;
+                font-size: 3vh;
+                position: absolute;
+                top: 0.5vh;
+                right: 0.5vh;
+                cursor: pointer;
+            }
+
+            ul {
+                display: flex;
+                flex-direction: column;
+                position: absolute;
+                right: 2vh;
+                top: 6vh;
+                list-style: none;
+                gap: 1vh;
+
+                li {
+                    width: 20vh;
+                    input {
+                        width: 100%;
+                        height: 100%;
+                        outline: none;
+                        border: none;
+                        background: rgb(255, 255, 255);
+                        color: #000000;
+                        font-size: 14px;
+                        font-weight: bold;
+                        padding: 1vh 2vh;
+                        border-radius: 15px;
+                    }
+
+                    select {
+                        width: 100%;
+                        height: 100%;
+                        color: #000000;
+                        font-size: 12px;
+                        background: white;
+                        outline: none;
+                        border: 2px solid rgba(255, 255, 255, 0.11);
+                        border-radius: 40px;
+                        padding: 1vh 1vh;
+                        cursor: pointer;
+                    }
+                }
+            }
         }
 
         .post {
@@ -822,10 +870,15 @@
         }
 
         .feed {
+
             .posts {
                 width: 90%;
                 height: 60vh;
                 padding: 2vh 2vh;
+
+                .postsSettings {
+                    font-size: 2.5vh;
+                }
             }
 
             .post {

@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react'
 import {AiFillLike, AiOutlineLike} from "react-icons/ai";
 import { TfiCommentAlt } from "react-icons/tfi";
 import { FaEllipsisH } from "react-icons/fa";
+import { MdOutlineMenuOpen } from "react-icons/md";
 import { Post } from './Post';
 import {useDispatch, useSelector} from "react-redux";
 import {deletePost, getAllPosts, likePost} from "../../Redux/Post/Action.js";
@@ -13,6 +14,9 @@ function Feed() {
   const [selectedPost, setSelectedPost] = useState(false)
   const [postDetail, setPostDetail] = useState(null)
   const [menuPost, setMenuPost] = useState(false)
+  const [postsSettings, setPostsSettings] = useState(false)
+  const [filter, setFilter] = useState('')
+  const [sortOrder, setSortOrder] = useState('date')
 
   const dispatch = useDispatch()
   const {auth, post, comment } = useSelector(store => store);
@@ -46,62 +50,103 @@ function Feed() {
     dispatch(likePost(postId));
   }
 
+  const filteredPosts = post.posts
+      .filter(item => filter === '' || item.user.fullName.toLowerCase().includes(filter.toLowerCase()))
+      .sort((a, b) => {
+        switch (sortOrder) {
+          case 'likes':
+            return b.totalLikes - a.totalLikes
+          case 'date-asc':
+            return new Date(a.creationDate) - new Date(b.creationDate)
+          case 'date-desc':
+          default:
+            return new Date(b.creationDate) - new Date(a.creationDate)
+        }
+      })
+
   useEffect(() => {
       dispatch(getAllPosts())
   }, [dispatch, post.likedPost, post.createdPost, post.deletedPost, comment.createdComment,comment.deletedComment])
 
   return (
     <div className='feed'>
+
       <div className="posts">
-        { post.posts.map((item) => (
+        <i className="postsSettings" onClick={() => setPostsSettings(((prev) => !prev))}><MdOutlineMenuOpen/></i>
+        {postsSettings && (<ul>
+          <li className="filter">
+            <input
+                type="text"
+                placeholder="Filter by user name..."
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    setPostsSettings(false)
+                  }
+                }}
+            />
+          </li>
+
+          <li className="sort">
+            <select  value={sortOrder} onChange={(e) =>
+            {setSortOrder(e.target.value)
+              setPostsSettings(false)}}>
+              <option value="likes">Sort by likes</option>
+              <option value="date-asc">Sort by date (ascending)</option>
+              <option value="date-desc">Sort by date (descending)</option>
+            </select>
+          </li>
+        </ul>)}
+        {filteredPosts.map((item) => (
             <div className="post" key={item.id}>
-          <div className="up">
-            <img src={`${BASE_API_URL}/${item.user?.profilePicture || ''}`} alt=""
-                 onClick={() => handleProfileClick(item.user.id)}/>
-            <div className="userData">
-              <p>{item.user.fullName}</p>
-              <span>{formatTimeAgo(item.creationDate)}</span>
-            </div>
-            {auth.reqUser.id === item.user.id && (
-                <>
-                  <i onClick={() => handleMenuToggle(item.id)}><FaEllipsisH /></i>
-                  {menuPost === item.id && (
-                      <ul className="list">
-                        <li className="option">
-                          <span>Edit</span>
-                        </li>
-                        <li className="option" onClick={() => handleDeletePost(item.id)}>
-                          <span>Delete</span>
-                        </li>
-                      </ul>
-                  )}
-                </>
-            )}
-          </div>
-          <div className="middle">
-            <img
-                src={`${BASE_API_URL}${item.image}`}
-                alt=""/>
-          </div>
-          <div className="description">
-            <p>{item.description}</p>
-          </div>
-          <div className="bottom">
-            <div className="likes">
-              <i onClick={() => likePostHandler(item.id)}>{item.liked ? <AiFillLike /> : <AiOutlineLike />}</i>
-              <span>{item.totalLikes}</span>
-            </div>
-            <div className="comments" onClick={() => togglePost(item)}>
-              <i><TfiCommentAlt/></i>
-              <span>{item?.totalComments| 0} comments</span>
-            </div>
-          </div>
-        </div>))}
+              <div className="up">
+                <img src={`${BASE_API_URL}/${item.user?.profilePicture || ''}`} alt=""
+                     onClick={() => handleProfileClick(item.user.id)}/>
+                <div className="userData">
+                  <p>{item.user.fullName}</p>
+                  <span>{formatTimeAgo(item.creationDate)}</span>
+                </div>
+                {auth.reqUser.id === item.user.id && (
+                    <>
+                      <i onClick={() => handleMenuToggle(item.id)}><FaEllipsisH/></i>
+                      {menuPost === item.id && (
+                          <ul className="list">
+                            <li className="option">
+                              <span>Edit</span>
+                            </li>
+                            <li className="option" onClick={() => handleDeletePost(item.id)}>
+                              <span>Delete</span>
+                            </li>
+                          </ul>
+                      )}
+                    </>
+                )}
+              </div>
+              <div className="middle">
+                <img
+                    src={`${BASE_API_URL}${item.image}`}
+                    alt=""/>
+              </div>
+              <div className="description">
+                <p>{item.description}</p>
+              </div>
+              <div className="bottom">
+                <div className="likes">
+                  <i onClick={() => likePostHandler(item.id)}>{item.liked ? <AiFillLike/> : <AiOutlineLike/>}</i>
+                  <span>{item.totalLikes}</span>
+                </div>
+                <div className="comments" onClick={() => togglePost(item)}>
+                  <i><TfiCommentAlt/></i>
+                  <span>{item?.totalComments | 0} comments</span>
+                </div>
+              </div>
+            </div>))}
 
       </div>
-      {selectedPost && <Post post={postDetail} onClose={togglePost} />}
+      {selectedPost && <Post post={postDetail} onClose={togglePost}/>}
     </div>
   )
 }
 
-export { Feed }
+export {Feed}
