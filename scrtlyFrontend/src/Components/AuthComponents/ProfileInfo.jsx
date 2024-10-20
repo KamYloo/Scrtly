@@ -16,7 +16,7 @@ function ProfileInfo() {
 
     useEffect(() => {
         dispatch(findUserById(userId))
-    }, [userId]);
+    }, [userId, auth.updateUser]);
     return (
         <div className='profileInfo'>
             <div className="userData">

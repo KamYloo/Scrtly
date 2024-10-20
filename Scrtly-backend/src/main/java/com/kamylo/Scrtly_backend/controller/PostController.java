@@ -47,23 +47,14 @@ public class PostController {
         }
 
         User user = userService.findUserProfileByJwt(token);
-        try {
-            String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-            Path filePath = Paths.get("src/main/resources/static/uploads/postImages").resolve(fileName);
 
-            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+        SendPostRequest sendPostRequest = new SendPostRequest();
+        sendPostRequest.setDescription(description);
+        sendPostRequest.setUser(user);
+        Post post = postService.createPost(sendPostRequest, file);
 
-            SendPostRequest sendPostRequest = new SendPostRequest();
-            sendPostRequest.setDescription(description);
-            sendPostRequest.setImage("/uploads/postImages/" + fileName);
-            sendPostRequest.setUser(user);
-            Post post = postService.createPost(sendPostRequest);
-
-            PostDto postDto = PostDtoMapper.toPostDto(post, user);
-            return new ResponseEntity<>(postDto, HttpStatus.CREATED);
-        } catch (IOException e) {
-            throw new RuntimeException("Error saving image file.", e);
-        }
+        PostDto postDto = PostDtoMapper.toPostDto(post, user);
+        return new ResponseEntity<>(postDto, HttpStatus.CREATED);
     }
 
     @GetMapping("/getAll")
@@ -89,29 +80,14 @@ public class PostController {
     public ResponseEntity<ApiResponse> deletePost(@PathVariable Long postId, @RequestHeader("Authorization") String token) throws UserException, PostException {
         User user = userService.findUserProfileByJwt(token);
         ApiResponse res = new ApiResponse();
+
         try {
-            Optional<Post> optionalPost = postRepository.findById(postId);
-            if (optionalPost.isEmpty()) {
-                throw new PostException("Post not found");
-            }
-
-            Post post = optionalPost.get();
             postService.deletePost(postId, user.getId());
-
-            String imagePath = "src/main/resources/static" + post.getImage();
-            Path filePath = Paths.get(imagePath);
-            if (Files.exists(filePath)) {
-                Files.delete(filePath);
-            }
-
             res.setMessage("Post and associated image deleted successfully");
             return new ResponseEntity<>(res, HttpStatus.OK);
         } catch (UserException | PostException e) {
             res.setMessage(e.getMessage());
             return new ResponseEntity<>(res, HttpStatus.FORBIDDEN);
-        } catch (IOException e) {
-            res.setMessage("Error deleting the image file.");
-            return new ResponseEntity<>(res, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

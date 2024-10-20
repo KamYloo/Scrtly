@@ -24,7 +24,6 @@ function ProfileEdit() {
 
     dispatch(updateUser({data:{fullName: fullName, profilePicture:profilePicture, description:description.trim() || ""}}))
     navigate(`/profile/${auth.reqUser.id}`)
-    window.location.reload()
   }
 
   useEffect(() => {
