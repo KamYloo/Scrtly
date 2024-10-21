@@ -11,31 +11,26 @@ function ChatView() {
 
     const dispatch = useDispatch();
 
-    const {auth, chat } = useSelector(store => store);
-    const token = localStorage.getItem('token')
+    const { chat } = useSelector(store => store);
 
     useEffect(() => {
-        if (token)dispatch(currentUser(token))
-    }, [dispatch, token])
-
-    useEffect(() => {
-        dispatch(getUsersChat({token}))
+        dispatch(getUsersChat())
     }, [chat.createdChat])
 
     const handleCurrentChatRoom = (chatItem) => {
         setCurrentChat(chatItem)
     };
 
-    useEffect(() => {
+    /*useEffect(() => {
         if (chat.chats && chat.chats.length > 0 && !currentChat) {
             setCurrentChat(chat.chats[0])
         }
-    }, [chat.chats, currentChat])
+    }, [chat.chats, currentChat])*/
 
     return (
         <div className='chatView'>
-            <ChatList chat={chat} auth={auth} onChatSelect={handleCurrentChatRoom}/>
-            {currentChat ? <Chat chat={currentChat} auth={auth} token={token}/> : <p className='chatNone'>Select a chat to start messaging</p>
+            <ChatList chat={chat} onChatSelect={handleCurrentChatRoom}/>
+            {currentChat ? <Chat chat={currentChat} /> : <p className='chatNone'>Select a chat to start messaging</p>
             }
         </div>
     )

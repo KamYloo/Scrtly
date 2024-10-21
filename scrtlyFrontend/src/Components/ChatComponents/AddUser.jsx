@@ -2,8 +2,9 @@ import React, {useEffect, useState} from 'react'
 import {useDispatch, useSelector} from "react-redux";
 import {currentUser, searchUser} from "../../Redux/Auth/Action.js";
 import {createChat} from "../../Redux/Chat/Action.js";
+import { MdCancel } from "react-icons/md";
 
-function AddUser() {
+function AddUser({onClose}) {
     const [keyword, setKeyword] = useState('');
     const dispatch = useDispatch();
 
@@ -31,6 +32,7 @@ function AddUser() {
 
     return (
         <div className='addUser'>
+            <i className='cancel' onClick={onClose}><MdCancel/></i>
             <form onSubmit={handleSearch}>
                 <input type="text" placeholder='Username...' onChange={(e) => setKeyword(e.target.value)}/>
                 <button>Search</button>
@@ -40,7 +42,7 @@ function AddUser() {
                     {auth.searchResults.map((user) => (
                         <div className="user" key={user.id}>
                             <div className="detail">
-                                <img src='#' alt="" />
+                                <img src='#' alt=""/>
                                 <span>{user.fullName}</span>
                             </div>
                             <button onClick={() => handleCreateChat(user.id)}>Add User</button>
@@ -55,4 +57,4 @@ function AddUser() {
     )
 }
 
-export { AddUser }
+export {AddUser}

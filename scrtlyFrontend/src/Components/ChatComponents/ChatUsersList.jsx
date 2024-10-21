@@ -4,11 +4,13 @@ import { BsPlus } from "react-icons/bs";
 import { FaMinus } from "react-icons/fa";
 import { AddUser } from './AddUser';
 import {BASE_API_URL} from "../../config/api.js";
+import {useSelector} from "react-redux";
 
 // eslint-disable-next-line react/prop-types
-function ChatUsersList({chat, auth, onChatSelect }) {
+function ChatUsersList({chat, onChatSelect }) {
     const [addMode, setAddMode] = useState(false)
     const [searchQuery, setSearchQuery] = useState('');
+    const {auth } = useSelector(store => store);
 
     // eslint-disable-next-line react/prop-types
     const filteredChats = chat?.chats?.filter(chatItem => {
@@ -19,6 +21,10 @@ function ChatUsersList({chat, auth, onChatSelect }) {
         return otherPerson.fullName.toLowerCase().includes(searchQuery.toLowerCase())
     })
 
+    const toggleAdUser = (post = null) => {
+        setAddMode((prev) => !prev);
+    };
+
     return (
         <div className='chatUserList'>
             <div className="search">
@@ -28,7 +34,7 @@ function ChatUsersList({chat, auth, onChatSelect }) {
                            onChange={(e) => setSearchQuery(e.target.value)}/>
                 </div>
 
-                <i className='addUserBtn' onClick={() => setAddMode(((prev) => !prev))}>{addMode ? <FaMinus/> :
+                <i className='addUserBtn' onClick={toggleAdUser}>{addMode ? <FaMinus/> :
                     <BsPlus/>}</i>
             </div>
 
@@ -53,7 +59,7 @@ function ChatUsersList({chat, auth, onChatSelect }) {
                     <p>No users found</p>
                 )}
             </div>
-            {addMode && <AddUser/>}
+            {addMode && <AddUser onClose={toggleAdUser}/>}
         </div>
     )
 }

@@ -7,13 +7,12 @@ export const createChatMessage = (messageData) => async (dispatch) => {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${messageData.token}`
+                Authorization: `Bearer ${localStorage.getItem('token')}`
             },
             body: JSON.stringify(messageData.data)
         })
 
         const data = await res.json()
-        console.log("create ChatMessage ", data)
         dispatch({ type: CREATE_NEW_MESSAGE, payload: data })
     } catch (error) {
         console.log("catch error ", error)
@@ -26,13 +25,12 @@ export const getAllMessages = (reqData) => async (dispatch) => {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${reqData.token}`
+                Authorization: `Bearer ${localStorage.getItem('token')}`
             },
             body: JSON.stringify(reqData.data)
         })
 
         const data = await res.json()
-        console.log("getALLMessages ", data)
         dispatch({ type: GET_ALL_MESSAGE, payload: data })
     } catch (error) {
         console.log("catch error ", error)
