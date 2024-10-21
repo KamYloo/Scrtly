@@ -81,10 +81,8 @@ public class UserServiceImplementation implements UserService {
         User user = findUserById(userId);
         String currentProfilePicture = user.getProfilePicture();
 
-        if (currentProfilePicture != null && !currentProfilePicture.isEmpty()) {
-            String imagePath = fileService.updateFile(userImage, "/"+currentProfilePicture, "/uploads/userImages");
-            user.setProfilePicture("uploads/userImages/" + imagePath);
-        }
+        String imagePath = fileService.updateFile(userImage, "/"+currentProfilePicture, "/uploads/userImages");
+        user.setProfilePicture("uploads/userImages/" + imagePath);
 
         user.setFullName(fullName);
         user.setDescription(description);

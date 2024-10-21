@@ -10,7 +10,6 @@ public class UserDto {
     private String fullName;
     private String profilePicture;
     private String description;
-    private String role;
 
     private boolean req_user;
     private boolean followed;
