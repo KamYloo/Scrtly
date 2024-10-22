@@ -61,10 +61,9 @@ public class ChatMessageServiceImplementation implements ChatMessageService {
     public void deleteChatMessageById(Integer messageId, User reqUser) throws MessageException {
         ChatMessage chatMessage = findChatMessageById(messageId);
 
-        if (chatMessage.getUser().getId().equals(reqUser.getId())) {
-            chatMessageRepository.deleteById(messageId);
+        if (!chatMessage.getUser().getId().equals(reqUser.getId())) {
+            throw new MessageException("You can't delete another user's message" + reqUser.getFullName());
         }
-
-        throw new MessageException("You can't delete another user's message" + reqUser.getFullName());
+        chatMessageRepository.deleteById(messageId);
     }
 }

@@ -3,11 +3,12 @@ import EmojiPicker from 'emoji-picker-react'
 import { FaPhoneAlt, FaInfoCircle, FaImage, FaCamera, FaMicrophone } from "react-icons/fa";
 import { BsCameraVideoFill, BsEmojiSmileFill } from "react-icons/bs";
 import {useDispatch, useSelector} from "react-redux";
-import {createChatMessage, getAllMessages} from "../../Redux/ChatMessage/Action.js";
+import {createChatMessage, deleteChatMessage, getAllMessages} from "../../Redux/ChatMessage/Action.js";
 import { formatDistanceToNow } from 'date-fns'
 import {BASE_API_URL} from "../../config/api.js";
 import SockJs from "sockjs-client/dist/sockjs"
 import {over} from "stompjs"
+import {deleteChat} from "../../Redux/Chat/Action.js";
 
 // eslint-disable-next-line react/prop-types
 function Chat({chat}) {
@@ -129,6 +130,13 @@ function Chat({chat}) {
         }
     }
 
+    const deletedChatMessageHandler = (messageId) => {
+        const confirmDelete = window.confirm('Are you sure you want to delete this Message?');
+        if (confirmDelete) {
+            dispatch(deleteChatMessage(messageId))
+        }
+    }
+
     useEffect(() => {
         const connectAndSubscribe = async () => {
             await connect(); // Połączenie ze stomClient
@@ -144,7 +152,7 @@ function Chat({chat}) {
         return () => {
             unsubscribeFromChat(); // Czyścimy subskrypcje na unmount
         };
-    }, [isConnected, chat]);
+    }, [isConnected, chat, chatMessage.deletedMessage]);
 
 
     useEffect(() => {
@@ -152,18 +160,18 @@ function Chat({chat}) {
             setMessages([...messages, chatMessage.newMessage])
             stompClient?.send("/app/message", {}, JSON.stringify(chatMessage.newMessage))
         }
-    }, [chatMessage.newMessage])
+    }, [chatMessage.newMessage, chatMessage.deletedMessage])
 
     useEffect(() => {
         setMessages(chatMessage.messages)
-    },[ chatMessage.messages]);
+    },[ chatMessage.messages, chatMessage.deletedMessage]);
 
 
     useEffect(() => {
         // eslint-disable-next-line react/prop-types
         if(chat.id)
             dispatch(getAllMessages({chatId:chat.id}))
-    }, [chat, chatMessage.newMessage, dispatch]);
+    }, [chat, chatMessage.newMessage, dispatch , chatMessage.deletedMessage]);
 
     // eslint-disable-next-line react/prop-types
     const otherPerson = chat.firstPerson.id !== auth.reqUser.id ? chat.firstPerson : chat.secondPerson;
@@ -189,7 +197,10 @@ function Chat({chat}) {
                         <img src={`${BASE_API_URL}/${otherPerson?.profilePicture || ''}`} alt=""/>
                         <div className="text">
                             <p>{item.messageText}</p>
-                            <span>{formatTimeAgo(item.timestamp)}</span>
+                            <div className="info">
+                                <span>{formatTimeAgo(item.timestamp)}</span>
+                                <button onClick={()=>deletedChatMessageHandler(item.id)}>Delete</button>
+                            </div>
                         </div>
                     </div>))}
 

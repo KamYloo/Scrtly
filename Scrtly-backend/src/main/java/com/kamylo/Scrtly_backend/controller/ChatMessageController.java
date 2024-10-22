@@ -45,12 +45,12 @@ public class ChatMessageController {
         return new  ResponseEntity<>(chatMessage, HttpStatus.OK);
     }
 
-    @DeleteMapping("/{messageId}")
+    @DeleteMapping("/delete/{messageId}")
     public ResponseEntity<ApiResponse> deleteMessageHandler(@PathVariable Integer messageId, @RequestHeader("Authorization") String token) throws UserException, MessageException {
         User user = userService.findUserProfileByJwt(token);
 
         chatMessageService.deleteChatMessageById(messageId, user);
-        ApiResponse apiResponse = new ApiResponse("message deleted successfully", false);
+        ApiResponse apiResponse = new ApiResponse("message deleted successfully", true);
         return new  ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 }

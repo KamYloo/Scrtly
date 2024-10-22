@@ -3,6 +3,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {currentUser, searchUser} from "../../Redux/Auth/Action.js";
 import {createChat} from "../../Redux/Chat/Action.js";
 import { MdCancel } from "react-icons/md";
+import {BASE_API_URL} from "../../config/api.js";
 
 function AddUser({onClose}) {
     const [keyword, setKeyword] = useState('');
@@ -42,7 +43,7 @@ function AddUser({onClose}) {
                     {auth.searchResults.map((user) => (
                         <div className="user" key={user.id}>
                             <div className="detail">
-                                <img src='#' alt=""/>
+                                <img src={`${BASE_API_URL}/${user?.profilePicture || ''}`} alt=""/>
                                 <span>{user.fullName}</span>
                             </div>
                             <button onClick={() => handleCreateChat(user.id)}>Add User</button>
