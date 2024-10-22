@@ -1,9 +1,12 @@
 package com.kamylo.Scrtly_backend.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 
@@ -16,19 +19,19 @@ public class ChatMessage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "message", nullable = false)
+    @Column(nullable = false)
     private String messageText;
 
-    @Column(name = "timestamp", nullable = false, updatable = false)
+    @Column(nullable = false, updatable = false)
     private LocalDateTime timestamp;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @ToString.Exclude
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "chatRoom_id")
-    private ChatRoom chat;
+    @ToString.Exclude
+    private ChatRoom chatRoom;
 
     @PrePersist
     protected void onCreate() {

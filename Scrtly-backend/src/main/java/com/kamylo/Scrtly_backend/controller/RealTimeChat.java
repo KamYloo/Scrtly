@@ -19,12 +19,11 @@ public class RealTimeChat {
     @MessageMapping("/message")
     public ChatMessage receiveMessage(@Payload ChatMessage message) {
 
-        ChatRoom chatRoom = message.getChat();
+        ChatRoom chatRoom = message.getChatRoom();
 
         String user1Destination = "/queue/private/" + chatRoom.getFirstPerson().getId();
         String user2Destination = "/queue/private/" + chatRoom.getSecondPerson().getId();
 
-        // Wysyłanie wiadomości do obu uczestników prywatnego czatu
         template.convertAndSend(user1Destination, message);
         template.convertAndSend(user2Destination, message);
 

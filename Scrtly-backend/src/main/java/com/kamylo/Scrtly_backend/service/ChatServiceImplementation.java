@@ -42,13 +42,7 @@ public class ChatServiceImplementation implements ChatService {
 
     @Override
     public ChatRoom findChatById(Integer chatId) throws ChatException {
-        Optional<ChatRoom> chatRoom = chatRepository.findById(chatId);
-
-        if (chatRoom.isPresent()) {
-            return chatRoom.get();
-        }
-
-        throw new ChatException("Chat not found with id " + chatId);
+        return chatRepository.findById(chatId).orElseThrow(() -> new ChatException("Chat not found with id " + chatId));
     }
 
     @Override
@@ -58,11 +52,16 @@ public class ChatServiceImplementation implements ChatService {
     }
 
     @Override
-    public void deleteChat(Integer chatId, Long userId) {
-        Optional<ChatRoom> chatRoom = chatRepository.findById(chatId);
-        if (chatRoom.isPresent()) {
-            ChatRoom chatRoomToDelete = chatRoom.get();
-            chatRepository.deleteById(chatRoomToDelete.getId());
+    public void deleteChat(Integer chatId, Long userId) throws ChatException, UserException {
+        ChatRoom chatRoom = findChatById(chatId);
+
+        if (chatRoom == null) {
+            throw new ChatException("Chat not found with id " + chatId);
         }
+        if (!userId.equals(chatRoom.getFirstPerson().getId()) && !userId.equals(chatRoom.getSecondPerson().getId())) {
+            throw new UserException("You do not have permission to delete this chat");
+        }
+
+        chatRepository.deleteById(chatId);
     }
 }

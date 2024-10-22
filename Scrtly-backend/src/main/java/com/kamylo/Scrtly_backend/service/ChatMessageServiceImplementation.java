@@ -34,9 +34,8 @@ public class ChatMessageServiceImplementation implements ChatMessageService {
 
         ChatMessage chatMessage = new ChatMessage();
         chatMessage.setUser(user);
-        chatMessage.setChat(chatRoom);
+        chatMessage.setChatRoom(chatRoom);
         chatMessage.setMessageText(request.getMessage());
-        chatMessage.setTimestamp(LocalDateTime.now());
 
         return chatMessageRepository.save(chatMessage);
     }
@@ -45,7 +44,7 @@ public class ChatMessageServiceImplementation implements ChatMessageService {
     public List<ChatMessage> getChatsMessages(Integer chatId) throws ChatException {
         ChatRoom chatRoom = chatService.findChatById(chatId);
 
-        return chatMessageRepository.findByChatId(chatRoom.getId());
+        return chatMessageRepository.findByChatRoomId(chatRoom.getId());
     }
 
     @Override
