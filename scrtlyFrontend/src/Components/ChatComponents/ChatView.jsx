@@ -15,7 +15,7 @@ function ChatView() {
 
     useEffect(() => {
         dispatch(getUsersChat())
-    }, [chat.createdChat])
+    }, [chat.createdChat, chat.deletedChat, dispatch]);
 
     const handleCurrentChatRoom = (chatItem) => {
         setCurrentChat(chatItem)

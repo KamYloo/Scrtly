@@ -26,7 +26,7 @@ function AddUser({onClose}) {
 
     const handleCreateChat = (user) => {
         console.log(user);
-        dispatch(createChat({token, data: user}));
+        dispatch(createChat({data: user}));
     }
 
 

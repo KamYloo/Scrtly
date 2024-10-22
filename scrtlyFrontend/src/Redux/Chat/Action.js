@@ -1,5 +1,5 @@
 import {BASE_API_URL} from "../../config/api.js";
-import {CREATE_CHAT, GET_USERS_CHAT} from "./ActionType.js";
+import {CREATE_CHAT, DELETE_CHAT_ERROR, DELETE_CHAT_REQUEST, GET_USERS_CHAT} from "./ActionType.js";
 
 export const createChat = (chatData) => async (dispatch) => {
     try {
@@ -35,3 +35,22 @@ export const getUsersChat = () => async (dispatch) => {
         console.log("catch error ", error)
     }
 }
+
+export const deleteChat = (chatRoomId) => async (dispatch) => {
+    try {
+        const response = await fetch(`${BASE_API_URL}/api/chats/delete/${chatRoomId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            },
+        });
+
+        const res = await response.json();
+        console.log("Deleted ChatRoom", res)
+        dispatch({ type: DELETE_CHAT_REQUEST, payload: res });
+    } catch (error) {
+        console.log('catch error', error);
+        dispatch({ type: DELETE_CHAT_ERROR, payload: error.message });
+    }
+};

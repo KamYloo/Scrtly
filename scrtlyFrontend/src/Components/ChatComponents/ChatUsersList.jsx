@@ -1,16 +1,21 @@
 import React, { useState} from 'react'
 import { RiUserSearchFill } from "react-icons/ri";
+import { MdDeleteSweep } from "react-icons/md";
 import { BsPlus } from "react-icons/bs";
 import { FaMinus } from "react-icons/fa";
 import { AddUser } from './AddUser';
 import {BASE_API_URL} from "../../config/api.js";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
+import {deleteChat} from "../../Redux/Chat/Action.js";
+import {useNavigate} from "react-router-dom";
 
 // eslint-disable-next-line react/prop-types
 function ChatUsersList({chat, onChatSelect }) {
     const [addMode, setAddMode] = useState(false)
     const [searchQuery, setSearchQuery] = useState('');
     const {auth } = useSelector(store => store);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     // eslint-disable-next-line react/prop-types
     const filteredChats = chat?.chats?.filter(chatItem => {
@@ -21,9 +26,17 @@ function ChatUsersList({chat, onChatSelect }) {
         return otherPerson.fullName.toLowerCase().includes(searchQuery.toLowerCase())
     })
 
-    const toggleAdUser = (post = null) => {
+    const toggleAdUser = () => {
         setAddMode((prev) => !prev);
     };
+    const deleteChatRoomHandler = (chatRoomId) => {
+        const confirmDelete = window.confirm('Are you sure you want to delete this ChatRoom?');
+        if (confirmDelete) {
+            dispatch(deleteChat(chatRoomId))
+            navigate('/chat')
+        }
+    }
+
 
     return (
         <div className='chatUserList'>
@@ -46,13 +59,21 @@ function ChatUsersList({chat, onChatSelect }) {
                         const otherPerson = isUserFirstPerson ? chatItem?.secondPerson : chatItem?.firstPerson
 
                         return (
-                            <div className="userItem" key={chatItem.id} onClick={()=> onChatSelect(chatItem)}>
+                            <div className="userItem" key={chatItem.id} onClick={() => onChatSelect(chatItem)}>
                                 <img src={`${BASE_API_URL}/${otherPerson?.profilePicture || ''}`} alt=""/>
                                 <div className="text">
                                     <span>{otherPerson.fullName}</span>
                                     <p>afdsafdsgad</p>
                                 </div>
+                                <i onClick={(e) => {
+                                    e.stopPropagation();
+                                    deleteChatRoomHandler(chatItem.id);
+                                    onChatSelect(null)
+                                }}>
+                                    <MdDeleteSweep/>
+                                </i>
                             </div>
+
                         )
                     })
                 ) : (

@@ -13,6 +13,7 @@ export const createChatMessage = (messageData) => async (dispatch) => {
         })
 
         const data = await res.json()
+        console.log("created ChatMessage", data)
         dispatch({ type: CREATE_NEW_MESSAGE, payload: data })
     } catch (error) {
         console.log("catch error ", error)
