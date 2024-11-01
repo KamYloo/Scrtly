@@ -34,21 +34,27 @@ public class AlbumServiceImplementation implements AlbumService{
     @Override
     public Album createAlbum(AlbumRequest albumRequest, MultipartFile albumImage) throws ArtistException, UserException {
         User user = userService.findUserById(albumRequest.getArtist().getId());
-        if(user instanceof Artist artist) {
+        if (user instanceof Artist artist) {
             Album album = new Album();
             album.setArtist(artist);
             album.setTitle(albumRequest.getTitle());
+
             if (!albumImage.isEmpty()) {
                 String imagePath = fileService.saveFile(albumImage, "/uploads/albumImages");
-                album.setCoverImage("/uploads/albumImages/" + imagePath);
+                if (imagePath != null && !imagePath.isBlank()) {
+                    album.setCoverImage("/uploads/albumImages/" + imagePath);
+                } else {
+                    throw new RuntimeException("FileService failed to save the album image.");
+                }
             }
+
             album.setReleaseDate(LocalDate.now());
             return albumRepository.save(album);
-        }
-        else {
+        } else {
             throw new ArtistException("User is not an artist");
         }
     }
+
 
     @Override
     public List<Album> getAllAlbums() {
