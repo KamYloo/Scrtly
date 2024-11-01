@@ -130,6 +130,7 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.13.0</version>
 				<configuration>
+					<executable>C:\Program Files\Java\jdk-19\bin\javac</executable>
 					<verbose>true</verbose>
 					<fork>true</fork>
 				</configuration>
