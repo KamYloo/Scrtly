@@ -13,7 +13,8 @@ function MenuPlayList({setCreatePlayList}) {
     const deletePlayListHandler = (playListId) => {
         const confirmDelete = window.confirm('Are you sure you want to delete this playList?');
         if (confirmDelete) {
-            dispatch(deletePlayList(playListId));
+            dispatch(deletePlayList(playListId))
+            navigate('/home')
         }
     }
 
@@ -28,10 +29,9 @@ function MenuPlayList({setCreatePlayList}) {
             <div className="scrollBox">
                 {
                     playList?.playLists.map((playList)=> (
-                    <div className="playList" key={playList.id}
-                         onClick={() => navigate(`/playList/${playList.id}`)}>
+                    <div className="playList" key={playList.id}>
                         <i className='iconP'><BsMusicNoteList /></i>
-                        <p>{playList?.title}</p>
+                        <p onClick={() => navigate(`/playList/${playList.id}`)}>{playList?.title}</p>
                         <i className='trash' onClick={() => deletePlayListHandler(playList.id)}><BsTrash /></i>
                     </div>
                     ))

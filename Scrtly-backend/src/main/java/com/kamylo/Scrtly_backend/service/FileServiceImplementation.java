@@ -31,10 +31,8 @@ public class FileServiceImplementation {
 
     public String updateFile(MultipartFile newImage, String existingFileName, String directory) {
         try {
-            // Ścieżka do katalogu
             Path folderPath = Paths.get("src/main/resources/static" + directory);
 
-            // Sprawdzenie czy katalog istnieje
             if (!Files.exists(folderPath)) {
                 Files.createDirectories(folderPath);
             }
@@ -45,11 +43,9 @@ public class FileServiceImplementation {
                 Files.delete(filePath);
             }
 
-            // Generowanie nowej nazwy pliku
             String newFileName = UUID.randomUUID().toString() + "_" + newImage.getOriginalFilename();
             Path newFilePath = folderPath.resolve(newFileName);
-
-            // Zapisanie nowego pliku
+            
             Files.copy(newImage.getInputStream(), newFilePath, StandardCopyOption.REPLACE_EXISTING);
 
             return newFileName;

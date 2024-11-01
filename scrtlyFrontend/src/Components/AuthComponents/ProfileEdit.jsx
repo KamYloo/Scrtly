@@ -11,7 +11,7 @@ function ProfileEdit() {
   const [fullName, setFullName] = useState(auth.reqUser?.fullName || "")
   const [description, setDescription] = useState(auth.reqUser?.description || "")
   const [profilePicture, setProfilePicture] = useState(null)
-  const [preview, setPreview] = useState('');
+  const [preview, setPreview] = useState(auth.reqUser?.profilePicture ? `${BASE_API_URL}/${auth.reqUser.profilePicture}` : '');
   const navigate = useNavigate()
 
 
@@ -21,7 +21,7 @@ function ProfileEdit() {
 
   const handleSubmit = () => {
     dispatch(updateUser({data:{fullName: fullName, profilePicture:profilePicture, description:description.trim() || ""}}))
-    navigate(`/profile/${auth.reqUser.id}`)
+    navigate(`/profile/${auth.reqUser.id}?reload=true`)
   }
 
   useEffect(() => {

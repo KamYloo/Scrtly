@@ -1,40 +1,51 @@
-import React, { useEffect } from 'react'
-import "../../Styles/Profile.css"
+import React, { useEffect } from 'react';
+import "../../Styles/Profile.css";
 import { IoIosSettings } from "react-icons/io";
-import {useNavigate, useParams} from 'react-router-dom';
-import {BASE_API_URL} from "../../config/api.js";
-import {findUserById, followUser} from "../../Redux/Auth/Action.js";
-import {useDispatch, useSelector} from "react-redux";
-
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { BASE_API_URL } from "../../config/api.js";
+import { findUserById, followUser } from "../../Redux/Auth/Action.js";
+import { useDispatch, useSelector } from "react-redux";
 
 function ProfileInfo() {
-    const navigate = useNavigate()
-    const dispatch = useDispatch()
-    const {userId} = useParams();
-
-    const {auth} = useSelector(store => store);
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const { userId } = useParams();
+    const { auth } = useSelector(store => store);
+    const location = useLocation();
 
     useEffect(() => {
-        dispatch(findUserById(userId))
-    }, [userId, auth.updateUser]);
+        dispatch(findUserById(userId));
+    }, [dispatch, userId]);
+
+
+    useEffect(() => {
+        const searchParams = new URLSearchParams(location.search);
+        if (searchParams.get('reload')) {
+            dispatch(findUserById(userId));
+        }
+    }, [location, dispatch, userId]);
+
     return (
         <div className='profileInfo'>
             <div className="userData">
-                <img src={`${BASE_API_URL}/${auth.findUser?.profilePicture || ''}`} alt="" />
+                <img
+                    src={`${BASE_API_URL}/${auth.findUser?.profilePicture || ''}`}
+                    alt={auth.findUser?.fullName || 'Profile Picture'}
+                />
                 <div className="right">
                     <div className="top">
                         <p>{auth.findUser?.fullName || 'Name Surname'}</p>
-                        {!auth.findUser?.req_user &&
-                            (<button className={auth.findUser?.followed ? 'following' : 'follow'} onClick={() => {
-                           dispatch(followUser(userId))
-                        }}>{auth.findUser?.followed ? 'unFollow' : 'Follow'}
-                        </button>)}
-                        {auth.findUser?.req_user &&
-                            (
-                        <button onClick={() => {
-                            navigate("/profile/edit")
-                        }}>Edit Profile
-                        </button>)}
+                        {!auth.findUser?.req_user && (
+                            <button className={auth.findUser?.followed ? 'following' : 'follow'}
+                                    onClick={() => dispatch(followUser(userId))}>
+                                {auth.findUser?.followed ? 'unFollow' : 'Follow'}
+                            </button>
+                        )}
+                        {auth.findUser?.req_user && (
+                            <button onClick={() => navigate("/profile/edit")}>
+                                Edit Profile
+                            </button>
+                        )}
                         <i><IoIosSettings/></i>
                     </div>
                     <div className="stats">
@@ -49,7 +60,7 @@ function ProfileInfo() {
                 </div>
             </div>
         </div>
-    )
+    );
 }
 
-export { ProfileInfo }
+export { ProfileInfo };

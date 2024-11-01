@@ -2,8 +2,10 @@ import React, {useEffect, useState} from 'react'
 import {useDispatch, useSelector} from "react-redux";
 import {currentUser, searchUser} from "../../Redux/Auth/Action.js";
 import {createChat} from "../../Redux/Chat/Action.js";
+import { MdCancel } from "react-icons/md";
+import {BASE_API_URL} from "../../config/api.js";
 
-function AddUser() {
+function AddUser({onClose}) {
     const [keyword, setKeyword] = useState('');
     const dispatch = useDispatch();
 
@@ -25,12 +27,13 @@ function AddUser() {
 
     const handleCreateChat = (user) => {
         console.log(user);
-        dispatch(createChat({token, data: user}));
+        dispatch(createChat({data: user}));
     }
 
 
     return (
         <div className='addUser'>
+            <i className='cancel' onClick={onClose}><MdCancel/></i>
             <form onSubmit={handleSearch}>
                 <input type="text" placeholder='Username...' onChange={(e) => setKeyword(e.target.value)}/>
                 <button>Search</button>
@@ -40,7 +43,7 @@ function AddUser() {
                     {auth.searchResults.map((user) => (
                         <div className="user" key={user.id}>
                             <div className="detail">
-                                <img src='#' alt="" />
+                                <img src={`${BASE_API_URL}/${user?.profilePicture || ''}`} alt=""/>
                                 <span>{user.fullName}</span>
                             </div>
                             <button onClick={() => handleCreateChat(user.id)}>Add User</button>
@@ -55,4 +58,4 @@ function AddUser() {
     )
 }
 
-export { AddUser }
+export {AddUser}

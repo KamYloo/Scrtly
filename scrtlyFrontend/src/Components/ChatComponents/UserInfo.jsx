@@ -2,9 +2,12 @@ import React from 'react'
 import { FaUserEdit, FaEllipsisH, FaAngleRight } from "react-icons/fa";
 import { BsCameraVideoFill } from "react-icons/bs";
 import {BASE_API_URL} from "../../config/api.js";
+import {useSelector} from "react-redux";
 
 // eslint-disable-next-line react/prop-types
-function UserInfo({ toggleChatListView, auth}) {
+function UserInfo({ toggleChatListView }) {
+
+    const {auth} = useSelector(store => store);
 
     return (
         <div className='userInfo'>

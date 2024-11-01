@@ -3,7 +3,9 @@ package com.kamylo.Scrtly_backend.config;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,18 +22,17 @@ import java.util.Collections;
 @Configuration
 public class ApplicationConfig implements WebMvcConfigurer {
 
-    @SuppressWarnings("deprecation")
     @Bean
-    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeRequests(
                         authorize -> authorize.requestMatchers("/api/**")
                                 .authenticated().anyRequest().permitAll())
                 .addFilterBefore(new JwtTokenValidator(), BasicAuthenticationFilter.class)
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()));
-        //.httpBasic(Customizer.withDefaults())
-        //.formLogin(Customizer.withDefaults());
+//        .httpBasic(Customizer.withDefaults())
+//        .formLogin(Customizer.withDefaults());
         return http.build();
     }
 
@@ -44,7 +45,7 @@ public class ApplicationConfig implements WebMvcConfigurer {
                 ccfg.setAllowedMethods(Collections.singletonList("*"));
                 ccfg.setAllowCredentials(true);
                 ccfg.setAllowedHeaders(Collections.singletonList("*"));
-                ccfg.setExposedHeaders(Arrays.asList("Authorization"));
+                ccfg.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "X-XSRF-TOKEN"));
                 ccfg.setMaxAge(3600L);
                 return ccfg;
 

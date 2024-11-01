@@ -52,13 +52,22 @@ public class ChatController {
     }
 
     @DeleteMapping("/delete/{chatId}")
-    public ResponseEntity<ApiResponse> deleteChatHandler(@PathVariable Integer chatId, @RequestHeader("Authorization")String token) throws UserException, ChatException {
+    public ResponseEntity<ApiResponse> deleteChatHandler(@PathVariable Integer chatId, @RequestHeader("Authorization")String token) throws UserException {
         User reqUser = userService.findUserProfileByJwt(token);
+        ApiResponse res = new ApiResponse();
 
+        try {
         chatService.deleteChat(chatId, reqUser.getId());
-        ApiResponse response = new ApiResponse("chat is deleted successfully", true);
+        res.setMessage("Chat deleted successfully");
+        res.setStatus(true);
+        return new ResponseEntity<>(res, HttpStatus.OK);
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+        catch (ChatException | UserException e) {
+            res.setStatus(false);
+            res.setMessage(e.getMessage());
+            return new ResponseEntity<>(res, HttpStatus.FORBIDDEN);
+        }
     }
 
 }

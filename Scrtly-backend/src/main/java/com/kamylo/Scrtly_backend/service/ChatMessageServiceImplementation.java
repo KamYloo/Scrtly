@@ -34,9 +34,8 @@ public class ChatMessageServiceImplementation implements ChatMessageService {
 
         ChatMessage chatMessage = new ChatMessage();
         chatMessage.setUser(user);
-        chatMessage.setChat(chatRoom);
+        chatMessage.setChatRoom(chatRoom);
         chatMessage.setMessageText(request.getMessage());
-        chatMessage.setTimestamp(LocalDateTime.now());
 
         return chatMessageRepository.save(chatMessage);
     }
@@ -45,7 +44,7 @@ public class ChatMessageServiceImplementation implements ChatMessageService {
     public List<ChatMessage> getChatsMessages(Integer chatId) throws ChatException {
         ChatRoom chatRoom = chatService.findChatById(chatId);
 
-        return chatMessageRepository.findByChatId(chatRoom.getId());
+        return chatMessageRepository.findByChatRoomId(chatRoom.getId());
     }
 
     @Override
@@ -62,10 +61,9 @@ public class ChatMessageServiceImplementation implements ChatMessageService {
     public void deleteChatMessageById(Integer messageId, User reqUser) throws MessageException {
         ChatMessage chatMessage = findChatMessageById(messageId);
 
-        if (chatMessage.getUser().getId().equals(reqUser.getId())) {
-            chatMessageRepository.deleteById(messageId);
+        if (!chatMessage.getUser().getId().equals(reqUser.getId())) {
+            throw new MessageException("You can't delete another user's message" + reqUser.getFullName());
         }
-
-        throw new MessageException("You can't delete another user's message" + reqUser.getFullName());
+        chatMessageRepository.deleteById(messageId);
     }
 }
