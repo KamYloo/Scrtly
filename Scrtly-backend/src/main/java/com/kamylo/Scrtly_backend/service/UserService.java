@@ -11,11 +11,7 @@ import java.util.Set;
 
 @Service
 public interface UserService {
-     List<User> getAllUser();
-
      User findUserProfileByJwt(String jwt) throws UserException;
-
-     User findUserByEmail(String email);
 
      User findUserById(Long userId) throws UserException;
 

@@ -25,11 +25,6 @@ public class UserServiceImplementation implements UserService {
     private FileServiceImplementation fileService;
 
     @Override
-    public List<User> getAllUser() {
-        return List.of();
-    }
-
-    @Override
     public User findUserProfileByJwt(String jwt) throws UserException{
         String email = JwtProvider.getEmailFromJwtToken(jwt);
 
@@ -42,11 +37,6 @@ public class UserServiceImplementation implements UserService {
             throw new UserException("User not found with this email"+email);
         }
         return user;
-    }
-
-    @Override
-    public User findUserByEmail(String email) {
-        return null;
     }
 
     @Override
