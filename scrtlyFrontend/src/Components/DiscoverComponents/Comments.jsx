@@ -5,11 +5,14 @@ import {BASE_API_URL} from "../../config/api.js";
 import {useDispatch, useSelector} from "react-redux";
 import {getAllPostComments, likeComment} from "../../Redux/Comment/Action.js";
 import {formatDistanceToNow} from "date-fns";
+import {useNavigate} from "react-router-dom";
 
 // eslint-disable-next-line react/prop-types
 function Comments({post}) {
     const { comment } = useSelector(store => store)
     const dispatch = useDispatch()
+    const navigate = useNavigate();
+    const {auth} = useSelector(store => store);
 
     const formatTimeAgo = (timestamp) => {
         return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
@@ -28,13 +31,13 @@ function Comments({post}) {
   return (
     <div className='commentsSection'>
         <div className="up">
-            <img src={`${BASE_API_URL}/${post.user?.profilePicture || ''}`} alt="" />
+            <img src={`${BASE_API_URL}/${post.user?.profilePicture || ''}`} alt="" onClick={() => navigate(`/profile/${auth.reqUser.id}`)}/>
             <p>{post.user.fullName}</p>
         </div>
         <hr className="line" />
         <div className="comments">
             <div className="comment Own">
-            <img src={`${BASE_API_URL}/${post.user?.profilePicture || ''}`} alt="" />
+            <img src={`${BASE_API_URL}/${post.user?.profilePicture || ''}`} alt="" onClick={() => navigate(`/profile/${auth.reqUser.id}`)}/>
                 <div className="context">
                     <p>{post.user.fullName}</p>
                     <span>{post.description}</span>
@@ -45,7 +48,7 @@ function Comments({post}) {
             </div>
             {comment.comments.map((item) => (
                 <div className="comment" key={item.id}>
-                <img src={`${BASE_API_URL}/${item.user?.profilePicture || ''}`} alt=""/>
+                <img src={`${BASE_API_URL}/${item.user?.profilePicture || ''}`} alt="" onClick={() => navigate(`/profile/${item.user.id}`)}/>
                 <div className="context">
                     <p>{item.user.fullName}</p>
                     <span>{item.comment}</span>

@@ -9,6 +9,7 @@ import {BASE_API_URL} from "../../config/api.js";
 import SockJs from "sockjs-client/dist/sockjs"
 import {over} from "stompjs"
 import {deleteChat} from "../../Redux/Chat/Action.js";
+import {useNavigate} from "react-router-dom";
 
 // eslint-disable-next-line react/prop-types
 function Chat({chat}) {
@@ -23,6 +24,7 @@ function Chat({chat}) {
 
     const endRef = useRef(null)
     const dispatch = useDispatch();
+    const navigate = useNavigate()
 
     useEffect(() => {
         endRef.current?.scrollIntoView({ behaviour: "smooth" })
@@ -108,7 +110,6 @@ function Chat({chat}) {
         try {
             const receivedMessage = JSON.parse(payload.body);
 
-            // Sprawdź, czy wiadomość już nie została dodana
             setMessages((prevMessages) => {
                 const messageExists = prevMessages.some(msg => msg.id === receivedMessage.id);
                 if (!messageExists) {
@@ -123,10 +124,10 @@ function Chat({chat}) {
 
 
     const handleCreateNewMessage = () => {
-        if (text.trim() === "") return; // Sprawdzenie, czy wiadomość nie jest pusta
+        if (text.trim() === "") return;
         if (stompClient && stompClient.connected) {
             dispatch(createChatMessage({ data: { chatId: chat.id, message: text } }));
-            setText(""); // Resetowanie pola tekstowego
+            setText("");
         }
     }
 
@@ -139,18 +140,18 @@ function Chat({chat}) {
 
     useEffect(() => {
         const connectAndSubscribe = async () => {
-            await connect(); // Połączenie ze stomClient
+            await connect();
 
-            // Subskrypcja jest możliwa dopiero po nawiązaniu połączenia
+
             if (isConnected && chat) {
-                subscribeToChat();  // Subskrybuj wiadomości po nawiązaniu połączenia
+                subscribeToChat();
             }
         };
 
-        connectAndSubscribe(); // Wywołaj funkcję nawiązywania połączenia i subskrypcji
+        connectAndSubscribe();
 
         return () => {
-            unsubscribeFromChat(); // Czyścimy subskrypcje na unmount
+            unsubscribeFromChat();
         };
     }, [isConnected, chat, chatMessage.deletedMessage]);
 
@@ -179,7 +180,7 @@ function Chat({chat}) {
         <div className='chat'>
             <div className="top">
                 <div className="user">
-                    <img src={`${BASE_API_URL}/${otherPerson?.profilePicture || ''}`} alt="" />
+                    <img src={`${BASE_API_URL}/${otherPerson?.profilePicture || ''}`} alt=""  onClick={() => navigate(`/profile/${otherPerson.id}`)}/>
                     <div className="userData">
                         <span>{otherPerson.fullName}</span>
                         <p>{otherPerson?.description || ''}</p>
@@ -194,7 +195,7 @@ function Chat({chat}) {
             <div className="center">
                 { messages?.map((item, index) => (
                     <div className={item.user.id === auth.reqUser.id ? "messageOwn" : "message"} key={`${item.id}-${index}`}>
-                        <img src={`${BASE_API_URL}/${otherPerson?.profilePicture || ''}`} alt=""/>
+                        <img src={`${BASE_API_URL}/${otherPerson?.profilePicture || ''}`} alt="" onClick={() => navigate(`/profile/${item.user.id}`)}/>
                         <div className="text">
                             <p>{item.messageText}</p>
                             <div className="info">

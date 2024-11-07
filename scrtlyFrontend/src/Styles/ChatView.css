@@ -58,6 +58,7 @@
         background: rgb(98, 98, 104);
         border-radius: 50%;
         object-fit: cover;
+        cursor: pointer;
     }
 
     h2 {
@@ -190,6 +191,7 @@
                 border-radius: 50%;
                 background: rgb(0, 0, 0);
                 object-fit: cover;
+                cursor: pointer;
             }
 
             .userData {
@@ -242,6 +244,7 @@
                 background: rgb(0, 0, 0);
                 object-fit: cover;
                 border-radius: 50%;
+                cursor: pointer;
             }
 
 

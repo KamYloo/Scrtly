@@ -64,7 +64,6 @@ public class LikeServiceImplementation implements LikeService{
        Like like = new Like();
        like.setUser(user);
        like.setComment(comment);
-       like.setPost(comment.getPost());
        Like savedLike = likeRepository.save(like);
        comment.getLikes().add(savedLike);
        commentRepository.save(comment);

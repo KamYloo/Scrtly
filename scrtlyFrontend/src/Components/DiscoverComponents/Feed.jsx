@@ -73,7 +73,7 @@ function Feed() {
 
       <div className="posts">
         <i className="postsSettings" onClick={() => setPostsSettings(((prev) => !prev))}><MdOutlineMenuOpen/></i>
-        {postsSettings && (<ul>
+        {postsSettings && (<ul className="filtredMenu">
           <li className="filter">
             <input
                 type="text"

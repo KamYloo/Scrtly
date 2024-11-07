@@ -20,7 +20,7 @@ function RightMenu() {
   }
 
   const handleProfileClick = () => {
-    if (auth?.reqUser) {
+    if (localStorage.getItem('token')) {
       navigate(`/profile/${auth.reqUser.id}`)
     } else {
       navigate('/login')
@@ -40,7 +40,7 @@ function RightMenu() {
         <div className="profileImg" onClick={handleProfileClick}>
           <img src={`${BASE_API_URL}/${auth.reqUser?.profilePicture || ''}`} alt="" />
         </div>
-        {auth?.reqUser ? (
+        {localStorage.getItem('token') ? (
           <p className='loginBtn' onClick={handleLogout}>Logout</p>
         ) : (
           <p className='loginBtn' onClick={() => navigate('/login')}>Login</p>

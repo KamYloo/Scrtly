@@ -283,6 +283,7 @@
             background: rgb(59, 59, 65);
             border-radius: 50%;
             object-fit: cover;
+            cursor: pointer;
         }
 
         .middle {
@@ -321,6 +322,7 @@
 
                     span {
                         font-size: 14px;
+                        cursor: pointer;
                     }
                 }
             }
@@ -397,6 +399,10 @@
                 top: 0.5vh;
                 right: 0.5vh;
                 cursor: pointer;
+            }
+
+            .filtredMenu {
+                z-index: 20;
             }
 
             ul {
@@ -613,6 +619,7 @@
             background: rgb(59, 59, 65);
             border-radius: 50%;
             object-fit: cover;
+            cursor: pointer;
         }
 
         p {

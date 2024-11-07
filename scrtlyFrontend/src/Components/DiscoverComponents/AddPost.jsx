@@ -5,6 +5,7 @@ import EmojiPicker from 'emoji-picker-react'
 import {useDispatch, useSelector} from "react-redux";
 import {createPost} from "../../Redux/Post/Action.js";
 import {BASE_API_URL} from "../../config/api.js";
+import {useNavigate} from "react-router-dom";
 
 
 function AddPost() {
@@ -13,6 +14,7 @@ function AddPost() {
   const [filePic, setFilePic] = useState(null)
   const [openEmoji, setOpenEmoji] = useState(false)
   const { auth } = useSelector(store => store);
+  const navigate = useNavigate();
 
   const handleFileChange = (e) => {
     setFilePic(e.target.files[0])
@@ -36,7 +38,7 @@ function AddPost() {
   return (
     <div className='addPost'>
       <div className="context">
-        <img src={`${BASE_API_URL}/${auth.reqUser?.profilePicture || ''}`} alt="" />
+        <img src={`${BASE_API_URL}/${auth.reqUser?.profilePicture || ''}`} alt="" onClick={() => navigate(`/profile/${auth.reqUser.id}`)}/>
         <div className="middle">
           <textarea type="text" value={descriptionText}
                     onChange={(e) => setDescriptionText(e.target.value)} />
