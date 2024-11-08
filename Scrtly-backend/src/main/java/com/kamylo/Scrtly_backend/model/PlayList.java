@@ -19,6 +19,7 @@ public class PlayList {
     private String title;
     private String coverImage;
     private LocalDate creationDate;
+    private boolean favourite;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

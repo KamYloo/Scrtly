@@ -14,6 +14,7 @@ public class PlayListDtoMapper {
         PlayListDto playListDto = new PlayListDto();
         playListDto.setId(playList.getId());
         playListDto.setUser(user);
+        playListDto.setFavourite(playList.isFavourite());
         playListDto.setCreationDate(playList.getCreationDate());
         playListDto.setPlayListImage(playList.getCoverImage());
         playListDto.setTitle(playList.getTitle());

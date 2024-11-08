@@ -1,13 +1,20 @@
 package com.kamylo.Scrtly_backend.controller;
 
 import com.kamylo.Scrtly_backend.dto.LikeDto;
+import com.kamylo.Scrtly_backend.dto.SongLikeDto;
 import com.kamylo.Scrtly_backend.dto.mapper.LikeDtoMapper;
+import com.kamylo.Scrtly_backend.dto.mapper.SongLikeDtoMapper;
 import com.kamylo.Scrtly_backend.exception.CommentException;
 import com.kamylo.Scrtly_backend.exception.PostException;
+import com.kamylo.Scrtly_backend.exception.SongException;
 import com.kamylo.Scrtly_backend.exception.UserException;
 import com.kamylo.Scrtly_backend.model.Like;
+import com.kamylo.Scrtly_backend.model.Song;
+import com.kamylo.Scrtly_backend.model.SongLike;
 import com.kamylo.Scrtly_backend.model.User;
 import com.kamylo.Scrtly_backend.service.LikeService;
+import com.kamylo.Scrtly_backend.service.SongLikeService;
+import com.kamylo.Scrtly_backend.service.SongService;
 import com.kamylo.Scrtly_backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,6 +32,12 @@ public class LikeController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private SongService songService;
+
+    @Autowired
+    private SongLikeService songLikeService;
+
     @PostMapping("/post/{postId}/like")
     public ResponseEntity<LikeDto> likePost (@PathVariable Long postId, @RequestHeader("Authorization") String token) throws UserException, PostException {
         User user = userService.findUserProfileByJwt(token);
@@ -41,6 +54,15 @@ public class LikeController {
         LikeDto likeDto = LikeDtoMapper.toLikeCommentDto(like,user);
 
         return new ResponseEntity<>(likeDto, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/song/{songId}/like")
+    public ResponseEntity<?> likeSong(@PathVariable Long songId, @RequestHeader("Authorization") String token) throws UserException, SongException {
+        User user = userService.findUserProfileByJwt(token);
+        Song song = songService.findSongById(songId);
+        SongLike songLike = songLikeService.likeSong(song, user);
+        SongLikeDto songLikeDto = SongLikeDtoMapper.toLikeSongDto(songLike,user);
+        return new ResponseEntity<>(songLikeDto, HttpStatus.CREATED);
     }
 
     @GetMapping("/post/{postId}/likes")

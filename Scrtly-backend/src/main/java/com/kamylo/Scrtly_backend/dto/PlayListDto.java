@@ -8,6 +8,7 @@ import java.time.LocalDate;
 public class PlayListDto {
     private Integer id;
     private String title;
+    private boolean favourite;
     private LocalDate creationDate;
     private String playListImage;
     private UserDto user;

@@ -75,6 +75,22 @@ public class PlayListServiceImplementation implements PlayListService {
     }
 
     @Override
+    public void addToFavourites(User user, Song song) {
+        PlayList favourites = findOrCreateFavouritePlayList(user);
+        if (!favourites.getSongs().contains(song)) {
+            favourites.getSongs().add(song);
+            playListRepository.save(favourites);
+        }
+    }
+
+    @Override
+    public void removeFromFavourites(User user, Song song) {
+        PlayList favourites = findOrCreateFavouritePlayList(user);
+        favourites.getSongs().remove(song);
+        playListRepository.save(favourites);
+    }
+
+    @Override
     public void removeSongFromPlayList(Long songId, Integer playListId) throws SongException, PlayListException {
         Song song = songService.findSongById(songId);
         PlayList playList = getPlayList(playListId);
@@ -105,5 +121,17 @@ public class PlayListServiceImplementation implements PlayListService {
         }
         playListRepository.deleteById(playListId);
         fileService.deleteFile(playList.getCoverImage());
+    }
+
+
+    private PlayList findOrCreateFavouritePlayList(User user) {
+        return playListRepository.findByUserAndFavourite(user, true)
+                .orElseGet(() -> {
+                    PlayList favouritePlayList = new PlayList();
+                    favouritePlayList.setUser(user);
+                    favouritePlayList.setFavourite(true);
+                    favouritePlayList.setTitle("Favourite Songs");
+                    return playListRepository.save(favouritePlayList);
+                });
     }
 }
