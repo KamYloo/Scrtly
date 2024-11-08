@@ -11,7 +11,7 @@ import {AddSongToPlayList} from "./AddSongToPlayList.jsx";
 function PlayList({ volume, onTrackChange}) {
     const {playListId} = useParams();
     const dispatch = useDispatch();
-    const {playList} = useSelector(store => store);
+    const {playList, song} = useSelector(store => store);
     const [addSong, setAddSong] = useState(false)
     //const navigate = useNavigate();
 
@@ -34,14 +34,14 @@ function PlayList({ volume, onTrackChange}) {
 
     useEffect(() => {
         dispatch(getPlayListTracks(playListId))
-    }, [playListId, playList.uploadSong, playList.deletedSong]);
+    }, [playListId, playList.uploadSong, playList.deletedSong, song.likedSong]);
 
     return (
         <div className='playListDetail'>
             <div className="topSection">
                 <img src={`${BASE_API_URL}${playList.findPlayList?.playListImage || ''}`} alt="" />
                 <div className="playListData">
-                    <p>Album</p>
+                    <p>PlayList</p>
                     <h1 className='playListName'>{playList.findPlayList?.title}</h1>
                     <p className='stats'>{playList.findPlayList?.user.fullName} • {playList.findPlayList?.totalSongs} Songs <span>• {playList.findPlayList?.creationDate} • {formatTime(playList.findPlayList?.totalDuration)}</span> </p>
                 </div>

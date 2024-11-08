@@ -22,6 +22,7 @@ public class Song {
     private String track;
     private int duration;
     private String imageSong;
+    private boolean favorite;
 
     @ManyToOne
     @JoinColumn(name = "album_id", nullable = false)

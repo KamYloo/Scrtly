@@ -8,6 +8,7 @@ public class SongDto {
     private String title;
     private String track;
     private int duration;
+    private boolean favorite;
     private String imageSong;
     private ArtistDto artist;
     private AlbumDto album;

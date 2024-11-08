@@ -1,5 +1,12 @@
 import {BASE_API_URL} from "../../config/api.js";
-import {DELETE_SONG_FAILURE, DELETE_SONG_REQUEST, SEARCH_SONG_ERROR, SEARCH_SONG_REQUEST} from "./ActionType.js";
+import {
+    DELETE_SONG_FAILURE,
+    DELETE_SONG_REQUEST, LIKE_SONG_ERROR,
+    LIKE_SONG_REQUEST,
+    SEARCH_SONG_ERROR,
+    SEARCH_SONG_REQUEST
+} from "./ActionType.js";
+import {LIKE_POST_ERROR, LIKE_POST_REQUEST} from "../Post/ActionType.js";
 
 export const deleteSong = (songId) => async (dispatch) => {
     try {
@@ -37,5 +44,25 @@ export const searchSong = (data) => async (dispatch) => {
         console.log("catch error ", error)
         dispatch({ type: SEARCH_SONG_ERROR, payload: error.message });
 
+    }
+}
+
+export const likeSong = (songId) => async (dispatch) => {
+    try {
+        const res = await fetch(`${BASE_API_URL}/api/song/${songId}/like`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify(songId)
+        })
+
+        const like = await res.json()
+        console.log("LikedSong ", like)
+        dispatch({ type: LIKE_SONG_REQUEST, payload: like })
+    } catch (error) {
+        console.log("catch error ", error)
+        dispatch({ type: LIKE_SONG_ERROR, payload: error.message });
     }
 }

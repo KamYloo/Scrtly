@@ -17,16 +17,21 @@ public class SongLikeServiceImplementation implements SongLikeService {
 
     @Override
     public SongLike likeSong(Song song, User user) {
-        SongLike songLike = songLikeRepository.findByUserAndSong(user, song)
-                .orElseGet(() -> {
-                    SongLike like = new SongLike();
-                    like.setSong(song);
-                    like.setUser(user);
-                    playListService.addToFavourites(user, song);
-                    return songLikeRepository.save(like);
-                });
-        playListService.removeFromFavourites(user, song);
-        songLikeRepository.delete(songLike);
-        return songLike;
+        SongLike existingLike = songLikeRepository.findByUserAndSong(user, song).orElse(null);
+
+        if (existingLike != null) {
+            song.setFavorite(false);
+            playListService.removeFromFavourites(user, song);
+            songLikeRepository.delete(existingLike);
+        } else {
+            song.setFavorite(true);
+            playListService.addToFavourites(user, song);
+            SongLike newLike = new SongLike();
+            newLike.setSong(song);
+            newLike.setUser(user);
+            return songLikeRepository.save(newLike);
+        }
+
+        return null;
     }
 }

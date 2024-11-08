@@ -34,7 +34,7 @@ function Artist({ volume, onTrackChange}) {
 
   useEffect(() => {
     dispatch(getArtistTracks(artistId))
-  }, [artistId, song.deletedSong]);
+  }, [artistId, song.deletedSong, song.likedSong]);
 
   return (
     <div className='mainBox'>

@@ -5,21 +5,20 @@ import { MusicPlayer } from './MusicPlayer.jsx'
 import {BASE_API_URL} from "../../config/api.js";
 import {BsTrash } from 'react-icons/bs'
 import {useDispatch, useSelector} from "react-redux";
-import {deleteSong} from "../../Redux/Song/Action.js";
+import {deleteSong, likeSong} from "../../Redux/Song/Action.js";
 import {addSongToPlayList, deleteSongFromPlayList} from "../../Redux/PlayList/Action.js";
 
 
 // eslint-disable-next-line react/prop-types
 function AudioList({ volume, onTrackChange, initialSongs , req_artist, isplayListSongs, playListId}) {
-    const [songs, setSongs] = useState(initialSongs);
-    const [song, setSong] = useState(songs[0]?.track)
-    const [img, setImage] = useState(songs[0]?.imageSong)
+    const [song, setSong] = useState(initialSongs[0]?.track)
+    const [img, setImage] = useState(initialSongs[0]?.imageSong)
     const [auto, setAuto] = useState(false);
     const [addToPlayList, setAddToPlayList] = useState(false)
     const dispatch = useDispatch();
     const {playList} = useSelector(store => store);
 
-    useEffect(() => {
+    /*useEffect(() => {
         const songs = document.querySelectorAll(".songs")
 
         function changeActive() {
@@ -28,17 +27,7 @@ function AudioList({ volume, onTrackChange, initialSongs , req_artist, isplayLis
         }
 
         songs.forEach((n) => n.addEventListener("click", changeActive))
-    }, [])
-
-
-    const changeFavourite = (id) => {
-        songs.map((song) => {
-            if (song.id === id) {
-                song.favourite = !song.favourite
-            }
-        })
-        setSongs([...songs])
-    }
+    }, [])*/
 
     const setMainSong = (songSrc, imgSrc, songName, songArtist) => {
         const encodedSongSrc = encodeURI(songSrc)
@@ -77,6 +66,10 @@ function AudioList({ volume, onTrackChange, initialSongs , req_artist, isplayLis
         dispatch(addSongToPlayList({playListId, songId}));
     }
 
+    const likeSongHandler = (songId) => {
+        dispatch(likeSong(songId));
+    }
+
     return (
         <div className='audioList'>
             <h2 className="title">
@@ -108,9 +101,9 @@ function AudioList({ volume, onTrackChange, initialSongs , req_artist, isplayLis
                                             {formatTime(song?.duration)}
                                         </p>
 
-                                        <div className="favourite" onClick={() => changeFavourite(song?.id)}>
+                                        <div className="favourite" onClick={() => likeSongHandler(song.id)}>
                                             {
-                                                song?.favourite ?
+                                                song?.favorite ?
                                                     <i><FaHeart /></i>
                                                     :
                                                     <i><FaRegHeart /></i>

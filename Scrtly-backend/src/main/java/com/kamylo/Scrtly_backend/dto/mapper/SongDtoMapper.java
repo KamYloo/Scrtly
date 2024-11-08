@@ -22,6 +22,7 @@ public class SongDtoMapper {
         songDto.setAlbum(album);
         songDto.setImageSong(song.getImageSong());
         songDto.setDuration(song.getDuration());
+        songDto.setFavorite(song.isFavorite());
         songDto.setTrack(song.getTrack());
         return songDto;
     }

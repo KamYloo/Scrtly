@@ -7,7 +7,9 @@ import com.kamylo.Scrtly_backend.model.PlayList;
 import com.kamylo.Scrtly_backend.model.Song;
 import com.kamylo.Scrtly_backend.model.User;
 import com.kamylo.Scrtly_backend.repository.PlayListRepository;
+import com.kamylo.Scrtly_backend.repository.SongLikeRepository;
 import com.kamylo.Scrtly_backend.request.PlayListRequest;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,6 +33,9 @@ public class PlayListServiceImplementation implements PlayListService {
 
     @Autowired
     private SongService songService;
+
+    @Autowired
+    private SongLikeRepository songLikeRepository;
 
     @Override
     public PlayList createPlayList(PlayListRequest playListRequest, MultipartFile playListImage) throws UserException {
@@ -111,6 +116,7 @@ public class PlayListServiceImplementation implements PlayListService {
     }
 
     @Override
+    @Transactional
     public void deletePlayList(Integer playListId, Long userId) throws PlayListException, UserException {
         PlayList playList = getPlayList(playListId);
         if (playList == null) {
@@ -119,10 +125,17 @@ public class PlayListServiceImplementation implements PlayListService {
         if (!userId.equals(playList.getUser().getId())) {
             throw new UserException("You do not have permission to delete this playlist");
         }
+
+        if (playList.isFavourite()) {
+            for (Song song : playList.getSongs()) {
+                song.setFavorite(false);
+                songLikeRepository.deleteBySong(song);
+            }
+        }
+
         playListRepository.deleteById(playListId);
         fileService.deleteFile(playList.getCoverImage());
     }
-
 
     private PlayList findOrCreateFavouritePlayList(User user) {
         return playListRepository.findByUserAndFavourite(user, true)
@@ -130,6 +143,7 @@ public class PlayListServiceImplementation implements PlayListService {
                     PlayList favouritePlayList = new PlayList();
                     favouritePlayList.setUser(user);
                     favouritePlayList.setFavourite(true);
+                    favouritePlayList.setCreationDate(LocalDate.now());
                     favouritePlayList.setTitle("Favourite Songs");
                     return playListRepository.save(favouritePlayList);
                 });

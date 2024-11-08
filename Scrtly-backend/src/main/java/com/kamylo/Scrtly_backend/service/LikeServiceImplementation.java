@@ -40,7 +40,7 @@ public class LikeServiceImplementation implements LikeService{
            return islikeExistPost;
        }
 
-        Post post = postRepository.findById(postId).get();
+       Post post = postRepository.findById(postId).get();
        Like like = new Like();
        like.setUser(user);
        like.setPost(post);

@@ -42,7 +42,7 @@ function Album({ volume, onTrackChange}) {
 
     useEffect(() => {
         dispatch(getAlbumTracks(albumId))
-    }, [albumId, album.uploadSong, song.deletedSong]);
+    }, [albumId, album.uploadSong, song.deletedSong, song.likedSong]);
 
     return (
         <div className='albumDetail'>

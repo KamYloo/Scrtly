@@ -23,7 +23,7 @@ import {Home} from "./Components/Home.jsx";
 
 function App() {
   const dispatch = useDispatch();
-  const { auth, playList } = useSelector(store => store);
+  const { auth, playList, song} = useSelector(store => store);
   const [createPlayList, setCreatePlayList] = useState(false)
 
   const [volume, setVolume] = useState(0.5)
@@ -41,7 +41,7 @@ function App() {
     if (auth.reqUser?.req_user) {
       dispatch(getUserPlayLists());
     }
-  }, [dispatch, auth.reqUser?.req_user, playList.createPlayList, playList.deletePlayList]);
+  }, [dispatch, auth.reqUser?.req_user, playList.createPlayList, playList.deletePlayList, song.likedSong]);
 
 
   const renderLayout = (Component, props) => {
