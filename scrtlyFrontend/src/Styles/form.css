@@ -30,16 +30,14 @@
     }
 }
 
-
-
-.editArtist, .createAlbum, .addSong, .createPlayList{
+.editArtist, .createAlbum, .addSong, .createPlayList, .editPost{
     display: flex;
     justify-content: center;
     flex-direction: column;
     align-items: center;
     border: 2px solid white;
     border-radius: 10px;
-    background: rgba(0, 0, 0, 0.411);
+    background: rgba(0, 0, 0, 0.9);
     width: max-content;
     height: max-content;
     padding: 30px;
@@ -96,6 +94,11 @@
 
                 .trackImg {
                     width: 70px;
+                }
+
+                .postImg {
+                    width: 240px;
+                    height: 150px;
                 }
 
                 span {
@@ -184,8 +187,8 @@
     }
 }
 
-.createPlayList {
-
+.editPost {
+    top: 0;
 }
 
 .createPlayList {

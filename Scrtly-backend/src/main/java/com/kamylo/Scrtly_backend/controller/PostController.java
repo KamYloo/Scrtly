@@ -57,6 +57,17 @@ public class PostController {
         return new ResponseEntity<>(postDto, HttpStatus.CREATED);
     }
 
+    @PutMapping("/update/{postId}")
+    public ResponseEntity<PostDto> updatePost(@PathVariable Long postId,
+                                              @RequestParam(required = false) String description,
+                                              @RequestParam(required = false) MultipartFile file,
+                                              @RequestHeader("Authorization") String token) throws UserException, PostException {
+        User user = userService.findUserProfileByJwt(token);
+        Post updatePost = postService.updatePost(postId,description,file,user.getId());
+        PostDto postDto = PostDtoMapper.toPostDto(updatePost, user);
+        return new ResponseEntity<>(postDto, HttpStatus.OK);
+    }
+
     @GetMapping("/getAll")
     public ResponseEntity<List<PostDto>> getAllPosts(@RequestHeader("Authorization") String token) throws UserException {
         User user = userService.findUserProfileByJwt(token);

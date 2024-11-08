@@ -2,10 +2,15 @@
 import {BASE_API_URL} from "../../config/api.js";
 import {
     GET_ALL_POSTS_ERROR,
-    GET_ALL_POSTS_REQUEST, GET_POSTS_BY_USERID_ERROR, GET_POSTS_BY_USERID_REQUEST, LIKE_POST_ERROR, LIKE_POST_REQUEST,
+    GET_ALL_POSTS_REQUEST,
+    GET_POSTS_BY_USERID_ERROR,
+    GET_POSTS_BY_USERID_REQUEST,
+    LIKE_POST_ERROR,
+    LIKE_POST_REQUEST,
+    POST_CREATE_ERROR,
     POST_CREATE_REQUEST,
     POST_DELETE_ERROR,
-    POST_DELETE_REQUEST
+    POST_DELETE_REQUEST, UPDATE_POST_ERROR, UPDATE_POST_REQUEST
 } from "./ActionType.js";
 
 export const createPost = (formData) => async (dispatch) => {
@@ -24,6 +29,27 @@ export const createPost = (formData) => async (dispatch) => {
         dispatch({type: POST_CREATE_REQUEST, payload: res})
     }catch(err) {
         console.log("catch error " + err)
+        dispatch({ type: POST_CREATE_ERROR, payload: err.message });
+    }
+}
+
+export const updatePost = (formData) => async (dispatch) => {
+
+    try {
+        const response = await fetch(`${BASE_API_URL}/api/posts/update/${formData.get("postId")}`,  {
+            method: 'PUT',
+            headers : {
+                Authorization: `Bearer ${localStorage.getItem('token')}`
+            },
+            body: formData
+        })
+
+        const res = await response.json()
+        console.log("Updated Post", res)
+        dispatch({type: UPDATE_POST_REQUEST, payload: res})
+    }catch(err) {
+        console.log("catch error " + err)
+        dispatch({ type: UPDATE_POST_ERROR, payload: err.message });
     }
 }
 

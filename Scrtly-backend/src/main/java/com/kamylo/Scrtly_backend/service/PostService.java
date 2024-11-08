@@ -13,7 +13,7 @@ import java.util.List;
 @Service
 public interface PostService {
     Post createPost(SendPostRequest sendPostRequest, MultipartFile postImage) throws UserException;
-    Post updatePost(Long postId) throws UserException, PostException;
+    Post updatePost(Long postId, String description, MultipartFile file, Long userId) throws UserException, PostException;
     void deletePost(Long postId, Long userId) throws UserException, PostException;
     List<Post> getAllPostsByUser(Long userId) throws UserException;
     List<Post> getAllPosts() ;

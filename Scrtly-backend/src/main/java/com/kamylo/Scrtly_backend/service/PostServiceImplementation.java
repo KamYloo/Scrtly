@@ -42,19 +42,39 @@ public class PostServiceImplementation implements PostService {
     }
 
     @Override
-    public Post updatePost(Long postId) throws UserException, PostException {
-        return null;
+    public Post updatePost(Long postId, String description, MultipartFile file, Long userId) throws UserException, PostException {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostException("Post not found with ID: " + postId));
+
+
+        if (!userId.equals(post.getUser().getId())) {
+            throw new UserException("You can't delete another user's post");
+        }
+
+        if (description != null && !description.isEmpty()) {
+            post.setDescription(description);
+        }
+
+        if (file != null && !file.isEmpty()) {
+            String imagePath = fileService.updateFile(file, post.getImage(), "/uploads/postImages");
+            post.setImage("/uploads/postImages/" + imagePath);
+        }
+
+        post.setUpdateDate(LocalDateTime.now());
+
+        return postRepository.save(post);
     }
 
     @Override
     public void deletePost(Long postId, Long userId) throws UserException, PostException {
-        Optional<Post> post = postRepository.findById(postId);
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostException("Post not found with ID: " + postId));
 
-        if (!userId.equals(post.get().getUser().getId())) {
+        if (!userId.equals(post.getUser().getId())) {
             throw new UserException("You can't delete another user's post");
         }
         postRepository.deleteById(postId);
-        fileService.deleteFile(post.get().getImage());
+        fileService.deleteFile(post.getImage());
     }
 
     @Override

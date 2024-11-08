@@ -9,12 +9,14 @@ import {deletePost, getAllPosts, likePost} from "../../Redux/Post/Action.js";
 import {BASE_API_URL} from "../../config/api.js";
 import { formatDistanceToNow } from 'date-fns'
 import {useNavigate} from "react-router-dom";
+import {EditPost} from "./EditPost.jsx";
 
 function Feed() {
   const [selectedPost, setSelectedPost] = useState(false)
   const [postDetail, setPostDetail] = useState(null)
   const [menuPost, setMenuPost] = useState(false)
   const [postsSettings, setPostsSettings] = useState(false)
+  const [editPost, setEditPost] = useState(false)
   const [filter, setFilter] = useState('')
   const [sortOrder, setSortOrder] = useState('date')
 
@@ -29,6 +31,12 @@ function Feed() {
   const togglePost = (post = null) => {
     setPostDetail(post)
     setSelectedPost((prev) => !prev);
+  };
+
+  const toggleEditPost = (post = null) => {
+    setPostDetail(post)
+    setEditPost((prev) => !prev);
+    setMenuPost(false)
   };
 
   const handleMenuToggle = (postId) => {
@@ -112,10 +120,13 @@ function Feed() {
                       <i onClick={() => handleMenuToggle(item.id)}><FaEllipsisH/></i>
                       {menuPost === item.id && (
                           <ul className="list">
-                            <li className="option">
+                            <li className="option" onClick={()=> toggleEditPost(item)}>
                               <span>Edit</span>
                             </li>
-                            <li className="option" onClick={() => handleDeletePost(item.id)}>
+                            <li className="option" onClick={() => {
+                              handleDeletePost(item.id)
+                              setMenuPost(false)
+                            }}>
                               <span>Delete</span>
                             </li>
                           </ul>
@@ -144,6 +155,7 @@ function Feed() {
             </div>))}
 
       </div>
+      {editPost && <EditPost post={postDetail} onClose={() => setEditPost(((prev) => !prev))}/>}
       {selectedPost && <Post post={postDetail} onClose={togglePost}/>}
     </div>
   )
