@@ -58,7 +58,7 @@
             gap: 2vh;
             align-items: flex-end;
 
-            .addSongBtn, .deleteAlbumBtn {
+            .addSongBtn, .deleteAlbumBtn, .editPlayListBtn {
                 width: 10vh;
                 height: 4vh;
                 text-align: center;
@@ -74,11 +74,11 @@
                 transition: 0.3s;
             }
 
-            .deleteAlbumBtn {
+            .deleteAlbumBtn, .editPlayListBtn {
                 height: 5vh;
             }
 
-            .addSongBtn:hover, .delteAlbumBtn:hover {
+            .addSongBtn:hover, .deleteAlbumBtn:hover, .editPlayListBtn:hover {
                 background: rgb(4, 214, 214);
             }
         }

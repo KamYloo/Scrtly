@@ -6,9 +6,11 @@ import {useDispatch, useSelector} from "react-redux";
 import {BASE_API_URL} from "../../config/api.js";
 import {getPlayList, getPlayListTracks} from "../../Redux/PlayList/Action.js";
 import {AddSongToPlayList} from "./AddSongToPlayList.jsx";
+import {PlayListForm} from "./PlayListForm.jsx";
 
 // eslint-disable-next-line react/prop-types
 function PlayList({ volume, onTrackChange}) {
+    const [editPlayList, setEditPlayList] = useState(false)
     const {playListId} = useParams();
     const dispatch = useDispatch();
     const {playList, song} = useSelector(store => store);
@@ -45,13 +47,16 @@ function PlayList({ volume, onTrackChange}) {
                     <h1 className='playListName'>{playList.findPlayList?.title}</h1>
                     <p className='stats'>{playList.findPlayList?.user.fullName} • {playList.findPlayList?.totalSongs} Songs <span>• {playList.findPlayList?.creationDate} • {formatTime(playList.findPlayList?.totalDuration)}</span> </p>
                 </div>
-                    <div className="buttons">
-                        <button className="addSongBtn" onClick={() =>
-                            setAddSong(((prev) => !prev))}>Add Song</button>
-                    </div>
+                <div className="buttons">
+                    <button className="addSongBtn" onClick={() =>
+                        setAddSong(((prev) => !prev))}>Add Song
+                    </button>
+                    <button className="editPlayListBtn" onClick={()=> setEditPlayList((prev) => !prev)}>Update</button>
+                </div>
             </div>
             <AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={playList?.songs} isplayListSongs={true} playListId={playListId}/>
             {addSong && <AddSongToPlayList onClose={() => setAddSong(((prev) => !prev))} playListId={playListId} />}
+            {editPlayList && <PlayListForm onClose={() => setEditPlayList((prev) => !prev)} isEdit={playList.findPlayList} />}
         </div>
     )
 }

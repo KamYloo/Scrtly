@@ -10,7 +10,7 @@ import {
     GET_PLAYLIST_TRACK_ERROR,
     GET_PLAYLIST_TRACKS_REQUEST,
     GET_USER_PLAYLISTS_ERROR,
-    GET_USER_PLAYLISTS_REQUEST,
+    GET_USER_PLAYLISTS_REQUEST, UPDATE_PLAYLIST_ERROR, UPDATE_PLAYLIST_REQUEST,
     UPLOAD_SONG_TO_PLAYLIST_ERROR,
     UPLOAD_SONG_TO_PLAYLIST_REQUEST
 } from "./ActionType.js";
@@ -49,6 +49,13 @@ export const addSongToPlayList = (data) => async (dispatch) => {
 export const deleteSongFromPlayList = (data) => async (dispatch) => {
     await dispatchAction(dispatch, DELETE_SONG_FROM_PLAYLIST_REQUEST, DELETE_SONG_FROM_PLAYLIST_ERROR, `/api/playLists/${data.playListId}/deleteSong/${data.songId}`, {
         method: 'DELETE',
+    });
+}
+
+export const updatePlayList = (formData) => async (dispatch) => {
+    await dispatchAction(dispatch, UPDATE_PLAYLIST_REQUEST, UPDATE_PLAYLIST_ERROR, `/api/playLists/update/${formData.get("playListId")}`, {
+        method: 'PUT',
+        body: formData
     });
 }
 

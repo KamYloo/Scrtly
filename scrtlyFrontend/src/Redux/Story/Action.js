@@ -14,7 +14,7 @@ export const createStory = (formData) => async (dispatch) => {
 }
 
 export const getFollowedUsersStory = () => async (dispatch) => {
-    await dispatchAction(dispatch, GET_USERS_FOLLOWED_STORY_REQUEST, GET_USERS_FOLLOWED_STORY_ERROR, '/api/stories/followed`', {
+    await dispatchAction(dispatch, GET_USERS_FOLLOWED_STORY_REQUEST, GET_USERS_FOLLOWED_STORY_ERROR, '/api/stories/followed', {
         method: 'GET',
     });
 }

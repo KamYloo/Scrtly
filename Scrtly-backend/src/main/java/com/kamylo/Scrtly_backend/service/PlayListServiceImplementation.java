@@ -116,6 +116,25 @@ public class PlayListServiceImplementation implements PlayListService {
     }
 
     @Override
+    public PlayList updatePlayList(Integer playListId, String title, Long userId, MultipartFile playListImage) throws PlayListException, UserException {
+       PlayList playList = getPlayList(playListId);
+
+       if (!userId.equals(playList.getUser().getId())) {
+           throw new UserException("User does not have permission to update playlist");
+       }
+
+       if (title != null && !title.isEmpty()) {
+           playList.setTitle(title);
+       }
+
+        if (playListImage != null && !playListImage.isEmpty()) {
+            String imagePath = fileService.updateFile(playListImage, playList.getCoverImage(), "/uploads/playListImages");
+            playList.setCoverImage("/uploads/playListImages/" + imagePath);
+        }
+        return playListRepository.save(playList);
+    }
+
+    @Override
     @Transactional
     public void deletePlayList(Integer playListId, Long userId) throws PlayListException, UserException {
         PlayList playList = getPlayList(playListId);

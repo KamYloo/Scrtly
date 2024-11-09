@@ -101,6 +101,17 @@ public class PlayListController {
         }
     }
 
+    @PutMapping("/update/{playListId}")
+    public ResponseEntity<PlayListDto> updatePlayList(@PathVariable Integer playListId,
+                                              @RequestParam(required = false) String title,
+                                              @RequestParam(required = false) MultipartFile file,
+                                              @RequestHeader("Authorization") String token) throws UserException, PlayListException {
+        User user = userService.findUserProfileByJwt(token);
+        PlayList updatePlayList = playListService.updatePlayList(playListId, title, user.getId(), file);
+        PlayListDto playListDto = PlayListDtoMapper.toPlayListDto(updatePlayList);
+        return new ResponseEntity<>(playListDto, HttpStatus.OK);
+    }
+
     @DeleteMapping("/delete/{playListId}")
     public ResponseEntity<ApiResponse> deletePlayListHandler(@PathVariable Integer playListId, @RequestHeader("Authorization") String token) throws UserException {
         User user = userService.findUserProfileByJwt(token);

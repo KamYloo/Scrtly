@@ -24,6 +24,6 @@ public interface PlayListService {
     void removeFromFavourites(User user, Song song);
     void removeSongFromPlayList(Long songId, Integer playListId) throws SongException, PlayListException;
     Set<Song> getPlayListTracks (Integer playListId) throws PlayListException;
+    PlayList updatePlayList(Integer playListId, String title, Long userId, MultipartFile playListImage) throws PlayListException, UserException;
     void deletePlayList(Integer playListId, Long userId) throws PlayListException, UserException;
-
 }

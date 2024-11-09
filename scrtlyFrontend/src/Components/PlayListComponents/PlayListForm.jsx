@@ -1,12 +1,13 @@
 import React, {useEffect, useState} from 'react'
 import {MdCancel} from "react-icons/md";
 import {useDispatch} from "react-redux";
-import {createPlayList} from "../../Redux/PlayList/Action.js";
+import {createPlayList, updatePlayList} from "../../Redux/PlayList/Action.js";
+import {BASE_API_URL} from "../../config/api.js";
 
-function AddPlayList({onClose}) {
-    const [title, setTitle] = useState()
+function PlayListForm({onClose, isEdit}) {
+    const [title, setTitle] = useState(isEdit?.title || "")
     const [playListImg, setPlayListImg] = useState(null)
-    const [preview, setPreview] = useState('');
+    const [preview, setPreview] = useState(isEdit?.playListImage ? `${BASE_API_URL}${isEdit.playListImage}` : '');
     const dispatch = useDispatch()
 
 
@@ -14,11 +15,16 @@ function AddPlayList({onClose}) {
         setPlayListImg(e.target.files[0])
     };
 
-    const createPlayListHandler = () => {
+    const playListHandler = () => {
         const formData = new FormData()
         formData.append('file', playListImg)
         formData.append('title', title)
-        dispatch(createPlayList(formData))
+        if (isEdit) {
+            formData.append("playListId", isEdit?.id)
+            dispatch(updatePlayList(formData))
+        } else {
+            dispatch(createPlayList(formData))
+        }
         setPlayListImg(null)
         onClose()
     }
@@ -37,9 +43,9 @@ function AddPlayList({onClose}) {
         <div className='createPlayList'>
             <i className='cancel' onClick={onClose}><MdCancel/></i>
             <div className="title">
-                <h2>Create PlayList</h2>
+                <h2>{isEdit ? "Edit PlayList" : "Create PlayList"}</h2>
             </div>
-            <form onSubmit={createPlayListHandler}>
+            <form onSubmit={playListHandler}>
                 <div className="editPic">
                     <div className="left">
                         <img className="trackImg" src={preview} alt=""/>
@@ -63,4 +69,4 @@ function AddPlayList({onClose}) {
     )
 }
 
-export {AddPlayList}
+export {PlayListForm}

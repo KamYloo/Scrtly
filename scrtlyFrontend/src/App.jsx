@@ -16,7 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { currentUser } from "./Redux/Auth/Action.js";
 import {AlbumsView} from "./Components/AlbumComponents/AlbumsView.jsx";
 import {Album} from "./Components/AlbumComponents/Album.jsx";
-import {AddPlayList} from "./Components/PlayListComponents/AddPlayList.jsx";
+import {PlayListForm} from "./Components/PlayListComponents/PlayListForm.jsx";
 import {getUserPlayLists} from "./Redux/PlayList/Action.js";
 import {PlayList} from "./Components/PlayListComponents/PlayList.jsx";
 import {Home} from "./Components/Home.jsx";
@@ -52,7 +52,7 @@ function App() {
         <LeftMenu onVolumeChange={setVolume} currentTrack={currentTrack} setCreatePlayList={setCreatePlayList} />
         <Component volume={volume} onTrackChange={handleTrackChange}/>
         <RightMenu/>
-        {createPlayList && <AddPlayList onClose={() => setCreatePlayList(((prev) => !prev))} />}
+        {createPlayList && <PlayListForm onClose={() => setCreatePlayList(((prev) => !prev))} />}
         <div className="background"></div>
       </div>
     )
