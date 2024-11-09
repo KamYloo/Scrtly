@@ -1,14 +1,18 @@
-import { BASE_API_URL } from "../../config/api"
+import {BASE_API_URL, dispatchAction} from "../../config/api"
 import {
     REGISTER,
     LOGIN,
     REQUEST_USER,
-    SEARCH_USER,
-    UPDATE_USER,
     LOGOUT,
     FIND_USER_BY_ID_REQUEST,
-    FIND_USER_BY_ID_ERROR, FOLLOW_USER_REQUEST, FOLLOW_USER_ERROR
+    FIND_USER_BY_ID_ERROR,
+    FOLLOW_USER_REQUEST,
+    FOLLOW_USER_ERROR,
+    SEARCH_USER_REQUEST,
+    SEARCH_USER_ERROR,
+    UPDATE_USER_REQUEST, UPDATE_USER_ERROR, REQUEST_USER_ERROR
 } from "./ActionType"
+
 
 export const register = (data) => async (dispatch) => {
     try {
@@ -50,111 +54,34 @@ export const login = (data) => async (dispatch) => {
 }
 
 export const currentUser = () => async (dispatch) => {
-    try {
-        const res = await fetch(`${BASE_API_URL}/api/users/profile`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
-        })
-
-        const resData = await res.json()
-        console.log("usersProfile ", resData)
-        dispatch({ type: REQUEST_USER, payload: resData })
-    } catch (error) {
-        console.log("catch error ", error)
-    }
+    await dispatchAction(dispatch, REQUEST_USER, REQUEST_USER_ERROR, `/api/users/profile`, {
+        method: 'GET',
+    });
 }
 
 export const findUserById = (userId) => async (dispatch) => {
-    try {
-        const res = await fetch(`${BASE_API_URL}/api/users/${userId}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem('token')}`
-            },
-        })
-
-        const resData = await res.json()
-        console.log("Find user ", resData)
-        dispatch({ type: FIND_USER_BY_ID_REQUEST, payload: resData })
-    } catch (error) {
-        console.log("catch error ", error)
-        dispatch({ type: FIND_USER_BY_ID_ERROR, payload: error.message });
-    }
+    await dispatchAction(dispatch, FIND_USER_BY_ID_REQUEST, FIND_USER_BY_ID_ERROR, `/api/users/${userId}`, {
+        method: 'GET',
+    });
 }
 
 export const followUser = (userId) => async (dispatch) => {
-    try {
-        const res = await fetch(`${BASE_API_URL}/api/users/${userId}/follow`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem('token')}`
-            },
-        })
-
-        const resData = await res.json()
-        console.log("followUser ", resData)
-        dispatch({ type: FOLLOW_USER_REQUEST, payload: resData })
-    } catch (error) {
-        console.log("catch error ", error)
-        dispatch({ type: FOLLOW_USER_ERROR, payload: error.message });
-    }
+    await dispatchAction(dispatch, FOLLOW_USER_REQUEST, FOLLOW_USER_ERROR, `/api/users/${userId}/follow`, {
+        method: 'PUT',
+    });
 }
 
 export const searchUser = (data) => async (dispatch) => {
-    try {
-        const res = await fetch(`${BASE_API_URL}/api/users/search?name=${data.keyword}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem('token')}`
-            },
-        })
-
-        const resData = await res.json()
-        console.log("searchUser ", resData)
-        if (res.ok) {
-            dispatch({ type: SEARCH_USER, payload: resData });
-        } else {
-            console.error("API returned an error:", resData);
-        }
-    } catch (error) {
-        console.log("catch error ", error)
-    }
+    await dispatchAction(dispatch, SEARCH_USER_REQUEST, SEARCH_USER_ERROR, `/api/users/search?name=${data.keyword}`, {
+        method: 'GET',
+    });
 }
 
-export const updateUser = (data) => async (dispatch) => {
-    try {
-        const formData = new FormData();
-        formData.append("fullName", data.data.fullName);
-        if (data.data.profilePicture) {
-            formData.append("profilePicture", data.data.profilePicture);
-        }else {
-
-            formData.append("profilePicture", null);
-        }
-        formData.append("description", data.data.description);
-
-        console.log(data.data.description)
-
-        const res = await fetch(`${BASE_API_URL}/api/users/update`, {
-            method: "PUT",
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`
-            },
-            body: formData
-        })
-
-        const resData = await res.json()
-        console.log("updateUser ", resData)
-        dispatch({ type: UPDATE_USER, payload: resData })
-    } catch (error) {
-        console.log("catch error ", error)
-    }
+export const updateUser = (formData) => async (dispatch) => {
+    await dispatchAction(dispatch, UPDATE_USER_REQUEST, UPDATE_USER_ERROR, '/api/users/update', {
+        method: 'PUT',
+        body: formData
+    });
 }
 
 export const logoutAction = () => async (dispatch) => {

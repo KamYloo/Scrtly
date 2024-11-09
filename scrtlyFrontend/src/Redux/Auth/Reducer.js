@@ -4,8 +4,8 @@ import {
     LOGIN,
     REGISTER,
     REQUEST_USER,
-    SEARCH_USER,
-    UPDATE_USER
+    SEARCH_USER_REQUEST,
+    UPDATE_USER_REQUEST
 } from "./ActionType.js";
 
 const initialValue= {
@@ -27,10 +27,10 @@ export const authReducer=(store=initialValue, {type,payload})=>{
     else if (type === REQUEST_USER) {
         return {...store, reqUser: payload}
     }
-    else if (type === UPDATE_USER) {
+    else if (type === UPDATE_USER_REQUEST) {
         return {...store, reqUser: payload}
     }
-    else if (type === SEARCH_USER) {
+    else if (type === SEARCH_USER_REQUEST) {
         return {...store, searchResults: payload}
     }
     else if (type === FIND_USER_BY_ID_REQUEST) {

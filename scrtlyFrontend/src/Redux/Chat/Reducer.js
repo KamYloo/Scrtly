@@ -1,4 +1,4 @@
-import {CREATE_CHAT, DELETE_CHAT_REQUEST, GET_USERS_CHAT} from "./ActionType.js";
+import {CREATE_CHAT_REQUEST, DELETE_CHAT_REQUEST, GET_USERS_CHAT_REQUEST} from "./ActionType.js";
 
 const initialValues = {
     chats:[],
@@ -8,10 +8,10 @@ const initialValues = {
 
 export const chatReducer = (store=initialValues,{type,payload}) => {
 
-    if (type === CREATE_CHAT) {
+    if (type === CREATE_CHAT_REQUEST) {
         return {...store, createdChat: payload}
     }
-    else if (type === GET_USERS_CHAT) {
+    else if (type === GET_USERS_CHAT_REQUEST) {
         return {...store, chats: payload}
     }
     else if (type === DELETE_CHAT_REQUEST) {

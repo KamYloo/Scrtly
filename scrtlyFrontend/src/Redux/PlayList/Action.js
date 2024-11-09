@@ -1,4 +1,4 @@
-import {BASE_API_URL} from "../../config/api.js";
+import {dispatchAction} from "../../config/api.js";
 import {
     CREATE_PLAYLIST_ERROR,
     CREATE_PLAYLIST_REQUEST, DELETE_PLAYLIST_ERROR,
@@ -16,136 +16,44 @@ import {
 } from "./ActionType.js";
 
 export const createPlayList = (formData) => async (dispatch) => {
-
-    try {
-        const response = await fetch(`${BASE_API_URL}/api/playLists/create`,  {
-            method: 'POST',
-            headers : {
-                Authorization: `Bearer ${localStorage.getItem('token')}`
-            },
-            body: formData
-        })
-
-        const playList = await response.json()
-        console.log("created PlayList", playList)
-        dispatch({type: CREATE_PLAYLIST_REQUEST, payload: playList})
-    }catch(err) {
-        console.log("catch error " + err)
-        dispatch({ type: CREATE_PLAYLIST_ERROR, payload: err.message });
-    }
+    await dispatchAction(dispatch, CREATE_PLAYLIST_REQUEST, CREATE_PLAYLIST_ERROR, '/api/playLists/create', {
+        method: 'POST',
+        body: formData
+    });
 }
 
 export const getUserPlayLists = () => async (dispatch) => {
-    try {
-        const response = await fetch(`${BASE_API_URL}/api/playLists/user`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
-        });
-        const playLists = await response.json();
-        console.log("getUserPlayLists", playLists);
-        dispatch({ type: GET_USER_PLAYLISTS_REQUEST, payload: playLists });
-    } catch (error) {
-        console.log('catch error', error);
-        dispatch({ type: GET_USER_PLAYLISTS_ERROR, payload: error.message });
-    }
+    await dispatchAction(dispatch, GET_USER_PLAYLISTS_REQUEST, GET_USER_PLAYLISTS_ERROR, '/api/playLists/user', {
+        method: 'GET',
+    });
 };
 
 export const getPlayList = (playListId) => async (dispatch) => {
-    try {
-        const res = await fetch(`${BASE_API_URL}/api/playLists/${playListId}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem('token')}`
-            },
-        })
-
-        const resData = await res.json()
-        console.log("Find PlayList ", resData)
-        dispatch({ type: GET_PLAYLIST_REQUEST, payload: resData })
-    } catch (error) {
-        console.log("catch error ", error)
-        dispatch({ type: GET_PLAYLIST_ERROR, payload: error.message });
-    }
+    await dispatchAction(dispatch, GET_PLAYLIST_REQUEST, GET_PLAYLIST_ERROR, `/api/playLists/${playListId}`, {
+        method: 'GET',
+    });
 }
 
 export const getPlayListTracks = (playListId) => async (dispatch) => {
-    try {
-        const res = await fetch(`${BASE_API_URL}/api/playLists/${playListId}/tracks`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem('token')}`
-            },
-        })
-
-        const resData = await res.json()
-        console.log("Find tracks ", resData)
-        dispatch({ type: GET_PLAYLIST_TRACKS_REQUEST, payload: resData })
-    } catch (error) {
-        console.log("catch error ", error)
-        dispatch({ type: GET_PLAYLIST_TRACK_ERROR, payload: error.message });
-    }
+    await dispatchAction(dispatch, GET_PLAYLIST_TRACKS_REQUEST, GET_PLAYLIST_TRACK_ERROR, `/api/playLists/${playListId}/tracks`, {
+        method: 'GET',
+    });
 }
 
 export const addSongToPlayList = (data) => async (dispatch) => {
-    try {
-        const res = await fetch(`${BASE_API_URL}/api/playLists/${data.playListId}/addSong/${data.songId}`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem('token')}`
-            },
-            body: JSON.stringify(data),
-        })
-
-        const resData = await res.json()
-        console.log("addSongToPlayList ", resData)
-        dispatch({ type: UPLOAD_SONG_TO_PLAYLIST_REQUEST, payload: resData })
-    } catch (error) {
-        console.log("catch error ", error)
-        dispatch({ type: UPLOAD_SONG_TO_PLAYLIST_ERROR, payload: error.message });
-    }
+    await dispatchAction(dispatch, UPLOAD_SONG_TO_PLAYLIST_REQUEST, UPLOAD_SONG_TO_PLAYLIST_ERROR, `/api/playLists/${data.playListId}/addSong/${data.songId}`, {
+        method: 'PUT',
+    });
 }
 
 export const deleteSongFromPlayList = (data) => async (dispatch) => {
-    try {
-        const res = await fetch(`${BASE_API_URL}/api/playLists/${data.playListId}/deleteSong/${data.songId}`, {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem('token')}`
-            },
-            body: JSON.stringify(data),
-        })
-
-        const resData = await res.json()
-        console.log("deleteSongFromPlayList ", resData)
-        dispatch({ type: DELETE_SONG_FROM_PLAYLIST_REQUEST, payload: resData })
-    } catch (error) {
-        console.log("catch error ", error)
-        dispatch({ type: DELETE_SONG_FROM_PLAYLIST_ERROR, payload: error.message });
-    }
+    await dispatchAction(dispatch, DELETE_SONG_FROM_PLAYLIST_REQUEST, DELETE_SONG_FROM_PLAYLIST_ERROR, `/api/playLists/${data.playListId}/deleteSong/${data.songId}`, {
+        method: 'DELETE',
+    });
 }
 
 export const deletePlayList = (playListId) => async (dispatch) => {
-    try {
-        const response = await fetch(`${BASE_API_URL}/api/playLists/delete/${playListId}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            },
-        });
-
-        const res = await response.json();
-        console.log("Deleted Album", res)
-        dispatch({ type: DELETE_PLAYLIST_REQUEST, payload: res });
-    } catch (error) {
-        console.log('catch error', error);
-        dispatch({ type: DELETE_PLAYLIST_ERROR, payload: error.message });
-    }
+    await dispatchAction(dispatch, DELETE_PLAYLIST_REQUEST, DELETE_PLAYLIST_ERROR, `/api/playLists/delete/${playListId}`, {
+        method: 'DELETE',
+    });
 };

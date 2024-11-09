@@ -20,7 +20,12 @@ function ProfileEdit() {
   };
 
   const handleSubmit = () => {
-    dispatch(updateUser({data:{fullName: fullName, profilePicture:profilePicture, description:description.trim() || ""}}))
+    const formData = new FormData();
+    formData.append("fullName", fullName);
+    formData.append("profilePicture", profilePicture);
+    formData.append("description", description);
+
+    dispatch(updateUser(formData))
     navigate(`/profile/${auth.reqUser.id}?reload=true`)
   }
 

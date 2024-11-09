@@ -1,5 +1,4 @@
-
-import {BASE_API_URL} from "../../config/api.js";
+import {dispatchAction} from "../../config/api.js";
 import {
     GET_ALL_POSTS_ERROR,
     GET_ALL_POSTS_REQUEST,
@@ -14,119 +13,39 @@ import {
 } from "./ActionType.js";
 
 export const createPost = (formData) => async (dispatch) => {
-
-    try {
-        const response = await fetch(`${BASE_API_URL}/api/posts/create`,  {
-            method: 'POST',
-            headers : {
-                Authorization: `Bearer ${localStorage.getItem('token')}`
-            },
-            body: formData
-        })
-
-        const res = await response.json()
-        console.log("created Post", res)
-        dispatch({type: POST_CREATE_REQUEST, payload: res})
-    }catch(err) {
-        console.log("catch error " + err)
-        dispatch({ type: POST_CREATE_ERROR, payload: err.message });
-    }
+    await dispatchAction(dispatch, POST_CREATE_REQUEST, POST_CREATE_ERROR, '/api/posts/create', {
+        method: 'POST',
+        body: formData
+    });
 }
 
 export const updatePost = (formData) => async (dispatch) => {
-
-    try {
-        const response = await fetch(`${BASE_API_URL}/api/posts/update/${formData.get("postId")}`,  {
-            method: 'PUT',
-            headers : {
-                Authorization: `Bearer ${localStorage.getItem('token')}`
-            },
-            body: formData
-        })
-
-        const res = await response.json()
-        console.log("Updated Post", res)
-        dispatch({type: UPDATE_POST_REQUEST, payload: res})
-    }catch(err) {
-        console.log("catch error " + err)
-        dispatch({ type: UPDATE_POST_ERROR, payload: err.message });
-    }
+    await dispatchAction(dispatch, UPDATE_POST_REQUEST, UPDATE_POST_ERROR, `/api/posts/update/${formData.get("postId")}`, {
+        method: 'PUT',
+        body: formData
+    });
 }
 
 export const getAllPosts = () => async (dispatch) => {
-    try {
-        const response = await fetch(`${BASE_API_URL}/api/posts/getAll`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
-        });
-
-
-        const posts = await response.json();
-        console.log("getAllPosts", posts);
-        dispatch({ type: GET_ALL_POSTS_REQUEST, payload: posts });
-    } catch (error) {
-        console.log('catch error', error);
-        dispatch({ type: GET_ALL_POSTS_ERROR, payload: error.message });
-    }
+    await dispatchAction(dispatch, GET_ALL_POSTS_REQUEST, GET_ALL_POSTS_ERROR, '/api/posts/getAll', {
+        method: 'GET',
+    });
 };
 
 export const getPostsByUser = (userId) => async (dispatch) => {
-    try {
-        const res = await fetch(`${BASE_API_URL}/api/posts/all/${userId}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem('token')}`
-            },
-        })
-
-        const posts = await res.json()
-        console.log("userPosts ", posts)
-        dispatch({ type: GET_POSTS_BY_USERID_REQUEST, payload: posts })
-    } catch (error) {
-        console.log("catch error ", error)
-        dispatch({ type: GET_POSTS_BY_USERID_ERROR, payload: error.message });
-    }
+    await dispatchAction(dispatch, GET_POSTS_BY_USERID_REQUEST, GET_POSTS_BY_USERID_ERROR, `/api/posts/all/${userId}`, {
+        method: 'GET',
+    });
 }
 
 export const likePost = (postId) => async (dispatch) => {
-    try {
-        const res = await fetch(`${BASE_API_URL}/api/post/${postId}/like`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem('token')}`
-            },
-            body: JSON.stringify(postId)
-        })
-
-        const like = await res.json()
-        console.log("LikedPost ", like)
-        dispatch({ type: LIKE_POST_REQUEST, payload: like })
-    } catch (error) {
-        console.log("catch error ", error)
-        dispatch({ type: LIKE_POST_ERROR, payload: error.message });
-    }
+    await dispatchAction(dispatch, LIKE_POST_REQUEST, LIKE_POST_ERROR, `/api/post/${postId}/like`, {
+        method: 'POST',
+    });
 }
 
 export const deletePost = (postId) => async (dispatch) => {
-    try {
-        const response = await fetch(`${BASE_API_URL}/api/posts/delete/${postId}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            },
-        });
-
-        const res = await response.json();
-        console.log("Deleted Post", res)
-        dispatch({ type: POST_DELETE_REQUEST, payload: res });
-    } catch (error) {
-        console.log('catch error', error);
-        dispatch({ type: POST_DELETE_ERROR, payload: error.message });
-    }
+    await dispatchAction(dispatch, POST_DELETE_REQUEST, POST_DELETE_ERROR, `/api/posts/delete/${postId}`, {
+        method: 'DELETE',
+    });
 };
