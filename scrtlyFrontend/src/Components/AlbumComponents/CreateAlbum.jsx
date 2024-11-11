@@ -2,6 +2,8 @@ import React, {useEffect, useState} from 'react'
 import {MdCancel} from "react-icons/md";
 import {useDispatch} from "react-redux";
 import {createAlbum} from "../../Redux/Album/Action.js";
+import {deleteSong} from "../../Redux/Song/Action.js";
+import toast from "react-hot-toast";
 
 function CreateAlbum({onClose}) {
     const [title, setTitle] = useState()
@@ -13,14 +15,26 @@ function CreateAlbum({onClose}) {
         setAlbumImg(e.target.files[0])
     };
 
-    const createAlbumHandler = () => {
-        const formData = new FormData()
-        formData.append('file', albumImg)
-        formData.append('title', title)
+    const createAlbumHandler = (event) => {
+        event.preventDefault()
+        const formData = new FormData();
+        formData.append('file', albumImg);
+        formData.append('title', title);
+
         dispatch(createAlbum(formData))
-        setAlbumImg(null)
-        onClose()
-    }
+            .then(() => {
+                toast.success('Album created successfully.');
+            })
+            .catch(() => {
+                toast.error('Failed to create album. Please try again.');
+            })
+            .finally(() => {
+                setAlbumImg(null);
+                setTitle(null);
+                onClose();
+            });
+    };
+
 
     useEffect(() => {
         if (albumImg) {

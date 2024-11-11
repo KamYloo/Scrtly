@@ -1,22 +1,33 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import { FaPlus } from 'react-icons/fa'
 import { BsMusicNoteList, BsTrash } from 'react-icons/bs'
 import {useDispatch, useSelector} from "react-redux";
 import {useNavigate} from "react-router-dom";
-import {deletePlayList} from "../../Redux/PlayList/Action.js";
+import {deletePlayList, getUserPlayLists} from "../../Redux/PlayList/Action.js";
+import toast from "react-hot-toast";
 
 function MenuPlayList({setCreatePlayList}) {
     const dispatch = useDispatch();
-    const { playList} = useSelector(store => store);
     const navigate = useNavigate();
+    const { auth, playList, song} = useSelector(store => store);
 
     const deletePlayListHandler = (playListId) => {
         const confirmDelete = window.confirm('Are you sure you want to delete this playList?');
         if (confirmDelete) {
-            dispatch(deletePlayList(playListId))
-            navigate('/home')
+            dispatch(deletePlayList(playListId)).then(() => {
+                toast.success('Playlist deleted successfully.');
+                navigate('/home')
+            }).catch(() => {
+                toast.error('Failed to delete playlist. Please try again.');
+            });
         }
     }
+
+    useEffect(() => {
+        if (auth.reqUser?.req_user) {
+            dispatch(getUserPlayLists());
+        }
+    }, [dispatch, auth.reqUser?.req_user, playList.createPlayList, playList.deletePlayList, song.likedSong]);
 
     return (
         <div className='playListBox'>

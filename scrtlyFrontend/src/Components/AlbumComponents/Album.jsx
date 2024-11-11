@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react'
+import toast from 'react-hot-toast';
 import "../../Styles/Album&&PlayList.css"
 import { AudioList } from '../SongComponents/AudioList.jsx'
 import {useNavigate, useParams} from "react-router-dom";
@@ -18,8 +19,12 @@ function Album({ volume, onTrackChange}) {
     const albumDeleteHandler = () => {
         const confirmDelete = window.confirm('Are you sure you want to delete this album?');
         if (confirmDelete) {
-            dispatch(deleteAlbum(albumId));
-            navigate("/albums")
+            dispatch(deleteAlbum(albumId)).then(() => {
+                toast.success('Album deleted successfully.');
+                navigate("/albums");
+            }).catch(() => {
+                toast.error('Failed to delete album. Please try again.');
+            });
         }
     };
 

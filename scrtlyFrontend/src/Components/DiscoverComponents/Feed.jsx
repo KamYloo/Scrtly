@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react'
+import toast from 'react-hot-toast';
 import {AiFillLike, AiOutlineLike} from "react-icons/ai";
 import { TfiCommentAlt } from "react-icons/tfi";
 import { FaEllipsisH } from "react-icons/fa";
@@ -50,7 +51,11 @@ function Feed() {
   const handleDeletePost = (postId) => {
     const confirmDelete = window.confirm('Are you sure you want to delete this post?');
     if (confirmDelete) {
-      dispatch(deletePost(postId));
+      dispatch(deletePost(postId)).then(() => {
+        toast.success('Post deleted successfully.');
+      }).catch(() => {
+        toast.error('Failed to delete post. Please try again.');
+      });
     }
   };
 

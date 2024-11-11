@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { FaHeadphones, FaHeart, FaRegClock, FaRegHeart } from 'react-icons/fa'
 import { FaRegSquarePlus } from "react-icons/fa6";
 import { MusicPlayer } from './MusicPlayer.jsx'
@@ -7,6 +7,7 @@ import {BsTrash } from 'react-icons/bs'
 import {useDispatch, useSelector} from "react-redux";
 import {deleteSong, likeSong} from "../../Redux/Song/Action.js";
 import {addSongToPlayList, deleteSongFromPlayList} from "../../Redux/PlayList/Action.js";
+import toast from "react-hot-toast";
 
 
 // eslint-disable-next-line react/prop-types
@@ -17,17 +18,6 @@ function AudioList({ volume, onTrackChange, initialSongs , req_artist, isplayLis
     const [addToPlayList, setAddToPlayList] = useState(false)
     const dispatch = useDispatch();
     const {playList} = useSelector(store => store);
-
-    /*useEffect(() => {
-        const songs = document.querySelectorAll(".songs")
-
-        function changeActive() {
-            songs.forEach((n) => n.classList.remove("active"))
-            this.classList.add("active")
-        }
-
-        songs.forEach((n) => n.addEventListener("click", changeActive))
-    }, [])*/
 
     const setMainSong = (songSrc, imgSrc, songName, songArtist) => {
         const encodedSongSrc = encodeURI(songSrc)
@@ -51,14 +41,22 @@ function AudioList({ volume, onTrackChange, initialSongs , req_artist, isplayLis
     const songDeleteFromAlbumHandler = (songId) => {
         const confirmDelete = window.confirm('Are you sure you want to delete this song?');
         if (confirmDelete) {
-            dispatch(deleteSong(songId));
+            dispatch(deleteSong(songId)).then(() => {
+                toast.success('Song deleted successfully.');
+            }).catch(() => {
+                toast.error('Failed to delete Song. Please try again.');
+            });
         }
     };
 
     const songDeleteFromPlayListHandler = (songId) => {
         const confirmDelete = window.confirm('Are you sure you want to delete this song?');
         if (confirmDelete) {
-            dispatch(deleteSongFromPlayList({playListId, songId}));
+            dispatch(deleteSongFromPlayList({playListId, songId})).then(() => {
+                toast.success('Song deleted successfully.');
+            }).catch(() => {
+                toast.error('Failed to delete Song. Please try again.');
+            });
         }
     }
 

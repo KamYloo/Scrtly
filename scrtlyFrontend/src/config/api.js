@@ -9,6 +9,12 @@ const fetchWithAuth = async (url, options = {}, errorType) => {
 
     try {
         const response = await fetch(`${BASE_API_URL}${url}`, { ...options, headers });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            return { error: true, message: errorData.message || 'Request failed' };
+        }
+
         return await response.json();
     } catch (error) {
         console.error(`Error in ${errorType}:`, error);
@@ -16,11 +22,14 @@ const fetchWithAuth = async (url, options = {}, errorType) => {
     }
 };
 
-export const dispatchAction = async (dispatch, actionTypeRequest,actionTypeError, url, options = {}) => {
-    try {
-        const data = await fetchWithAuth(url, options, actionTypeRequest);
-        dispatch({ type: actionTypeRequest, payload: data });
-    } catch (error) {
-        dispatch({ type: actionTypeError, payload: error.message });
+
+export const dispatchAction = async (dispatch, actionTypeRequest, actionTypeError, url, options = {}) => {
+    const result = await fetchWithAuth(url, options, actionTypeRequest);
+    console.log(result);
+    if (result.error) {
+        dispatch({ type: actionTypeError, payload: result.message });
+        throw new Error(result.message);
     }
+
+    dispatch({ type: actionTypeRequest, payload: result });
 };

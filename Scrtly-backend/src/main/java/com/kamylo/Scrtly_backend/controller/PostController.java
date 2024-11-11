@@ -94,7 +94,7 @@ public class PostController {
 
         try {
             postService.deletePost(postId, user.getId());
-            res.setMessage("Post and associated image deleted successfully");
+            res.setMessage("Post  deleted successfully.");
             return new ResponseEntity<>(res, HttpStatus.OK);
         } catch (UserException | PostException e) {
             res.setMessage(e.getMessage());
