@@ -3,6 +3,7 @@ import {MdCancel} from "react-icons/md";
 import {useDispatch} from "react-redux";
 import {uploadSong} from "../../Redux/Album/Action.js";
 import "../../Styles/form.css"
+import toast from "react-hot-toast";
 
 // eslint-disable-next-line react/prop-types
 function AddSong({onClose, albumId}) {
@@ -20,12 +21,20 @@ function AddSong({onClose, albumId}) {
         formData.append('audioFile', audio)
         formData.append('title', title)
         formData.append('albumId', albumId)
-        dispatch(uploadSong(formData))
-        setSongImg(null);
-        setAudio(null);
-        setTitle('');
-        onClose()
 
+        dispatch(uploadSong(formData))
+            .then(() => {
+                toast.success('Song upload successfully.');
+            })
+            .catch(() => {
+                toast.error('Failed to upload song. Please try again.');
+            })
+            .finally(() => {
+                setSongImg(null);
+                setAudio(null);
+                setTitle('');
+                onClose();
+            });
     }
 
     useEffect(() => {

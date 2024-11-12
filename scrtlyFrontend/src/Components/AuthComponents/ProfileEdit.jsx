@@ -4,6 +4,8 @@ import "../../Styles/Profile.css"
 import {useDispatch, useSelector} from "react-redux";
 import {updateUser} from "../../Redux/Auth/Action.js";
 import {useNavigate} from "react-router-dom";
+import {updatePost} from "../../Redux/Post/Action.js";
+import toast from "react-hot-toast";
 
 function ProfileEdit() {
   const dispatch = useDispatch()
@@ -19,14 +21,21 @@ function ProfileEdit() {
     setProfilePicture(e.target.files[0])
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
     const formData = new FormData();
     formData.append("fullName", fullName);
     formData.append("profilePicture", profilePicture);
     formData.append("description", description);
 
     dispatch(updateUser(formData))
-    navigate(`/profile/${auth.reqUser.id}?reload=true`)
+        .then(() => {
+          toast.success('User updated successfully.');
+          navigate(`/profile/${auth.reqUser.id}?reload=true`)
+        })
+        .catch(() => {
+          toast.error('Failed to update user. Please try again.');
+        });
   }
 
   useEffect(() => {

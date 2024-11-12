@@ -8,6 +8,7 @@ import {BASE_API_URL} from "../../config/api.js";
 import {useDispatch, useSelector} from "react-redux";
 import {deleteChat} from "../../Redux/Chat/Action.js";
 import {useNavigate} from "react-router-dom";
+import toast from "react-hot-toast";
 
 // eslint-disable-next-line react/prop-types
 function ChatUsersList({chat, onChatSelect }) {
@@ -32,11 +33,14 @@ function ChatUsersList({chat, onChatSelect }) {
     const deleteChatRoomHandler = (chatRoomId) => {
         const confirmDelete = window.confirm('Are you sure you want to delete this ChatRoom?');
         if (confirmDelete) {
-            dispatch(deleteChat(chatRoomId))
-            navigate('/chat')
+            dispatch(deleteChat(chatRoomId)).then(() => {
+                toast.success('ChatRoom deleted successfully.');
+                navigate('/chat')
+            }).catch(() => {
+                toast.error('Failed to delete chatRoom. Please try again.');
+            });
         }
     }
-
 
     return (
         <div className='chatUserList'>

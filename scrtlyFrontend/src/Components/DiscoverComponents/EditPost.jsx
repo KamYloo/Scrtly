@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import "../../Styles/form.css";
 import { BASE_API_URL } from "../../config/api.js";
 import {updatePost} from "../../Redux/Post/Action.js";
+import toast from "react-hot-toast";
 
 function EditPost({ post, onClose }) {
     const [description, setDescription] = useState(post?.description || "");
@@ -25,9 +26,19 @@ function EditPost({ post, onClose }) {
         formData.append('postId', post?.id);
         formData.append('file', postImg);
         formData.append('description', description);
+
         dispatch(updatePost(formData))
-        setPostImg(null);
-        onClose();
+            .then(() => {
+                toast.success('Post updated successfully.');
+            })
+            .catch(() => {
+                toast.error('Failed to update post. Please try again.');
+            })
+            .finally(() => {
+                setDescription('')
+                setPostImg(null);
+                onClose();
+            });
     };
 
     useEffect(() => {

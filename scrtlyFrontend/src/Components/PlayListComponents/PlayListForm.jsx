@@ -3,13 +3,13 @@ import {MdCancel} from "react-icons/md";
 import {useDispatch} from "react-redux";
 import {createPlayList, updatePlayList} from "../../Redux/PlayList/Action.js";
 import {BASE_API_URL} from "../../config/api.js";
+import toast from "react-hot-toast";
 
 function PlayListForm({onClose, isEdit}) {
     const [title, setTitle] = useState(isEdit?.title || "")
     const [playListImg, setPlayListImg] = useState(null)
     const [preview, setPreview] = useState(isEdit?.playListImage ? `${BASE_API_URL}${isEdit.playListImage}` : '');
     const dispatch = useDispatch()
-
 
     const handleFileChange = (e) => {
         setPlayListImg(e.target.files[0])
@@ -22,9 +22,22 @@ function PlayListForm({onClose, isEdit}) {
         if (isEdit) {
             formData.append("playListId", isEdit?.id)
             dispatch(updatePlayList(formData))
+                .then(() => {
+                    toast.success('Playlist updated successfully.');
+                })
+                .catch(() => {
+                    toast.error('Failed to update playlist. Please try again.');
+                });
         } else {
             dispatch(createPlayList(formData))
+                .then(() => {
+                    toast.success('Playlist created successfully.');
+                })
+                .catch(() => {
+                    toast.error('Failed to create playlist. Please try again.');
+                });
         }
+        setTitle('')
         setPlayListImg(null)
         onClose()
     }

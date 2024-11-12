@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react'
 import {MdCancel} from "react-icons/md";
 import {updateArtist} from "../../Redux/Artist/Action.js";
 import {useDispatch} from "react-redux";
+import toast from "react-hot-toast";
 
 function EditArtist({onClose}) {
     const [artistBio, setArtistBio] = useState()
@@ -13,13 +14,23 @@ function EditArtist({onClose}) {
         setBannerImg(e.target.files[0])
     };
 
-    const updateArtistHandler = () => {
+    const updateArtistHandler = (e) => {
+        e.preventDefault()
         const formData = new FormData()
         formData.append('bannerImg', bannerImg)
         formData.append('artistBio', artistBio)
+
         dispatch(updateArtist(formData))
-        setBannerImg(null)
-        onClose()
+            .then(() => {
+                toast.success('Artist profile updated successfully.');
+            })
+            .catch(() => {
+                toast.error('Failed to update artist profile. Please try again.');
+            })
+            .finally(() => {
+                setBannerImg(null)
+                onClose();
+            });
     }
 
     useEffect(() => {

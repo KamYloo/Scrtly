@@ -6,6 +6,7 @@ import '../../Styles/Login&Register.css'
 import { Link, useNavigate } from 'react-router-dom'
 import {currentUser, login} from "../../Redux/Auth/Action.js";
 import {useDispatch, useSelector} from "react-redux";
+import toast from "react-hot-toast";
 
 function Login() {
     const [inputData, setInputData] = useState({email: "", password: ""});
@@ -33,7 +34,7 @@ function Login() {
         e.preventDefault();
         const formErrors = validate();
         if (Object.keys(formErrors).length === 0) {
-            dispatch(login(inputData));
+            dispatch(login(inputData))
         } else {
             setErrors(formErrors);
         }
@@ -45,7 +46,10 @@ function Login() {
 
     useEffect(() => {
         if (auth.reqUser?.fullName) {
-            navigate("/home");
+            navigate("/home")
+            toast.success('You have logged in successfully.');
+        } else {
+            toast.error('Failed to login. Please try again.');
         }
     }, [auth.reqUser, navigate]);
 

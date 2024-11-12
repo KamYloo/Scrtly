@@ -6,7 +6,7 @@ import '../../Styles/Login&Register.css'
 import { Link, useNavigate } from 'react-router-dom'
 import {useDispatch, useSelector} from "react-redux";
 import {currentUser, register} from "../../Redux/Auth/Action.js";
-
+import toast from "react-hot-toast";
 
 function Register() {
     const [inputData, setInputData] = useState({
@@ -40,7 +40,7 @@ function Register() {
         e.preventDefault();
         const formErrors = validate();
         if (Object.keys(formErrors).length === 0) {
-            dispatch(register(inputData));
+            dispatch(register(inputData))
         } else {
             setErrors(formErrors);
         }
@@ -53,6 +53,9 @@ function Register() {
     useEffect(() => {
         if (auth.reqUser?.fullName) {
             navigate("/login");
+            toast.success('You have registered successfully.');
+        } else {
+            toast.error('Failed to register. Please try again.');
         }
     }, [auth.reqUser, navigate]);
 

@@ -6,6 +6,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {createPost} from "../../Redux/Post/Action.js";
 import {BASE_API_URL} from "../../config/api.js";
 import {useNavigate} from "react-router-dom";
+import toast from "react-hot-toast";
 
 
 function AddPost() {
@@ -29,10 +30,18 @@ function AddPost() {
     const formData = new FormData()
     formData.append('file', filePic)
     formData.append('description', descriptionText)
-    dispatch(createPost(formData))
 
-    setDescriptionText('')
-    setFilePic(null)
+    dispatch(createPost(formData))
+        .then(() => {
+          toast.success('Post created successfully.');
+        })
+        .catch(() => {
+          toast.error('Failed to create post. Please try again.');
+        })
+        .finally(() => {
+          setDescriptionText('')
+          setFilePic(null)
+        });
   }
 
   return (

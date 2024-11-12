@@ -2,6 +2,7 @@ import React, {useState} from 'react'
 import {MdCancel} from "react-icons/md";
 import {useDispatch} from "react-redux";
 import {createStory} from "../../Redux/Story/Action.js";
+import toast from "react-hot-toast";
 
 // eslint-disable-next-line react/prop-types
 function AddStory({onClose}) {
@@ -12,11 +13,22 @@ function AddStory({onClose}) {
         setImage(e.target.files[0])
     };
 
-    const handleStoryCreation = () => {
+    const handleStoryCreation = (e) => {
+        e.preventDefault()
         const formData = new FormData()
         formData.append('file', image)
+
         dispatch(createStory(formData))
-        setImage(null)
+            .then(() => {
+                toast.success('Story created successfully.');
+            })
+            .catch(() => {
+                toast.error('Failed to create story. Please try again.');
+            })
+            .finally(() => {
+                setImage(null);
+                onClose();
+            });
     }
 
     return (
