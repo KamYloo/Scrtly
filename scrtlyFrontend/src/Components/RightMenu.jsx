@@ -5,14 +5,14 @@ import { FaBell, FaCogs, FaCrown, FaRegHeart, FaSun } from 'react-icons/fa'
 import {useDispatch, useSelector} from "react-redux";
 import {logoutAction} from "../Redux/Auth/Action.js";
 import {BASE_API_URL} from "../config/api.js";
+import {NotificationsList} from "./NotificationsList.jsx";
 
 
 function RightMenu() {
+  const [openNotifications, setOpenNotifications] = useState(false)
   const {auth} = useSelector(store => store);
   const dispatch = useDispatch()
   const navigate = useNavigate()
-
-
 
   const handleLogout = () => {
     dispatch(logoutAction())
@@ -29,9 +29,10 @@ function RightMenu() {
 
   return (
     <div className='rightMenu'>
+      {openNotifications && <NotificationsList onClose={() => setOpenNotifications(false)}/>}
       <div className="top">
         <i><FaCrown /><p>Go <span>Premium</span></p></i>
-        <i><FaBell /></i>
+        <i onClick={() => setOpenNotifications(((prev) => !prev))}><FaBell /></i>
         <i><FaRegHeart /></i>
       </div>
       <div className="profile">
