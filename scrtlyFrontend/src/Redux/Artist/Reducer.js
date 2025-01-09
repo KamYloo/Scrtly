@@ -3,13 +3,25 @@ import {
     GET_ALL_ARTISTS_REQUEST,
     GET_ARTIST_TRACKS_REQUEST
 } from "./ActionType.js";
-import {FOLLOW_USER_REQUEST} from "../Auth/ActionType.js";
+import {FOLLOW_USER_REQUEST} from "../AuthService/ActionType.js";
 
 const initialValue= {
     findArtist:null,
-    artists: [],
+    artists: {
+        content: [],
+        pageNumber: 0,
+        pageSize: 10,
+        totalElements: 0,
+        totalPages: 0,
+    },
     updateArtist: null,
-    songs: [],
+    songs: {
+        content: [],
+        pageNumber: 0,
+        pageSize: 10,
+        totalElements: 0,
+        totalPages: 0,
+    },
     follow:null
 }
 

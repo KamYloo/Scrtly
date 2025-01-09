@@ -17,10 +17,9 @@ function AddSong({onClose, albumId}) {
     const createSongHandler = (e) => {
         e.preventDefault();
         const formData = new FormData()
-        formData.append('imageSong', songImg)
-        formData.append('audioFile', audio)
-        formData.append('title', title)
-        formData.append('albumId', albumId)
+        formData.append("songDetails", new Blob([JSON.stringify({ title, albumId })], { type: "application/json" }));
+        formData.append("imageSong", songImg);
+        formData.append("audioFile", audio);
 
         dispatch(uploadSong(formData))
             .then(() => {

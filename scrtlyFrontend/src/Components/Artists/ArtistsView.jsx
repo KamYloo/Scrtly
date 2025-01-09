@@ -7,7 +7,6 @@ import { FaHeadphones } from "react-icons/fa";
 import {useDispatch, useSelector} from "react-redux";
 import {useNavigate} from "react-router-dom";
 import {getAllArtists} from "../../Redux/Artist/Action.js";
-import {BASE_API_URL} from "../../config/api.js";
 
 function ArtistsView() {
     const dispatch = useDispatch()
@@ -15,8 +14,7 @@ function ArtistsView() {
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
 
-
-    const filteredArtists = artist.artists.filter(artistItem =>
+    const filteredArtists = artist?.artists.content.filter(artistItem =>
         artistItem.artistName.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
@@ -45,7 +43,7 @@ function ArtistsView() {
                 <div className="artist" key={item.id} onClick={() => navigate(`/artist/${item.id}/popular`)}>
                     <i className="listen"><FaHeadphones/></i>
                     <div className="imgPic">
-                        <img src={`${BASE_API_URL}/${item.artistPic || ''}`} alt=""/>
+                        <img src={item.profilePicture} alt=""/>
                         <img className='check' src={Verification} alt=""/>
                     </div>
                     <p>{item?.artistName}</p>

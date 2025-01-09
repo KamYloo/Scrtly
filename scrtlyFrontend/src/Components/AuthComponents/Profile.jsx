@@ -20,16 +20,16 @@ function Profile() {
         setSelectedPost((prev) => !prev);
     };
 
-    useEffect(() => {
+   /* useEffect(() => {
         dispatch(getPostsByUser(userId))
-    }, [dispatch,userId, post.likedPost, post.createdPost, post.deletedPost, comment.createdComment,comment.deletedComment])
+    }, [dispatch,userId, post.likedPost, post.createdPost, post.deletedPost, comment.createdComment,comment.deletedComment])*/
 
     return (
         <div className='profileSite'>
             <ProfileInfo  />
             <hr className="lineP"/>
             <div className="posts">
-                {post.posts.map((item) => (
+                {post.posts.content.map((item) => (
                     <div className="post" key={item.id} onClick={() => togglePost(item)}>
                         <img src={`${BASE_API_URL}${item.image}`} alt=""/>
                     </div>

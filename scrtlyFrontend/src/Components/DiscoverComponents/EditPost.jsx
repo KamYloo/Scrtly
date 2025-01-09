@@ -2,14 +2,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import { MdCancel } from "react-icons/md";
 import { useDispatch } from "react-redux";
 import "../../Styles/form.css";
-import { BASE_API_URL } from "../../config/api.js";
 import {updatePost} from "../../Redux/Post/Action.js";
 import toast from "react-hot-toast";
 
 function EditPost({ post, onClose }) {
     const [description, setDescription] = useState(post?.description || "");
     const [postImg, setPostImg] = useState(null);
-    const [preview, setPreview] = useState(post?.image ? `${BASE_API_URL}${post.image}` : '');
+    const [preview, setPreview] = useState(post?.image ? `${post.image}` : '');
     const fileInputRef = useRef(null);
     const dispatch = useDispatch();
 

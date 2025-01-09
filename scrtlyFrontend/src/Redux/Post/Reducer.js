@@ -9,7 +9,13 @@ import {
 const initialValue= {
     createdPost:null,
     deletedPost:null,
-    posts:[],
+    posts: {
+        content: [],
+        pageNumber: 0,
+        pageSize: 10,
+        totalElements: 0,
+        totalPages: 0,
+    },
     likedPost: null,
 }
 

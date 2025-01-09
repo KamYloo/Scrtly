@@ -5,7 +5,6 @@ import { AudioList } from '../SongComponents/AudioList.jsx'
 import {useNavigate, useParams} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {deleteAlbum, getAlbum, getAlbumTracks} from "../../Redux/Album/Action.js";
-import {BASE_API_URL} from "../../config/api.js";
 import {AddSong} from "../SongComponents/addSong.jsx";
 
 // eslint-disable-next-line react/prop-types
@@ -15,6 +14,7 @@ function Album({ volume, onTrackChange}) {
     const {album, song} = useSelector(store => store);
     const [addSong, setAddSong] = useState(false)
     const navigate = useNavigate();
+    const userData = (() => { try { return JSON.parse(localStorage.getItem("user")) || null; } catch { return null; } })();
 
     const albumDeleteHandler = () => {
         const confirmDelete = window.confirm('Are you sure you want to delete this album?');
@@ -43,7 +43,7 @@ function Album({ volume, onTrackChange}) {
 
     useEffect(() => {
         dispatch(getAlbum(albumId))
-    }, [albumId]);
+    }, [albumId, album.uploadSong, song.deletedSong,]);
 
     useEffect(() => {
         dispatch(getAlbumTracks(albumId))
@@ -52,13 +52,13 @@ function Album({ volume, onTrackChange}) {
     return (
         <div className='albumDetail'>
             <div className="topSection">
-                <img src={`${BASE_API_URL}${album.findAlbum?.albumImage || ''}`} alt="" />
+                <img src={album.findAlbum?.albumImage || ''} alt="" />
                 <div className="albumData">
                     <p>Album</p>
                     <h1 className='albumName'>{album.findAlbum?.title}</h1>
-                    <p className='stats'>{album.findAlbum?.artist.artistName} • {album.findAlbum?.totalSongs} Songs <span>• {album.findAlbum?.releaseDate} • {formatTime(album.findAlbum?.totalDuration)}</span> </p>
+                    <p className='stats'>{album.findAlbum?.artist.artistName} • {album.findAlbum?.tracksCount} Songs <span>• {album.findAlbum?.releaseDate} • {formatTime(album.findAlbum?.totalDuration)}</span> </p>
                 </div>
-                {album.findAlbum?.artist.req_artist && (
+                {album.findAlbum?.artist.id === userData?.id && (
                 <div className="buttons">
                     <button className="addSongBtn" onClick={() =>
                         setAddSong(((prev) => !prev))}>Add Song</button>
@@ -67,7 +67,7 @@ function Album({ volume, onTrackChange}) {
                 </div>)}
 
             </div>
-            <AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={album?.songs} req_artist={album.findAlbum?.artist.req_artist}  isplayListSongs={false}/>
+            <AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={album?.songs} req_artist={album.findAlbum?.artist.id === userData?.id}  isplayListSongs={false}/>
             {addSong && <AddSong onClose={() => setAddSong(((prev) => !prev))} albumId={albumId} />}
         </div>
     )

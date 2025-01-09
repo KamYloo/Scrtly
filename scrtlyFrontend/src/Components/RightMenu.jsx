@@ -1,27 +1,34 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState} from 'react'
 import { useNavigate } from 'react-router-dom';
 import '../Styles/RightMenu.css'
 import { FaBell, FaCogs, FaCrown, FaRegHeart, FaSun } from 'react-icons/fa'
 import {useDispatch, useSelector} from "react-redux";
-import {logoutAction} from "../Redux/Auth/Action.js";
-import {BASE_API_URL} from "../config/api.js";
+import {logoutAction} from "../Redux/AuthService/Action.js";
 import {NotificationsList} from "./NotificationsList.jsx";
+import toast from "react-hot-toast";
 
 
 function RightMenu() {
   const [openNotifications, setOpenNotifications] = useState(false)
-  const {auth} = useSelector(store => store);
+  const userData = (() => { try { return JSON.parse(localStorage.getItem("user")) || null; } catch { return null; } })();
   const dispatch = useDispatch()
+  const {auth} = useSelector(store => store);
   const navigate = useNavigate()
 
   const handleLogout = () => {
     dispatch(logoutAction())
-    navigate('/login')
+        .then(() => {
+          navigate("/login");
+          toast.success(auth.logout || 'Logged out successfully');
+        })
+        .catch(() => {
+          toast.error("Failed to logout. Please try again.");
+        })
   }
 
   const handleProfileClick = () => {
-    if (localStorage.getItem('token')) {
-      navigate(`/profile/${auth.reqUser.id}`)
+    if (localStorage.getItem("refreshToken")) {
+      navigate(`/profile/${userData?.nickName}`)
     } else {
       navigate('/login')
     }
@@ -39,9 +46,9 @@ function RightMenu() {
         <i><FaSun /></i>
         <i><FaCogs /></i>
         <div className="profileImg" onClick={handleProfileClick}>
-          <img src={`${BASE_API_URL}/${auth.reqUser?.profilePicture || ''}`} alt="" />
+          <img src={userData?.profilePicture || ''} alt="" />
         </div>
-        {localStorage.getItem('token') ? (
+        {localStorage.getItem("refreshToken") ? (
           <p className='loginBtn' onClick={handleLogout}>Logout</p>
         ) : (
           <p className='loginBtn' onClick={() => navigate('/login')}>Login</p>

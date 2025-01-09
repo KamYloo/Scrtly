@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 function MenuPlayList({setCreatePlayList}) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { auth, playList, song} = useSelector(store => store);
+    const { playList, song} = useSelector(store => store);
 
     const deletePlayListHandler = (playListId) => {
         const confirmDelete = window.confirm('Are you sure you want to delete this playList?');
@@ -24,10 +24,10 @@ function MenuPlayList({setCreatePlayList}) {
     }
 
     useEffect(() => {
-        if (auth.reqUser?.req_user) {
+        if (localStorage.getItem("refreshToken")) {
             dispatch(getUserPlayLists());
         }
-    }, [dispatch, auth.reqUser?.req_user, playList.createPlayList, playList.deletePlayList, song.likedSong]);
+    }, [dispatch, playList.createPlayList, playList.deletePlayList, song.likedSong]);
 
     return (
         <div className='playListBox'>
@@ -39,7 +39,7 @@ function MenuPlayList({setCreatePlayList}) {
             </div>
             <div className="scrollBox">
                 {
-                    playList?.playLists.map((playList)=> (
+                    playList?.playLists.content.map((playList)=> (
                     <div className="playList" key={playList.id}>
                         <i className='iconP'><BsMusicNoteList /></i>
                         <p onClick={() => navigate(`/playList/${playList.id}`)}>{playList?.title}</p>

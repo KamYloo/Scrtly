@@ -7,7 +7,6 @@ import { MdOutlineMenuOpen } from "react-icons/md";
 import { Post } from './Post';
 import {useDispatch, useSelector} from "react-redux";
 import {deletePost, getAllPosts, likePost} from "../../Redux/Post/Action.js";
-import {BASE_API_URL} from "../../config/api.js";
 import { formatDistanceToNow } from 'date-fns'
 import {useNavigate} from "react-router-dom";
 import {EditPost} from "./EditPost.jsx";
@@ -22,11 +21,11 @@ function Feed() {
   const [sortOrder, setSortOrder] = useState('date')
 
   const dispatch = useDispatch()
-  const {auth, post, comment } = useSelector(store => store);
+  const {post, comment } = useSelector(store => store);
   const navigate = useNavigate();
 
-  const handleProfileClick = (userId) => {
-    navigate(`/profile/${userId}`)
+  const handleProfileClick = (nickName) => {
+    navigate(`/profile/${nickName}`)
   };
 
   const togglePost = (post = null) => {
@@ -63,7 +62,7 @@ function Feed() {
     dispatch(likePost(postId));
   }
 
-  const filteredPosts = post.posts
+  const filteredPosts = post.posts.content
       .filter(item => filter === '' || item.user.fullName.toLowerCase().includes(filter.toLowerCase()))
       .sort((a, b) => {
         switch (sortOrder) {
@@ -114,13 +113,13 @@ function Feed() {
         {filteredPosts.map((item) => (
             <div className="post" key={item.id}>
               <div className="up">
-                <img src={`${BASE_API_URL}/${item.user?.profilePicture || ''}`} alt=""
-                     onClick={() => handleProfileClick(item.user.id)}/>
+                <img src={item.user?.profilePicture} alt=""
+                     onClick={() => handleProfileClick(item.user.nickName)}/>
                 <div className="userData">
                   <p>{item.user.fullName}</p>
                   <span>{formatTimeAgo(item.creationDate)}</span>
                 </div>
-                {auth.reqUser.id === item.user.id && (
+                {/*{auth.reqUser.id === item.user.id && (*/}
                     <>
                       <i onClick={() => handleMenuToggle(item.id)}><FaEllipsisH/></i>
                       {menuPost === item.id && (
@@ -137,11 +136,11 @@ function Feed() {
                           </ul>
                       )}
                     </>
-                )}
+                {/*)}*/}
               </div>
               <div className="middle">
                 <img
-                    src={`${BASE_API_URL}${item.image}`}
+                    src={item?.image}
                     alt=""/>
               </div>
               <div className="description">
@@ -149,12 +148,12 @@ function Feed() {
               </div>
               <div className="bottom">
                 <div className="likes">
-                  <i onClick={() => likePostHandler(item.id)}>{item.liked ? <AiFillLike/> : <AiOutlineLike/>}</i>
-                  <span>{item.totalLikes}</span>
+                  <i onClick={() => likePostHandler(item.id)}>{item.likedByUser ? <AiFillLike/> : <AiOutlineLike/>}</i>
+                  <span>{item.likeCount | 0}</span>
                 </div>
                 <div className="comments" onClick={() => togglePost(item)}>
                   <i><TfiCommentAlt/></i>
-                  <span>{item?.totalComments | 0} comments</span>
+                  <span>{item?.commentCount | 0} comments</span>
                 </div>
               </div>
             </div>))}

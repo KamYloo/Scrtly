@@ -1,20 +1,15 @@
 package com.kamylo.Scrtly_backend.service;
 
 
-import com.kamylo.Scrtly_backend.exception.PostException;
-import com.kamylo.Scrtly_backend.exception.UserException;
-import com.kamylo.Scrtly_backend.model.Post;
-import com.kamylo.Scrtly_backend.request.SendPostRequest;
-import org.springframework.stereotype.Service;
+import com.kamylo.Scrtly_backend.dto.PostDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-
-@Service
 public interface PostService {
-    Post createPost(SendPostRequest sendPostRequest, MultipartFile postImage) throws UserException;
-    Post updatePost(Long postId, String description, MultipartFile file, Long userId) throws UserException, PostException;
-    void deletePost(Long postId, Long userId) throws UserException, PostException;
-    List<Post> getAllPostsByUser(Long userId) throws UserException;
-    List<Post> getAllPosts() ;
+    PostDto createPost(String username, String description, MultipartFile postImage) ;
+    PostDto updatePost(Long postId, String username, MultipartFile file, String description);
+    void deletePost(Long postId, String username);
+    Page<PostDto> getPostsByUser(Long userId, Pageable pageable);
+    Page<PostDto> getPosts(Pageable pageable, String username) ;
 }

@@ -1,22 +1,25 @@
 package com.kamylo.Scrtly_backend.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import java.util.HashSet;
-import java.util.Set;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserDto {
     private Long id;
     private String fullName;
+    private String nickName;
     private String profilePicture;
     private String description;
 
-    private boolean req_user;
-    private boolean followed;
+    private boolean observed;
+    private int observersCount;
+    private int observationsCount;
 
-    private int totalFollowers;
-    private int totalFollowing;
-    private Set<UserDto> followers = new HashSet<>();
-    private Set<UserDto> following = new HashSet<>();
-
+    /*private Set<UserDto> followers = new HashSet<>();
+    private Set<UserDto> following = new HashSet<>();*/
 }

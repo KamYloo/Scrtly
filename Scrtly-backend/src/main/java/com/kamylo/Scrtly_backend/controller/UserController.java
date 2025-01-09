@@ -1,84 +1,50 @@
 package com.kamylo.Scrtly_backend.controller;
 
 import com.kamylo.Scrtly_backend.dto.UserDto;
-import com.kamylo.Scrtly_backend.dto.mapper.UserDtoMapper;
-import com.kamylo.Scrtly_backend.exception.UserException;
-import com.kamylo.Scrtly_backend.model.User;
+import com.kamylo.Scrtly_backend.entity.UserEntity;
+import com.kamylo.Scrtly_backend.mappers.Mapper;
+import com.kamylo.Scrtly_backend.request.UserRequestDto;
 import com.kamylo.Scrtly_backend.service.UserService;
-
-import com.kamylo.Scrtly_backend.util.UserUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.security.Principal;
 import java.util.Set;
-import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/user")
+@RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
 
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
-
-    @GetMapping("/profile")
-    public ResponseEntity<UserDto> getUserProfileHandler(@RequestHeader("Authorization") String token) throws UserException {
-        if (token != null && token.startsWith("Bearer ")) {
-            User user = userService.findUserProfileByJwt(token);
-            UserDto userDto = UserDtoMapper.toUserDto(user);
-            userDto.setReq_user(true);
-            return new ResponseEntity<>(userDto, HttpStatus.ACCEPTED);
-
-        } else {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    @GetMapping("/{userId}")
-    public ResponseEntity<UserDto> getUserbyId(@PathVariable Long userId, @RequestHeader("Authorization") String token) throws UserException {
-        User reqUser = userService.findUserProfileByJwt(token);
-        User user = userService.findUserById(userId);
-        UserDto userDto = UserDtoMapper.toUserDto(user);
-        userDto.setReq_user(UserUtil.isReqUser(reqUser, user));
-        userDto.setFollowed(UserUtil.isFollowedByReqUser(reqUser, user));
-        return new ResponseEntity<>(userDto, HttpStatus.ACCEPTED);
+    @GetMapping("/profile/{nickName}")
+    public ResponseEntity<UserDto> getProfile(@PathVariable("nickName") String nickName, Principal principal) {
+        UserDto user = userService.getUserProfile(nickName, principal.getName());
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Set<UserDto>> searchUserHandler(@RequestParam("name") String name) {
-        Set<User> users = userService.searchUser(name);
-        Set<UserDto> userDtos = UserDtoMapper.toUserDtos(users);
-        return new ResponseEntity<>(userDtos, HttpStatus.OK);
+    public ResponseEntity<Set<UserDto>> searchUser(@RequestParam("name") String name) {
+        Set<UserDto> users = userService.searchUser(name);
+        return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<UserDto> updateUserHandler( @RequestPart("fullName") String fullName,
-                                                          @RequestPart("profilePicture") MultipartFile profilePicture,
-                                                          @RequestPart("description") String description,
-                                                          @RequestHeader("Authorization") String token) throws UserException, IOException {
-        User user = userService.findUserProfileByJwt(token);
+    @PutMapping("/profile/edit")
+    public ResponseEntity<UserDto> updateUser(@RequestPart("userDetails") UserRequestDto userRequestDto,
+                                                     @RequestPart(value = "profilePicture", required = false) MultipartFile profilePicture,
+                                                     Principal principal) {
 
-        userService.updateUser(user.getId(), fullName, description, profilePicture);
-        UserDto userDto = UserDtoMapper.toUserDto(user);
-
-        return new ResponseEntity<>(userDto, HttpStatus.ACCEPTED);
+        UserDto user = userService.updateUser(principal.getName(), userRequestDto, profilePicture);
+        return new ResponseEntity<>(user, HttpStatus.ACCEPTED);
     }
 
-    @PutMapping("/{userId}/follow")
-    public ResponseEntity<UserDto> followUser(@PathVariable Long userId, @RequestHeader("Authorization") String token) throws UserException {
-        User reqUser = userService.findUserProfileByJwt(token);
-        User user = userService.followUser(userId, reqUser);
-        UserDto userDto = UserDtoMapper.toUserDto(user);
-        userDto.setFollowed(UserUtil.isFollowedByReqUser(reqUser, user));
-        return new ResponseEntity<>(userDto, HttpStatus.ACCEPTED);
+    @PutMapping("/follow/{userId}")
+    public ResponseEntity<UserDto> followUser(@PathVariable Long userId, Principal principal) {
+        UserDto user = userService.followUser(userId, principal.getName());
+        return ResponseEntity.ok(user);
     }
 }

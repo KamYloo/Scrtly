@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { FaHeadphones, FaHeart, FaRegClock, FaRegHeart } from 'react-icons/fa'
 import { FaRegSquarePlus } from "react-icons/fa6";
 import { MusicPlayer } from './MusicPlayer.jsx'
-import {BASE_API_URL} from "../../config/api.js";
 import {BsTrash } from 'react-icons/bs'
 import {useDispatch, useSelector} from "react-redux";
 import {deleteSong, likeSong} from "../../Redux/Song/Action.js";
@@ -77,11 +76,11 @@ function AudioList({ volume, onTrackChange, initialSongs , req_artist, isplayLis
                 {
                     // eslint-disable-next-line react/prop-types
                     initialSongs?.map((song, index) => (
-                        <div className="songs" key={song?.id} onClick={() => setMainSong(`${BASE_API_URL}${song?.track || ''}`, `${BASE_API_URL}${song?.imageSong || ''}`, song?.title, song?.artist.artistName)}>
+                        <div className="songs" key={song?.id} onClick={() => setMainSong(song?.track, song?.imageSong, song?.title, song?.artist.artistName)}>
                             <div className="count">#{index + 1}</div>
                             <div className="song">
                                 <div className="imgBox">
-                                    <img src={`${BASE_API_URL}${song?.imageSong || ''}`} alt="" />
+                                    <img src={song?.imageSong || ''} alt="" />
                                 </div>
                                 <div className="section">
                                     <p className="songName">

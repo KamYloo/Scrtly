@@ -9,24 +9,28 @@ import {
 export const findArtistById = (artistId) => async (dispatch) => {
     await dispatchAction(dispatch, FIND_ARTIST_BY_ID_REQUEST, FIND_ARTIST_BY_ID_ERROR, `/api/artists/${artistId}`, {
         method: 'GET',
+        credentials: 'include',
     });
 }
 
 export const getAllArtists = () => async (dispatch) => {
-    await dispatchAction(dispatch, GET_ALL_ARTISTS_REQUEST, GET_ALL_ARTISTS_ERROR, '/api/artists/', {
+    await dispatchAction(dispatch, GET_ALL_ARTISTS_REQUEST, GET_ALL_ARTISTS_ERROR, '/api/artists/all', {
         method: 'GET',
+        credentials: 'include',
     });
 };
 
 export const updateArtist = (formData) => async (dispatch) => {
     await dispatchAction(dispatch, FIND_ARTIST_BY_ID_REQUEST, FIND_ARTIST_BY_ID_ERROR, '/api/artists/update', {
         method: 'PUT',
-        body: formData
+        body: formData,
+        credentials: 'include',
     });
 };
 
 export const getArtistTracks = (artistId) => async (dispatch) => {
     await dispatchAction(dispatch, GET_ARTIST_TRACKS_REQUEST, GET_ARTIST_TRACKS_ERROR, `/api/artists/${artistId}/tracks`, {
         method: 'GET',
+        credentials: 'include',
     });
 }

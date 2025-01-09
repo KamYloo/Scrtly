@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react'
 import {MdCancel} from "react-icons/md";
 import {useDispatch} from "react-redux";
 import {createAlbum} from "../../Redux/Album/Action.js";
-import {deleteSong} from "../../Redux/Song/Action.js";
 import toast from "react-hot-toast";
 
 function CreateAlbum({onClose}) {

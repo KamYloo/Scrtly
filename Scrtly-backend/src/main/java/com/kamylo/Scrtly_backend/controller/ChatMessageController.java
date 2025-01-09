@@ -1,56 +1,38 @@
 package com.kamylo.Scrtly_backend.controller;
 
-import com.kamylo.Scrtly_backend.exception.ChatException;
-import com.kamylo.Scrtly_backend.exception.MessageException;
-import com.kamylo.Scrtly_backend.exception.UserException;
-import com.kamylo.Scrtly_backend.model.ChatMessage;
-import com.kamylo.Scrtly_backend.model.User;
+import com.kamylo.Scrtly_backend.dto.ChatMessageDto;
 import com.kamylo.Scrtly_backend.request.SendMessageRequest;
-import com.kamylo.Scrtly_backend.response.ApiResponse;
 import com.kamylo.Scrtly_backend.service.ChatMessageService;
-import com.kamylo.Scrtly_backend.service.UserService;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
+@AllArgsConstructor
 @RestController
-@RequestMapping("/api/messages")
+@RequestMapping("/messages")
 public class ChatMessageController {
 
     private final ChatMessageService chatMessageService;
-    private final UserService userService;
-
-    public ChatMessageController(ChatMessageService chatMessageService, UserService userService) {
-        this.chatMessageService = chatMessageService;
-        this.userService = userService;
-    }
 
     @PostMapping("/create")
-    public ResponseEntity<ChatMessage> sendMessageHandler(@RequestBody SendMessageRequest request, @RequestHeader("Authorization") String token) throws UserException, ChatException {
-        User user = userService.findUserProfileByJwt(token);
-
-        request.setUserId(user.getId());
-        ChatMessage chatMessage = chatMessageService.sendMessage(request);
-
-        return new  ResponseEntity<>(chatMessage, HttpStatus.OK);
+    public ResponseEntity<ChatMessageDto> sendMessage(@RequestBody SendMessageRequest request, Principal principal) {
+        ChatMessageDto chatMessage = chatMessageService.sendMessage(request,principal.getName());
+        return new  ResponseEntity<>(chatMessage, HttpStatus.CREATED);
     }
 
     @GetMapping("/chat/{chatId}")
-    public ResponseEntity<List<ChatMessage>> getChatsMessagesHandler(@PathVariable Integer chatId, @RequestHeader("Authorization") String token) throws ChatException {
-
-        List<ChatMessage> chatMessage = chatMessageService.getChatsMessages(chatId);
-
-        return new  ResponseEntity<>(chatMessage, HttpStatus.OK);
+    public ResponseEntity<List<ChatMessageDto>> getChatMessages(@PathVariable Integer chatId, Principal principal) {
+        List<ChatMessageDto> chatMessages = chatMessageService.getChatsMessages(chatId, principal.getName());
+        return new  ResponseEntity<>(chatMessages, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{messageId}")
-    public ResponseEntity<ApiResponse> deleteMessageHandler(@PathVariable Integer messageId, @RequestHeader("Authorization") String token) throws UserException, MessageException {
-        User user = userService.findUserProfileByJwt(token);
-
-        chatMessageService.deleteChatMessageById(messageId, user);
-        ApiResponse apiResponse = new ApiResponse("message deleted successfully", true);
-        return new  ResponseEntity<>(apiResponse, HttpStatus.OK);
+    public ResponseEntity<?> deleteMessage(@PathVariable Integer messageId, Principal principal) {
+        chatMessageService.deleteChatMessage(messageId, principal.getName());
+        return new  ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

@@ -9,10 +9,22 @@ import {
 
 const initialValue= {
     findPlayList:null,
-    playLists: [],
+    playLists: {
+        content: [],
+        pageNumber: 0,
+        pageSize: 10,
+        totalElements: 0,
+        totalPages: 0,
+    },
     createPlayList : null,
     deletePlayList : null,
-    songs: [],
+    songs: {
+        content: [],
+        pageNumber: 0,
+        pageSize: 10,
+        totalElements: 0,
+        totalPages: 0,
+    },
     uploadSong: null,
     deletedSong: null,
 }

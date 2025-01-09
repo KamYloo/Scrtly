@@ -1,19 +1,17 @@
 import './App.css'
-import React, { useEffect, useState } from 'react'
+import React, {useState } from 'react'
 import {Toaster} from "react-hot-toast";
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { LeftMenu } from './Components/LeftMenu'
 import { Artist } from './Components/Artists/Artist.jsx'
 import { RightMenu } from './Components/RightMenu'
 import { ChatView } from './Components/ChatComponents/ChatView'
-import { Login } from './Components/AuthComponents/Login';
-import { Register } from './Components/AuthComponents/Register';
+import { Login } from './pages/Login.jsx';
+import { Register } from './pages/Register.jsx';
 import { Profile } from './Components/AuthComponents/Profile';
 import { ArtistsView } from './Components/Artists/ArtistsView.jsx'
 import { Discover } from './Components/DiscoverComponents/Discover.jsx'
 import { ProfileEdit } from "./Components/AuthComponents/ProfileEdit.jsx";
-import { useDispatch} from "react-redux";
-import { currentUser } from "./Redux/Auth/Action.js";
 import {AlbumsView} from "./Components/AlbumComponents/AlbumsView.jsx";
 import {Album} from "./Components/AlbumComponents/Album.jsx";
 import {PlayListForm} from "./Components/PlayListComponents/PlayListForm.jsx";
@@ -21,7 +19,6 @@ import {PlayList} from "./Components/PlayListComponents/PlayList.jsx";
 import {Home} from "./Components/Home.jsx";
 
 function App() {
-  const dispatch = useDispatch();
   const [createPlayList, setCreatePlayList] = useState(false)
   const [volume, setVolume] = useState(0.5)
   const [currentTrack, setCurrentTrack] = useState({ songName: 'Default Song', artist: 'Default Artist' })
@@ -29,10 +26,6 @@ function App() {
   const handleTrackChange = (songName, artist) => {
     setCurrentTrack({ songName, artist })
   }
-
-  useEffect(() => {
-    dispatch(currentUser())
-  }, [dispatch])
 
   const renderLayout = (Component, props) => {
     const { setVolume, currentTrack, volume, handleTrackChange} = props
@@ -42,10 +35,6 @@ function App() {
           <LeftMenu onVolumeChange={setVolume} currentTrack={currentTrack} setCreatePlayList={setCreatePlayList} />
           <Component volume={volume} onTrackChange={handleTrackChange}/>
           <RightMenu/>
-          <Toaster
-              position="bottom-right"
-              reverseOrder={false}
-          />
           {createPlayList && <PlayListForm onClose={() => setCreatePlayList(((prev) => !prev))} />}
           <div className="background"></div>
         </div>
@@ -100,7 +89,7 @@ function App() {
             renderLayout(Discover, { setVolume, currentTrack})
           } />
 
-          <Route path="/profile/:userId" element={
+          <Route path="/profile/:nickName" element={
             renderLayout(Profile, { setVolume, currentTrack})
           } />
 
@@ -108,9 +97,12 @@ function App() {
             renderLayout(ProfileEdit, { setVolume, currentTrack})
           } />
 
-          {/* Default Route */}
           <Route path="/" element={<Navigate to="/home" />} />
         </Routes>
+        <Toaster
+            position="bottom-right"
+            reverseOrder={false}
+        />
       </Router>
   )
 }

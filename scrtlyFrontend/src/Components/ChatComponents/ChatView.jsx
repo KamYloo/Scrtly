@@ -3,18 +3,15 @@ import '../../Styles/ChatView.css'
 import { ChatList } from './ChatList'
 import { Chat } from './Chat'
 import {useDispatch, useSelector} from "react-redux";
-import {currentUser} from "../../Redux/Auth/Action.js";
-import {getUsersChat} from "../../Redux/Chat/Action.js";
+import {getUserChats} from "../../Redux/Chat/Action.js";
 
 function ChatView() {
     const [currentChat, setCurrentChat] = useState(null);
-
     const dispatch = useDispatch();
-
     const { chat } = useSelector(store => store);
 
     useEffect(() => {
-        dispatch(getUsersChat())
+        dispatch(getUserChats())
     }, [chat.createdChat, chat.deletedChat, dispatch]);
 
     const handleCurrentChatRoom = (chatItem) => {

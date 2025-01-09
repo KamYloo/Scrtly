@@ -1,20 +1,19 @@
 import React, {useEffect, useState} from 'react'
-import { BASE_API_URL } from "../../config/api"
 import "../../Styles/Profile.css"
-import {useDispatch, useSelector} from "react-redux";
-import {updateUser} from "../../Redux/Auth/Action.js";
+import {useDispatch} from "react-redux";
+import {updateUser} from "../../Redux/AuthService/Action.js";
 import {useNavigate} from "react-router-dom";
-import {updatePost} from "../../Redux/Post/Action.js";
 import toast from "react-hot-toast";
 
 function ProfileEdit() {
   const dispatch = useDispatch()
-  const {auth} = useSelector(store => store);
-  const [fullName, setFullName] = useState(auth.reqUser?.fullName || "")
-  const [description, setDescription] = useState(auth.reqUser?.description || "")
+  const userData = (() => { try { return JSON.parse(localStorage.getItem("user")) || null; } catch { return null; } })();
+  const [fullName, setFullName] = useState(userData?.fullName || "")
+  const [description, setDescription] = useState(userData?.description || "")
   const [profilePicture, setProfilePicture] = useState(null)
-  const [preview, setPreview] = useState(auth.reqUser?.profilePicture ? `${BASE_API_URL}/${auth.reqUser.profilePicture}` : '');
+  const [preview, setPreview] = useState(userData?.profilePicture ? userData.profilePicture : '');
   const navigate = useNavigate()
+
 
 
   const handleFileChange = (e) => {
@@ -24,19 +23,25 @@ function ProfileEdit() {
   const handleSubmit = (e) => {
     e.preventDefault();
     const formData = new FormData();
-    formData.append("fullName", fullName);
-    formData.append("profilePicture", profilePicture);
-    formData.append("description", description);
+    const jsonBlob = new Blob([JSON.stringify({ fullName, description })], {
+      type: 'application/json',
+    });
+    formData.append('userDetails', jsonBlob);
+    if (profilePicture) {
+      formData.append("profilePicture", profilePicture);
+    }
 
     dispatch(updateUser(formData))
-        .then(() => {
+        .then((res) => {
+          const updatedUserData = { ...userData, profilePicture: res.profilePicture, description: res.description, fullName: res.fullName };
+          localStorage.setItem("user", JSON.stringify(updatedUserData));
           toast.success('User updated successfully.');
-          navigate(`/profile/${auth.reqUser.id}?reload=true`)
+          navigate(`/profile/${userData?.nickName}?reload=true`);
         })
         .catch(() => {
           toast.error('Failed to update user. Please try again.');
         });
-  }
+  };
 
   useEffect(() => {
     if (profilePicture) {
@@ -59,7 +64,7 @@ function ProfileEdit() {
             <div className="editAvatar">
               <div className="left">
                 <img src={preview} alt=""/>
-                <p>{auth.reqUser?.fullName || 'Name Surname'}</p>
+                <p>{userData?.fullName || 'Name Surname'}</p>
               </div>
               <div className="right">
                 <input type="file" onChange={handleFileChange}/>

@@ -10,19 +10,21 @@ import {
 export const createChatMessage = (messageData) => async (dispatch) => {
     await dispatchAction(dispatch, CREATE_NEW_MESSAGE_REQUEST, CREATE_NEW_MESSAGE_ERROR, '/api/messages/create', {
         method: 'POST',
-        body: JSON.stringify(messageData.data)
+        body: JSON.stringify(messageData.data),
+        credentials: 'include',
     });
 }
 
-export const getAllMessages = (reqData) => async (dispatch) => {
-    await dispatchAction(dispatch, GET_ALL_MESSAGES_REQUEST, GET_ALL_MESSAGES_ERROR, `/api/messages/chat/${reqData.chatId}`, {
+export const getAllMessages = (chatId) => async (dispatch) => {
+    await dispatchAction(dispatch, GET_ALL_MESSAGES_REQUEST, GET_ALL_MESSAGES_ERROR, `/api/messages/chat/${chatId}`, {
         method: 'GET',
-        body: JSON.stringify(reqData.data)
+        credentials: 'include',
     });
 }
 
 export const deleteChatMessage = (messageId) => async (dispatch) => {
     await dispatchAction(dispatch, DELETE_MESSAGE_REQUEST, DELETE_MESSAGE_ERROR, `/api/messages/delete/${messageId}`, {
         method: 'DELETE',
+        credentials: 'include',
     });
 };

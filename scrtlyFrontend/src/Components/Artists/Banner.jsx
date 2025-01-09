@@ -3,10 +3,9 @@ import React, {useState} from 'react'
 import Verification from '../../img/check.png'
 import { FaEllipsisH, FaHeadphones, FaCheck } from 'react-icons/fa'
 import {EditArtist} from "./EditArtist.jsx";
-import {BASE_API_URL} from "../../config/api.js";
 import {CreateAlbum} from "../AlbumComponents/CreateAlbum.jsx";
 import {useDispatch} from "react-redux";
-import {followUser} from "../../Redux/Auth/Action.js";
+import {followUser} from "../../Redux/AuthService/Action.js";
 
 // eslint-disable-next-line react/prop-types
 function Banner({artist}) {
@@ -14,14 +13,15 @@ function Banner({artist}) {
     const [editArtist, setEditArtist] = useState(false)
     const [createAlbum, setCreateAlbum] = useState(false)
     const dispatch = useDispatch()
+    const userData = (() => { try { return JSON.parse(localStorage.getItem("user")) || null; } catch { return null; } })();
 
     return (
         <div className='banner'>
-            <img src={`${BASE_API_URL}/${artist.findArtist?.bannerImg || ''}`} alt="" className='bannerImg' />
+            <img src={artist.findArtist?.bannerImg} alt="" className='bannerImg' />
             <div className="content">
                 <div className="top">
                     <p>Home <span>/Popular Artist</span></p>
-                    {artist.findArtist?.req_artist && <i onClick={() => setMenu(((prev) => !prev))}><FaEllipsisH/></i>}
+                    {artist.findArtist?.id === userData?.id && <i onClick={() => setMenu(((prev) => !prev))}><FaEllipsisH/></i>}
                     {menu && <ul className="list">
                         <li onClick={() => {
                         setEditArtist(((prev) => !prev))
@@ -47,8 +47,8 @@ function Banner({artist}) {
                         <p><i><FaHeadphones/></i> 12,132,5478 <span>Monthly listeners</span></p>
                     </div>
                     <div className="right">
-                        {!artist.findArtist?.req_artist && <button className={artist.findArtist?.followed ? 'following' : 'follow'}
-                        onClick={() => dispatch(followUser(artist.findArtist?.id))}><i><FaCheck/></i>{artist.findArtist?.followed ? 'Following': 'Follow'}</button>}
+                        {!artist.findArtist?.id === userData?.id && <button className={artist.findArtist?.followed ? 'following' : 'follow'}
+                        onClick={() => dispatch(followUser(artist.findArtist?.id))}><i><FaCheck/></i>{artist.findArtist?.observed ? 'Following': 'Follow'}</button>}
                     </div>
                 </div>
             </div>

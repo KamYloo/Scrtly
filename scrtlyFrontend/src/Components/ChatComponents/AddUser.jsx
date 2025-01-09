@@ -1,33 +1,25 @@
-import React, {useEffect, useState} from 'react'
+import React, {useState} from 'react'
 import {useDispatch, useSelector} from "react-redux";
-import {currentUser, searchUser} from "../../Redux/Auth/Action.js";
+import {searchUser} from "../../Redux/AuthService/Action.js";
 import {createChat} from "../../Redux/Chat/Action.js";
 import { MdCancel } from "react-icons/md";
-import {BASE_API_URL} from "../../config/api.js";
 
 function AddUser({onClose}) {
     const [keyword, setKeyword] = useState('');
     const dispatch = useDispatch();
 
     const { auth } = useSelector(store => store);
-    const token = localStorage.getItem('token')
-
-    useEffect(() => {
-        if (token)dispatch(currentUser(token))
-    }, [dispatch, token])
-
 
     const handleSearch = async (e) => {
         e.preventDefault();
         console.log(keyword);
         if (keyword.trim() !== '') {
-            dispatch(searchUser({ keyword, token }));
+            dispatch(searchUser({ keyword }));
         }
     }
 
-    const handleCreateChat = (user) => {
-        console.log(user);
-        dispatch(createChat({data: user}));
+    const handleCreateChat = (userId) => {
+        dispatch(createChat(userId));
     }
 
 
@@ -43,7 +35,7 @@ function AddUser({onClose}) {
                     {auth.searchResults.map((user) => (
                         <div className="user" key={user.id}>
                             <div className="detail">
-                                <img src={`${BASE_API_URL}/${user?.profilePicture || ''}`} alt=""/>
+                                <img src={user?.profilePicture} alt=""/>
                                 <span>{user.fullName}</span>
                             </div>
                             <button onClick={() => handleCreateChat(user.id)}>Add User</button>

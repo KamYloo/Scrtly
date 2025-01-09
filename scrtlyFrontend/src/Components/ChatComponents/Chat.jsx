@@ -5,10 +5,8 @@ import { BsCameraVideoFill, BsEmojiSmileFill } from "react-icons/bs";
 import {useDispatch, useSelector} from "react-redux";
 import {createChatMessage, deleteChatMessage, getAllMessages} from "../../Redux/ChatMessage/Action.js";
 import { formatDistanceToNow } from 'date-fns'
-import {BASE_API_URL} from "../../config/api.js";
 import SockJs from "sockjs-client/dist/sockjs"
 import {over} from "stompjs"
-import {deleteChat} from "../../Redux/Chat/Action.js";
 import {useNavigate} from "react-router-dom";
 
 // eslint-disable-next-line react/prop-types
@@ -20,8 +18,8 @@ function Chat({chat}) {
     const [isConnected, setConnected] = useState(false)
     const [messages, setMessages] = useState([])
 
-    const {auth, chatMessage } = useSelector(store => store);
-
+    const {chatMessage } = useSelector(store => store);
+    const userData = (() => { try { return JSON.parse(localStorage.getItem("user")) || null; } catch { return null; } })();
     const endRef = useRef(null)
     const dispatch = useDispatch();
     const navigate = useNavigate()
@@ -40,7 +38,7 @@ function Chat({chat}) {
     }
 
     const connect = () => {
-        const sock = new SockJs("http://localhost:8080/ws")
+        const sock = new SockJs("http://localhost:8080/api/ws")
         const temp = over(sock)
         setStompClient(temp)
 
@@ -94,7 +92,6 @@ function Chat({chat}) {
             const user1Id = chat.firstPerson.id;
             const user2Id = chat.secondPerson.id;
 
-            // Sprawdź, czy subskrypcje istnieją, zanim je usuniesz
             if (stompClient.subscriptions["/queue/private/" + user1Id]) {
                 stompClient.unsubscribe("/queue/private/" + user1Id);
             }
@@ -171,16 +168,16 @@ function Chat({chat}) {
     useEffect(() => {
         // eslint-disable-next-line react/prop-types
         if(chat.id)
-            dispatch(getAllMessages({chatId:chat.id}))
+            dispatch(getAllMessages(chat.id))
     }, [chat, chatMessage.newMessage, dispatch , chatMessage.deletedMessage]);
 
     // eslint-disable-next-line react/prop-types
-    const otherPerson = chat.firstPerson.id !== auth.reqUser.id ? chat.firstPerson : chat.secondPerson;
+    const otherPerson = chat.firstPerson.id !== userData?.id ? chat.firstPerson : chat.secondPerson;
     return (
         <div className='chat'>
             <div className="top">
                 <div className="user">
-                    <img src={`${BASE_API_URL}/${otherPerson?.profilePicture || ''}`} alt=""  onClick={() => navigate(`/profile/${otherPerson.id}`)}/>
+                    <img src={otherPerson?.profilePicture} alt=""  onClick={() => navigate(`/profile/${otherPerson.nickName}`)}/>
                     <div className="userData">
                         <span>{otherPerson.fullName}</span>
                         <p>{otherPerson?.description || ''}</p>
@@ -194,8 +191,8 @@ function Chat({chat}) {
             </div>
             <div className="center">
                 { messages?.map((item, index) => (
-                    <div className={item.user.id === auth.reqUser.id ? "messageOwn" : "message"} key={`${item.id}-${index}`}>
-                        <img src={`${BASE_API_URL}/${otherPerson?.profilePicture || ''}`} alt="" onClick={() => navigate(`/profile/${item.user.id}`)}/>
+                    <div className={item.user.id === userData?.id ? "messageOwn" : "message"} key={`${item.id}-${index}`}>
+                        <img src={otherPerson?.profilePicture} alt="" onClick={() => navigate(`/profile/${item.user.nickName}`)}/>
                         <div className="text">
                             <p>{item.messageText}</p>
                             <div className="info">

@@ -2,46 +2,46 @@ import React, { useEffect } from 'react';
 import "../../Styles/Profile.css";
 import { IoIosSettings } from "react-icons/io";
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { BASE_API_URL } from "../../config/api.js";
-import { findUserById, followUser } from "../../Redux/Auth/Action.js";
+import {findUser, followUser} from "../../Redux/AuthService/Action.js";
 import { useDispatch, useSelector } from "react-redux";
 
 function ProfileInfo() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const { userId } = useParams();
+    const { nickName } = useParams();
     const { auth } = useSelector(store => store);
     const location = useLocation();
+    const userData = (() => { try { return JSON.parse(localStorage.getItem("user")) || null; } catch { return null; } })();
 
     useEffect(() => {
-        dispatch(findUserById(userId));
-    }, [dispatch, userId]);
+        dispatch(findUser(nickName));
+    }, [dispatch, nickName]);
 
 
     useEffect(() => {
         const searchParams = new URLSearchParams(location.search);
         if (searchParams.get('reload')) {
-            dispatch(findUserById(userId));
+            dispatch(findUser(nickName));
         }
-    }, [location, dispatch, userId]);
+    }, [location, dispatch, nickName]);
 
     return (
         <div className='profileInfo'>
             <div className="userData">
                 <img
-                    src={`${BASE_API_URL}/${auth.findUser?.profilePicture || ''}`}
+                    src={auth.findUser?.profilePicture || ''}
                     alt={auth.findUser?.fullName || 'Profile Picture'}
                 />
                 <div className="right">
                     <div className="top">
                         <p>{auth.findUser?.fullName || 'Name Surname'}</p>
-                        {!auth.findUser?.req_user && (
-                            <button className={auth.findUser?.followed ? 'following' : 'follow'}
-                                    onClick={() => dispatch(followUser(userId))}>
-                                {auth.findUser?.followed ? 'unFollow' : 'Follow'}
+                        {auth.findUser?.id !== userData?.id && (
+                            <button className={auth.findUser?.observed ? 'following' : 'follow'}
+                                    onClick={() => dispatch(followUser(auth.findUser?.id))}>
+                                {auth.findUser?.observed ? 'unFollow' : 'Follow'}
                             </button>
                         )}
-                        {auth.findUser?.req_user && (
+                        {auth.findUser?.id === userData?.id && (
                             <button onClick={() => navigate("/profile/edit")}>
                                 Edit Profile
                             </button>
@@ -50,8 +50,8 @@ function ProfileInfo() {
                     </div>
                     <div className="stats">
                         <p>Posts: 45</p>
-                        <p>{auth.findUser?.totalFollowers} Followers</p>
-                        <p>Following: {auth.findUser?.totalFollowing}</p>
+                        <p>{auth.findUser?.observersCount} Followers</p>
+                        <p>Following: {auth.findUser?.observationsCount}</p>
                     </div>
                     <div className="description">
                         <p>{auth.findUser?.fullName || 'Name'}</p>

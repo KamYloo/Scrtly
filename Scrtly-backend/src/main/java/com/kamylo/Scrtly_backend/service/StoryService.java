@@ -1,9 +1,7 @@
 package com.kamylo.Scrtly_backend.service;
 
-import com.kamylo.Scrtly_backend.exception.StoryException;
-import com.kamylo.Scrtly_backend.exception.UserException;
-import com.kamylo.Scrtly_backend.model.Story;
-import com.kamylo.Scrtly_backend.model.User;
+import com.kamylo.Scrtly_backend.dto.StoryDto;
+import com.kamylo.Scrtly_backend.entity.UserEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,9 +10,8 @@ import java.util.Map;
 
 @Service
 public interface StoryService {
-    Story createStory(Long userId, MultipartFile storyImage) throws UserException;
-    Story findStoryById(Long storyId) throws StoryException;
-    List<Story> getStoriesByUserId(Long userId) throws UserException, StoryException;
-    Map<User, List<Story>> getGroupedStoriesByFollowedUsers(Long userId);
-    void deleteStory(Long storyId, Long userId) throws UserException, StoryException;
+    StoryDto createStory(String username, MultipartFile storyImage);
+    List<StoryDto> getStoriesByUser(String username);
+    Map<UserEntity, List<StoryDto>> getGroupedStoriesByFollowedUsers(String username);
+    void deleteStory(Long storyId, String username);
 }

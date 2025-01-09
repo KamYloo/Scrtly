@@ -7,21 +7,23 @@ import {
     GET_USERS_CHAT_ERROR, GET_USERS_CHAT_REQUEST
 } from "./ActionType.js";
 
-export const createChat = (chatData) => async (dispatch) => {
-    await dispatchAction(dispatch, CREATE_CHAT_REQUEST, CREATE_CHAT_ERROR, '/api/chats/chatRoom', {
+export const createChat = (userId) => async (dispatch) => {
+    await dispatchAction(dispatch, CREATE_CHAT_REQUEST, CREATE_CHAT_ERROR, `/api/chats/create/${userId}`, {
         method: 'POST',
-        body: JSON.stringify(chatData.data)
+        credentials: 'include',
     });
 }
 
-export const getUsersChat = () => async (dispatch) => {
+export const getUserChats = () => async (dispatch) => {
     await dispatchAction(dispatch, GET_USERS_CHAT_REQUEST, GET_USERS_CHAT_ERROR, '/api/chats/user', {
         method: 'GET',
+        credentials: 'include',
     });
 }
 
 export const deleteChat = (chatRoomId) => async (dispatch) => {
     await dispatchAction(dispatch, DELETE_CHAT_REQUEST, DELETE_CHAT_ERROR, `/api/chats/delete/${chatRoomId}`, {
         method: 'DELETE',
+        credentials: 'include',
     });
 };

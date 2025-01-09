@@ -1,68 +1,47 @@
 package com.kamylo.Scrtly_backend.controller;
 
-
 import com.kamylo.Scrtly_backend.dto.CommentDto;
-import com.kamylo.Scrtly_backend.dto.mapper.CommentDtoMapper;
-import com.kamylo.Scrtly_backend.exception.CommentException;
-import com.kamylo.Scrtly_backend.exception.PostException;
-import com.kamylo.Scrtly_backend.exception.UserException;
-import com.kamylo.Scrtly_backend.model.Comment;
-import com.kamylo.Scrtly_backend.model.User;
-import com.kamylo.Scrtly_backend.request.SendCommentRequest;
-import com.kamylo.Scrtly_backend.response.ApiResponse;
+import com.kamylo.Scrtly_backend.request.CommentRequest;
+import com.kamylo.Scrtly_backend.response.PagedResponse;
 import com.kamylo.Scrtly_backend.service.CommentService;
-import com.kamylo.Scrtly_backend.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import java.security.Principal;
 
 @RestController
-@RequestMapping("/api/comments")
+@RequestMapping("/comments")
+@AllArgsConstructor
 public class CommentController {
-    @Autowired
-    private CommentService commentService;
+    private final CommentService commentService;
 
-    @Autowired
-    private UserService userService;
-
-    @PostMapping("/create/{postId}")
-    public ResponseEntity<CommentDto> createCommentHandler(@RequestBody SendCommentRequest sendCommentRequest, @RequestHeader("Authorization") String token) throws UserException, PostException {
-        User user = userService.findUserProfileByJwt(token);
-        sendCommentRequest.setUser(user);
-        Comment comment = commentService.createComment(sendCommentRequest);
-        CommentDto commentDto = CommentDtoMapper.commentDto(comment,user);
-
-        return new  ResponseEntity<>(commentDto, HttpStatus.OK);
+    @PostMapping("/create")
+    public ResponseEntity<CommentDto> createComment(@RequestBody CommentRequest commentRequest, Principal principal) {
+        CommentDto comment = commentService.createComment(commentRequest, principal.getName());
+        return new  ResponseEntity<>(comment, HttpStatus.CREATED);
     }
 
-    @GetMapping("/get/{postId}")
-    public ResponseEntity<List<CommentDto>> getAllCommentsByPostIdHandler(@PathVariable Long postId, @RequestHeader("Authorization") String token) throws UserException, PostException {
-        User user = userService.findUserProfileByJwt(token);
-        List<Comment> comments = commentService.getAllCommentsByPostId(postId);
-        List<CommentDto> commentDtos = CommentDtoMapper.commentDtoList(comments, user);
-        return new ResponseEntity<>(commentDtos, HttpStatus.OK);
+    @GetMapping("/all/{postId}")
+    public ResponseEntity<PagedResponse<CommentDto>> getComments(@PathVariable Long postId,
+                                                                 @RequestParam(defaultValue = "all") String sortBy,
+                                                                 Pageable pageable,
+                                                                 Principal principal)  {
+        Page<CommentDto> comments = commentService.getCommentsByPostId(postId, sortBy, pageable, principal.getName());
+        return new ResponseEntity<>(PagedResponse.of(comments), HttpStatus.OK);
     }
 
+    @PutMapping("/update/{commentId}")
+    public ResponseEntity<CommentDto> updateComment(@PathVariable Long commentId ,@RequestParam String content , Principal principal) {
+        CommentDto comment = commentService.updateComment(commentId, content, principal.getName());
+        return new ResponseEntity<>(comment, HttpStatus.OK);
+    }
 
     @DeleteMapping("/delete/{commentId}")
-    public ResponseEntity<ApiResponse> deleteCommentHandler(@PathVariable Long commentId, @RequestHeader("Authorization") String token) throws UserException, CommentException {
-        User user = userService.findUserProfileByJwt(token);
-        ApiResponse res = new ApiResponse();
-
-        try {
-            Comment comment = commentService.findCommentById(commentId);
-            if (comment == null) {
-                throw new CommentException("Comment not found with id " + commentId);
-            }
-            commentService.deleteComment(commentId, user.getId());
-            res.setMessage("Comment deleted");
-            return new ResponseEntity<>(res, HttpStatus.OK);
-        } catch (UserException | CommentException e) {
-            res.setMessage(e.getMessage());
-            return new ResponseEntity<>(res, HttpStatus.FORBIDDEN);
-        }
+    public ResponseEntity<?> deleteComment(@PathVariable Long commentId, Principal principal) {
+        commentService.deleteComment(commentId, principal.getName());
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

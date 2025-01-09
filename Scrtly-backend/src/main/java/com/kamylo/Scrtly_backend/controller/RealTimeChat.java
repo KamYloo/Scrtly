@@ -1,32 +1,30 @@
 package com.kamylo.Scrtly_backend.controller;
 
-import com.kamylo.Scrtly_backend.model.ChatMessage;
-import com.kamylo.Scrtly_backend.model.ChatRoom;
-import org.apache.logging.log4j.message.Message;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.kamylo.Scrtly_backend.dto.ChatMessageDto;
+import com.kamylo.Scrtly_backend.dto.ChatRoomDto;
+import lombok.AllArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.RestController;
 
+@AllArgsConstructor
 @RestController
 public class RealTimeChat {
 
-    @Autowired
-    private SimpMessagingTemplate template;
+    private final SimpMessagingTemplate template;
 
     @MessageMapping("/message")
-    public ChatMessage receiveMessage(@Payload ChatMessage message) {
+    public ChatMessageDto receiveMessage(@Payload ChatMessageDto  chatMessage) {
 
-        ChatRoom chatRoom = message.getChatRoom();
+        ChatRoomDto chatRoom = chatMessage.getChatRoom();
 
         String user1Destination = "/queue/private/" + chatRoom.getFirstPerson().getId();
         String user2Destination = "/queue/private/" + chatRoom.getSecondPerson().getId();
 
-        template.convertAndSend(user1Destination, message);
-        template.convertAndSend(user2Destination, message);
+        template.convertAndSend(user1Destination, chatMessage);
+        template.convertAndSend(user2Destination, chatMessage);
 
-        return message;
+        return chatMessage;
     }
 }

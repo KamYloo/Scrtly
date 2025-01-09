@@ -5,7 +5,6 @@ import { BiSearchAlt } from "react-icons/bi";
 import { FaCirclePlay } from "react-icons/fa6";
 import {useDispatch, useSelector} from "react-redux";
 import {getAllAlbums} from "../../Redux/Album/Action.js";
-import {BASE_API_URL} from "../../config/api.js";
 import {useNavigate} from "react-router-dom";
 
 function AlbumsView() {
@@ -14,7 +13,7 @@ function AlbumsView() {
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
 
-    const filteredAlbums = album.albums.filter(albumItem =>
+    const filteredAlbums = album?.albums.content.filter(albumItem =>
         albumItem.title.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
@@ -42,7 +41,7 @@ function AlbumsView() {
                 {filteredAlbums.map((item) => (
                     <div className="album" key={item.id} onClick={() => navigate(`/album/${item.id}`)}>
                         <i className="play"><FaCirclePlay/></i>
-                        <img src={`${BASE_API_URL}${item?.albumImage || ''}`} alt=""/>
+                        <img src={item?.albumImage || ''} alt=""/>
                         <span>{item?.artist.artistName}</span>
                         <p>{item?.title}</p>
                     </div>

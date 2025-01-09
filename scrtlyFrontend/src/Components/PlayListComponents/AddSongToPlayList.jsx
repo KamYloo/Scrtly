@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import {useDispatch, useSelector} from "react-redux";
 import {searchSong} from "../../Redux/Song/Action.js";
-import {BASE_API_URL} from "../../config/api.js";
 import {addSongToPlayList} from "../../Redux/PlayList/Action.js";
 
 function AddSongToPlayList({playListId}) {
@@ -31,7 +30,7 @@ function AddSongToPlayList({playListId}) {
                     {song.searchResults.map((song) => (
                         <div className="song" key={song.id}>
                             <div className="detail">
-                                <img src={`${BASE_API_URL}${song?.imageSong || ''}`} alt="" />
+                                <img src={song?.imageSong} alt="" />
                                 <div className="songData">
                                     <span>{song?.title}</span>
                                     <p>{song?.artist.artistName}</p>

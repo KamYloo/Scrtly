@@ -2,99 +2,65 @@ package com.kamylo.Scrtly_backend.controller;
 
 import com.kamylo.Scrtly_backend.dto.AlbumDto;
 import com.kamylo.Scrtly_backend.dto.SongDto;
-import com.kamylo.Scrtly_backend.dto.mapper.AlbumDtoMapper;
-import com.kamylo.Scrtly_backend.dto.mapper.SongDtoMapper;
-import com.kamylo.Scrtly_backend.exception.AlbumException;
-import com.kamylo.Scrtly_backend.exception.ArtistException;
-import com.kamylo.Scrtly_backend.exception.UserException;
-import com.kamylo.Scrtly_backend.model.Album;
-import com.kamylo.Scrtly_backend.model.Artist;
-import com.kamylo.Scrtly_backend.model.Song;
-import com.kamylo.Scrtly_backend.model.User;
-import com.kamylo.Scrtly_backend.request.AlbumRequest;
-import com.kamylo.Scrtly_backend.response.ApiResponse;
+import com.kamylo.Scrtly_backend.response.PagedResponse;
 import com.kamylo.Scrtly_backend.service.AlbumService;
-import com.kamylo.Scrtly_backend.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.security.Principal;
 import java.util.List;
-import java.util.Set;
 
 
 @RestController
-@RequestMapping("/api/albums")
+@AllArgsConstructor
+@RequestMapping("/albums")
 public class AlbumController {
-    @Autowired
-    private AlbumService albumService;
 
-    @Autowired
-    private UserService userService;
+    private final AlbumService albumService;
 
     @PostMapping("/create")
-    public ResponseEntity<AlbumDto> createAlbumHandler(@RequestParam("file") MultipartFile file,
+    public ResponseEntity<AlbumDto> createAlbum(@RequestParam(value = "file", required = false) MultipartFile file,
                                                        @RequestParam("title") String title,
-                                                       @RequestHeader("Authorization") String token) throws ArtistException, UserException {
-        if (file.isEmpty()) {
-            throw new RuntimeException("Image file not uploaded.");
-        }
-        User user = userService.findUserProfileByJwt(token);
-        AlbumRequest albumRequest = new AlbumRequest();
-        albumRequest.setTitle(title);
-        albumRequest.setArtist((Artist) user);
-        Album album = albumService.createAlbum(albumRequest, file);
-        AlbumDto albumDto = AlbumDtoMapper.toAlbumDto(album, user);
+                                                       Principal principal) {
+
+        AlbumDto albumDto = albumService.createAlbum(title, file, principal.getName());
         return new ResponseEntity<>(albumDto, HttpStatus.CREATED);
     }
 
-    @GetMapping("/getAll")
-    public ResponseEntity<List<AlbumDto>> getAllAlbumsHandler(@RequestHeader("Authorization") String token) throws UserException {
-        User user = userService.findUserProfileByJwt(token);
-        List<Album> albums = albumService.getAllAlbums();
-        List<AlbumDto> albumDtos = AlbumDtoMapper.toAlbumDtos(albums, user);
-        return new ResponseEntity<>(albumDtos, HttpStatus.OK);
+    @GetMapping("/all")
+    public ResponseEntity<PagedResponse<AlbumDto>> getAlbums(@PageableDefault(size = 9) Pageable pageable) {
+        Page<AlbumDto> albums = albumService.getAlbums(pageable);
+        return new ResponseEntity<>(PagedResponse.of(albums), HttpStatus.OK);
     }
 
     @GetMapping("/artist/{artistId}")
-    public ResponseEntity<List<AlbumDto>> getAlbumsByArtistHandler(@PathVariable("artistId") Long artistId, @RequestHeader("Authorization") String token) throws UserException, ArtistException {
-        User user = userService.findUserProfileByJwt(token);
-        List<Album> albums = albumService.getAlbumsByArtist(artistId);
-        List<AlbumDto> albumDtos = AlbumDtoMapper.toAlbumDtos(albums, user);
-        return new ResponseEntity<>(albumDtos, HttpStatus.OK);
+    public ResponseEntity<List<AlbumDto>> getAlbumsByArtist(@PathVariable("artistId") Long artistId) {
+        List<AlbumDto> albums = albumService.getAlbumsByArtist(artistId);
+        return new ResponseEntity<>(albums, HttpStatus.OK);
     }
 
     @GetMapping("/{albumId}")
-    public ResponseEntity<AlbumDto> getAlbumHandler(@PathVariable Integer albumId, @RequestHeader("Authorization") String token) throws AlbumException, UserException {
-        User user = userService.findUserProfileByJwt(token);
-        Album album = albumService.getAlbum(albumId);
-        AlbumDto albumDto = AlbumDtoMapper.toAlbumDto(album, user);
-        return new ResponseEntity<>(albumDto, HttpStatus.ACCEPTED);
+    public ResponseEntity<AlbumDto> getAlbum(@PathVariable Integer albumId) {
+        AlbumDto album = albumService.getAlbum(albumId);
+        return new ResponseEntity<>(album, HttpStatus.OK);
     }
 
     @GetMapping("/{albumId}/tracks")
-    public ResponseEntity<List<SongDto>> getAlbumTracksHandler(@PathVariable Integer albumId, @RequestHeader("Authorization") String token) throws AlbumException, UserException {
-        User user = userService.findUserProfileByJwt(token);
-        List<Song> songs = albumService.getAlbumTracks(albumId);
-        List<SongDto> songDtos = SongDtoMapper.toSongDtoListArrayList(songs,user);
-        return new ResponseEntity<>(songDtos, HttpStatus.OK);
+    public ResponseEntity<List<SongDto>> getAlbumTracks(@PathVariable Integer albumId) {
+        List<SongDto> songs = albumService.getAlbumTracks(albumId);
+        return new  ResponseEntity<>(songs, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{albumId}")
-    public ResponseEntity<ApiResponse> deleteAlbumHandler(@PathVariable Integer albumId , @RequestHeader("Authorization") String token) throws UserException, AlbumException, ArtistException {
-        Artist artist = (Artist) userService.findUserProfileByJwt(token);
-        ApiResponse res = new ApiResponse();
-
-        try {
-            albumService.deleteAlbum(albumId, artist.getId());
-            res.setMessage("Album deleted successfully.");
-            return new ResponseEntity<>(res, HttpStatus.OK);
-        }
-        catch (ArtistException | AlbumException e) {
-            res.setMessage(e.getMessage());
-            return new ResponseEntity<>(res, HttpStatus.FORBIDDEN);
-        }
+    public ResponseEntity<?> deleteAlbum(@PathVariable Integer albumId , Principal principal) {
+        albumService.deleteAlbum(albumId, principal.getName());
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

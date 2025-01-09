@@ -2,13 +2,12 @@ import React, {useEffect, useState} from 'react'
 import {MdCancel} from "react-icons/md";
 import {useDispatch} from "react-redux";
 import {createPlayList, updatePlayList} from "../../Redux/PlayList/Action.js";
-import {BASE_API_URL} from "../../config/api.js";
 import toast from "react-hot-toast";
 
 function PlayListForm({onClose, isEdit}) {
     const [title, setTitle] = useState(isEdit?.title || "")
     const [playListImg, setPlayListImg] = useState(null)
-    const [preview, setPreview] = useState(isEdit?.playListImage ? `${BASE_API_URL}${isEdit.playListImage}` : '');
+    const [preview, setPreview] = useState(isEdit?.playListImage ? `${isEdit.playListImage}` : '');
     const dispatch = useDispatch()
 
     const handleFileChange = (e) => {

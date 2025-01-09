@@ -9,12 +9,14 @@ import {
 export const createStory = (formData) => async (dispatch) => {
     await dispatchAction(dispatch, STORY_CREATE_REQUEST, STORY_CREATE_FAILURE, '/api/stories/create', {
         method: 'POST',
-        body: formData
+        body: formData,
+        credentials: 'include',
     });
 }
 
 export const getFollowedUsersStory = () => async (dispatch) => {
     await dispatchAction(dispatch, GET_USERS_FOLLOWED_STORY_REQUEST, GET_USERS_FOLLOWED_STORY_ERROR, '/api/stories/followed', {
         method: 'GET',
+        credentials: 'include',
     });
 }

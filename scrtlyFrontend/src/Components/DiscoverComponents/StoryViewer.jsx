@@ -1,6 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react'
 import {FaChevronLeft, FaChevronRight} from "react-icons/fa";
-import {BASE_API_URL} from "../../config/api.js";
 
 // eslint-disable-next-line react/prop-types
 function StoryViewer({ stories, currentUserIndex, currentStoryIndex, onClose }) {
@@ -88,7 +87,7 @@ function StoryViewer({ stories, currentUserIndex, currentStoryIndex, onClose }) 
                 <div className="progress-bar">
                     <div className="progress" style={{width: `${progress}%`}}></div>
                 </div>
-                <img src={`${BASE_API_URL}${currentUserStories[currentStory]?.image}`} alt={`Story ${currentStory}`} />
+                <img src={currentUserStories[currentStory]?.image} alt={`Story ${currentStory}`} />
                 <p>{currentUserStories[0]?.user?.fullName}</p>
             </div>
             <button className="nav-button right" onClick={handleNextStory}>

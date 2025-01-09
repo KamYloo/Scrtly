@@ -1,7 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import { FaChevronRight, FaChevronLeft } from "react-icons/fa";
 import {useDispatch, useSelector} from "react-redux";
-import {BASE_API_URL} from "../../config/api.js";
 import {AddStory} from "./AddStory.jsx";
 import {StoryViewer} from "./StoryViewer.jsx";
 
@@ -15,8 +14,8 @@ function Stories() {
   const [currentUserIndex, setCurrentUserIndex] = useState(0);
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
   const dispatch = useDispatch()
-
-  const {auth, story} = useSelector(store => store);
+  const userData = (() => { try { return JSON.parse(localStorage.getItem("user")) || null; } catch { return null; } })();
+  const {story} = useSelector(store => store);
 
     const handleScrollLeft = () => {
     storyBoxRef.current.scrollBy({
@@ -50,12 +49,12 @@ function Stories() {
         </button>
         <div className="box" ref={storyBoxRef}>
           <div className="story add-story" onClick={() => setAddStory(((prev) => !prev))}>
-            <img src={`${BASE_API_URL}/${auth.reqUser?.profilePicture || ''}`} alt="Add story" />
+            <img src={userData?.profilePicture } alt="Add story" />
             <span>+ Story</span>
           </div>
             {Object.entries(story.stories).map(([user, stories], userIndex) => (
                 <div className="story" key={userIndex} onClick={() => handleStoryClick(userIndex, 0)}>
-                    <img src={`${BASE_API_URL}/${stories[0]?.user?.profilePicture || ''}`} alt={stories[0]?.user?.fullName || ''} />
+                    <img src={stories[0]?.user?.profilePicture} alt={stories[0]?.user?.fullName || ''} />
                     <span>{stories[0]?.user?.fullName || ''}</span>
                 </div>
             ))}

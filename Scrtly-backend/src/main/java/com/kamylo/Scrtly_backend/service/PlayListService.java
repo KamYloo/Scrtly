@@ -1,29 +1,24 @@
 package com.kamylo.Scrtly_backend.service;
 
-import com.kamylo.Scrtly_backend.exception.PlayListException;
-import com.kamylo.Scrtly_backend.exception.SongException;
-import com.kamylo.Scrtly_backend.exception.UserException;
-import com.kamylo.Scrtly_backend.model.PlayList;
-import com.kamylo.Scrtly_backend.model.Song;
-import com.kamylo.Scrtly_backend.model.User;
+import com.kamylo.Scrtly_backend.dto.PlayListDto;
+import com.kamylo.Scrtly_backend.dto.SongDto;
+import com.kamylo.Scrtly_backend.entity.SongEntity;
+import com.kamylo.Scrtly_backend.entity.UserEntity;
 import com.kamylo.Scrtly_backend.request.PlayListRequest;
-import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.Set;
-
-@Service
 public interface PlayListService {
-    PlayList createPlayList(PlayListRequest playListRequest, MultipartFile playListImage) throws UserException;
-    PlayList getPlayList(Integer playListId) throws PlayListException;
-    List<PlayList> getPlayLists();
-    List<PlayList> getPlayListsByUser(Long userId) throws UserException;
-    PlayList addSongToPlayList(Long songId, Integer playListId) throws SongException, PlayListException;
-    void addToFavourites(User user, Song song);
-    void removeFromFavourites(User user, Song song);
-    void removeSongFromPlayList(Long songId, Integer playListId) throws SongException, PlayListException;
-    Set<Song> getPlayListTracks (Integer playListId) throws PlayListException;
-    PlayList updatePlayList(Integer playListId, String title, Long userId, MultipartFile playListImage) throws PlayListException, UserException;
-    void deletePlayList(Integer playListId, Long userId) throws PlayListException, UserException;
+    PlayListDto createPlayList(String title, String username, MultipartFile playListImage) ;
+    PlayListDto getPlayList(Integer playListId);
+    Page<PlayListDto> getPlayLists(Pageable pageable);
+    Page<PlayListDto> getPlayListsByUser(String username, Pageable pageable);
+    PlayListDto addSongToPlayList(Long songId, Integer playListId, String username);
+    void addToFavourites(UserEntity userEntity, SongEntity songEntity);
+    void removeFromFavourites(UserEntity userEntity, SongEntity songEntity);
+    void removeSongFromPlayList(Long songId, Integer playListId, String username);
+    Page<SongDto> getPlayListTracks (Integer playListId, Pageable pageable);
+    PlayListDto updatePlayList(PlayListRequest playListRequest, String username, MultipartFile playListImage);
+    void deletePlayList(Integer playListId, String username);
 }

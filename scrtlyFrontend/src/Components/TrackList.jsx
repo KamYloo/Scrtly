@@ -12,7 +12,7 @@ function TrackList({ onVolumeChange, songName, artist }) {
     const changeVolume = (event) => {
         const newVolume = event.target.value;
         setVolume(newVolume);
-        onVolumeChange(newVolume);  // Wywołujemy funkcję z LeftMenu przy zmianie głośności
+        onVolumeChange(newVolume);
     }
 
     useEffect(() => {

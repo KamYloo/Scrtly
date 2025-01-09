@@ -2,9 +2,8 @@ import React, {useState} from 'react'
 import { IoMdPhotos } from "react-icons/io";
 import { BsEmojiSmileFill , BsCameraVideoFill} from "react-icons/bs";
 import EmojiPicker from 'emoji-picker-react'
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch} from "react-redux";
 import {createPost} from "../../Redux/Post/Action.js";
-import {BASE_API_URL} from "../../config/api.js";
 import {useNavigate} from "react-router-dom";
 import toast from "react-hot-toast";
 
@@ -14,7 +13,7 @@ function AddPost() {
   const [descriptionText, setDescriptionText] = useState('')
   const [filePic, setFilePic] = useState(null)
   const [openEmoji, setOpenEmoji] = useState(false)
-  const { auth } = useSelector(store => store);
+  const userData = (() => { try { return JSON.parse(localStorage.getItem("user")) || null; } catch { return null; } })();
   const navigate = useNavigate();
 
   const handleFileChange = (e) => {
@@ -47,7 +46,7 @@ function AddPost() {
   return (
     <div className='addPost'>
       <div className="context">
-        <img src={`${BASE_API_URL}/${auth.reqUser?.profilePicture || ''}`} alt="" onClick={() => navigate(`/profile/${auth.reqUser.id}`)}/>
+        <img src={userData?.profilePicture} alt="" onClick={() => navigate(`/profile/${userData?.nickName}`)}/>
         <div className="middle">
           <textarea type="text" value={descriptionText}
                     onChange={(e) => setDescriptionText(e.target.value)} />

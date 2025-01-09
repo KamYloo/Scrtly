@@ -1,21 +1,13 @@
 package com.kamylo.Scrtly_backend.service;
 
-import com.kamylo.Scrtly_backend.exception.CommentException;
-import com.kamylo.Scrtly_backend.exception.PostException;
-import com.kamylo.Scrtly_backend.exception.UserException;
-import com.kamylo.Scrtly_backend.model.Like;
-import com.kamylo.Scrtly_backend.model.User;
-import org.springframework.stereotype.Service;
+import com.kamylo.Scrtly_backend.dto.LikeDto;
 
-import java.util.List;
-
-@Service
 public interface LikeService {
-    Like likePost(Long postId, User user) throws UserException, PostException;
+    LikeDto likePost(Long postId, String username);
 
-    Like likeComment(Long commentId, User user) throws UserException, CommentException;
+    LikeDto likeComment(Long commentId, String username);
 
-    public List<Like> getLikesByPost(Long postId) throws PostException;
-
-    public List<Like> getLikesByComment(Long commentId) throws CommentException;
+//    public List<LikeEntity> getLikesByPost(Long postId);
+//
+//    public List<LikeEntity> getLikesByComment(Long commentId);
 }

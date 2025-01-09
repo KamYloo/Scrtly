@@ -2,7 +2,7 @@ export const BASE_API_URL = "http://localhost:8080"
 
 const fetchWithAuth = async (url, options = {}, errorType) => {
     const headers = {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Authorization': `Bearer ${localStorage.getItem('refreshToken')}`,
         ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
         ...options.headers,
     };
@@ -14,8 +14,9 @@ const fetchWithAuth = async (url, options = {}, errorType) => {
             const errorData = await response.json();
             return { error: true, message: errorData.message || 'Request failed' };
         }
-
-        return await response.json();
+        const contentType = response.headers.get('content-type');
+        const isJson = contentType && contentType.includes('application/json');
+        return isJson ? await response.json() : await response.text();
     } catch (error) {
         console.error(`Error in ${errorType}:`, error);
         throw new Error(error.message);
@@ -26,10 +27,18 @@ const fetchWithAuth = async (url, options = {}, errorType) => {
 export const dispatchAction = async (dispatch, actionTypeRequest, actionTypeError, url, options = {}) => {
     const result = await fetchWithAuth(url, options, actionTypeRequest);
     console.log(result);
+
+    if (result.refreshToken) {
+        localStorage.setItem('refreshToken', result.refreshToken);
+        localStorage.setItem('user', JSON.stringify(result.user));
+    }
+
     if (result.error) {
         dispatch({ type: actionTypeError, payload: result.message });
         throw new Error(result.message);
     }
 
     dispatch({ type: actionTypeRequest, payload: result });
+
+    return result
 };

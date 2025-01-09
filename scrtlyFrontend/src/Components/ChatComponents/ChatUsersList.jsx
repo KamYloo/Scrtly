@@ -4,8 +4,7 @@ import { MdDeleteSweep } from "react-icons/md";
 import { BsPlus } from "react-icons/bs";
 import { FaMinus } from "react-icons/fa";
 import { AddUser } from './AddUser';
-import {BASE_API_URL} from "../../config/api.js";
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch} from "react-redux";
 import {deleteChat} from "../../Redux/Chat/Action.js";
 import {useNavigate} from "react-router-dom";
 import toast from "react-hot-toast";
@@ -14,14 +13,14 @@ import toast from "react-hot-toast";
 function ChatUsersList({chat, onChatSelect }) {
     const [addMode, setAddMode] = useState(false)
     const [searchQuery, setSearchQuery] = useState('');
-    const {auth } = useSelector(store => store);
+    const userData = (() => { try { return JSON.parse(localStorage.getItem("user")) || null; } catch { return null; } })();
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     // eslint-disable-next-line react/prop-types
     const filteredChats = chat?.chats?.filter(chatItem => {
         // eslint-disable-next-line react/prop-types
-        const isUserFirstPerson = chatItem?.firstPerson.id === auth?.reqUser.id
+        const isUserFirstPerson = chatItem?.firstPerson.id === userData?.id
         const otherPerson = isUserFirstPerson ? chatItem.secondPerson : chatItem.firstPerson
 
         return otherPerson.fullName.toLowerCase().includes(searchQuery.toLowerCase())
@@ -59,12 +58,12 @@ function ChatUsersList({chat, onChatSelect }) {
                 {filteredChats.length > 0 ? (
                     filteredChats.map((chatItem) => {
                         // eslint-disable-next-line react/prop-types
-                        const isUserFirstPerson = chatItem?.firstPerson.id === auth?.reqUser.id
+                        const isUserFirstPerson = chatItem?.firstPerson.id === userData?.id
                         const otherPerson = isUserFirstPerson ? chatItem?.secondPerson : chatItem?.firstPerson
 
                         return (
                             <div className="userItem" key={chatItem.id} onClick={() => onChatSelect(chatItem)}>
-                                <img src={`${BASE_API_URL}/${otherPerson?.profilePicture || ''}`} alt=""/>
+                                <img src={otherPerson?.profilePicture} alt=""/>
                                 <div className="text">
                                     <span>{otherPerson.fullName}</span>
                                     <p>afdsafdsgad</p>

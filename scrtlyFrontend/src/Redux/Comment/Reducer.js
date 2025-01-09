@@ -9,7 +9,13 @@ import {
 
 const initialValue = {
     createdComment:null,
-    comments: [],
+    comments: {
+        content: [],
+        pageNumber: 0,
+        pageSize: 10,
+        totalElements: 0,
+        totalPages: 0,
+    },
     deletedComment:null,
     likeComment:null,
 }

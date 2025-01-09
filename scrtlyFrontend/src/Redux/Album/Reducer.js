@@ -5,7 +5,14 @@ import {
 
 const initialValue= {
     findAlbum:null,
-    albums: [],
+    albums: {
+        content: [],
+        pageNumber: 0,
+        pageSize: 10,
+        totalElements: 0,
+        totalPages: 0,
+    },
+    albums2: [],
     createAlbum : null,
     deleteAlbum : null,
     songs: [],
@@ -20,7 +27,7 @@ export const albumReducer=(store=initialValue, {type,payload})=>{
         return {...store, albums: payload}
     }
     else if(type === GET_ARTIST_ALBUMS_REQUEST) {
-        return {...store, albums: payload}
+        return {...store, albums2: payload}
     }
     else if(type === FIND_ALBUM_REQUEST) {
         return {...store, findAlbum: payload}

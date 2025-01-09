@@ -1,6 +1,5 @@
 import React, {useEffect} from 'react'
 import {FaCirclePlay} from "react-icons/fa6";
-import {BASE_API_URL} from "../../config/api.js";
 import "../../Styles/AlbumsView&&ArtistsView.css"
 import {getArtistAlbums} from "../../Redux/Album/Action.js";
 import {useDispatch, useSelector} from "react-redux";
@@ -19,10 +18,10 @@ function ArtistAlbums() {
     return (
         <div className='artistAlbums'>
             <div className="albums">
-                { album?.albums.map((item) => (
+                { album?.albums2.map((item) => (
                     <div className="album" key={item.id} onClick={() => navigate(`/album/${item.id}`)}>
                         <i className="play"><FaCirclePlay/></i>
-                        <img src={`${BASE_API_URL}${item?.albumImage || ''}`} alt=""/>
+                        <img src={item?.albumImage} alt=""/>
                         <span>{item?.artist.artistName}</span>
                         <p>{item?.title}</p>
                     </div>
