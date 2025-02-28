@@ -55,7 +55,7 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public List<ChatRoomDto> findChatsByUser(String username) {
         UserEntity reqUser = userService.findUserByEmail(username);
-        return chatRepository.findChatRoomById(reqUser.getId()).stream().map(chatRoomMapper::mapTo).toList();
+        return chatRepository.findChatRoomsByUserId(reqUser.getId()).stream().map(chatRoomMapper::mapTo).toList();
     }
 
     @Override

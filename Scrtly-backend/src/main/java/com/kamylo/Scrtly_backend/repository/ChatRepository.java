@@ -12,7 +12,7 @@ import java.util.List;
 public interface ChatRepository extends JpaRepository<ChatRoomEntity, Integer> {
 
     @Query("SELECT c FROM ChatRoomEntity c WHERE (c.firstPerson.id = :userId OR c.secondPerson.id = :userId)")
-     List<ChatRoomEntity> findChatRoomById(@Param("userId") Long userId);
+     List<ChatRoomEntity> findChatRoomsByUserId(@Param("userId") Long userId);
 
     @Query("SELECT c FROM ChatRoomEntity c WHERE (c.firstPerson = :user1 AND c.secondPerson = :user2) " +
                   "OR (c.firstPerson = :user2 AND c.secondPerson = :user1)")
