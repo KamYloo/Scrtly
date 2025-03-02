@@ -1,91 +1,94 @@
-import React, { useState} from 'react'
+import React, { useState } from 'react';
 import { RiUserSearchFill } from "react-icons/ri";
 import { MdDeleteSweep } from "react-icons/md";
 import { BsPlus } from "react-icons/bs";
 import { FaMinus } from "react-icons/fa";
 import { AddUser } from './AddUser';
-import {useDispatch} from "react-redux";
-import {deleteChat} from "../../Redux/Chat/Action.js";
-import {useNavigate} from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { deleteChat } from "../../Redux/Chat/Action.js";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 // eslint-disable-next-line react/prop-types
-function ChatUsersList({chat, onChatSelect }) {
-    const [addMode, setAddMode] = useState(false)
+function ChatUsersList({ chat, onChatSelect }) {
+    const [addMode, setAddMode] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const userData = (() => { try { return JSON.parse(localStorage.getItem("user")) || null; } catch { return null; } })();
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    // eslint-disable-next-line react/prop-types
     const filteredChats = chat?.chats?.filter(chatItem => {
-        // eslint-disable-next-line react/prop-types
-        const isUserFirstPerson = chatItem?.firstPerson.id === userData?.id
-        const otherPerson = isUserFirstPerson ? chatItem.secondPerson : chatItem.firstPerson
+        if (!chatItem.participants || chatItem.participants.length === 0) return false;
 
-        return otherPerson.fullName.toLowerCase().includes(searchQuery.toLowerCase())
-    })
+        const otherParticipants = chatItem.participants.filter(user => user.id !== userData?.id);
 
-    const toggleAdUser = () => {
+        return otherParticipants.some(user => user.fullName.toLowerCase().includes(searchQuery.toLowerCase()));
+    });
+
+    const toggleAddUser = () => {
         setAddMode((prev) => !prev);
     };
+
     const deleteChatRoomHandler = (chatRoomId) => {
         const confirmDelete = window.confirm('Are you sure you want to delete this ChatRoom?');
         if (confirmDelete) {
             dispatch(deleteChat(chatRoomId)).then(() => {
                 toast.success('ChatRoom deleted successfully.');
-                navigate('/chat')
+                navigate('/chat');
             }).catch(() => {
                 toast.error('Failed to delete chatRoom. Please try again.');
             });
         }
-    }
+    };
 
     return (
         <div className='chatUserList'>
             <div className="search">
                 <div className="searchBar">
-                    <i><RiUserSearchFill/></i>
-                    <input type="text" placeholder='Search User...' value={searchQuery}
-                           onChange={(e) => setSearchQuery(e.target.value)}/>
+                    <i><RiUserSearchFill /></i>
+                    <input
+                        type="text"
+                        placeholder='Search User...'
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
                 </div>
 
-                <i className='addUserBtn' onClick={toggleAdUser}>{addMode ? <FaMinus/> :
-                    <BsPlus/>}</i>
+                <i className='addUserBtn' onClick={toggleAddUser}>
+                    {addMode ? <FaMinus /> : <BsPlus />}
+                </i>
             </div>
 
             <div className="userList">
                 {filteredChats.length > 0 ? (
                     filteredChats.map((chatItem) => {
-                        // eslint-disable-next-line react/prop-types
-                        const isUserFirstPerson = chatItem?.firstPerson.id === userData?.id
-                        const otherPerson = isUserFirstPerson ? chatItem?.secondPerson : chatItem?.firstPerson
+                        const otherParticipants = chatItem.participants.filter(user => user.id !== userData?.id);
 
                         return (
                             <div className="userItem" key={chatItem.id} onClick={() => onChatSelect(chatItem)}>
-                                <img src={otherPerson?.profilePicture} alt=""/>
+                                <img src={otherParticipants[0]?.profilePicture || "/default-avatar.png"} alt="User Avatar"/>
                                 <div className="text">
-                                    <span>{otherPerson.fullName}</span>
-                                    <p>afdsafdsgad</p>
+                                    <span>{otherParticipants[0]?.fullName || "Unknown User"}</span>
+                                    <p>Last message...</p>
                                 </div>
                                 <i onClick={(e) => {
                                     e.stopPropagation();
                                     deleteChatRoomHandler(chatItem.id);
-                                    onChatSelect(null)
+                                    onChatSelect(null);
                                 }}>
-                                    <MdDeleteSweep/>
+                                    <MdDeleteSweep />
                                 </i>
                             </div>
-
-                        )
+                        );
                     })
                 ) : (
                     <p>No users found</p>
                 )}
             </div>
-            {addMode && <AddUser onClose={toggleAdUser}/>}
+
+            {addMode && <AddUser onClose={toggleAddUser} />}
         </div>
-    )
+    );
 }
 
-export {ChatUsersList}
+export { ChatUsersList };

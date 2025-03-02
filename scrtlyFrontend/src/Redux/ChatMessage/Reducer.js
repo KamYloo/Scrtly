@@ -6,7 +6,7 @@ import {
 
 const initialValues = {
     newMessage: null,
-    messages: null,
+    messages: [],
     deletedMessage: null,
 }
 

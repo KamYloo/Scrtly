@@ -17,9 +17,9 @@ public class ChatController {
 
     private final ChatService chatService;
 
-    @PostMapping("/create/{userId}")
-    public ResponseEntity<ChatRoomDto> createChatRoom(@PathVariable Long userId, Principal principal) {
-        ChatRoomDto chatRoom = chatService.createChat(principal.getName(), userId);
+    @PostMapping("/create")
+    public ResponseEntity<ChatRoomDto> createChatRoom(@RequestBody List<Long> userIds, Principal principal) {
+        ChatRoomDto chatRoom = chatService.createChat(principal.getName(), userIds);
         return new ResponseEntity<>(chatRoom, HttpStatus.CREATED);
     }
 

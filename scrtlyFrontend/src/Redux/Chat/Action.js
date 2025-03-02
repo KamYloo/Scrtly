@@ -8,11 +8,15 @@ import {
 } from "./ActionType.js";
 
 export const createChat = (userId) => async (dispatch) => {
-    await dispatchAction(dispatch, CREATE_CHAT_REQUEST, CREATE_CHAT_ERROR, `/api/chats/create/${userId}`, {
+    await dispatchAction(dispatch, CREATE_CHAT_REQUEST, CREATE_CHAT_ERROR, `/api/chats/create`, {
         method: 'POST',
         credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify([userId])
     });
-}
+};
 
 export const getUserChats = () => async (dispatch) => {
     await dispatchAction(dispatch, GET_USERS_CHAT_REQUEST, GET_USERS_CHAT_ERROR, '/api/chats/user', {

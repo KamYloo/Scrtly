@@ -6,6 +6,9 @@ import com.kamylo.Scrtly_backend.service.ChatMessageService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -18,10 +21,10 @@ public class ChatMessageController {
 
     private final ChatMessageService chatMessageService;
 
-    @PostMapping("/create")
-    public ResponseEntity<ChatMessageDto> sendMessage(@RequestBody SendMessageRequest request, Principal principal) {
-        ChatMessageDto chatMessage = chatMessageService.sendMessage(request,principal.getName());
-        return new  ResponseEntity<>(chatMessage, HttpStatus.CREATED);
+    @MessageMapping("/sendMessage/{roomId}")
+    @SendTo("/topic/room/{roomId}")
+    public ChatMessageDto sendMessage(@Payload SendMessageRequest request, Principal principal) {
+        return chatMessageService.sendMessage(request, principal.getName());
     }
 
     @GetMapping("/chat/{chatId}")

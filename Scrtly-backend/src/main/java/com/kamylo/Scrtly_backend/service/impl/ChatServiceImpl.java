@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,22 +25,20 @@ public class ChatServiceImpl implements ChatService {
     private final Mapper<ChatRoomEntity, ChatRoomDto> chatRoomMapper;
 
     @Override
-    public ChatRoomDto createChat(String username, Long userId) {
+    public ChatRoomDto createChat(String username, List<Long> userIds) {
         UserEntity reqUser = userService.findUserByEmail(username);
-        UserEntity user2 = userService.findUserById(userId);
-        ChatRoomEntity isChatExist = chatRepository.findSingleChatRoomById(reqUser, user2);
+        Set<UserEntity> users = userIds.stream()
+                .map(userService::findUserById)
+                .collect(Collectors.toSet());
+        users.add(reqUser);
 
-        if (isChatExist != null) {
-            return chatRoomMapper.mapTo(isChatExist);
-        } else {
-            ChatRoomEntity chatRoom = ChatRoomEntity.builder()
-                    .firstPerson(reqUser)
-                    .secondPerson(user2)
-                    .build();
+        ChatRoomEntity chatRoom = ChatRoomEntity.builder()
+                .chatRoomName("Chat_" + System.currentTimeMillis())
+                .participants(List.copyOf(users))
+                .build();
 
-            ChatRoomEntity createdChatRoom = chatRepository.save(chatRoom);
-            return chatRoomMapper.mapTo(createdChatRoom);
-        }
+        ChatRoomEntity createdChatRoom = chatRepository.save(chatRoom);
+        return chatRoomMapper.mapTo(createdChatRoom);
     }
 
     @Override
@@ -66,6 +66,6 @@ public class ChatServiceImpl implements ChatService {
 
     private boolean validateChatRoomOwnership(String username, ChatRoomEntity chatRoom) {
         UserEntity user = userService.findUserByEmail(username);
-        return (user.getId().equals(chatRoom.getFirstPerson().getId()) || user.getId().equals(chatRoom.getSecondPerson().getId()));
+        return chatRoom.getParticipants().stream().anyMatch(participant -> participant.getId().equals(user.getId()));
     }
 }

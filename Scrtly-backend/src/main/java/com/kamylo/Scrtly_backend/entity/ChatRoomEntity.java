@@ -3,32 +3,41 @@ package com.kamylo.Scrtly_backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table( uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"first_person_id", "second_person_id"})
-})
+@Table(name = "chat_rooms")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Data
 public class ChatRoomEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "first_person_id")
-    @ToString.Exclude
-    private UserEntity firstPerson;
+    @Column(nullable = false, unique = true)
+    private String chatRoomName;
 
-    @ManyToOne
-    @JoinColumn(name = "second_person_id")
-    @ToString.Exclude
-    private UserEntity secondPerson;
+    @ManyToMany
+    @JoinTable(
+            name = "chat_room_users",
+            joinColumns = @JoinColumn(name = "chat_room_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private List<UserEntity> participants = new ArrayList<>();
 
-    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<ChatMessageEntity> messages = new ArrayList<>();
+
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
 }
