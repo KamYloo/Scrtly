@@ -5,6 +5,8 @@ import com.kamylo.Scrtly_backend.entity.CommentEntity;
 import com.kamylo.Scrtly_backend.entity.PostEntity;
 import com.kamylo.Scrtly_backend.entity.LikeEntity;
 import com.kamylo.Scrtly_backend.entity.UserEntity;
+import com.kamylo.Scrtly_backend.entity.enums.NotificationType;
+import com.kamylo.Scrtly_backend.events.NotificationEvent;
 import com.kamylo.Scrtly_backend.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.handler.CustomException;
 import com.kamylo.Scrtly_backend.mappers.Mapper;
@@ -14,6 +16,7 @@ import com.kamylo.Scrtly_backend.repository.PostRepository;
 import com.kamylo.Scrtly_backend.service.LikeService;
 import com.kamylo.Scrtly_backend.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,6 +28,7 @@ public class LikeServiceImpl implements LikeService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final Mapper<LikeEntity, LikeDto> likeMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
    /* @Override
     public List<LikeEntity> getLikesByPost(Long postId) throws PostException {
@@ -65,6 +69,15 @@ public class LikeServiceImpl implements LikeService {
         LikeEntity savedLikeEntity = likeRepository.save(like);
         post.getLikes().add(savedLikeEntity);
         postRepository.save(post);
+
+        eventPublisher.publishEvent(new NotificationEvent(
+                this,
+                post.getUser().getId(),
+                post.getId(),
+                NotificationType.LIKE,
+                username
+        ));
+
         return likeMapper.mapTo(like);
     }
 

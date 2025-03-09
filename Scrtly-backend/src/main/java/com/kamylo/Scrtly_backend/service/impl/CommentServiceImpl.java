@@ -4,6 +4,8 @@ import com.kamylo.Scrtly_backend.dto.CommentDto;
 import com.kamylo.Scrtly_backend.entity.CommentEntity;
 import com.kamylo.Scrtly_backend.entity.PostEntity;
 import com.kamylo.Scrtly_backend.entity.UserEntity;
+import com.kamylo.Scrtly_backend.entity.enums.NotificationType;
+import com.kamylo.Scrtly_backend.events.NotificationEvent;
 import com.kamylo.Scrtly_backend.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.handler.CustomException;
 import com.kamylo.Scrtly_backend.mappers.Mapper;
@@ -16,6 +18,7 @@ import com.kamylo.Scrtly_backend.service.UserService;
 import com.kamylo.Scrtly_backend.specification.CommentSpecification;
 import com.kamylo.Scrtly_backend.utils.UserLikeChecker;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -30,6 +33,7 @@ public class CommentServiceImpl implements CommentService {
     private final PostRepository postRepository;
     private final Mapper<CommentEntity, CommentDto> commentMapper;
     private final UserLikeChecker userLikeChecker;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public CommentDto createComment(CommentRequest commentRequest, String username) {
@@ -44,6 +48,14 @@ public class CommentServiceImpl implements CommentService {
                .build();
 
        CommentEntity savedCommentEntity = commentRepository.save(commentEntity);
+
+        eventPublisher.publishEvent(new NotificationEvent(
+                this,
+                post.getUser().getId(),
+                post.getId(),
+                NotificationType.COMMENT,
+                username
+        ));
        return commentMapper.mapTo(savedCommentEntity);
     }
 
