@@ -10,6 +10,7 @@ import com.kamylo.Scrtly_backend.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.handler.CustomException;
 import com.kamylo.Scrtly_backend.mappers.Mapper;
 import com.kamylo.Scrtly_backend.repository.AlbumRepository;
+import com.kamylo.Scrtly_backend.repository.ArtistRepository;
 import com.kamylo.Scrtly_backend.repository.SongRepository;
 import com.kamylo.Scrtly_backend.service.*;
 import com.kamylo.Scrtly_backend.specification.AlbumSpecification;
@@ -29,11 +30,10 @@ public class AlbumServiceImpl implements AlbumService {
 
     private final AlbumRepository albumRepository;
     private final UserService userService;
-    private final ArtistService artistService;
+    private final ArtistRepository artistRepository;
     private final UserRoleService userRoleService;
     private final FileService fileService;
     private final Mapper<AlbumEntity, AlbumDto> albumMapper;
-    private final Mapper<ArtistEntity, ArtistDto> artistMapper;
     private final Mapper<SongEntity, SongDto> songMapper;
     private final SongRepository songRepository;
 
@@ -62,7 +62,7 @@ public class AlbumServiceImpl implements AlbumService {
 
     @Override
     public Page<AlbumDto> getAlbums(Pageable pageable) {
-       return albumRepository.findAll(pageable).map(albumMapper::mapTo);
+        return albumRepository.findAll(pageable).map(albumMapper::mapTo);
     }
 
     @Override
@@ -83,13 +83,17 @@ public class AlbumServiceImpl implements AlbumService {
 
     @Override
     public List<AlbumDto> getAlbumsByArtist(Long artistId) {
-        ArtistEntity artistEntity = artistMapper.mapFrom(artistService.getArtistById(artistId));
+        ArtistEntity artistEntity = artistRepository.findById(artistId).orElseThrow(
+                () -> new CustomException(BusinessErrorCodes.ARTIST_NOT_FOUND));
         return albumRepository.findByArtistId(artistEntity.getId()).stream().map(albumMapper::mapTo).toList();
     }
 
     @Override
     public List<SongDto> getAlbumTracks(Integer albumId) {
         AlbumEntity albumEntity = albumMapper.mapFrom(getAlbum(albumId));
+        if (albumEntity == null) {
+            throw new CustomException(BusinessErrorCodes.ALBUM_NOT_FOUND);
+        }
         return songRepository.findByAlbumId(albumEntity.getId()).stream().map(songMapper::mapTo).toList();
     }
 
@@ -115,4 +119,6 @@ public class AlbumServiceImpl implements AlbumService {
         fileService.deleteFile(albumEntity.getCoverImage());
         albumRepository.deleteById(albumId);
     }
+
+
 }
