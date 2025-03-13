@@ -13,5 +13,6 @@ import java.util.List;
 @NoArgsConstructor
 public class ChatRoomDto {
     private Integer id;
+    private String chatRoomName;
     private List<UserDto> participants;
 }
