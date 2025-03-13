@@ -1,5 +1,8 @@
 package com.kamylo.Scrtly_backend.handler;
 
+import lombok.Getter;
+
+@Getter
 public class CustomException extends RuntimeException {
     BusinessErrorCodes errorCode;
 
