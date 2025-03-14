@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,10 +33,11 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     @Transactional
     public ChatMessageDto sendMessage(SendMessageRequest request, String username) {
         UserEntity userEntity = userService.findUserByEmail(username);
-        ChatRoomEntity chatRoomEntity = chatRoomMapper.mapFrom(chatService.getChatById(request.getChatId(), username));
+        ChatRoomDto chatRoomDto = chatService.getChatById(request.getChatId(), username);
+        ChatRoomEntity chatRoom = chatRoomMapper.mapFrom(chatRoomDto);
 
         ChatMessageEntity chatMessage = ChatMessageEntity.builder()
-                .chatRoom(chatRoomEntity)
+                .chatRoom(chatRoom)
                 .user(userEntity)
                 .messageText(request.getMessage())
                 .build();
@@ -46,8 +48,12 @@ public class ChatMessageServiceImpl implements ChatMessageService {
 
     @Override
     public List<ChatMessageDto> getChatsMessages(Integer chatId, String username) {
-        ChatRoomEntity chatRoom = chatRoomMapper.mapFrom(chatService.getChatById(chatId, username));
-        return chatMessageRepository.findByChatRoomId(chatRoom.getId()).stream().map(chatMessageMapper::mapTo).toList();
+        ChatRoomDto chatRoomDto = chatService.getChatById(chatId, username);
+        ChatRoomEntity chatRoom = chatRoomMapper.mapFrom(chatRoomDto);
+        List<ChatMessageEntity> messages = chatMessageRepository.findByChatRoomId(chatRoom.getId());
+        return messages.stream()
+                .map(chatMessageMapper::mapTo)
+                .collect(Collectors.toList());
     }
 
     @Override
