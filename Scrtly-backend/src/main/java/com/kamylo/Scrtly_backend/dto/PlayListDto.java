@@ -16,7 +16,7 @@ public class PlayListDto {
     private String title;
     private boolean favourite;
     private LocalDate creationDate;
-    private String playListImage;
+    private String coverImage;
     private UserDto user;
     private int tracksCount;
     private int totalDuration;

@@ -133,25 +133,27 @@ public class PlayListServiceImpl implements PlayListService {
     @Override
     @Transactional
     public PlayListDto updatePlayList(PlayListRequest playListRequest, String username, MultipartFile playListImage) {
-       PlayListEntity playListEntity = playListMapper.mapFrom(getPlayList(playListRequest.getPlayListId()));
-       if (validatePlayListOwnership(username, playListEntity)) {
-           if (playListRequest.getTitle() != null && !playListRequest.getTitle().isEmpty()) {
-               playListEntity.setTitle(playListRequest.getTitle());
-           }
-           if (playListImage != null && !playListImage.isEmpty()) {
-               String imagePath = fileService.updateFile(playListImage, playListEntity.getCoverImage(), "playListImages/");
-               playListEntity.setCoverImage(imagePath);
-           }
-           return playListMapper.mapTo(playListRepository.save(playListEntity));
-       } else  {
-           throw new CustomException(BusinessErrorCodes.PLAYLIST_MISMATCH);
-       }
+        PlayListEntity playListEntity = playListRepository.findById(playListRequest.getPlayListId())
+                .orElseThrow(() -> new CustomException(BusinessErrorCodes.PLAYLIST_NOT_FOUND));
+        if (validatePlayListOwnership(username, playListEntity)) {
+            if (playListRequest.getTitle() != null && !playListRequest.getTitle().isEmpty()) {
+                playListEntity.setTitle(playListRequest.getTitle());
+            }
+            if (playListImage != null && !playListImage.isEmpty()) {
+                String imagePath = fileService.updateFile(playListImage, playListEntity.getCoverImage(), "playListImages/");
+                playListEntity.setCoverImage(imagePath);
+            }
+            return playListMapper.mapTo(playListRepository.save(playListEntity));
+        } else {
+            throw new CustomException(BusinessErrorCodes.PLAYLIST_MISMATCH);
+        }
     }
 
     @Override
     @Transactional
     public void deletePlayList(Integer playListId, String username) {
-        PlayListEntity playListEntity = playListMapper.mapFrom(getPlayList(playListId));
+        PlayListEntity playListEntity = playListRepository.findById(playListId)
+                .orElseThrow(() -> new CustomException(BusinessErrorCodes.PLAYLIST_NOT_FOUND));
         if (validatePlayListOwnership(username, playListEntity)) {
             if (playListEntity.isFavourite()) {
                 for (SongEntity songEntity : playListEntity.getSongs()) {
@@ -166,7 +168,7 @@ public class PlayListServiceImpl implements PlayListService {
         }
     }
 
-    private PlayListEntity findOrCreateFavouritePlayList(UserEntity user) {
+    public PlayListEntity findOrCreateFavouritePlayList(UserEntity user) {
         return playListRepository.findByUserIdAndFavourite(user.getId(), true)
                 .orElseGet(() -> {
                     PlayListEntity favouritePlayList = PlayListEntity.builder()
