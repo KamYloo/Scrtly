@@ -22,6 +22,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepo;
     private final UserRepository userRepository;
 
+    @Transactional
     public RefreshTokenEntity createRefreshToken(String email){
         UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(
                 ()->new RuntimeException("User not found"));
@@ -44,6 +45,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
         refreshTokenRepo.deleteByUser(userEntity);
     }
+
     public RefreshTokenEntity findByToken(String token){
         return refreshTokenRepo.findByToken(token)
                 .orElseThrow(() -> new CustomException(BusinessErrorCodes.BAD_JWT_TOKEN));
