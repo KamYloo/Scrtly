@@ -1,6 +1,7 @@
 package com.kamylo.Scrtly_backend.serviceTests;
 
 import com.kamylo.Scrtly_backend.dto.PostDto;
+import com.kamylo.Scrtly_backend.dto.UserDto;
 import com.kamylo.Scrtly_backend.entity.PostEntity;
 import com.kamylo.Scrtly_backend.entity.UserEntity;
 import com.kamylo.Scrtly_backend.handler.BusinessErrorCodes;
@@ -418,18 +419,21 @@ class PostServiceImplTest {
 
     @Test
     void getPostsByUser_shouldReturnUserPosts() {
-        Long userId = 1L;
+        String nickName = "user123";
+        UserDto user = new UserDto();
+        user.setId(1L);
         Pageable pageable = mock(Pageable.class);
         PostEntity postEntity = PostEntity.builder().id(1L).description("Test post").build();
         PostDto postDto = new PostDto();
         postDto.setDescription("Test post");
 
-        when(postRepository.findByUserId(eq(userId), any(Pageable.class)))
+        when(userService.findUserByNickname(nickName)).thenReturn(user);
+        when(postRepository.findByUserId(eq(user.getId()), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(Collections.singletonList(postEntity)));
 
         when(postMapper.mapTo(any(PostEntity.class))).thenReturn(postDto);
 
-        Page<PostDto> result = postService.getPostsByUser(userId, pageable);
+        Page<PostDto> result = postService.getPostsByUser(nickName, pageable);
 
         assertFalse(result.isEmpty());
         assertEquals(1, result.getContent().size());

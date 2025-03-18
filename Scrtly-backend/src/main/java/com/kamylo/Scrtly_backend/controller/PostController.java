@@ -49,10 +49,10 @@ public class PostController {
 
     }
 
-    @GetMapping("/{userId}/all")
-    public ResponseEntity<PagedResponse<PostDto>> getAllPostsByUser(@PathVariable Long userId,
+    @GetMapping("/{nickName}/all")
+    public ResponseEntity<PagedResponse<PostDto>> getAllPostsByUser(@PathVariable String nickName,
                                                            @PageableDefault(size = 10, sort = "creationDate", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<PostDto> posts = postService.getPostsByUser(userId, pageable);
+        Page<PostDto> posts = postService.getPostsByUser(nickName, pageable);
         return new ResponseEntity<>(PagedResponse.of(posts), HttpStatus.OK);
     }
 

@@ -1,6 +1,7 @@
 package com.kamylo.Scrtly_backend.service.impl;
 
 import com.kamylo.Scrtly_backend.dto.PostDto;
+import com.kamylo.Scrtly_backend.dto.UserDto;
 import com.kamylo.Scrtly_backend.entity.PostEntity;
 import com.kamylo.Scrtly_backend.entity.UserEntity;
 import com.kamylo.Scrtly_backend.handler.BusinessErrorCodes;
@@ -79,8 +80,10 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Page<PostDto> getPostsByUser(Long userId, Pageable pageable) {
-        return postRepository.findByUserId(userId, pageable).map(postMapper::mapTo);
+    public Page<PostDto> getPostsByUser(String nickName, Pageable pageable) {
+
+        UserDto user = userService.findUserByNickname(nickName);
+        return postRepository.findByUserId(user.getId(), pageable).map(postMapper::mapTo);
     }
 
     @Override
