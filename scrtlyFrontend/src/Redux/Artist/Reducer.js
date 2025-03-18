@@ -1,11 +1,14 @@
 import {
-    FIND_ARTIST_BY_ID_REQUEST,
-    GET_ALL_ARTISTS_REQUEST,
-    GET_ARTIST_TRACKS_REQUEST
+    FIND_ARTIST_BY_ID_ERROR,
+    FIND_ARTIST_BY_ID_REQUEST, FIND_ARTIST_BY_ID_SUCCESS, GET_ALL_ARTISTS_ERROR,
+    GET_ALL_ARTISTS_REQUEST, GET_ALL_ARTISTS_SUCCESS, GET_ARTIST_TRACKS_ERROR,
+    GET_ARTIST_TRACKS_REQUEST, GET_ARTIST_TRACKS_SUCCESS
 } from "./ActionType.js";
-import {FOLLOW_USER_REQUEST} from "../AuthService/ActionType.js";
+import {FOLLOW_USER_ERROR, FOLLOW_USER_REQUEST, FOLLOW_USER_SUCCESS} from "../AuthService/ActionType.js";
 
 const initialValue= {
+    loading: false,
+    error: null,
     findArtist:null,
     artists: {
         content: [],
@@ -25,18 +28,37 @@ const initialValue= {
     follow:null
 }
 
-export const artistReducer=(store=initialValue, {type,payload})=>{
-    if (type === FIND_ARTIST_BY_ID_REQUEST) {
-        return {...store, findArtist: payload}
+export const artistReducer=(state=initialValue, {type,payload})=>{
+    switch (type) {
+        case FIND_ARTIST_BY_ID_REQUEST:
+            return { ...state, loading: true, error: null };
+        case FIND_ARTIST_BY_ID_SUCCESS:
+            return { ...state, loading: false, findArtist: payload };
+        case FIND_ARTIST_BY_ID_ERROR:
+            return { ...state, loading: false, error: payload };
+
+        case GET_ALL_ARTISTS_REQUEST:
+            return { ...state, loading: true, error: null };
+        case GET_ALL_ARTISTS_SUCCESS:
+            return { ...state, loading: false, artists: payload };
+        case GET_ALL_ARTISTS_ERROR:
+            return { ...state, loading: false, error: payload };
+
+        case GET_ARTIST_TRACKS_REQUEST:
+            return { ...state, loading: true, error: null };
+        case GET_ARTIST_TRACKS_SUCCESS:
+            return { ...state, loading: false, songs: payload };
+        case GET_ARTIST_TRACKS_ERROR:
+            return { ...state, loading: false, error: payload };
+
+        case FOLLOW_USER_REQUEST:
+            return { ...state, loading: true, error: null };
+        case FOLLOW_USER_SUCCESS:
+            return { ...state, loading: false, follow: payload };
+        case FOLLOW_USER_ERROR:
+            return { ...state, loading: false, error: payload };
+
+        default:
+            return state;
     }
-    else if (type === FOLLOW_USER_REQUEST) {
-        return {...store, follow: payload}
-    }
-    else if (type === GET_ALL_ARTISTS_REQUEST) {
-        return {...store, artists: payload}
-    }
-    else if (type === GET_ARTIST_TRACKS_REQUEST) {
-        return {...store, songs: payload}
-    }
-    return store
 }

@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import {MdCancel} from "react-icons/md";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {uploadSong} from "../../Redux/Album/Action.js";
 import "../../Styles/form.css"
 import toast from "react-hot-toast";
@@ -11,6 +11,7 @@ function AddSong({onClose, albumId}) {
     const [songImg, setSongImg] = useState(null)
     const [audio, setAudio] = useState(null)
     const [preview, setPreview] = useState('');
+    const { loading } = useSelector(state => state.album);
 
     const dispatch = useDispatch()
 
@@ -59,7 +60,7 @@ function AddSong({onClose, albumId}) {
                         <span>{songImg?.name}</span>
                     </div>
                     <div className="right">
-                        <input type="file" accept="image/*" onChange={(e)=> setSongImg(e.target.files[0])}/>
+                        <input type="file" accept="image/*" onChange={(e) => setSongImg(e.target.files[0])}/>
                         <button type="button"
                                 onClick={() => document.querySelector('input[type="file"][accept="image/*"]').click()}>
                             Select Img
@@ -82,7 +83,9 @@ function AddSong({onClose, albumId}) {
                     <h4>Title</h4>
                     <input type="text" value={title} onChange={(e) => setTitle(e.target.value)}></input>
                 </div>
-                <button type="submit" className='submit'>Send</button>
+                <button type="submit" className='submit' disabled={loading}>
+                    {loading ? "Sending..." : "Send"}
+                </button>
             </form>
         </div>
     )

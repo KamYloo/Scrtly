@@ -4,12 +4,14 @@ import { IoIosSettings } from "react-icons/io";
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import {findUser, followUser} from "../../Redux/AuthService/Action.js";
 import { useDispatch, useSelector } from "react-redux";
+import Spinner from "../Spinner.jsx";
+import ErrorAlert from "../ErrorAlert.jsx";
 
 function ProfileInfo() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { nickName } = useParams();
-    const { auth } = useSelector(store => store);
+    const { auth } = useSelector(state => state);
     const location = useLocation();
     const userData = (() => { try { return JSON.parse(localStorage.getItem("user")) || null; } catch { return null; } })();
 
@@ -24,6 +26,13 @@ function ProfileInfo() {
             dispatch(findUser(nickName));
         }
     }, [location, dispatch, nickName]);
+
+    if (auth.loading) {
+        return <Spinner />;
+    }
+    if (auth.error) {
+        return <ErrorAlert message={auth.error} />;
+    }
 
     return (
         <div className='profileInfo'>

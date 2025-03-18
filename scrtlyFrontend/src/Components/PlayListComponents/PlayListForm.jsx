@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import {MdCancel} from "react-icons/md";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {createPlayList, updatePlayList} from "../../Redux/PlayList/Action.js";
 import toast from "react-hot-toast";
 
@@ -9,6 +9,7 @@ function PlayListForm({onClose, isEdit}) {
     const [playListImg, setPlayListImg] = useState(null)
     const [preview, setPreview] = useState(isEdit?.playListImage ? `${isEdit.playListImage}` : '');
     const dispatch = useDispatch()
+    const { loading } = useSelector(state => state.playList);
 
     const handleFileChange = (e) => {
         setPlayListImg(e.target.files[0])
@@ -75,7 +76,9 @@ function PlayListForm({onClose, isEdit}) {
                     <h4>Title</h4>
                     <input type="text" value={title} onChange={(e) => setTitle(e.target.value)}></input>
                 </div>
-                <button type="submit" className='submit'>Send</button>
+                <button type="submit" className='submit' disabled={loading}>
+                    {loading ? "Sending..." : "Send"}
+                </button>
             </form>
         </div>
     )

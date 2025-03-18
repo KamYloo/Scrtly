@@ -8,7 +8,7 @@ import {useNavigate, useParams} from "react-router-dom";
 function ArtistAlbums() {
     const {artistId} = useParams();
     const dispatch = useDispatch();
-    const {album} = useSelector(store => store);
+    const {album} = useSelector(state => state);
     const navigate = useNavigate();
 
     useEffect(() => {

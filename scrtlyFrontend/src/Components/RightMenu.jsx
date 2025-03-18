@@ -12,7 +12,7 @@ function RightMenu() {
   const [openNotifications, setOpenNotifications] = useState(false)
   const userData = (() => { try { return JSON.parse(localStorage.getItem("user")) || null; } catch { return null; } })();
   const dispatch = useDispatch()
-  const {auth} = useSelector(store => store);
+  const {auth} = useSelector(state => state);
   const navigate = useNavigate()
 
   const handleLogout = () => {

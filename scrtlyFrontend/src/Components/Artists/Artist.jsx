@@ -10,12 +10,14 @@ import {findArtistById, getArtistTracks} from "../../Redux/Artist/Action.js";
 import {ArtistAlbums} from "./ArtistAlbums.jsx";
 import {Fans} from "./Fans.jsx";
 import {AboutArtist} from "./AboutArtist.jsx";
+import Spinner from "../Spinner.jsx";
+import ErrorAlert from "../ErrorAlert.jsx";
 
 
 function Artist({ volume, onTrackChange}) {
   const {artistId} = useParams();
   const dispatch = useDispatch();
-  const {artist, song} = useSelector(store => store);
+  const {artist, song} = useSelector(state => state);
   const userData = (() => { try { return JSON.parse(localStorage.getItem("user")) || null; } catch { return null; } })();
 
 
@@ -37,6 +39,15 @@ function Artist({ volume, onTrackChange}) {
   useEffect(() => {
     dispatch(getArtistTracks(artistId))
   }, [artistId, song.deletedSong, song.likedSong]);
+
+  if (artist.loading || song.loading) {
+    return <Spinner />;
+  }
+  if (artist.error) {
+    return <ErrorAlert message={artist.error} />
+  } else if (song.loading) {
+    return <ErrorAlert message={song.error}/>
+  }
 
   return (
     <div className='mainBox'>

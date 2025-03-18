@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import {MdCancel} from "react-icons/md";
 import {updateArtist} from "../../Redux/Artist/Action.js";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import toast from "react-hot-toast";
 
 function EditArtist({onClose}) {
@@ -9,6 +9,7 @@ function EditArtist({onClose}) {
     const [bannerImg, setBannerImg] = useState(null)
     const [preview, setPreview] = useState('');
     const dispatch = useDispatch()
+    const { loading } = useSelector(state => state.artist);
 
     const handleFileChange = (e) => {
         setBannerImg(e.target.files[0])
@@ -67,7 +68,9 @@ function EditArtist({onClose}) {
                     <h4>Artist Bio</h4>
                     <textarea value={artistBio} onChange={(e) => setArtistBio(e.target.value)}></textarea>
                 </div>
-                <button type="submit" className='submit'>Send</button>
+                <button type="submit" className='submit' disabled={loading}>
+                    {loading ? "Editing..." : "Send"}
+                </button>
             </form>
         </div>
     )

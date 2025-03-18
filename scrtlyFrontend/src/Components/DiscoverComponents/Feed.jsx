@@ -21,7 +21,7 @@ function Feed() {
   const [sortOrder, setSortOrder] = useState('date')
 
   const dispatch = useDispatch()
-  const {post, comment } = useSelector(store => store);
+  const {post, comment} = useSelector(store => store);
   const navigate = useNavigate();
 
   const handleProfileClick = (nickName) => {
@@ -44,7 +44,7 @@ function Feed() {
   };
 
   const formatTimeAgo = (timestamp) => {
-    return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
+    return formatDistanceToNow(new Date(timestamp), {addSuffix: true});
   };
 
   const handleDeletePost = (postId) => {
@@ -77,91 +77,108 @@ function Feed() {
       })
 
   useEffect(() => {
-      dispatch(getAllPosts())
-  }, [dispatch, post.likedPost, post.createdPost, post.deletedPost, comment.createdComment,comment.deletedComment])
+    dispatch(getAllPosts())
+  }, [dispatch, post.likedPost, post.createdPost, post.deletedPost, comment.createdComment, comment.deletedComment])
+
+  if (post.loading) {
+    return (
+        <div className="feed">
+          <div className="spinner"></div>
+        </div>)
+  }
+
+  if (post.error) {
+    return (
+        <div className="feed">
+          <p>Błąd: {post.error}</p>
+        </div>
+    );
+  }
 
   return (
-    <div className='feed'>
+      <div className='feed'>
 
-      <div className="posts">
-        <i className="postsSettings" onClick={() => setPostsSettings(((prev) => !prev))}><MdOutlineMenuOpen/></i>
-        {postsSettings && (<ul className="filtredMenu">
-          <li className="filter">
-            <input
-                type="text"
-                placeholder="Filter by user name..."
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    setPostsSettings(false)
-                  }
-                }}
-            />
-          </li>
+        <div className="posts">
+          <i className="postsSettings" onClick={() => setPostsSettings(((prev) => !prev))}><MdOutlineMenuOpen/></i>
+          {postsSettings && (<ul className="filtredMenu">
+            <li className="filter">
+              <input
+                  type="text"
+                  placeholder="Filter by user name..."
+                  value={filter}
+                  onChange={(e) => setFilter(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      setPostsSettings(false)
+                    }
+                  }}
+              />
+            </li>
 
-          <li className="sort">
-            <select  value={sortOrder} onChange={(e) =>
-            {setSortOrder(e.target.value)
-              setPostsSettings(false)}}>
-              <option value="likes">Sort by likes</option>
-              <option value="date-asc">Sort by date (ascending)</option>
-              <option value="date-desc">Sort by date (descending)</option>
-            </select>
-          </li>
-        </ul>)}
-        {filteredPosts.map((item) => (
-            <div className="post" key={item.id}>
-              <div className="up">
-                <img src={item.user?.profilePicture} alt=""
-                     onClick={() => handleProfileClick(item.user.nickName)}/>
-                <div className="userData">
-                  <p>{item.user.fullName}</p>
-                  <span>{formatTimeAgo(item.creationDate)}</span>
+            <li className="sort">
+              <select value={sortOrder} onChange={(e) => {
+                setSortOrder(e.target.value)
+                setPostsSettings(false)
+              }}>
+                <option value="likes">Sort by likes</option>
+                <option value="date-asc">Sort by date (ascending)</option>
+                <option value="date-desc">Sort by date (descending)</option>
+              </select>
+            </li>
+          </ul>)}
+          {filteredPosts.map((item) => (
+              <div className="post" key={item.id}>
+                <div className="up">
+                  <img src={item.user?.profilePicture} alt=""
+                       onClick={() => handleProfileClick(item.user.nickName)}/>
+                  <div className="userData">
+                    <p>{item.user.fullName}</p>
+                    <span>{formatTimeAgo(item.creationDate)}</span>
+                  </div>
+                  {/*{auth.reqUser.id === item.user.id && (*/}
+                  <>
+                    <i onClick={() => handleMenuToggle(item.id)}><FaEllipsisH/></i>
+                    {menuPost === item.id && (
+                        <ul className="list">
+                          <li className="option" onClick={() => toggleEditPost(item)}>
+                            <span>Edit</span>
+                          </li>
+                          <li className="option" onClick={() => {
+                            handleDeletePost(item.id)
+                            setMenuPost(false)
+                          }}>
+                            <span>Delete</span>
+                          </li>
+                        </ul>
+                    )}
+                  </>
+                  {/*)}*/}
                 </div>
-                {/*{auth.reqUser.id === item.user.id && (*/}
-                    <>
-                      <i onClick={() => handleMenuToggle(item.id)}><FaEllipsisH/></i>
-                      {menuPost === item.id && (
-                          <ul className="list">
-                            <li className="option" onClick={()=> toggleEditPost(item)}>
-                              <span>Edit</span>
-                            </li>
-                            <li className="option" onClick={() => {
-                              handleDeletePost(item.id)
-                              setMenuPost(false)
-                            }}>
-                              <span>Delete</span>
-                            </li>
-                          </ul>
-                      )}
-                    </>
-                {/*)}*/}
-              </div>
-              <div className="middle">
-                <img
-                    src={item?.image}
-                    alt=""/>
-              </div>
-              <div className="description">
-                <p>{item.description}</p>
-              </div>
-              <div className="bottom">
-                <div className="likes">
-                  <i onClick={() => likePostHandler(item.id)}>{item.likedByUser ? <AiFillLike/> : <AiOutlineLike/>}</i>
-                  <span>{item.likeCount | 0}</span>
+                <div className="middle">
+                  <img
+                      src={item?.image}
+                      alt=""/>
                 </div>
-                <div className="comments" onClick={() => togglePost(item)}>
-                  <i><TfiCommentAlt/></i>
-                  <span>{item?.commentCount | 0} comments</span>
+                <div className="description">
+                  <p>{item.description}</p>
                 </div>
-              </div>
-            </div>))}
+                <div className="bottom">
+                  <div className="likes">
+                    <i onClick={() => likePostHandler(item.id)}>{item.likedByUser ? <AiFillLike/> :
+                        <AiOutlineLike/>}</i>
+                    <span>{item.likeCount | 0}</span>
+                  </div>
+                  <div className="comments" onClick={() => togglePost(item)}>
+                    <i><TfiCommentAlt/></i>
+                    <span>{item?.commentCount | 0} comments</span>
+                  </div>
+                </div>
+              </div>))}
 
+        </div>
+        {editPost && <EditPost post={postDetail} onClose={() => setEditPost(((prev) => !prev))}/>}
+        {selectedPost && <Post post={postDetail} onClose={togglePost}/>}
       </div>
-      {editPost && <EditPost post={postDetail} onClose={() => setEditPost(((prev) => !prev))}/>}
-      {selectedPost && <Post post={postDetail} onClose={togglePost}/>}
-    </div>
   )
 }
 

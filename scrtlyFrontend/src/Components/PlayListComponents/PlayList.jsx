@@ -6,6 +6,8 @@ import {useDispatch, useSelector} from "react-redux";
 import {getPlayList, getPlayListTracks} from "../../Redux/PlayList/Action.js";
 import {AddSongToPlayList} from "./AddSongToPlayList.jsx";
 import {PlayListForm} from "./PlayListForm.jsx";
+import Spinner from "../Spinner.jsx";
+import ErrorAlert from "../ErrorAlert.jsx";
 
 // eslint-disable-next-line react/prop-types
 function PlayList({ volume, onTrackChange}) {
@@ -37,10 +39,20 @@ function PlayList({ volume, onTrackChange}) {
         dispatch(getPlayListTracks(playListId))
     }, [playListId, playList.uploadSong, playList.deletedSong, song.likedSong]);
 
+
+    if (playList.loading || song.loading) {
+        return <Spinner />;
+    }
+    if (playList.error) {
+        return <ErrorAlert message={playList.error} />
+    } else if (song.loading) {
+        return <ErrorAlert message={song.error}/>
+    }
+
     return (
         <div className='playListDetail'>
             <div className="topSection">
-                <img src={playList.findPlayList?.playListImage} alt="" />
+                <img src={playList.findPlayList?.coverImage} alt="" />
                 <div className="playListData">
                     <p>PlayList</p>
                     <h1 className='playListName'>{playList.findPlayList?.title}</h1>

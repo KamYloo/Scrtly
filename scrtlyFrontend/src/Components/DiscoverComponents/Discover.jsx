@@ -5,7 +5,7 @@ import { AddPost } from './AddPost'
 import { Feed } from './Feed'
 
 // eslint-disable-next-line react/prop-types
-function Discover({auth, token}) {
+function Discover() {
   return (
     <div className='discoverView'>
         <div className="discover">

@@ -6,12 +6,14 @@ import {useNavigate, useParams} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {deleteAlbum, getAlbum, getAlbumTracks} from "../../Redux/Album/Action.js";
 import {AddSong} from "../SongComponents/addSong.jsx";
+import Spinner from "../Spinner.jsx";
+import ErrorAlert from "../ErrorAlert.jsx";
 
 // eslint-disable-next-line react/prop-types
 function Album({ volume, onTrackChange}) {
     const {albumId} = useParams();
     const dispatch = useDispatch();
-    const {album, song} = useSelector(store => store);
+    const {album, song} = useSelector(state => state);
     const [addSong, setAddSong] = useState(false)
     const navigate = useNavigate();
     const userData = (() => { try { return JSON.parse(localStorage.getItem("user")) || null; } catch { return null; } })();
@@ -48,6 +50,14 @@ function Album({ volume, onTrackChange}) {
     useEffect(() => {
         dispatch(getAlbumTracks(albumId))
     }, [albumId, album.uploadSong, song.deletedSong, song.likedSong]);
+
+
+    if (album.loading) {
+        return <Spinner />;
+    }
+    if (album.error) {
+        return <ErrorAlert message={album.error} />;
+    }
 
     return (
         <div className='albumDetail'>

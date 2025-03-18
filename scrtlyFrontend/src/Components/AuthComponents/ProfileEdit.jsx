@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import "../../Styles/Profile.css"
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {updateUser} from "../../Redux/AuthService/Action.js";
 import {useNavigate} from "react-router-dom";
 import toast from "react-hot-toast";
@@ -13,8 +13,7 @@ function ProfileEdit() {
   const [profilePicture, setProfilePicture] = useState(null)
   const [preview, setPreview] = useState(userData?.profilePicture ? userData.profilePicture : '');
   const navigate = useNavigate()
-
-
+  const { loading } = useSelector(state => state.auth);
 
   const handleFileChange = (e) => {
     setProfilePicture(e.target.files[0])
@@ -81,7 +80,9 @@ function ProfileEdit() {
               <h4>Description</h4>
               <textarea value={description} onChange={(e) => setDescription(e.target.value)}></textarea>
             </div>
-            <button type="submit" className='submit'>Send</button>
+            <button type="submit" className='submit' disabled={loading}>
+              {loading ? "Editing..." : "Send"}
+            </button>
           </form>
 
         </div>

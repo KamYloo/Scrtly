@@ -6,10 +6,12 @@ import { FaCirclePlay } from "react-icons/fa6";
 import {useDispatch, useSelector} from "react-redux";
 import {getAllAlbums} from "../../Redux/Album/Action.js";
 import {useNavigate} from "react-router-dom";
+import Spinner from "../Spinner.jsx";
+import ErrorAlert from "../ErrorAlert.jsx";
 
 function AlbumsView() {
     const dispatch = useDispatch()
-    const {album} = useSelector(store => store);
+    const {album} = useSelector(state => state);
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -20,6 +22,13 @@ function AlbumsView() {
     useEffect(() => {
         dispatch(getAllAlbums())
     }, [dispatch, album.deleteAlbum])
+
+    if (album.loading) {
+        return <Spinner />;
+    }
+    if (album.error) {
+        return <ErrorAlert message={album.error} />;
+    }
 
     return (
         <div className='albumsView'>

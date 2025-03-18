@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import {MdCancel} from "react-icons/md";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {createAlbum} from "../../Redux/Album/Action.js";
 import toast from "react-hot-toast";
 
@@ -9,6 +9,7 @@ function CreateAlbum({onClose}) {
     const [albumImg, setAlbumImg] = useState(null)
     const [preview, setPreview] = useState('');
     const dispatch = useDispatch()
+    const { loading } = useSelector(state => state.album);
 
     const handleFileChange = (e) => {
         setAlbumImg(e.target.files[0])
@@ -69,7 +70,9 @@ function CreateAlbum({onClose}) {
                     <h4>Title</h4>
                     <input type="text" value={title} onChange={(e) => setTitle(e.target.value)}></input>
                 </div>
-                <button type="submit" className='submit'>Send</button>
+                <button type="submit" className='submit' disabled={loading}>
+                    {loading ? "Creating..." : "Send"}
+                </button>
             </form>
         </div>
     )

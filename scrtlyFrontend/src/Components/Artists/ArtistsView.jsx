@@ -7,10 +7,12 @@ import { FaHeadphones } from "react-icons/fa";
 import {useDispatch, useSelector} from "react-redux";
 import {useNavigate} from "react-router-dom";
 import {getAllArtists} from "../../Redux/Artist/Action.js";
+import Spinner from "../Spinner.jsx";
+import ErrorAlert from "../ErrorAlert.jsx";
 
 function ArtistsView() {
     const dispatch = useDispatch()
-    const {artist} = useSelector(store => store);
+    const {artist} = useSelector(state => state);
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -21,6 +23,13 @@ function ArtistsView() {
     useEffect(() => {
         dispatch(getAllArtists())
     }, [dispatch])
+
+    if (artist.loading) {
+        return <Spinner />;
+    }
+    if (artist.error) {
+        return <ErrorAlert message={artist.error} />;
+    }
 
     return (
         <div className='artistsView'>

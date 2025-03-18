@@ -2,7 +2,7 @@ import React, {useState} from 'react'
 import { IoMdPhotos } from "react-icons/io";
 import { BsEmojiSmileFill , BsCameraVideoFill} from "react-icons/bs";
 import EmojiPicker from 'emoji-picker-react'
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {createPost} from "../../Redux/Post/Action.js";
 import {useNavigate} from "react-router-dom";
 import toast from "react-hot-toast";
@@ -15,6 +15,7 @@ function AddPost() {
   const [openEmoji, setOpenEmoji] = useState(false)
   const userData = (() => { try { return JSON.parse(localStorage.getItem("user")) || null; } catch { return null; } })();
   const navigate = useNavigate();
+  const { loading } = useSelector(state => state.post);
 
   const handleFileChange = (e) => {
     setFilePic(e.target.files[0])
@@ -68,11 +69,13 @@ function AddPost() {
           </div>
         </div>
         <div className="right">
-          <button onClick={handlePostCreation}>Send</button>
+          <button onClick={handlePostCreation} disabled={loading}>
+            {loading ? "Sending..." : "Send"}
+          </button>
           <div className="emoji">
-            <i onClick={() => setOpenEmoji((prev) => !prev)}><BsEmojiSmileFill /></i>
+            <i onClick={() => setOpenEmoji((prev) => !prev)}><BsEmojiSmileFill/></i>
             <div className="picker">
-               <EmojiPicker open={openEmoji} onEmojiClick={handleEmoji}/>
+              <EmojiPicker open={openEmoji} onEmojiClick={handleEmoji}/>
             </div>
           </div>
         </div>
@@ -81,4 +84,4 @@ function AddPost() {
   )
 }
 
-export { AddPost }
+export {AddPost}

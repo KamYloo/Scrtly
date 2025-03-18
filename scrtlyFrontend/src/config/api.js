@@ -56,23 +56,36 @@ export const fetchWithAuth = async (url, options = {}, errorType) => {
 };
 
 
+export const dispatchAction = async (
+    dispatch,
+    actionTypeRequest,
+    actionTypeSuccess,
+    actionTypeError,
+    url,
+    options = {}
+) => {
 
-export const dispatchAction = async (dispatch, actionTypeRequest, actionTypeError, url, options = {}) => {
-    const result = await fetchWithAuth(url, options, actionTypeRequest);
-    console.log(result);
+    dispatch({ type: actionTypeRequest });
+    try {
+        const result = await fetchWithAuth(url, options, actionTypeRequest);
+        console.log(result);
 
-    if (result.refreshToken) {
-        localStorage.setItem('refreshToken', result.refreshToken);
-        localStorage.setItem('user', JSON.stringify(result.user));
+        if (result.refreshToken) {
+            localStorage.setItem('refreshToken', result.refreshToken);
+            localStorage.setItem('user', JSON.stringify(result.user));
+        }
+
+        if (result.error) {
+            dispatch({ type: actionTypeError, payload: result.message });
+            throw new Error(result.message);
+        }
+
+        dispatch({ type: actionTypeSuccess, payload: result });
+        return result;
+    } catch (error) {
+        dispatch({ type: actionTypeError, payload: error.message });
+        throw error;
     }
-
-    if (result.error) {
-        dispatch({ type: actionTypeError, payload: result.message });
-        throw new Error(result.message);
-    }
-
-    dispatch({ type: actionTypeRequest, payload: result });
-
-    return result;
 };
+
 

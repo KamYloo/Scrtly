@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { MdCancel } from "react-icons/md";
-import { useDispatch } from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import "../../Styles/form.css";
 import {updatePost} from "../../Redux/Post/Action.js";
 import toast from "react-hot-toast";
@@ -11,6 +11,7 @@ function EditPost({ post, onClose }) {
     const [preview, setPreview] = useState(post?.image ? `${post.image}` : '');
     const fileInputRef = useRef(null);
     const dispatch = useDispatch();
+    const { loading } = useSelector(state => state.post);
 
     const handleFileChange = (e) => {
         const selectedFile = e.target.files[0];
@@ -57,7 +58,7 @@ function EditPost({ post, onClose }) {
             <form onSubmit={editPostHandler}>
                 <div className="editPic">
                     <div className="left">
-                        <img className="postImg" src={preview} alt="" />
+                        <img className="postImg" src={preview} alt=""/>
                         <span>{postImg?.name}</span>
                     </div>
                     <div className="right">
@@ -65,7 +66,7 @@ function EditPost({ post, onClose }) {
                             type="file"
                             ref={fileInputRef}
                             onChange={handleFileChange}
-                            style={{ display: 'none' }}
+                            style={{display: 'none'}}
                         />
                         <button type="button" onClick={() => fileInputRef.current.click()}>
                             Select Img
@@ -80,10 +81,12 @@ function EditPost({ post, onClose }) {
                         onChange={(e) => setDescription(e.target.value)}
                     />
                 </div>
-                <button type="submit" className='submit'>Send</button>
+                <button type="submit" className='submit' disabled={loading}>
+                    {loading ? "Sending..." : "Send"}
+                </button>
             </form>
         </div>
     );
 }
 
-export { EditPost };
+export {EditPost};

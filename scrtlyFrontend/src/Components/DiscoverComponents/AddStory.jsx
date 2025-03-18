@@ -1,6 +1,6 @@
 import React, {useState} from 'react'
 import {MdCancel} from "react-icons/md";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {createStory} from "../../Redux/Story/Action.js";
 import toast from "react-hot-toast";
 
@@ -8,6 +8,8 @@ import toast from "react-hot-toast";
 function AddStory({onClose}) {
     const [image, setImage] = useState(null)
     const dispatch = useDispatch()
+    const { loading } = useSelector(state => state.story);
+
 
     const handleFileChange = (e) => {
         setImage(e.target.files[0])
@@ -44,7 +46,9 @@ function AddStory({onClose}) {
                         Pick Image
                     </button>
                 </div>
-                <button type="submit" className='submit'>Send</button>
+                <button type="submit" className='submit' disabled={loading}>
+                    {loading ? "Sending..." : "Send"}
+                </button>
             </form>
         </div>
     )

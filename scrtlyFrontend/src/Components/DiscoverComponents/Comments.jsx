@@ -26,6 +26,21 @@ function Comments({post}) {
 
     }, [dispatch, comment.likeComment, comment.createdComment, comment.deletedComment])
 
+    if (comment.loading) {
+        return (
+            <div className="comments">
+                <div className="spinner"></div>
+            </div>)
+    }
+
+    if (comment.error) {
+        return (
+            <div className="comments">
+                <p>Błąd: {comment.error}</p>
+            </div>
+        );
+    }
+
   return (
     <div className='commentsSection'>
         <div className="up">

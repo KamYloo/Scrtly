@@ -1,7 +1,7 @@
 import React, {useState} from 'react'
 import EmojiPicker from 'emoji-picker-react'
 import { BsEmojiSmileFill} from "react-icons/bs";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {createComment} from "../../Redux/Comment/Action.js";
 
 
@@ -9,6 +9,8 @@ function AddComment({post}) {
     const dispatch = useDispatch()
     const [commentText, setCommentText] = useState('')
     const [openEmoji, setOpenEmoji] = useState(false)
+    const { loading } = useSelector(state => state.comment);
+
 
     const handleEmoji = (e) => {
         setCommentText((prev) => prev + e.emoji)
@@ -30,7 +32,9 @@ function AddComment({post}) {
           </div>
           <textarea type="text" value={commentText}
                     onChange={(e) => setCommentText(e.target.value)} placeholder='Add Comment...'></textarea>
-          <button onClick={handleCommentCreation}>Send</button>
+          <button onClick={handleCommentCreation} disabled={loading}>
+              {loading ? "Sending..." : "Send"}
+          </button>
     </div>
   )
 }
