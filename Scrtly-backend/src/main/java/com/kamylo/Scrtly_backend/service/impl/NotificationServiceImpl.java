@@ -37,34 +37,46 @@ public class NotificationServiceImpl {
         NotificationEntity notification;
         if (optionalNotification.isPresent()) {
             notification = optionalNotification.get();
-
-            notification.setCount(notification.getCount() + 1);
-            if(type == NotificationType.LIKE) {
-                notification.setMessage(sender.getFullName() + " i " + (notification.getCount() - 1) + " innych polubiło Twoje zdjęcie");
-            } else if(type == NotificationType.COMMENT) {
-                notification.setMessage(sender.getFullName() + " i " + (notification.getCount() - 1) + " innych skomentowało Twoje zdjęcie");
-            }
-            notification.setCreatedDate(LocalDateTime.now());
+            int newCount = notification.getCount() + 1;
+            notification.setCount(newCount);
+            notification.setMessage(buildNotificationMessage(sender.getFullName(), type, newCount));
+            notification.setUpdatedDate(LocalDateTime.now());
         } else {
-
-            String message;
-            if(type == NotificationType.LIKE) {
-                message = sender.getFullName() + " polubił Twoje zdjęcie";
-            } else {
-                message = sender.getFullName() + " skomentował Twoje zdjęcie";
-            }
             notification = NotificationEntity.builder()
                     .recipient(recipient)
                     .post(post)
                     .type(type)
                     .count(1)
-                    .message(message)
+                    .message(buildNotificationMessage(sender.getFullName(), type, 1))
                     .seen(false)
                     .build();
         }
+
         NotificationEntity savedNotification = notificationRepository.save(notification);
         sendNotification(savedNotification);
     }
+
+    private String buildNotificationMessage(String senderFullName, NotificationType type, int count) {
+        if (type == NotificationType.LIKE) {
+            if (count == 1) {
+                return senderFullName + " polubił Twoje zdjęcie";
+            } else if (count == 2) {
+                return senderFullName + " i 1 inna osoba polubiły Twoje zdjęcie";
+            } else {
+                return senderFullName + " i " + (count - 1) + " innych osób polubiły Twoje zdjęcie";
+            }
+        } else if (type == NotificationType.COMMENT) {
+            if (count == 1) {
+                return senderFullName + " skomentował Twoje zdjęcie";
+            } else if (count == 2) {
+                return senderFullName + " i 1 inna osoba skomentowały Twoje zdjęcie";
+            } else {
+                return senderFullName + " i " + (count - 1) + " innych osób skomentowały Twoje zdjęcie";
+            }
+        }
+        return "";
+    }
+
 
     private void sendNotification(NotificationEntity notification) {
         messagingTemplate.convertAndSendToUser(
