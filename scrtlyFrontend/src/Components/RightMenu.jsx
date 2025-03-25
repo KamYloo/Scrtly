@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import { useNavigate } from 'react-router-dom';
 import '../Styles/RightMenu.css'
 import { FaBell, FaCogs, FaCrown, FaRegHeart, FaSun } from 'react-icons/fa'
@@ -6,6 +6,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {logoutAction} from "../Redux/AuthService/Action.js";
 import {NotificationsList} from "./NotificationsList.jsx";
 import toast from "react-hot-toast";
+import {getNotifications} from "../Redux/NotificationService/Action.js";
 
 
 function RightMenu() {
@@ -13,6 +14,7 @@ function RightMenu() {
   const userData = (() => { try { return JSON.parse(localStorage.getItem("user")) || null; } catch { return null; } })();
   const dispatch = useDispatch()
   const {auth} = useSelector(state => state);
+    const notifications = useSelector(state => state.notifications.notifications);
   const navigate = useNavigate()
 
   const handleLogout = () => {
@@ -34,9 +36,15 @@ function RightMenu() {
     }
   }
 
+    useEffect(() => {
+        if (openNotifications) {
+            dispatch(getNotifications());
+        }
+    }, [openNotifications, dispatch]);
+
   return (
     <div className='rightMenu'>
-      {openNotifications && <NotificationsList onClose={() => setOpenNotifications(false)}/>}
+      {openNotifications && <NotificationsList notifications={notifications}/>}
       <div className="top">
         <i><FaCrown /><p>Go <span>Premium</span></p></i>
         <i onClick={() => setOpenNotifications(((prev) => !prev))}><FaBell /></i>

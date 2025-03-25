@@ -17,6 +17,7 @@ import {Album} from "./Components/AlbumComponents/Album.jsx";
 import {PlayListForm} from "./Components/PlayListComponents/PlayListForm.jsx";
 import {PlayList} from "./Components/PlayListComponents/PlayList.jsx";
 import {Home} from "./Components/Home.jsx";
+import NotificationsListener from "./Components/NotificationsListener.jsx";
 
 function App() {
   const [createPlayList, setCreatePlayList] = useState(false)
@@ -43,6 +44,7 @@ function App() {
 
   return (
       <Router>
+        <NotificationsListener />
         <Routes>
 
           <Route path="/login" element={

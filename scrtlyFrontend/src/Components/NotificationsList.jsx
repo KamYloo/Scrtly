@@ -1,100 +1,27 @@
 import React from 'react'
 import {MdCancel} from "react-icons/md";
 
-function NotificationsList() {
+function NotificationsList({ notifications }) {
     return (
         <div className='notificationsBox'>
             <h5 className='notificationsHeading'>Notifications</h5>
             <hr/>
             <ul className='notificationsList'>
-                <li className='notificationsListItem'>
-                    <i ><MdCancel/></i>
-                    <img src="" alt=""/>
-                    <div className='notificationData'>
-                        <p>hgdfahgfdsghfbtrsbffsgbdsfffdsgfgshgffdsffffffffsghfgshfsghfntsfffff</p>
-                        <span>2 days ago</span>
-                    </div>
-                </li>
-                <li className='notificationsListItem'>
-                    <i ><MdCancel/></i>
-                    <img src="" alt=""/>
-                    <div className='notificationData'>
-                        <p>ssshgdfahgbffsgb</p>
-                        <span>2 days ago</span>
-                    </div>
-                </li>
-                <li className='notificationsListItem'>
-                    <i><MdCancel/></i>
-                    <img src="" alt=""/>
-                    <div className='notificationData'>
-                        <p>hgdfahgfdsghfbtrsbffsgb</p>
-                        <span>2 days ago</span>
-                    </div>
-                </li>
-                <li className='notificationsListItem'>
-                    <i><MdCancel/></i>
-                    <img src="" alt=""/>
-                    <div className='notificationData'>
-                        <p>ssshgdfahgbffsgb</p>
-                        <span>2 days ago</span>
-                    </div>
-                </li>
-                <li className='notificationsListItem'>
-                    <i><MdCancel/></i>
-                    <img src="" alt=""/>
-                    <div className='notificationData'>
-                        <p>hgdfahgfdsghfbtrsbffsgb</p>
-                        <span>2 days ago</span>
-                    </div>
-                </li>
-                <li className='notificationsListItem'>
-                    <i><MdCancel/></i>
-                    <img src="" alt=""/>
-                    <div className='notificationData'>
-                        <p>ssshgdfahgbffsgb</p>
-                        <span>2 days ago</span>
-                    </div>
-                </li>
-                <li className='notificationsListItem'>
-                    <i><MdCancel/></i>
-                    <img src="" alt=""/>
-                    <div className='notificationData'>
-                        <p>hgdfahgfdsghfbtrsbffsgb</p>
-                        <span>2 days ago</span>
-                    </div>
-                </li>
-                <li className='notificationsListItem'>
-                    <i><MdCancel/></i>
-                    <img src="" alt=""/>
-                    <div className='notificationData'>
-                        <p>ssshgdfahgbffsgb</p>
-                        <span>2 days ago</span>
-                    </div>
-                </li>
-                <li className='notificationsListItem'>
-                    <i><MdCancel/></i>
-                    <img src="" alt=""/>
-                    <div className='notificationData'>
-                        <p>hgdfahgfdsghfbtrsbffsgb</p>
-                        <span>2 days ago</span>
-                    </div>
-                </li>
-                <li className='notificationsListItem'>
-                    <i><MdCancel/></i>
-                    <img src="" alt=""/>
-                    <div className='notificationData'>
-                        <p>ssshgdfahgbffsgb</p>
-                        <span>2 days ago</span>
-                    </div>
-                </li>
-                <li className='notificationsListItem'>
-                    <i><MdCancel/></i>
-                    <img src="" alt=""/>
-                    <div className='notificationData'>
-                        <p>hgdfahgfdsghfbtrsbffsgb</p>
-                        <span>2 days ago</span>
-                    </div>
-                </li>
+                {notifications && notifications.length > 0 ? (
+                    notifications.map((notif, index) => (
+                        <li key={index} className='notificationsListItem'>
+                            <i><MdCancel /></i>
+                            <img src={notif.post.image || ''} alt=""/>
+                            <div className='notificationData'>
+                                <p>{notif.message}</p>
+                                <span>{notif.createdDate ? new Date(notif.createdDate).toLocaleString() : ""}</span>
+                            </div>
+                        </li>
+                    ))
+                ) : (
+                    <p>No notifications</p>
+                )}
+
             </ul>
         </div>
     )
