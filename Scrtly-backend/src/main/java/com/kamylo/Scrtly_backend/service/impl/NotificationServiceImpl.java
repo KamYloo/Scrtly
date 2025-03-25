@@ -1,15 +1,20 @@
 package com.kamylo.Scrtly_backend.service.impl;
 
+import com.kamylo.Scrtly_backend.dto.NotificationDto;
 import com.kamylo.Scrtly_backend.entity.NotificationEntity;
 import com.kamylo.Scrtly_backend.entity.PostEntity;
 import com.kamylo.Scrtly_backend.entity.UserEntity;
 import com.kamylo.Scrtly_backend.entity.enums.NotificationType;
 import com.kamylo.Scrtly_backend.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.handler.CustomException;
+import com.kamylo.Scrtly_backend.mappers.Mapper;
 import com.kamylo.Scrtly_backend.repository.NotificationRepository;
 import com.kamylo.Scrtly_backend.repository.PostRepository;
+import com.kamylo.Scrtly_backend.service.NotificationService;
 import com.kamylo.Scrtly_backend.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,11 +24,12 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class NotificationServiceImpl {
+public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
     private final PostRepository postRepository;
     private final SimpMessagingTemplate messagingTemplate;
     private final UserService userService;
+    private final Mapper<NotificationEntity, NotificationDto> notificationMapper;
 
     @Transactional
     public void createOrUpdateNotification(Long userId, Long postId, NotificationType type, String triggeringUserName) {
@@ -79,10 +85,17 @@ public class NotificationServiceImpl {
 
 
     private void sendNotification(NotificationEntity notification) {
+        NotificationDto notificationDto = notificationMapper.mapTo(notification);
         messagingTemplate.convertAndSendToUser(
                 notification.getRecipient().getUsername(),
                 "/queue/notifications",
-                notification
+                notificationDto
         );
+    }
+
+    @Override
+    public Page<NotificationDto> getOwnerNotifications(String username, Pageable pageable) {
+        UserEntity user = userService.findUserByEmail(username);
+        return notificationRepository.findByRecipientIdOrderByUpdatedDateDesc(user.getId(), pageable).map(notificationMapper::mapTo);
     }
 }

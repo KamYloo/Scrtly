@@ -1,6 +1,7 @@
 package com.kamylo.Scrtly_backend.listeners;
 
 import com.kamylo.Scrtly_backend.events.NotificationEvent;
+import com.kamylo.Scrtly_backend.service.NotificationService;
 import com.kamylo.Scrtly_backend.service.impl.NotificationServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class NotificationEventListener {
 
-    private final NotificationServiceImpl notificationService;
+    private final NotificationService notificationService;
 
     @Async
     @EventListener
