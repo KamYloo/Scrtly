@@ -8,4 +8,5 @@ import org.springframework.data.domain.Pageable;
 public interface NotificationService {
     void createOrUpdateNotification(Long userId, Long postId, NotificationType type, String triggeringUserName);
     Page<NotificationDto> getOwnerNotifications(String username, Pageable pageable);
+    void deleteNotification(Long id, String username);
 }

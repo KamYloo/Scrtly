@@ -37,7 +37,9 @@ public enum BusinessErrorCodes {
     SONG_EXISTS(329, "The song is in this playlist", HttpStatus.BAD_REQUEST),
     SONG_NOT_EXISTS(330, "The song is not in this playlist", HttpStatus.BAD_REQUEST),
     STORY_NOT_FOUND(331, "Story not found", HttpStatus.NOT_FOUND),
-    STORY_MISMATCH(332, "No user permissions for this story", HttpStatus.UNAUTHORIZED);
+    STORY_MISMATCH(332, "No user permissions for this story", HttpStatus.UNAUTHORIZED),
+    NOTIFICATION_NOT_FOUND(333, "Notification not found", HttpStatus.NOT_FOUND),
+    NOTIFICATION_MISMATCH(333, "No user permissions for this notification", HttpStatus.FORBIDDEN),;
     @Getter
     private final int code;
     @Getter

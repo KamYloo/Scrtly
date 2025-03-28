@@ -10,9 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
@@ -28,5 +26,11 @@ public class NotificationController {
                                                                                 Principal principal) {
         Page<NotificationDto> notifications = notificationService.getOwnerNotifications(principal.getName(), pageable);
         return new ResponseEntity<>(PagedResponse.of(notifications), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/delete/{notificationId}")
+    public ResponseEntity<?> deleteNotification(@PathVariable Long notificationId, Principal principal)  {
+        notificationService.deleteNotification(notificationId, principal.getName());
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -98,4 +99,17 @@ public class NotificationServiceImpl implements NotificationService {
         UserEntity user = userService.findUserByEmail(username);
         return notificationRepository.findByRecipientIdOrderByUpdatedDateDesc(user.getId(), pageable).map(notificationMapper::mapTo);
     }
+
+    @Override
+    public void deleteNotification(Long id, String username) {
+        NotificationEntity notification = notificationRepository.findById(id).orElseThrow(
+                () -> new CustomException(BusinessErrorCodes.NOTIFICATION_NOT_FOUND));
+        UserEntity userEntity = userService.findUserByEmail(username);
+        if (notification.getRecipient().getId().equals(userEntity.getId())) {
+            notificationRepository.deleteById(notification.getId());
+        } else {
+            throw new CustomException(BusinessErrorCodes.NOTIFICATION_MISMATCH);
+        }
+    }
+
 }
