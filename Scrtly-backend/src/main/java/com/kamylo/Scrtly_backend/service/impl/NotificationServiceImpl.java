@@ -33,6 +33,7 @@ public class NotificationServiceImpl implements NotificationService {
     private final Mapper<NotificationEntity, NotificationDto> notificationMapper;
 
     @Transactional
+    @Override
     public void createOrUpdateNotification(Long userId, Long postId, NotificationType type, String triggeringUserName) {
         UserEntity recipient = userService.findUserById(userId);
         UserEntity sender = userService.findUserByEmail(triggeringUserName);
@@ -61,6 +62,32 @@ public class NotificationServiceImpl implements NotificationService {
 
         NotificationEntity savedNotification = notificationRepository.save(notification);
         sendNotification(savedNotification);
+    }
+
+    @Override
+    public void decrementNotification(Long recipientId, Long postId, NotificationType type) {
+        UserEntity recipient = userService.findUserById(recipientId);
+        PostEntity post = postRepository.findById(postId).orElseThrow(
+                () -> new CustomException(BusinessErrorCodes.POST_NOT_FOUND));
+        Optional<NotificationEntity> optionalNotification = notificationRepository.findByRecipientAndTypeAndPost(recipient, type, post);
+        if (optionalNotification.isPresent()) {
+            NotificationEntity notification = optionalNotification.get();
+            if (notification.getCount() > 1) {
+                int newCount = notification.getCount() - 1;
+                notification.setCount(newCount);
+                String senderFullName = notification.getMessage().split(" ")[0];
+                notification.setMessage(buildNotificationMessage(senderFullName, type, newCount));
+                notification.setUpdatedDate(LocalDateTime.now());
+                notificationRepository.save(notification);
+            } else {
+                notificationRepository.delete(notification);
+            }
+        }
+    }
+
+    @Override
+    public void deleteNotificationsByPost(PostEntity post) {
+        notificationRepository.deleteAllByPost(post);
     }
 
     private String buildNotificationMessage(String senderFullName, NotificationType type, int count) {

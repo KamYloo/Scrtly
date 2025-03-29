@@ -14,6 +14,7 @@ import com.kamylo.Scrtly_backend.repository.CommentRepository;
 import com.kamylo.Scrtly_backend.repository.PostRepository;
 import com.kamylo.Scrtly_backend.request.CommentRequest;
 import com.kamylo.Scrtly_backend.service.CommentService;
+import com.kamylo.Scrtly_backend.service.NotificationService;
 import com.kamylo.Scrtly_backend.service.UserService;
 import com.kamylo.Scrtly_backend.specification.CommentSpecification;
 import com.kamylo.Scrtly_backend.utils.UserLikeChecker;
@@ -23,6 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -34,8 +36,10 @@ public class CommentServiceImpl implements CommentService {
     private final Mapper<CommentEntity, CommentDto> commentMapper;
     private final UserLikeChecker userLikeChecker;
     private final ApplicationEventPublisher eventPublisher;
+    private final NotificationService notificationService;
 
     @Override
+    @Transactional
     public CommentDto createComment(CommentRequest commentRequest, String username) {
        UserEntity user = userService.findUserByEmail(username);
        PostEntity post = postRepository.findById(commentRequest.getPostId()).orElseThrow(
@@ -90,13 +94,18 @@ public class CommentServiceImpl implements CommentService {
         });
     }
 
+
     @Override
+    @Transactional
     public void deleteComment(Long commentId, String username) {
         CommentEntity comment = commentRepository.findById(commentId).orElseThrow(
                 () -> new CustomException(BusinessErrorCodes.COMMENT_NOT_FOUND));
 
         if (validateCommentOwnership(username, comment)) {
             commentRepository.delete(comment);
+            Long postId = comment.getPost().getId();
+            Long recipientId = comment.getPost().getUser().getId();
+            notificationService.decrementNotification(recipientId, postId, NotificationType.COMMENT);
         } else {
             throw new CustomException(BusinessErrorCodes.COMMENT_MISMATCH);
         }
