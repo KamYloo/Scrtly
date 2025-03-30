@@ -14,8 +14,10 @@ function RightMenu() {
   const userData = (() => { try { return JSON.parse(localStorage.getItem("user")) || null; } catch { return null; } })();
   const dispatch = useDispatch()
   const {auth} = useSelector(state => state);
-    const notifications = useSelector(state => state.notifications.notifications);
+  const notifications = useSelector(state => state.notifications.notifications);
   const navigate = useNavigate()
+
+  const unseenCount = notifications.filter(notif => !notif.seen).length;
 
   const handleLogout = () => {
     dispatch(logoutAction())
@@ -40,21 +42,26 @@ function RightMenu() {
         if (openNotifications) {
             dispatch(getNotifications());
         }
-    }, [openNotifications, dispatch]);
+    }, [openNotifications, notifications.length, dispatch ]);
 
   return (
     <div className='rightMenu'>
       {openNotifications && <NotificationsList notifications={notifications}/>}
-      <div className="top">
-        <i><FaCrown /><p>Go <span>Premium</span></p></i>
-        <i onClick={() => setOpenNotifications(((prev) => !prev))}><FaBell /></i>
-        <i><FaRegHeart /></i>
-      </div>
-      <div className="profile">
-        <i><FaSun /></i>
-        <i><FaCogs /></i>
-        <div className="profileImg" onClick={handleProfileClick}>
-          <img src={userData?.profilePicture || ''} alt="" />
+        <div className="top">
+            <i><FaCrown/><p>Go <span>Premium</span></p></i>
+            <i
+                className={unseenCount > 0 ? "has-unseen" : ""}
+                onClick={() => setOpenNotifications(prev => !prev)}
+            >
+                <FaBell/>
+            </i>
+            <i><FaRegHeart/></i>
+        </div>
+        <div className="profile">
+            <i><FaSun/></i>
+            <i><FaCogs/></i>
+            <div className="profileImg" onClick={handleProfileClick}>
+                <img src={userData?.profilePicture || ''} alt="" />
         </div>
         {localStorage.getItem("refreshToken") ? (
           <p className='loginBtn' onClick={handleLogout}>Logout</p>

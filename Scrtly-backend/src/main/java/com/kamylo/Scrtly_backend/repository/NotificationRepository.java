@@ -16,7 +16,7 @@ import java.util.Optional;
 @Repository
 public interface NotificationRepository extends JpaRepository<NotificationEntity, Long> {
     Optional<NotificationEntity> findByRecipientAndTypeAndPost(UserEntity recipient, NotificationType type, PostEntity post);
-    Page<NotificationEntity> findByRecipientIdOrderByUpdatedDateDesc(Long recipientId, Pageable pageable);
+    Page<NotificationEntity> findByRecipientIdOrderByUpdatedDateDescCreatedDateDesc(Long recipientId, Pageable pageable);
 
     @Modifying
     @Query("DELETE FROM NotificationEntity n WHERE n.post = ?1")

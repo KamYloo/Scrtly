@@ -25,6 +25,7 @@ export const fetchWithAuth = async (url, options = {}, errorType) => {
 
                     if (refreshResult.refreshToken) {
                         localStorage.setItem('refreshToken', refreshResult.refreshToken);
+                        localStorage.setItem('user', JSON.stringify(refreshResult.user));
                     }
 
                     headers = {
@@ -32,11 +33,13 @@ export const fetchWithAuth = async (url, options = {}, errorType) => {
                         'Authorization': `Bearer ${localStorage.getItem('refreshToken')}`
                     };
 
+                    headers = { ...headers, 'Authorization': `Bearer ${refreshResult.refreshToken}` };
                     response = await fetch(`${BASE_API_URL}${url}`, { ...options, headers, credentials: 'include' });
                 } else {
-
-                    const errorData = await refreshResponse.json();
-                    return { error: true, message: errorData.message || 'Token odświeżania nie powiódł się' };
+                    localStorage.removeItem('refreshToken');
+                    localStorage.removeItem('user');
+                    window.location.href = "/login";
+                    return { error: true, message: 'Sesja wygasła. Zaloguj się ponownie.' };
                 }
             }
         }
