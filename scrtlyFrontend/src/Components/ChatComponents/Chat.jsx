@@ -1,3 +1,4 @@
+// Chat.jsx
 import React, { useEffect, useRef, useState } from 'react';
 import EmojiPicker from 'emoji-picker-react';
 import { FaPhoneAlt, FaInfoCircle, FaImage, FaCamera, FaMicrophone } from "react-icons/fa";
@@ -13,7 +14,6 @@ function Chat({ chat }) {
     const [open, setOpen] = useState(false);
     const [text, setText] = useState("");
     const [stompClient, setStompClient] = useState(null);
-    const [messages, setMessages] = useState([]);
     const [editingMessageId, setEditingMessageId] = useState(null);
     const [editingMessageText, setEditingMessageText] = useState("");
 
@@ -26,13 +26,23 @@ function Chat({ chat }) {
         }
     })();
 
-    const endRef = useRef(null);
+    const messagesEndRef = useRef(null);
+    const messagesContainerRef = useRef(null);
+    const prevScrollHeightRef = useRef(0);
+
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     useEffect(() => {
-        endRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [messages]);
+        const container = messagesContainerRef.current;
+        if (!container) return;
+        if (chatMessage.page === 0) {
+            messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        } else {
+            const newScrollHeight = container.scrollHeight;
+            container.scrollTop = newScrollHeight - prevScrollHeightRef.current;
+        }
+    }, [chatMessage.messages, chatMessage.page]);
 
     const formatTimeAgo = (timestamp) => {
         return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
@@ -41,31 +51,26 @@ function Chat({ chat }) {
     const onMessageReceive = (message) => {
         try {
             const receivedMessage = JSON.parse(message.body);
-            setMessages((prevMessages) => {
-                if (receivedMessage.status === "EDITED") {
-                    return prevMessages.map(msg =>
-                        msg.id === receivedMessage.id ? { ...msg, ...receivedMessage } : msg
-                    );
-                }
-                if (receivedMessage.status === "DELETED") {
-                    return prevMessages.filter(msg => msg.id !== receivedMessage.id);
-                }
-                const exists = prevMessages.some(msg => msg.id === receivedMessage.id);
-                return exists ? prevMessages : [...prevMessages, receivedMessage];
-            });
+            if (receivedMessage.status === "EDITED") {
+                dispatch({ type: 'EDIT_MESSAGE', payload: receivedMessage });
+            } else if (receivedMessage.status === "DELETED") {
+                dispatch({ type: 'DELETE_MESSAGE', payload: receivedMessage });
+            } else {
+                dispatch({ type: 'ADD_NEW_MESSAGE', payload: receivedMessage });
+            }
+
+            setTimeout(() => {
+                messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+            }, 100);
         } catch (error) {
             console.error("Błąd parsowania odebranej wiadomości:", error);
         }
     };
 
     useEffect(() => {
-        setMessages([]);
-
         const client = new Client({
             webSocketFactory: () => new SockJS("http://localhost:8080/api/ws"),
             reconnectDelay: 5000,
-            debug: function(str) {
-            },
             onConnect: (frame) => {
                 console.log("Połączono STOMP:", frame);
                 if (chat?.id) {
@@ -81,7 +86,7 @@ function Chat({ chat }) {
         setStompClient(client);
 
         if (chat?.id) {
-            dispatch(getAllMessages(chat.id));
+            dispatch(getAllMessages(chat.id, 0));
         }
 
         return () => {
@@ -90,23 +95,26 @@ function Chat({ chat }) {
         };
     }, [chat?.id, dispatch]);
 
-    useEffect(() => {
-        if (chat?.id) {
-            setMessages(chatMessage.messages || []);
-        } else {
-            setMessages([]);
+    const handleScroll = () => {
+        const container = messagesContainerRef.current;
+        if (container.scrollTop === 0 && !chatMessage.last && !chatMessage.loading) {
+            prevScrollHeightRef.current = container.scrollHeight;
+            dispatch(getAllMessages(chat.id, chatMessage.page + 1));
         }
-    }, [chat?.id, chatMessage.messages, chatMessage.deletedMessage]);
+    };
 
     const handleCreateNewMessage = () => {
         if (text.trim() === "" || !stompClient || !stompClient.connected) return;
-
-        const newMessage = { chatId: chat.id, message: text };
+        const newMessage = { message: text };
         stompClient.publish({
             destination: `/app/chat/sendMessage/${chat.id}`,
             body: JSON.stringify(newMessage)
         });
         setText("");
+
+        setTimeout(() => {
+            messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        }, 100);
     };
 
     const startEditing = (message) => {
@@ -116,7 +124,6 @@ function Chat({ chat }) {
 
     const handleEditMessage = () => {
         if (editingMessageText.trim() === "" || !stompClient || !stompClient.connected) return;
-
         const payload = { id: editingMessageId, message: editingMessageText };
         stompClient.publish({
             destination: `/app/chat/editMessage/${chat.id}`,
@@ -147,8 +154,8 @@ function Chat({ chat }) {
                     <i><FaInfoCircle /></i>
                 </div>
             </div>
-            <div className="center">
-                {messages?.map((item, index) => (
+            <div className="center" ref={messagesContainerRef} onScroll={handleScroll}>
+                {chatMessage.messages?.map((item, index) => (
                     <div
                         className={item.user.id === userData?.id ? "messageOwn" : "message"}
                         key={`${item.id}-${index}`}
@@ -168,7 +175,7 @@ function Chat({ chat }) {
                                 )}
                             </p>
                             <div className="info">
-                                <span>{item.timestamp ? formatTimeAgo(item.timestamp) : "Unknown time"}</span>
+                                <span>{item.lastModifiedDate ? formatTimeAgo(item.lastModifiedDate) : formatTimeAgo(item.createDate)}</span>
                                 {item.user.id === userData?.id && (
                                     <>
                                         {editingMessageId === item.id ? (
@@ -188,7 +195,7 @@ function Chat({ chat }) {
                         </div>
                     </div>
                 ))}
-                <div ref={endRef}></div>
+                <div ref={messagesEndRef}></div>
             </div>
             <div className="bottom">
                 <div className="icons">

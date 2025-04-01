@@ -1,7 +1,7 @@
 import {
-    CREATE_NEW_MESSAGE_ERROR,
-    CREATE_NEW_MESSAGE_REQUEST, CREATE_NEW_MESSAGE_SUCCESS, DELETE_MESSAGE_ERROR,
-    DELETE_MESSAGE_REQUEST, DELETE_MESSAGE_SUCCESS, GET_ALL_MESSAGES_ERROR,
+    ADD_NEW_MESSAGE,
+     DELETE_MESSAGE,
+    EDIT_MESSAGE, GET_ALL_MESSAGES_ERROR,
     GET_ALL_MESSAGES_REQUEST, GET_ALL_MESSAGES_SUCCESS
 } from "./ActionType.js";
 
@@ -11,31 +11,48 @@ const initialValues = {
     newMessage: null,
     messages: [],
     deletedMessage: null,
+    page: 0,
+    last: false,
 }
 
 export const chatMessageReducer = (state=initialValues,{type,payload}) => {
 
     switch (type) {
-        case CREATE_NEW_MESSAGE_REQUEST:
-            return { ...state, loading: true, error: null };
-        case CREATE_NEW_MESSAGE_SUCCESS:
-            return { ...state, loading: false, newMessage: payload };
-        case CREATE_NEW_MESSAGE_ERROR:
-            return { ...state, loading: false, error: payload };
-
         case GET_ALL_MESSAGES_REQUEST:
             return { ...state, loading: true, error: null };
         case GET_ALL_MESSAGES_SUCCESS:
-            return { ...state, loading: false, messages: payload };
+            // eslint-disable-next-line no-case-declarations
+            const newMessages = [...payload.content].reverse();
+            return {
+                ...state,
+                loading: false,
+                messages: payload.pageNumber === 0 ? newMessages : [...newMessages, ...state.messages],
+                page: payload.pageNumber,
+                last: payload.last,
+            };
+
         case GET_ALL_MESSAGES_ERROR:
             return { ...state, loading: false, error: payload };
 
-        case DELETE_MESSAGE_REQUEST:
-            return { ...state, loading: true, error: null };
-        case DELETE_MESSAGE_SUCCESS:
-            return { ...state, loading: false, deletedMessage: payload };
-        case DELETE_MESSAGE_ERROR:
-            return { ...state, loading: false, error: payload };
+        case ADD_NEW_MESSAGE:
+            return {
+                ...state,
+                messages: [...state.messages, payload],
+            };
+
+        case EDIT_MESSAGE:
+            return {
+                ...state,
+                messages: state.messages.map(msg =>
+                    msg.id === payload.id ? { ...msg, ...payload } : msg
+                ),
+            };
+
+        case DELETE_MESSAGE:
+            return {
+                ...state,
+                messages: state.messages.filter(message => message.id !== payload.id),
+            };
 
         default:
             return state;

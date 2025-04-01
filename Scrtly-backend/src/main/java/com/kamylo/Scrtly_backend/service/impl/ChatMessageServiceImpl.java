@@ -17,12 +17,14 @@ import com.kamylo.Scrtly_backend.service.ChatService;
 import com.kamylo.Scrtly_backend.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
+
+import java.time.LocalDateTime;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -60,11 +62,17 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     @Override
     @Async
     @Transactional
-    public CompletableFuture<ChatMessageDto> editMessageAsync(ChatMessageEditRequest request, String username) {
+    public CompletableFuture<ChatMessageDto> editMessageAsync(ChatMessageEditRequest request, Integer chatId, String username) {
         ChatMessageEntity message = chatMessageRepository.findById(request.getId()).orElseThrow(
                 () -> new CustomException(BusinessErrorCodes.CHAT_MESSAGE_NOT_FOUND));
+
+        if (!message.getChatRoom().getId().equals(chatId)) {
+            throw new CustomException(BusinessErrorCodes.CHAT_MESSAGE_NOT_IN_CHAT);
+        }
+
         if (validateChatMessageOwnership(username, message)) {
             message.setMessageText(request.getMessage());
+            message.setLastModifiedDate(LocalDateTime.now());
             ChatMessageEntity updatedMessage = chatMessageRepository.save(message);
             ChatMessageDto dto = chatMessageMapper.mapTo(updatedMessage);
             dto.setChatRoomId(message.getChatRoom().getId());
@@ -79,9 +87,12 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     @Override
     @Async
     @Transactional
-    public CompletableFuture<ChatMessageDto> deleteMessageAsync(Long messageId, String username) {
+    public CompletableFuture<ChatMessageDto> deleteMessageAsync(Long messageId, Integer chatId, String username) {
         ChatMessageEntity chatMessage = chatMessageRepository.findById(messageId).orElseThrow(
                 () -> new CustomException(BusinessErrorCodes.CHAT_MESSAGE_NOT_FOUND));
+        if (!chatMessage.getChatRoom().getId().equals(chatId)) {
+            throw new CustomException(BusinessErrorCodes.CHAT_MESSAGE_NOT_IN_CHAT);
+        }
         if (validateChatMessageOwnership(username, chatMessage)) {
             chatMessageRepository.deleteById(messageId);
             ChatMessageDto dto = ChatMessageDto.builder()
@@ -98,13 +109,8 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     }
 
     @Override
-    public List<ChatMessageDto> getChatsMessages(Integer chatId, String username) {
-        ChatRoomDto chatRoomDto = chatService.getChatById(chatId, username);
-        ChatRoomEntity chatRoom = chatRoomMapper.mapFrom(chatRoomDto);
-        List<ChatMessageEntity> messages = chatMessageRepository.findByChatRoomId(chatRoom.getId());
-        return messages.stream()
-                .map(chatMessageMapper::mapTo)
-                .collect(Collectors.toList());
+    public Page<ChatMessageDto> getChatMessages(Integer chatId, String username, Pageable pageable) {
+        return chatMessageRepository.findByChatRoomIdOrderByCreateDateDesc(chatId, pageable).map(chatMessageMapper::mapTo);
     }
 
 
