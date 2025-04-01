@@ -42,7 +42,7 @@
     margin-right: 5px;
 }
 
-.rightMenu .top i:nth-child(2)::before {
+.rightMenu .top i.has-unseen::before {
     position: absolute;
     content: "";
     width: 8px;
@@ -52,6 +52,7 @@
     right: 0;
     background: #45ab2e;
 }
+
 
 .rightMenu .top i:hover .rightMenu .profile i:hover {
     transform: scale(1.2);
@@ -146,12 +147,12 @@
     .notificationData p {
         display: -webkit-box;
         -webkit-box-orient: vertical;
-        -webkit-line-clamp: 3;
+        -webkit-line-clamp: 4;
         overflow: hidden;
         text-overflow: ellipsis;
         color: rgba(255, 255, 255, 0.88);
         line-height: 1.2em;
-        max-height: 3.6em;
+        max-height: 5em;
         margin: 0;
         word-break: break-word;
         white-space: normal;

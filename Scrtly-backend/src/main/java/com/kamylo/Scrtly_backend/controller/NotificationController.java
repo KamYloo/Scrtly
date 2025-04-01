@@ -21,7 +21,7 @@ public class NotificationController {
     private final NotificationService notificationService;
 
     @GetMapping("/own")
-    public ResponseEntity<PagedResponse<NotificationDto>> getOwnerNotifications(@PageableDefault(size = 10, sort = "updatedDate", direction = Sort.Direction.DESC)
+    public ResponseEntity<PagedResponse<NotificationDto>> getOwnerNotifications(@PageableDefault(size = 10)
                                                                                 Pageable pageable,
                                                                                 Principal principal) {
         Page<NotificationDto> notifications = notificationService.getOwnerNotifications(principal.getName(), pageable);
@@ -31,6 +31,6 @@ public class NotificationController {
     @DeleteMapping("/delete/{notificationId}")
     public ResponseEntity<?> deleteNotification(@PathVariable Long notificationId, Principal principal)  {
         notificationService.deleteNotification(notificationId, principal.getName());
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return ResponseEntity.ok(notificationId);
     }
 }

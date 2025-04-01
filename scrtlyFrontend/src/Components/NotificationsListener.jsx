@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 
-import {addNotification} from "../Redux/NotificationService/Action.js";
+import {sendNotification} from "../Redux/NotificationService/Action.js";
 import {connectWebSocket} from "../utils/websocketClient.js";
 
 
@@ -12,7 +12,7 @@ const NotificationsListener = () => {
     useEffect(() => {
         if (userData) {
             const client = connectWebSocket(userData.email, (notification) => {
-                dispatch(addNotification(notification));
+                dispatch(sendNotification(notification));
             });
 
             return () => client.deactivate();

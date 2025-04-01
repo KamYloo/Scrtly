@@ -14,10 +14,12 @@ import com.kamylo.Scrtly_backend.repository.CommentRepository;
 import com.kamylo.Scrtly_backend.repository.LikeRepository;
 import com.kamylo.Scrtly_backend.repository.PostRepository;
 import com.kamylo.Scrtly_backend.service.LikeService;
+import com.kamylo.Scrtly_backend.service.NotificationService;
 import com.kamylo.Scrtly_backend.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +31,7 @@ public class LikeServiceImpl implements LikeService {
     private final CommentRepository commentRepository;
     private final Mapper<LikeEntity, LikeDto> likeMapper;
     private final ApplicationEventPublisher eventPublisher;
+    private final NotificationService notificationService;
 
    /* @Override
     public List<LikeEntity> getLikesByPost(Long postId) throws PostException {
@@ -49,12 +52,16 @@ public class LikeServiceImpl implements LikeService {
     }*/
 
     @Override
+    @Transactional
     public LikeDto likePost(Long postId, String username) {
         UserEntity user = userService.findUserByEmail(username);
         LikeEntity checkLikeExistPost = likeRepository.isLikeExistPost(user.getId(), postId);
 
         if (checkLikeExistPost != null) {
             likeRepository.deleteById(checkLikeExistPost.getId());
+            PostEntity post = postRepository.findById(postId).orElseThrow(
+                    () -> new CustomException(BusinessErrorCodes.POST_NOT_FOUND));
+            notificationService.decrementNotification(post.getUser().getId(), postId, NotificationType.LIKE);
             return likeMapper.mapTo(checkLikeExistPost);
         }
 
@@ -82,6 +89,7 @@ public class LikeServiceImpl implements LikeService {
     }
 
     @Override
+    @Transactional
     public LikeDto likeComment(Long commentId, String username) {
         UserEntity user = userService.findUserByEmail(username);
         LikeEntity checkLikeExistComment = likeRepository.isLikeExistComment(user.getId(), commentId);

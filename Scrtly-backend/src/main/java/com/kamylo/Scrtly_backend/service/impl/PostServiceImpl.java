@@ -8,6 +8,7 @@ import com.kamylo.Scrtly_backend.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.handler.CustomException;
 import com.kamylo.Scrtly_backend.mappers.Mapper;
 import com.kamylo.Scrtly_backend.repository.PostRepository;
+import com.kamylo.Scrtly_backend.service.NotificationService;
 import com.kamylo.Scrtly_backend.service.PostService;
 import com.kamylo.Scrtly_backend.service.UserService;
 import com.kamylo.Scrtly_backend.utils.UserLikeChecker;
@@ -27,6 +28,8 @@ public class PostServiceImpl implements PostService {
     private final FileServiceImpl fileService;
     private final Mapper<PostEntity, PostDto> postMapper;
     private final UserLikeChecker userLikeChecker;
+    private final NotificationService notificationService;
+
 
     @Override
     @Transactional
@@ -72,8 +75,9 @@ public class PostServiceImpl implements PostService {
         PostEntity post = postRepository.findById(postId).orElseThrow(
                 () -> new CustomException(BusinessErrorCodes.POST_NOT_FOUND));
         if (validatePostOwnership(username, post)) {
-            postRepository.deleteById(postId);
             fileService.deleteFile(post.getImage());
+            notificationService.deleteNotificationsByPost(post);
+            postRepository.deleteById(postId);
         } else {
             throw new CustomException(BusinessErrorCodes.POST_MISMATCH);
         }

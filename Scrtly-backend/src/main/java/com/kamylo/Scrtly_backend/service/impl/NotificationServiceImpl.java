@@ -16,9 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -32,10 +30,14 @@ public class NotificationServiceImpl implements NotificationService {
     private final UserService userService;
     private final Mapper<NotificationEntity, NotificationDto> notificationMapper;
 
-    @Transactional
+    @Override
     public void createOrUpdateNotification(Long userId, Long postId, NotificationType type, String triggeringUserName) {
         UserEntity recipient = userService.findUserById(userId);
         UserEntity sender = userService.findUserByEmail(triggeringUserName);
+
+        if (recipient.getId().equals(sender.getId())) {
+            return;
+        }
 
         PostEntity post = postRepository.findById(postId).orElseThrow(
                 () -> new CustomException(BusinessErrorCodes.POST_NOT_FOUND));
@@ -44,6 +46,7 @@ public class NotificationServiceImpl implements NotificationService {
         NotificationEntity notification;
         if (optionalNotification.isPresent()) {
             notification = optionalNotification.get();
+
             int newCount = notification.getCount() + 1;
             notification.setCount(newCount);
             notification.setMessage(buildNotificationMessage(sender.getFullName(), type, newCount));
@@ -61,6 +64,32 @@ public class NotificationServiceImpl implements NotificationService {
 
         NotificationEntity savedNotification = notificationRepository.save(notification);
         sendNotification(savedNotification);
+    }
+
+    @Override
+    public void decrementNotification(Long recipientId, Long postId, NotificationType type) {
+        UserEntity recipient = userService.findUserById(recipientId);
+        PostEntity post = postRepository.findById(postId).orElseThrow(
+                () -> new CustomException(BusinessErrorCodes.POST_NOT_FOUND));
+        Optional<NotificationEntity> optionalNotification = notificationRepository.findByRecipientAndTypeAndPost(recipient, type, post);
+        if (optionalNotification.isPresent()) {
+            NotificationEntity notification = optionalNotification.get();
+            if (notification.getCount() > 1) {
+                int newCount = notification.getCount() - 1;
+                notification.setCount(newCount);
+                String senderFullName = notification.getMessage().split(" ")[0];
+                notification.setMessage(buildNotificationMessage(senderFullName, type, newCount));
+                notification.setUpdatedDate(LocalDateTime.now());
+                notificationRepository.save(notification);
+            } else {
+                notificationRepository.delete(notification);
+            }
+        }
+    }
+
+    @Override
+    public void deleteNotificationsByPost(PostEntity post) {
+        notificationRepository.deleteAllByPost(post);
     }
 
     private String buildNotificationMessage(String senderFullName, NotificationType type, int count) {
@@ -97,7 +126,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public Page<NotificationDto> getOwnerNotifications(String username, Pageable pageable) {
         UserEntity user = userService.findUserByEmail(username);
-        return notificationRepository.findByRecipientIdOrderByUpdatedDateDesc(user.getId(), pageable).map(notificationMapper::mapTo);
+        return notificationRepository.findByRecipientIdOrderByUpdatedDateDescCreatedDateDesc(user.getId(), pageable).map(notificationMapper::mapTo);
     }
 
     @Override

@@ -2,7 +2,7 @@ import {
     GET_NOTIFICATIONS_REQUEST,
     GET_NOTIFICATIONS_SUCCESS,
     GET_NOTIFICATIONS_ERROR,
-    ADD_NOTIFICATION
+    SEND_NOTIFICATION, DELETE_NOTIFICATION_REQUEST, DELETE_NOTIFICATION_SUCCESS, DELETE_NOTIFICATION_ERROR
 } from "./ActionType.js";
 
 const initialState = {
@@ -11,6 +11,7 @@ const initialState = {
     notifications: [],
     page: 0,
     last: false,
+    deletedNotification:null,
 };
 
 export const notificationReducer = (state = initialState, { type, payload, page }) => {
@@ -27,12 +28,23 @@ export const notificationReducer = (state = initialState, { type, payload, page 
             };
         case GET_NOTIFICATIONS_ERROR:
             return { ...state, loading: false, error: payload };
-        case ADD_NOTIFICATION:
+        case SEND_NOTIFICATION:
             return {
                 ...state,
                 notifications: [payload, ...state.notifications.filter(n => n.id !== payload.id)],
             };
+        case DELETE_NOTIFICATION_REQUEST:
+            return { ...state, loading: true };
+        case DELETE_NOTIFICATION_SUCCESS:
+            return {
+                ...state,
+                loading: false,
+                notifications: state.notifications.filter(n => n.id !== payload),
+            };
+        case DELETE_NOTIFICATION_ERROR:
+            return { ...state, loading: false, error: payload };
         default:
             return state;
+
     }
 };

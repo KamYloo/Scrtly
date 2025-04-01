@@ -18,6 +18,7 @@ public class NotificationDto {
     private String message;
     private boolean seen;
     private LocalDateTime updatedDate;
+    private LocalDateTime createdDate;
     private Integer count;
     private UserMinimalDto recipient;
     private PostMinimalDto post;
