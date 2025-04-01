@@ -1,9 +1,7 @@
 package com.kamylo.Scrtly_backend.controller;
 
 import com.kamylo.Scrtly_backend.dto.UserDto;
-import com.kamylo.Scrtly_backend.entity.UserEntity;
-import com.kamylo.Scrtly_backend.mappers.Mapper;
-import com.kamylo.Scrtly_backend.request.UserRequestDto;
+import com.kamylo.Scrtly_backend.dto.request.UserRequestDto;
 import com.kamylo.Scrtly_backend.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

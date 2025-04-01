@@ -5,7 +5,7 @@ import com.kamylo.Scrtly_backend.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.handler.CustomException;
 import com.kamylo.Scrtly_backend.mappers.Mapper;
 import com.kamylo.Scrtly_backend.repository.UserRepository;
-import com.kamylo.Scrtly_backend.request.UserRequestDto;
+import com.kamylo.Scrtly_backend.dto.request.UserRequestDto;
 import com.kamylo.Scrtly_backend.service.FileService;
 import com.kamylo.Scrtly_backend.service.UserService;
 import com.kamylo.Scrtly_backend.utils.UserLikeChecker;

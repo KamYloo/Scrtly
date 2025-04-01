@@ -16,10 +16,10 @@ import java.util.List;
 public class ChatRoomEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String chatRoomName;
 
     @ManyToMany

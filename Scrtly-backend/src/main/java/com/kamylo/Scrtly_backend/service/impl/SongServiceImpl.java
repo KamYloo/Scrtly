@@ -7,7 +7,7 @@ import com.kamylo.Scrtly_backend.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.handler.CustomException;
 import com.kamylo.Scrtly_backend.mappers.Mapper;
 import com.kamylo.Scrtly_backend.repository.SongRepository;
-import com.kamylo.Scrtly_backend.request.SongRequest;
+import com.kamylo.Scrtly_backend.dto.request.SongRequest;
 import com.kamylo.Scrtly_backend.service.AlbumService;
 import com.kamylo.Scrtly_backend.service.SongService;
 import com.kamylo.Scrtly_backend.service.UserRoleService;

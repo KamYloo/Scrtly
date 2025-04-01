@@ -11,7 +11,7 @@ import com.kamylo.Scrtly_backend.mappers.Mapper;
 import com.kamylo.Scrtly_backend.repository.PlayListRepository;
 import com.kamylo.Scrtly_backend.repository.SongLikeRepository;
 import com.kamylo.Scrtly_backend.repository.SongRepository;
-import com.kamylo.Scrtly_backend.request.PlayListRequest;
+import com.kamylo.Scrtly_backend.dto.request.PlayListRequest;
 import com.kamylo.Scrtly_backend.service.PlayListService;
 import com.kamylo.Scrtly_backend.service.UserService;
 import jakarta.transaction.Transactional;

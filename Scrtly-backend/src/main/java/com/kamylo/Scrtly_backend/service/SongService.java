@@ -1,7 +1,7 @@
 package com.kamylo.Scrtly_backend.service;
 
 import com.kamylo.Scrtly_backend.dto.SongDto;
-import com.kamylo.Scrtly_backend.request.SongRequest;
+import com.kamylo.Scrtly_backend.dto.request.SongRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 

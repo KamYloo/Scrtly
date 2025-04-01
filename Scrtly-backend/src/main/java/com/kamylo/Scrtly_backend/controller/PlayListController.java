@@ -2,7 +2,7 @@ package com.kamylo.Scrtly_backend.controller;
 
 import com.kamylo.Scrtly_backend.dto.PlayListDto;
 import com.kamylo.Scrtly_backend.dto.SongDto;
-import com.kamylo.Scrtly_backend.request.PlayListRequest;
+import com.kamylo.Scrtly_backend.dto.request.PlayListRequest;
 import com.kamylo.Scrtly_backend.response.PagedResponse;
 import com.kamylo.Scrtly_backend.service.PlayListService;
 import lombok.AllArgsConstructor;

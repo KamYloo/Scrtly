@@ -28,7 +28,7 @@ public enum BusinessErrorCodes {
     CHATROOM_NOT_FOUND(320, "ChatRoom not found", HttpStatus.NOT_FOUND),
     CHATROOM_MISMATCH(321, "No user permissions for this chatRoom", HttpStatus.UNAUTHORIZED),
     CHAT_MESSAGE_NOT_FOUND(322, "ChatMessage not found", HttpStatus.NOT_FOUND),
-    CHAT_MESSAGE_MISMATCH(323, "No user permissions for this chatMessage", HttpStatus.UNAUTHORIZED),
+    CHAT_MESSAGE_MISMATCH(323, "No user permissions for this chatMessage", HttpStatus.FORBIDDEN),
     TOKEN_EXPIRED(324, "Token expired", HttpStatus.BAD_REQUEST),
     NICKNAME_IS_USED(325, "Nick name is used", HttpStatus.BAD_REQUEST),
     SONG_MISMATCH(326, "No user permissions for this song", HttpStatus.UNAUTHORIZED),

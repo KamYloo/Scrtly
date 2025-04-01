@@ -1,7 +1,7 @@
 package com.kamylo.Scrtly_backend.service;
 
 import com.kamylo.Scrtly_backend.dto.CommentDto;
-import com.kamylo.Scrtly_backend.request.CommentRequest;
+import com.kamylo.Scrtly_backend.dto.request.CommentRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

@@ -1,7 +1,7 @@
 package com.kamylo.Scrtly_backend.controller;
 
 import com.kamylo.Scrtly_backend.dto.CommentDto;
-import com.kamylo.Scrtly_backend.request.CommentRequest;
+import com.kamylo.Scrtly_backend.dto.request.CommentRequest;
 import com.kamylo.Scrtly_backend.response.PagedResponse;
 import com.kamylo.Scrtly_backend.service.CommentService;
 import lombok.AllArgsConstructor;

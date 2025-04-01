@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ChatMessageRepository extends JpaRepository<ChatMessageEntity, Integer> {
+public interface ChatMessageRepository extends JpaRepository<ChatMessageEntity, Long> {
      List<ChatMessageEntity> findByChatRoomId(Integer chatId);
 }

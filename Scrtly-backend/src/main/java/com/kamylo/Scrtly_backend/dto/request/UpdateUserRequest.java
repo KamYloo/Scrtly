@@ -1,4 +1,4 @@
-package com.kamylo.Scrtly_backend.request;
+package com.kamylo.Scrtly_backend.dto.request;
 
 import lombok.Getter;
 import lombok.Setter;

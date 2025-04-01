@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+
 import java.time.LocalDateTime;
 
 @Data
@@ -11,8 +14,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChatMessageDto {
-    private Integer id;
+    private Long id;
     private String messageText;
-    private LocalDateTime timestamp;
+    private LocalDateTime createDate;
+    private LocalDateTime lastModifiedDate;
     private UserDto user;
+    private Integer chatRoomId;
+    private String status;
 }

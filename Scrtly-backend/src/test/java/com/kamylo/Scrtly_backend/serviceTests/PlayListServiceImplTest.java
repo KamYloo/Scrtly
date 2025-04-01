@@ -12,7 +12,7 @@ import com.kamylo.Scrtly_backend.mappers.PlayListMapperImpl;
 import com.kamylo.Scrtly_backend.repository.PlayListRepository;
 import com.kamylo.Scrtly_backend.repository.SongLikeRepository;
 import com.kamylo.Scrtly_backend.repository.SongRepository;
-import com.kamylo.Scrtly_backend.request.PlayListRequest;
+import com.kamylo.Scrtly_backend.dto.request.PlayListRequest;
 import com.kamylo.Scrtly_backend.service.UserService;
 import com.kamylo.Scrtly_backend.service.impl.FileServiceImpl;
 import com.kamylo.Scrtly_backend.service.impl.PlayListServiceImpl;

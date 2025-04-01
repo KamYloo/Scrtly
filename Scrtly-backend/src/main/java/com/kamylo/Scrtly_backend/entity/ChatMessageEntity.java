@@ -2,6 +2,9 @@ package com.kamylo.Scrtly_backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -11,17 +14,21 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 @Data
+@EntityListeners(AuditingEntityListener.class)
 public class ChatMessageEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Long id;
 
     @Column(nullable = false)
     private String messageText;
 
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime timestamp;
+    @CreatedDate
+    private LocalDateTime createDate;
+
+    @LastModifiedDate
+    private LocalDateTime lastModifiedDate;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -30,9 +37,4 @@ public class ChatMessageEntity {
     @ManyToOne
     @JoinColumn(name = "chatRoom_id", nullable = false)
     private ChatRoomEntity chatRoom;
-
-    @PrePersist
-    protected void onCreate() {
-        timestamp = LocalDateTime.now();
-    }
 }

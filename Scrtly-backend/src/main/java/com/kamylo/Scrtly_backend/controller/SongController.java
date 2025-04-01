@@ -1,7 +1,7 @@
 package com.kamylo.Scrtly_backend.controller;
 
 import com.kamylo.Scrtly_backend.dto.SongDto;
-import com.kamylo.Scrtly_backend.request.SongRequest;
+import com.kamylo.Scrtly_backend.dto.request.SongRequest;
 import com.kamylo.Scrtly_backend.service.SongService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

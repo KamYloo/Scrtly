@@ -12,7 +12,7 @@ import com.kamylo.Scrtly_backend.mappers.Mapper;
 import com.kamylo.Scrtly_backend.repository.CommentRepository;
 
 import com.kamylo.Scrtly_backend.repository.PostRepository;
-import com.kamylo.Scrtly_backend.request.CommentRequest;
+import com.kamylo.Scrtly_backend.dto.request.CommentRequest;
 import com.kamylo.Scrtly_backend.service.CommentService;
 import com.kamylo.Scrtly_backend.service.UserService;
 import com.kamylo.Scrtly_backend.specification.CommentSpecification;

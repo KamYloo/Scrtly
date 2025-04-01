@@ -1,7 +1,9 @@
 package com.kamylo.Scrtly_backend.service.impl;
 
+import com.kamylo.Scrtly_backend.config.RabbitMQConfig;
 import com.kamylo.Scrtly_backend.dto.ChatMessageDto;
 import com.kamylo.Scrtly_backend.dto.ChatRoomDto;
+import com.kamylo.Scrtly_backend.dto.request.ChatMessageEditRequest;
 import com.kamylo.Scrtly_backend.entity.UserEntity;
 import com.kamylo.Scrtly_backend.entity.ChatMessageEntity;
 import com.kamylo.Scrtly_backend.entity.ChatRoomEntity;
@@ -9,14 +11,17 @@ import com.kamylo.Scrtly_backend.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.handler.CustomException;
 import com.kamylo.Scrtly_backend.mappers.Mapper;
 import com.kamylo.Scrtly_backend.repository.ChatMessageRepository;
-import com.kamylo.Scrtly_backend.request.SendMessageRequest;
+import com.kamylo.Scrtly_backend.dto.request.SendMessageRequest;
 import com.kamylo.Scrtly_backend.service.ChatMessageService;
 import com.kamylo.Scrtly_backend.service.ChatService;
 import com.kamylo.Scrtly_backend.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,22 +33,68 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     private final ChatService chatService;
     private final Mapper<ChatRoomEntity, ChatRoomDto> chatRoomMapper;
     private final Mapper<ChatMessageEntity, ChatMessageDto> chatMessageMapper;
+    private final RabbitTemplate rabbitTemplate;
 
     @Override
+    @Async
     @Transactional
-    public ChatMessageDto sendMessage(SendMessageRequest request, String username) {
+    public CompletableFuture<ChatMessageDto> sendMessageAsync(SendMessageRequest request, String username) {
         UserEntity userEntity = userService.findUserByEmail(username);
         ChatRoomDto chatRoomDto = chatService.getChatById(request.getChatId(), username);
         ChatRoomEntity chatRoom = chatRoomMapper.mapFrom(chatRoomDto);
-
         ChatMessageEntity chatMessage = ChatMessageEntity.builder()
                 .chatRoom(chatRoom)
                 .user(userEntity)
                 .messageText(request.getMessage())
                 .build();
 
-        ChatMessageEntity savedChatMessage= chatMessageRepository.save(chatMessage);
-        return chatMessageMapper.mapTo(savedChatMessage);
+        ChatMessageEntity savedChatMessage = chatMessageRepository.save(chatMessage);
+        ChatMessageDto dto = chatMessageMapper.mapTo(savedChatMessage);
+        dto.setChatRoomId(chatRoom.getId());
+        dto.setStatus("NEW");
+
+        rabbitTemplate.convertAndSend(RabbitMQConfig.CHAT_EXCHANGE, RabbitMQConfig.ROUTING_KEY, dto);
+        return CompletableFuture.completedFuture(dto);
+    }
+
+    @Override
+    @Async
+    @Transactional
+    public CompletableFuture<ChatMessageDto> editMessageAsync(ChatMessageEditRequest request, String username) {
+        ChatMessageEntity message = chatMessageRepository.findById(request.getId()).orElseThrow(
+                () -> new CustomException(BusinessErrorCodes.CHAT_MESSAGE_NOT_FOUND));
+        if (validateChatMessageOwnership(username, message)) {
+            message.setMessageText(request.getMessage());
+            ChatMessageEntity updatedMessage = chatMessageRepository.save(message);
+            ChatMessageDto dto = chatMessageMapper.mapTo(updatedMessage);
+            dto.setChatRoomId(message.getChatRoom().getId());
+            dto.setStatus("EDITED");
+            rabbitTemplate.convertAndSend(RabbitMQConfig.CHAT_EXCHANGE, RabbitMQConfig.ROUTING_KEY, dto);
+            return CompletableFuture.completedFuture(dto);
+        } else {
+            throw new CustomException(BusinessErrorCodes.CHAT_MESSAGE_MISMATCH);
+        }
+    }
+
+    @Override
+    @Async
+    @Transactional
+    public CompletableFuture<ChatMessageDto> deleteMessageAsync(Long messageId, String username) {
+        ChatMessageEntity chatMessage = chatMessageRepository.findById(messageId).orElseThrow(
+                () -> new CustomException(BusinessErrorCodes.CHAT_MESSAGE_NOT_FOUND));
+        if (validateChatMessageOwnership(username, chatMessage)) {
+            chatMessageRepository.deleteById(messageId);
+            ChatMessageDto dto = ChatMessageDto.builder()
+                    .id(chatMessage.getId())
+                    .messageText("message deleted")
+                    .chatRoomId(chatMessage.getChatRoom().getId())
+                    .status("DELETED")
+                    .build();
+            rabbitTemplate.convertAndSend(RabbitMQConfig.CHAT_EXCHANGE, RabbitMQConfig.ROUTING_KEY, dto);
+            return CompletableFuture.completedFuture(dto);
+        } else {
+            throw new CustomException(BusinessErrorCodes.CHAT_MESSAGE_MISMATCH);
+        }
     }
 
     @Override
@@ -56,16 +107,6 @@ public class ChatMessageServiceImpl implements ChatMessageService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public void deleteChatMessage(Integer messageId, String username) {
-        ChatMessageEntity chatMessage = chatMessageRepository.findById(messageId).orElseThrow(
-                () -> new CustomException(BusinessErrorCodes.CHAT_MESSAGE_NOT_FOUND));
-        if (validateChatMessageOwnership(username, chatMessage)) {
-            chatMessageRepository.deleteById(messageId);
-        } else {
-            throw new CustomException(BusinessErrorCodes.CHAT_MESSAGE_MISMATCH);
-        }
-    }
 
     private boolean validateChatMessageOwnership(String username, ChatMessageEntity chatMessage) {
         UserEntity user = userService.findUserByEmail(username);

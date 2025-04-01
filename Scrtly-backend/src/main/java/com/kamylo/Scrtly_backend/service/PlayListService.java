@@ -4,7 +4,7 @@ import com.kamylo.Scrtly_backend.dto.PlayListDto;
 import com.kamylo.Scrtly_backend.dto.SongDto;
 import com.kamylo.Scrtly_backend.entity.SongEntity;
 import com.kamylo.Scrtly_backend.entity.UserEntity;
-import com.kamylo.Scrtly_backend.request.PlayListRequest;
+import com.kamylo.Scrtly_backend.dto.request.PlayListRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
