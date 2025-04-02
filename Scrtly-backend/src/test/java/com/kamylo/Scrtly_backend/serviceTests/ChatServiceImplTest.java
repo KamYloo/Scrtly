@@ -1,6 +1,7 @@
 package com.kamylo.Scrtly_backend.serviceTests;
 
 import com.kamylo.Scrtly_backend.dto.ChatRoomDto;
+import com.kamylo.Scrtly_backend.dto.request.ChatRoomRequest;
 import com.kamylo.Scrtly_backend.entity.ChatRoomEntity;
 import com.kamylo.Scrtly_backend.entity.UserEntity;
 import com.kamylo.Scrtly_backend.handler.BusinessErrorCodes;
@@ -48,6 +49,11 @@ public class ChatServiceImplTest {
         String username = "test@example.com";
         List<Long> userIds = Arrays.asList(2L, 3L);
 
+        // Tworzymy obiekt ChatRoomRequest zgodny z wymaganiami
+        ChatRoomRequest chatRoomRequest = new ChatRoomRequest();
+        chatRoomRequest.setUserIds(userIds);
+        chatRoomRequest.setChatRoomName(null); // Dla czatu indywidualnego nazwa jest null
+
         UserEntity requester = new UserEntity();
         requester.setId(1L);
         requester.setEmail(username);
@@ -62,8 +68,7 @@ public class ChatServiceImplTest {
         when(userService.findUserById(3L)).thenReturn(user3);
 
         ChatRoomEntity savedChatRoom = ChatRoomEntity.builder()
-                // Nazwa czatu generowana na podstawie czasu – w teście ustawiamy przykładową wartość
-                .chatRoomName("Chat_123456789")
+                .chatRoomName(chatRoomRequest.getChatRoomName())
                 .participants(Arrays.asList(requester, user2, user3))
                 .build();
         when(chatRepository.save(any(ChatRoomEntity.class))).thenReturn(savedChatRoom);
@@ -72,7 +77,7 @@ public class ChatServiceImplTest {
         expectedDto.setChatRoomName(savedChatRoom.getChatRoomName());
         when(chatRoomMapper.mapTo(savedChatRoom)).thenReturn(expectedDto);
 
-        ChatRoomDto result = chatService.createChat(username, userIds);
+        ChatRoomDto result = chatService.createChat(username, chatRoomRequest);
 
         assertNotNull(result);
         assertEquals(expectedDto.getChatRoomName(), result.getChatRoomName());
@@ -82,6 +87,7 @@ public class ChatServiceImplTest {
         verify(chatRepository, times(1)).save(any(ChatRoomEntity.class));
         verify(chatRoomMapper, times(1)).mapTo(savedChatRoom);
     }
+
 
     @Test
     void getChatById_shouldReturnChat_whenUserIsParticipant() {

@@ -1,6 +1,7 @@
 package com.kamylo.Scrtly_backend.controller;
 
 import com.kamylo.Scrtly_backend.dto.ChatRoomDto;
+import com.kamylo.Scrtly_backend.dto.request.ChatRoomRequest;
 import com.kamylo.Scrtly_backend.service.ChatService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,8 +19,8 @@ public class ChatController {
     private final ChatService chatService;
 
     @PostMapping("/create")
-    public ResponseEntity<ChatRoomDto> createChatRoom(@RequestBody List<Long> userIds, Principal principal) {
-        ChatRoomDto chatRoom = chatService.createChat(principal.getName(), userIds);
+    public ResponseEntity<ChatRoomDto> createChatRoom(@RequestBody ChatRoomRequest chatRoomRequest, Principal principal) {
+        ChatRoomDto chatRoom = chatService.createChat(principal.getName(), chatRoomRequest);
         return new ResponseEntity<>(chatRoom, HttpStatus.CREATED);
     }
 

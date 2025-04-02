@@ -1,6 +1,7 @@
 package com.kamylo.Scrtly_backend.service.impl;
 
 import com.kamylo.Scrtly_backend.dto.ChatRoomDto;
+import com.kamylo.Scrtly_backend.dto.request.ChatRoomRequest;
 import com.kamylo.Scrtly_backend.entity.UserEntity;
 import com.kamylo.Scrtly_backend.entity.ChatRoomEntity;
 import com.kamylo.Scrtly_backend.handler.BusinessErrorCodes;
@@ -25,15 +26,15 @@ public class ChatServiceImpl implements ChatService {
     private final Mapper<ChatRoomEntity, ChatRoomDto> chatRoomMapper;
 
     @Override
-    public ChatRoomDto createChat(String username, List<Long> userIds) {
+    public ChatRoomDto createChat(String username, ChatRoomRequest chatRoomRequest) {
         UserEntity reqUser = userService.findUserByEmail(username);
-        Set<UserEntity> users = userIds.stream()
+        Set<UserEntity> users = chatRoomRequest.getUserIds().stream()
                 .map(userService::findUserById)
                 .collect(Collectors.toSet());
         users.add(reqUser);
 
         ChatRoomEntity chatRoom = ChatRoomEntity.builder()
-                .chatRoomName("Chat_" + System.currentTimeMillis())
+                .chatRoomName(chatRoomRequest.getChatRoomName())
                 .participants(List.copyOf(users))
                 .build();
 
