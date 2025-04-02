@@ -7,14 +7,17 @@ import {
     GET_USERS_CHAT_ERROR, GET_USERS_CHAT_REQUEST, GET_USERS_CHAT_SUCCESS
 } from "./ActionType.js";
 
-export const createChat = (userId) => async (dispatch) => {
+export const createChat = (userIds, chatRoomName = null) => async (dispatch) => {
     await dispatchAction(dispatch, CREATE_CHAT_REQUEST, CREATE_CHAT_SUCCESS, CREATE_CHAT_ERROR, `/api/chats/create`, {
         method: 'POST',
         credentials: 'include',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify([userId])
+        body: JSON.stringify({
+            userIds,
+            chatRoomName
+        })
     });
 };
 

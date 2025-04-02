@@ -9,35 +9,42 @@ import { deleteChat } from "../../Redux/Chat/Action.js";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
-// eslint-disable-next-line react/prop-types
 function ChatUsersList({ chat, onChatSelect }) {
     const [addMode, setAddMode] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const userData = (() => { try { return JSON.parse(localStorage.getItem("user")) || null; } catch { return null; } })();
+    const userData = (() => {
+        try {
+            return JSON.parse(localStorage.getItem("user")) || null;
+        } catch {
+            return null;
+        }
+    })();
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const filteredChats = chat?.chats?.filter(chatItem => {
         if (!chatItem.participants || chatItem.participants.length === 0) return false;
-
         const otherParticipants = chatItem.participants.filter(user => user.id !== userData?.id);
-
-        return otherParticipants.some(user => user.fullName.toLowerCase().includes(searchQuery.toLowerCase()));
+        // Dla czatu grupowego używamy nazwy czatu, dla indywidualnego nazwy użytkownika
+        const displayName = chatItem.chatRoomName || (otherParticipants[0]?.fullName || '');
+        return displayName.toLowerCase().includes(searchQuery.toLowerCase());
     });
 
     const toggleAddUser = () => {
-        setAddMode((prev) => !prev);
+        setAddMode(prev => !prev);
     };
 
     const deleteChatRoomHandler = (chatRoomId) => {
         const confirmDelete = window.confirm('Are you sure you want to delete this ChatRoom?');
         if (confirmDelete) {
-            dispatch(deleteChat(chatRoomId)).then(() => {
-                toast.success('ChatRoom deleted successfully.');
-                navigate('/chat');
-            }).catch(() => {
-                toast.error('Failed to delete chatRoom. Please try again.');
-            });
+            dispatch(deleteChat(chatRoomId))
+                .then(() => {
+                    toast.success('ChatRoom deleted successfully.');
+                    navigate('/chat');
+                })
+                .catch(() => {
+                    toast.error('Failed to delete chatRoom. Please try again.');
+                });
         }
     };
 
@@ -53,22 +60,25 @@ function ChatUsersList({ chat, onChatSelect }) {
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
                 </div>
-
                 <i className='addUserBtn' onClick={toggleAddUser}>
                     {addMode ? <FaMinus /> : <BsPlus />}
                 </i>
             </div>
 
             <div className="userList">
-                {filteredChats.length > 0 ? (
+                {filteredChats && filteredChats.length > 0 ? (
                     filteredChats.map((chatItem) => {
                         const otherParticipants = chatItem.participants.filter(user => user.id !== userData?.id);
+                        const displayName = chatItem.chatRoomName || (otherParticipants[0]?.fullName || "Unknown User");
 
                         return (
                             <div className="userItem" key={chatItem.id} onClick={() => onChatSelect(chatItem)}>
-                                <img src={otherParticipants[0]?.profilePicture || "/default-avatar.png"} alt="User Avatar"/>
+                                <img
+                                    src={otherParticipants[0]?.profilePicture || "/default-avatar.png"}
+                                    alt="User Avatar"
+                                />
                                 <div className="text">
-                                    <span>{otherParticipants[0]?.fullName || "Unknown User"}</span>
+                                    <span>{displayName}</span>
                                     <p>Last message...</p>
                                 </div>
                                 <i onClick={(e) => {

@@ -142,16 +142,36 @@ function Chat({ chat }) {
         }
     };
 
+    const otherPerson =  chat.participants.find(user => user.id !== userData?.id)
     return (
         <div className='chat'>
             <div className="top">
                 <div className="user">
-                    <span>{chat.chatRoomName}</span>
-                </div>
-                <div className="icons">
-                    <i><FaPhoneAlt /></i>
-                    <i><BsCameraVideoFill /></i>
-                    <i><FaInfoCircle /></i>
+                    {chat?.participants && chat.participants.length === 2 ? (
+
+                        <>
+                            <img
+                                src={otherPerson?.profilePicture}
+                                alt={otherPerson?.fullName}
+                                onClick={() => navigate(`/profile/${otherPerson?.nickName}`)}
+                            />
+                            <div className="userData">
+                                <span>{otherPerson?.fullName}</span>
+                                <p>{otherPerson?.description || ''}</p>
+                            </div>
+                        </>
+                    ) : (
+                        <div className="userData">
+                            <span>{chat.chatRoomName}</span>
+                        </div>
+
+                    )}
+            </div>
+
+            <div className="icons">
+                <i><FaPhoneAlt/></i>
+                <i><BsCameraVideoFill/></i>
+                    <i><FaInfoCircle/></i>
                 </div>
             </div>
             <div className="center" ref={messagesContainerRef} onScroll={handleScroll}>

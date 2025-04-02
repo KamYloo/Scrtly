@@ -448,6 +448,45 @@
     }
 }
 
+.styledButton {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    background: rgb(53, 53, 53);
+    color: white;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+}
+
+.styledButton:hover {
+    background: rgba(53, 53, 53, 0.8);
+}
+
+.addUser .user.selected {
+    padding: 5px;
+    border-radius: 10px;
+    background: rgba(53, 53, 53, 0.8);
+}
+
+.addUser .groupNameInput {
+    margin: 20px 0;
+}
+
+.addUser .groupNameInput input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    background: rgba(10, 10, 10, 0.63);
+    color: white;
+}
+
+.addUser {
+    text-align: center;
+}
+
+
 
 @media screen and (max-width: 1200px) {
     .chatList {

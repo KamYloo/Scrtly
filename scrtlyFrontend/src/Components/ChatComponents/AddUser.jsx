@@ -1,53 +1,90 @@
-import React, {useState} from 'react'
-import {useDispatch, useSelector} from "react-redux";
-import {searchUser} from "../../Redux/AuthService/Action.js";
-import {createChat} from "../../Redux/Chat/Action.js";
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from "react-redux";
+import { searchUser } from "../../Redux/AuthService/Action.js";
+import { createChat } from "../../Redux/Chat/Action.js";
 import { MdCancel } from "react-icons/md";
 
-function AddUser({onClose}) {
+function AddUser({ onClose }) {
     const [keyword, setKeyword] = useState('');
+    const [selectedUsers, setSelectedUsers] = useState([]);
+    const [groupName, setGroupName] = useState('');
     const dispatch = useDispatch();
-
     const { auth } = useSelector(store => store);
 
-    const handleSearch = async (e) => {
+    const handleSearch = (e) => {
         e.preventDefault();
-        console.log(keyword);
         if (keyword.trim() !== '') {
             dispatch(searchUser({ keyword }));
         }
-    }
+    };
 
-    const handleCreateChat = (userId) => {
-        dispatch(createChat(userId));
-    }
+    const toggleUserSelection = (user) => {
+        if (selectedUsers.find(u => u.id === user.id)) {
+            setSelectedUsers(selectedUsers.filter(u => u.id !== user.id));
+        } else {
+            setSelectedUsers([...selectedUsers, user]);
+        }
+    };
 
+    const handleCreateChat = () => {
+        if (selectedUsers.length === 0) return;
+        if (selectedUsers.length > 1 && groupName.trim() === '') {
+            alert('Proszę podać nazwę grupy.');
+            return;
+        }
+        const userIds = selectedUsers.map(user => user.id);
+        dispatch(createChat(userIds, selectedUsers.length > 1 ? groupName : ""));
+        onClose();
+    };
 
     return (
         <div className='addUser'>
-            <i className='cancel' onClick={onClose}><MdCancel/></i>
+            <i className='cancel' onClick={onClose}><MdCancel /></i>
             <form onSubmit={handleSearch}>
-                <input type="text" placeholder='Username...' onChange={(e) => setKeyword(e.target.value)}/>
-                <button>Search</button>
+                <input
+                    type="text"
+                    placeholder='Username...'
+                    onChange={(e) => setKeyword(e.target.value)}
+                />
+                <button type="submit" className="styledButton">Search</button>
             </form>
             {auth.searchResults && auth.searchResults.length > 0 ? (
                 <div className="userList">
                     {auth.searchResults.map((user) => (
-                        <div className="user" key={user.id}>
+                        <div
+                            key={user.id}
+                            className={`user ${selectedUsers.find(u => u.id === user.id) ? 'selected' : ''}`}
+                            onClick={() => toggleUserSelection(user)}
+                        >
                             <div className="detail">
-                                <img src={user?.profilePicture} alt=""/>
+                                <img src={user?.profilePicture} alt={user.fullName} />
                                 <span>{user.fullName}</span>
                             </div>
-                            <button onClick={() => handleCreateChat(user.id)}>Add User</button>
                         </div>
                     ))}
                 </div>
             ) : (
                 <p>No users found</p>
             )}
-
+            {selectedUsers.length > 1 && (
+                <div className="groupNameInput">
+                    <input
+                        type="text"
+                        placeholder="Enter group name"
+                        value={groupName}
+                        onChange={(e) => setGroupName(e.target.value)}
+                    />
+                </div>
+            )}
+            <button
+                onClick={handleCreateChat}
+                className="styledButton"
+                style={{ marginTop: selectedUsers.length === 1 ? '40px' : '20px', display: 'block', marginLeft: 'auto', marginRight: 'auto' }}
+            >
+                Create Chat
+            </button>
         </div>
-    )
+    );
 }
 
-export {AddUser}
+export { AddUser };
