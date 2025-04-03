@@ -13,6 +13,7 @@ import com.kamylo.Scrtly_backend.mappers.Mapper;
 import com.kamylo.Scrtly_backend.repository.CommentRepository;
 import com.kamylo.Scrtly_backend.repository.LikeRepository;
 import com.kamylo.Scrtly_backend.repository.PostRepository;
+import com.kamylo.Scrtly_backend.service.NotificationService;
 import com.kamylo.Scrtly_backend.service.impl.LikeServiceImpl;
 import com.kamylo.Scrtly_backend.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,6 +46,9 @@ public class LikeServiceImplTest {
 
     @Mock
     private ApplicationEventPublisher eventPublisher;
+
+    @Mock
+    private NotificationService notificationService;
 
     @InjectMocks
     private LikeServiceImpl likeService;
@@ -84,42 +88,38 @@ public class LikeServiceImplTest {
 
     @Test
     void likePost_shouldUnlike_whenAlreadyLiked() {
-        // Użytkownik już polubił dany post
         when(userService.findUserByEmail("test@example.com")).thenReturn(user);
         when(likeRepository.isLikeExistPost(user.getId(), post.getId())).thenReturn(likeEntity);
+        when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
         when(likeMapper.mapTo(likeEntity)).thenReturn(likeDto);
 
         LikeDto result = likeService.likePost(post.getId(), "test@example.com");
 
-        // Spodziewamy się, że like zostanie usunięty
         verify(likeRepository, times(1)).deleteById(likeEntity.getId());
-        // Wynik to mapowanie usuniętego like
+        verify(notificationService, times(1))
+                .decrementNotification(post.getUser().getId(), post.getId(), NotificationType.LIKE);
         assertNotNull(result);
         assertEquals(likeDto, result);
     }
 
+
     @Test
     void likePost_shouldLike_whenNotAlreadyLiked() {
-        // Użytkownik jeszcze nie polubił posta
         when(userService.findUserByEmail("test@example.com")).thenReturn(user);
         when(likeRepository.isLikeExistPost(user.getId(), post.getId())).thenReturn(null);
         when(postRepository.findById(post.getId())).thenReturn(Optional.of(post));
 
-        // Symulujemy zapis nowego like – ustawiamy identyfikator przy zapisie
         when(likeRepository.save(any(LikeEntity.class))).thenAnswer(invocation -> {
             LikeEntity saved = invocation.getArgument(0);
             saved.setId(501L);
             return saved;
         });
-        // Mapujemy dowolny LikeEntity na likeDto
         when(likeMapper.mapTo(any(LikeEntity.class))).thenReturn(likeDto);
 
         LikeDto result = likeService.likePost(post.getId(), "test@example.com");
 
         verify(likeRepository, times(1)).save(any(LikeEntity.class));
-        // Sprawdzamy, że do posta dodano like oraz zapisano zmodyfikowany post
         verify(postRepository, times(1)).save(post);
-        // Sprawdzamy, że został opublikowany event notyfikacji
         verify(eventPublisher, times(1)).publishEvent(any(NotificationEvent.class));
         assertNotNull(result);
         assertEquals(likeDto, result);
@@ -140,10 +140,7 @@ public class LikeServiceImplTest {
 
     @Test
     void likeComment_shouldUnlike_whenAlreadyLiked() {
-        // Dla komentarza – symulujemy, że użytkownik już polubił komentarz
-        // Ustawiamy w likeEntity, że like dotyczy komentarza
         likeEntity.setComment(comment);
-        // Upewniamy się, że pole post jest puste
         likeEntity.setPost(null);
 
         when(userService.findUserByEmail("test@example.com")).thenReturn(user);
@@ -159,12 +156,10 @@ public class LikeServiceImplTest {
 
     @Test
     void likeComment_shouldLike_whenNotAlreadyLiked() {
-        // Użytkownik jeszcze nie polubił komentarza
         when(userService.findUserByEmail("test@example.com")).thenReturn(user);
         when(likeRepository.isLikeExistComment(user.getId(), comment.getId())).thenReturn(null);
         when(commentRepository.findById(comment.getId())).thenReturn(Optional.of(comment));
 
-        // Symulujemy zapis nowego like dla komentarza
         when(likeRepository.save(any(LikeEntity.class))).thenAnswer(invocation -> {
             LikeEntity saved = invocation.getArgument(0);
             saved.setId(502L);
@@ -175,7 +170,6 @@ public class LikeServiceImplTest {
         LikeDto result = likeService.likeComment(comment.getId(), "test@example.com");
 
         verify(likeRepository, times(1)).save(any(LikeEntity.class));
-        // Sprawdzamy, że komentarz został zapisany po dodaniu like
         verify(commentRepository, times(1)).save(comment);
         assertNotNull(result);
         assertEquals(likeDto, result);

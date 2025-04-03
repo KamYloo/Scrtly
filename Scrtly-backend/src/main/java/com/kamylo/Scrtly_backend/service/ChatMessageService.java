@@ -12,5 +12,5 @@ public interface ChatMessageService {
      CompletableFuture<ChatMessageDto> sendMessageAsync(SendMessageRequest request, String username);
      CompletableFuture<ChatMessageDto> editMessageAsync(ChatMessageEditRequest request, Integer chatId, String username);
      CompletableFuture<ChatMessageDto> deleteMessageAsync(Long messageId, Integer chatId, String username);
-     Page<ChatMessageDto> getChatMessages(Integer chatId, String username, Pageable pageable);
+     Page<ChatMessageDto> getChatMessages(Integer chatId, Pageable pageable);
 }

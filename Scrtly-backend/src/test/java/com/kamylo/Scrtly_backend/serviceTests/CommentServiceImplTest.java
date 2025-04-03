@@ -10,9 +10,11 @@ import com.kamylo.Scrtly_backend.mappers.Mapper;
 import com.kamylo.Scrtly_backend.repository.CommentRepository;
 import com.kamylo.Scrtly_backend.repository.PostRepository;
 import com.kamylo.Scrtly_backend.dto.request.CommentRequest;
+import com.kamylo.Scrtly_backend.service.NotificationService;
 import com.kamylo.Scrtly_backend.service.UserService;
 import com.kamylo.Scrtly_backend.service.impl.CommentServiceImpl;
 import com.kamylo.Scrtly_backend.utils.UserLikeChecker;
+import com.kamylo.Scrtly_backend.entity.enums.NotificationType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -53,6 +55,9 @@ class CommentServiceImplTest {
 
     @Mock
     private ApplicationEventPublisher eventPublisher;
+
+    @Mock
+    private NotificationService notificationService;
 
     private UserEntity user;
     private PostEntity post;
@@ -115,7 +120,7 @@ class CommentServiceImplTest {
         CommentDto result = commentService.updateComment(1L, "Updated Comment", user.getEmail());
 
         assertNotNull(result);
-        assertEquals("Test Comment", result.getComment());
+        assertEquals("Updated Comment", comment.getComment());
     }
 
     @Test
@@ -227,7 +232,6 @@ class CommentServiceImplTest {
         verify(commentRepository, times(1)).findAll(any(Specification.class), eq(pageable));
     }
 
-
     @Test
     void deleteComment_shouldDeleteCommentIfOwner() {
         when(commentRepository.findById(1L)).thenReturn(Optional.of(comment));
@@ -236,6 +240,8 @@ class CommentServiceImplTest {
         commentService.deleteComment(1L, user.getEmail());
 
         verify(commentRepository, times(1)).delete(comment);
+        verify(notificationService, times(1))
+                .decrementNotification(post.getUser().getId(), post.getId(), NotificationType.COMMENT);
     }
 
     @Test

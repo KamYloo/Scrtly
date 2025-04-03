@@ -24,9 +24,8 @@ public class ChatMessageController {
     @GetMapping("/chat/{chatId}")
     public ResponseEntity<PagedResponse<ChatMessageDto>> getChatMessages(@PathVariable Integer chatId,
                                                                          @PageableDefault(size = 10, sort = "createDate", direction = Sort.Direction.DESC)
-                                                                         Pageable pageable,
-                                                                         Principal principal) {
-        Page<ChatMessageDto> messages = chatMessageService.getChatMessages(chatId, principal.getName(), pageable);
+                                                                         Pageable pageable) {
+        Page<ChatMessageDto> messages = chatMessageService.getChatMessages(chatId, pageable);
         return new ResponseEntity<>(PagedResponse.of(messages), HttpStatus.OK);
     }
 }

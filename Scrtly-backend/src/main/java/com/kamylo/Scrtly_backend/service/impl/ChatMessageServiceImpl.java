@@ -109,7 +109,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     }
 
     @Override
-    public Page<ChatMessageDto> getChatMessages(Integer chatId, String username, Pageable pageable) {
+    public Page<ChatMessageDto> getChatMessages(Integer chatId, Pageable pageable) {
         return chatMessageRepository.findByChatRoomIdOrderByCreateDateDesc(chatId, pageable).map(chatMessageMapper::mapTo);
     }
 

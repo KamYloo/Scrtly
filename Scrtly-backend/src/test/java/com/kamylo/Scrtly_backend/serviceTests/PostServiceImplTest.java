@@ -8,6 +8,7 @@ import com.kamylo.Scrtly_backend.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.handler.CustomException;
 import com.kamylo.Scrtly_backend.mappers.Mapper;
 import com.kamylo.Scrtly_backend.repository.PostRepository;
+import com.kamylo.Scrtly_backend.service.NotificationService;
 import com.kamylo.Scrtly_backend.service.UserService;
 import com.kamylo.Scrtly_backend.service.impl.FileServiceImpl;
 import com.kamylo.Scrtly_backend.service.impl.PostServiceImpl;
@@ -45,6 +46,10 @@ class PostServiceImplTest {
 
     @Mock
     private UserLikeChecker userLikeChecker;
+
+    @Mock
+    private NotificationService notificationService;
+
 
     @InjectMocks
     private PostServiceImpl postService;
@@ -174,11 +179,11 @@ class PostServiceImplTest {
         user1.setId(1L);
 
         UserEntity user2 = new UserEntity();
-        user2.setId(2L); // Inny użytkownik
+        user2.setId(2L);
 
         PostEntity post = PostEntity.builder()
                 .id(postId)
-                .user(user2) // Post należy do innego użytkownika
+                .user(user2)
                 .build();
 
         when(postRepository.findById(postId)).thenReturn(Optional.of(post));
@@ -221,7 +226,7 @@ class PostServiceImplTest {
 
         assertNotNull(result);
         assertEquals("New description", result.getDescription());
-        assertEquals("old/path", result.getImage()); // Obrazek nie zmienia się
+        assertEquals("old/path", result.getImage());
     }
 
     @Test
@@ -279,7 +284,7 @@ class PostServiceImplTest {
 
         PostDto expectedDto = new PostDto();
         expectedDto.setDescription("Updated description");
-        expectedDto.setImage("old/path"); // Nie zmieniamy obrazka
+        expectedDto.setImage("old/path");
 
         when(postMapper.mapTo(any(PostEntity.class))).thenReturn(expectedDto);
 
@@ -287,7 +292,7 @@ class PostServiceImplTest {
 
         assertNotNull(result);
         assertEquals("Updated description", result.getDescription());
-        assertEquals("old/path", result.getImage()); // Sprawdzamy, że obrazek nie został zmieniony
+        assertEquals("old/path", result.getImage());
     }
 
     @Test
@@ -298,7 +303,7 @@ class PostServiceImplTest {
         user.setId(1L);
 
         MultipartFile file = mock(MultipartFile.class);
-        when(file.isEmpty()).thenReturn(true); // Plik jest pusty
+        when(file.isEmpty()).thenReturn(true);
 
         PostEntity post = PostEntity.builder()
                 .id(postId)
@@ -313,7 +318,7 @@ class PostServiceImplTest {
 
         PostDto expectedDto = new PostDto();
         expectedDto.setDescription("Updated description");
-        expectedDto.setImage("old/path"); // Obrazek nie powinien się zmienić
+        expectedDto.setImage("old/path");
 
         when(postMapper.mapTo(any(PostEntity.class))).thenReturn(expectedDto);
 
@@ -321,7 +326,7 @@ class PostServiceImplTest {
 
         assertNotNull(result);
         assertEquals("Updated description", result.getDescription());
-        assertEquals("old/path", result.getImage()); // Sprawdzamy, że obrazek nie został zmieniony
+        assertEquals("old/path", result.getImage());
     }
 
     @Test
@@ -347,16 +352,16 @@ class PostServiceImplTest {
         when(postRepository.save(any(PostEntity.class))).thenReturn(post);
 
         PostDto expectedDto = new PostDto();
-        expectedDto.setDescription("Old description"); // Opis nie powinien się zmienić
-        expectedDto.setImage("new/path"); // Obrazek się zmieni
+        expectedDto.setDescription("Old description");
+        expectedDto.setImage("new/path");
 
         when(postMapper.mapTo(any(PostEntity.class))).thenReturn(expectedDto);
 
         PostDto result = postService.updatePost(postId, username, file, null);
 
         assertNotNull(result);
-        assertEquals("Old description", result.getDescription()); // Opis nie zmieniony
-        assertEquals("new/path", result.getImage()); // Obrazek zmieniony
+        assertEquals("Old description", result.getDescription());
+        assertEquals("new/path", result.getImage());
     }
 
     @Test
@@ -382,16 +387,16 @@ class PostServiceImplTest {
         when(postRepository.save(any(PostEntity.class))).thenReturn(post);
 
         PostDto expectedDto = new PostDto();
-        expectedDto.setDescription("Old description"); // Opis nie powinien się zmienić
-        expectedDto.setImage("new/path"); // Obrazek się zmienia
+        expectedDto.setDescription("Old description");
+        expectedDto.setImage("new/path");
 
         when(postMapper.mapTo(any(PostEntity.class))).thenReturn(expectedDto);
 
         PostDto result = postService.updatePost(postId, username, file, "");
 
         assertNotNull(result);
-        assertEquals("Old description", result.getDescription()); // Opis nie zmieniony
-        assertEquals("new/path", result.getImage()); // Obrazek zmieniony
+        assertEquals("Old description", result.getDescription());
+        assertEquals("new/path", result.getImage());
     }
 
 
@@ -411,10 +416,13 @@ class PostServiceImplTest {
         when(postRepository.findById(postId)).thenReturn(Optional.of(postEntity));
         when(userService.findUserByEmail(username)).thenReturn(user);
 
+        doNothing().when(notificationService).deleteNotificationsByPost(postEntity);
+
         postService.deletePost(postId, username);
 
-        verify(postRepository, times(1)).deleteById(postId);
         verify(fileService, times(1)).deleteFile("image/path");
+        verify(notificationService, times(1)).deleteNotificationsByPost(postEntity);
+        verify(postRepository, times(1)).deleteById(postId);
     }
 
     @Test
@@ -485,7 +493,7 @@ class PostServiceImplTest {
         user1.setId(1L);
 
         UserEntity user2 = new UserEntity();
-        user2.setId(2L); // Inny właściciel posta
+        user2.setId(2L);
 
         PostEntity post = PostEntity.builder()
                 .id(postId)

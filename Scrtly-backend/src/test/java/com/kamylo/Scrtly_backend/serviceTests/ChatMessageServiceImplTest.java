@@ -1,8 +1,8 @@
-/*
 package com.kamylo.Scrtly_backend.serviceTests;
 
 import com.kamylo.Scrtly_backend.dto.ChatMessageDto;
 import com.kamylo.Scrtly_backend.dto.ChatRoomDto;
+import com.kamylo.Scrtly_backend.dto.request.ChatMessageEditRequest;
 import com.kamylo.Scrtly_backend.entity.ChatMessageEntity;
 import com.kamylo.Scrtly_backend.entity.ChatRoomEntity;
 import com.kamylo.Scrtly_backend.entity.UserEntity;
@@ -22,10 +22,15 @@ import org.modelmapper.ModelMapper;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -42,6 +47,9 @@ public class ChatMessageServiceImplTest {
     @Mock
     private ChatService chatService;
 
+    @Mock
+    private RabbitTemplate rabbitTemplate;
+
     @InjectMocks
     private ChatMessageServiceImpl chatMessageService;
 
@@ -49,9 +57,14 @@ public class ChatMessageServiceImplTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         Mapper<ChatRoomEntity, ChatRoomDto> chatRoomMapper = new ChatRoomMapperImpl(new ModelMapper());
-        Mapper<ChatMessageEntity, ChatMessageDto> chatMessageMapper = new ChatMessageMapperImpl(new ModelMapper());
+        Mapper<com.kamylo.Scrtly_backend.entity.ChatMessageEntity, ChatMessageDto> chatMessageMapper = new ChatMessageMapperImpl(new ModelMapper());
         chatMessageService = new ChatMessageServiceImpl(
-                chatMessageRepository, userService, chatService, chatRoomMapper, chatMessageMapper
+                chatMessageRepository,
+                userService,
+                chatService,
+                chatRoomMapper,
+                chatMessageMapper,
+                rabbitTemplate
         );
     }
 
@@ -67,6 +80,7 @@ public class ChatMessageServiceImplTest {
         userEntity.setEmail(username);
 
         ChatRoomDto chatRoomDto = new ChatRoomDto();
+        chatRoomDto.setId(1);
         chatRoomDto.setChatRoomName("Test Chat");
 
         ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
@@ -79,14 +93,12 @@ public class ChatMessageServiceImplTest {
                 .messageText("Hello World")
                 .build();
 
-        ChatMessageDto expectedDto = new ChatMessageDto();
-        expectedDto.setMessageText("Hello World");
-
         when(userService.findUserByEmail(username)).thenReturn(userEntity);
         when(chatService.getChatById(request.getChatId(), username)).thenReturn(chatRoomDto);
         when(chatMessageRepository.save(any(ChatMessageEntity.class))).thenReturn(chatMessageEntity);
 
-        ChatMessageDto result = chatMessageService.sendMessage(request, username);
+        CompletableFuture<ChatMessageDto> futureResult = chatMessageService.sendMessageAsync(request, username);
+        ChatMessageDto result = futureResult.join();
 
         assertNotNull(result, "Result should not be null");
         assertEquals("Hello World", result.getMessageText());
@@ -96,39 +108,145 @@ public class ChatMessageServiceImplTest {
     }
 
     @Test
-    void getChatsMessages_shouldReturnMessages() {
+    void editChatMessage_shouldThrowException_whenChatIdMismatch() {
+        ChatMessageEditRequest request = new ChatMessageEditRequest();
+        request.setId(1L);
+        request.setMessage("Updated message");
+        Integer providedChatId = 2;
         String username = "user@example.com";
-        int chatId = 1;
 
-        ChatRoomDto chatRoomDto = new ChatRoomDto();
-        chatRoomDto.setId(chatId); // FIXED: Set the ID
-        chatRoomDto.setChatRoomName("Test Chat");
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(100L);
+        userEntity.setEmail(username);
+
+        ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
+                .id(1)
+                .build();
+
+        ChatMessageEntity messageEntity = ChatMessageEntity.builder()
+                .chatRoom(chatRoomEntity)
+                .user(userEntity)
+                .messageText("Original message")
+                .build();
+
+        when(chatMessageRepository.findById(request.getId())).thenReturn(Optional.of(messageEntity));
+
+        CustomException exception = assertThrows(CustomException.class, () ->
+                chatMessageService.editMessageAsync(request, providedChatId, username).join());
+        assertEquals(BusinessErrorCodes.CHAT_MESSAGE_NOT_IN_CHAT, exception.getErrorCode());
+    }
+
+    @Test
+    void editMessage_shouldEditSuccessfully_whenChatIdMatchesAndUserIsOwner() {
+        ChatMessageEditRequest request = new ChatMessageEditRequest();
+        request.setId(1L);
+        request.setMessage("Updated message");
+        Integer chatId = 1;
+        String username = "owner@example.com";
+
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(100L);
+        userEntity.setEmail(username);
+
+        ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
+                .id(chatId)
+                .build();
+
+        ChatMessageEntity messageEntity = ChatMessageEntity.builder()
+                .chatRoom(chatRoomEntity)
+                .user(userEntity)
+                .messageText("Original message")
+                .build();
+
+        when(chatMessageRepository.findById(request.getId())).thenReturn(Optional.of(messageEntity));
+        when(userService.findUserByEmail(username)).thenReturn(userEntity);
+        when(chatMessageRepository.save(any(ChatMessageEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        CompletableFuture<ChatMessageDto> future = chatMessageService.editMessageAsync(request, chatId, username);
+        ChatMessageDto result = future.join();
+
+        assertNotNull(result);
+        assertEquals("Updated message", result.getMessageText());
+        assertEquals("EDITED", result.getStatus());
+        assertEquals(chatId, result.getChatRoomId());
+    }
+
+    @Test
+    void editMessage_shouldThrowException_whenUserNotOwner() {
+        ChatMessageEditRequest request = new ChatMessageEditRequest();
+        request.setId(1L);
+        request.setMessage("Updated message");
+        Integer chatId = 1;
+        String username = "user@example.com";
+
+        UserEntity owner = new UserEntity();
+        owner.setId(200L);
+
+        UserEntity currentUser = new UserEntity();
+        currentUser.setId(100L);
+        currentUser.setEmail(username);
+
+        ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
+                .id(chatId)
+                .build();
+
+        ChatMessageEntity messageEntity = ChatMessageEntity.builder()
+                .chatRoom(chatRoomEntity)
+                .user(owner)
+                .messageText("Original message")
+                .build();
+
+        when(chatMessageRepository.findById(request.getId())).thenReturn(Optional.of(messageEntity));
+        when(userService.findUserByEmail(username)).thenReturn(currentUser);
+
+        CustomException exception = assertThrows(CustomException.class, () ->
+                chatMessageService.editMessageAsync(request, chatId, username).join());
+        assertEquals(BusinessErrorCodes.CHAT_MESSAGE_MISMATCH, exception.getErrorCode());
+    }
+
+
+    @Test
+    void getChatMessages_shouldReturnMessages() {
+        int chatId = 1;
 
         ChatMessageEntity messageEntity = ChatMessageEntity.builder()
                 .messageText("Test Message")
                 .build();
 
-        ChatMessageDto messageDto = new ChatMessageDto();
-        messageDto.setMessageText("Test Message");
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<ChatMessageEntity> pageEntity = new PageImpl<>(Collections.singletonList(messageEntity), pageable, 1);
 
-        when(chatService.getChatById(chatId, username)).thenReturn(chatRoomDto);
-        when(chatMessageRepository.findByChatRoomId(chatId))
-                .thenReturn(Collections.singletonList(messageEntity));
+        when(chatMessageRepository.findByChatRoomIdOrderByCreateDateDesc(chatId, pageable)).thenReturn(pageEntity);
 
-        List<ChatMessageDto> result = chatMessageService.getChatsMessages(chatId, username);
+        Page<ChatMessageDto> resultPage = chatMessageService.getChatMessages(chatId, pageable);
 
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals("Test Message", result.get(0).getMessageText());
-        verify(chatService, times(1)).getChatById(chatId, username);
-        verify(chatMessageRepository, times(1)).findByChatRoomId(chatId);
+        assertNotNull(resultPage);
+        assertEquals(1, resultPage.getTotalElements());
+        assertEquals("Test Message", resultPage.getContent().get(0).getMessageText());
+        verify(chatMessageRepository, times(1)).findByChatRoomIdOrderByCreateDateDesc(chatId, pageable);
+    }
+
+    @Test
+    void editMessage_shouldThrowException_whenMessageNotFound() {
+        ChatMessageEditRequest request = new ChatMessageEditRequest();
+        request.setId(99L);
+        request.setMessage("Updated message");
+        Integer chatId = 1;
+        String username = "user@example.com";
+
+        when(chatMessageRepository.findById(request.getId())).thenReturn(Optional.empty());
+
+        CustomException exception = assertThrows(CustomException.class, () ->
+                chatMessageService.editMessageAsync(request, chatId, username).join());
+        assertEquals(BusinessErrorCodes.CHAT_MESSAGE_NOT_FOUND, exception.getErrorCode());
     }
 
 
     @Test
     void deleteChatMessage_shouldDeleteMessage_whenUserIsOwner() {
         String username = "owner@example.com";
-        int messageId = 1;
+        Long messageId = 1L;
+        Integer chatId = 1;
 
         UserEntity userEntity = new UserEntity();
         userEntity.setId(100L);
@@ -137,28 +255,37 @@ public class ChatMessageServiceImplTest {
         UserEntity messageOwner = new UserEntity();
         messageOwner.setId(100L);
 
+        ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
+                .id(chatId)
+                .build();
+
         ChatMessageEntity messageEntity = ChatMessageEntity.builder()
                 .user(messageOwner)
+                .chatRoom(chatRoomEntity)
                 .messageText("Test Message")
                 .build();
 
         when(chatMessageRepository.findById(messageId)).thenReturn(Optional.of(messageEntity));
         when(userService.findUserByEmail(username)).thenReturn(userEntity);
 
-        chatMessageService.deleteChatMessage(messageId, username);
+        CompletableFuture<ChatMessageDto> futureResult = chatMessageService.deleteMessageAsync(messageId, chatId, username);
+        ChatMessageDto result = futureResult.join();
 
         verify(chatMessageRepository, times(1)).deleteById(messageId);
+        assertEquals("DELETED", result.getStatus());
+        assertEquals(chatId, result.getChatRoomId());
     }
 
     @Test
     void deleteChatMessage_shouldThrowException_whenMessageNotFound() {
         String username = "user@example.com";
-        int messageId = 1;
+        Long messageId = 1L;
+        Integer chatId = 1;
 
         when(chatMessageRepository.findById(messageId)).thenReturn(Optional.empty());
 
         CustomException exception = assertThrows(CustomException.class, () ->
-                chatMessageService.deleteChatMessage(messageId, username));
+                chatMessageService.deleteMessageAsync(messageId, chatId, username).join());
         assertEquals(BusinessErrorCodes.CHAT_MESSAGE_NOT_FOUND, exception.getErrorCode());
         verify(chatMessageRepository, never()).deleteById(any());
     }
@@ -166,7 +293,8 @@ public class ChatMessageServiceImplTest {
     @Test
     void deleteChatMessage_shouldThrowException_whenUserNotOwner() {
         String username = "user@example.com";
-        int messageId = 1;
+        Long messageId = 1L;
+        Integer chatId = 1;
 
         UserEntity currentUser = new UserEntity();
         currentUser.setId(100L);
@@ -175,8 +303,13 @@ public class ChatMessageServiceImplTest {
         UserEntity messageOwner = new UserEntity();
         messageOwner.setId(200L);
 
+        ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
+                .id(chatId)
+                .build();
+
         ChatMessageEntity messageEntity = ChatMessageEntity.builder()
                 .user(messageOwner)
+                .chatRoom(chatRoomEntity)
                 .messageText("Test Message")
                 .build();
 
@@ -184,8 +317,36 @@ public class ChatMessageServiceImplTest {
         when(userService.findUserByEmail(username)).thenReturn(currentUser);
 
         CustomException exception = assertThrows(CustomException.class, () ->
-                chatMessageService.deleteChatMessage(messageId, username));
+                chatMessageService.deleteMessageAsync(messageId, chatId, username).join());
         assertEquals(BusinessErrorCodes.CHAT_MESSAGE_MISMATCH, exception.getErrorCode());
         verify(chatMessageRepository, never()).deleteById(messageId);
     }
-}*/
+
+    @Test
+    void deleteChatMessage_shouldThrowException_whenChatIdMismatch() {
+        Long messageId = 1L;
+        Integer providedChatId = 2;
+        String username = "user@example.com";
+
+        ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
+                .id(1)
+                .build();
+
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(100L);
+        userEntity.setEmail(username);
+
+        ChatMessageEntity chatMessageEntity = ChatMessageEntity.builder()
+                .chatRoom(chatRoomEntity)
+                .user(userEntity)
+                .messageText("Test message")
+                .build();
+
+        when(chatMessageRepository.findById(messageId)).thenReturn(Optional.of(chatMessageEntity));
+
+        CustomException exception = assertThrows(CustomException.class, () ->
+                chatMessageService.deleteMessageAsync(messageId, providedChatId, username).join());
+        assertEquals(BusinessErrorCodes.CHAT_MESSAGE_NOT_IN_CHAT, exception.getErrorCode());
+    }
+
+}

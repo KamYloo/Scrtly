@@ -49,10 +49,9 @@ public class ChatServiceImplTest {
         String username = "test@example.com";
         List<Long> userIds = Arrays.asList(2L, 3L);
 
-        // Tworzymy obiekt ChatRoomRequest zgodny z wymaganiami
         ChatRoomRequest chatRoomRequest = new ChatRoomRequest();
         chatRoomRequest.setUserIds(userIds);
-        chatRoomRequest.setChatRoomName(null); // Dla czatu indywidualnego nazwa jest null
+        chatRoomRequest.setChatRoomName(null);
 
         UserEntity requester = new UserEntity();
         requester.setId(1L);
