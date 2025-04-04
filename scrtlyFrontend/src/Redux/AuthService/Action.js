@@ -52,7 +52,6 @@ export const logoutAction = () => async (dispatch) => {
         })
 
         const resData = await res.text()
-        localStorage.removeItem("refreshToken")
         localStorage.removeItem("user")
         dispatch({ type: LOGOUT_REQUEST, payload: resData })
 

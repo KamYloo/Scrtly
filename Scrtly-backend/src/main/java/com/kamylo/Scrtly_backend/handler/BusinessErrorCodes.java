@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+@Getter
 @AllArgsConstructor
 public enum BusinessErrorCodes {
     NO_CODE(0,"No code", HttpStatus.NOT_IMPLEMENTED),
@@ -41,10 +42,7 @@ public enum BusinessErrorCodes {
     STORY_MISMATCH(333, "No user permissions for this story", HttpStatus.FORBIDDEN),
     NOTIFICATION_NOT_FOUND(334, "Notification not found", HttpStatus.NOT_FOUND),
     NOTIFICATION_MISMATCH(335, "No user permissions for this notification", HttpStatus.FORBIDDEN),;
-    @Getter
     private final int code;
-    @Getter
     private final String description;
-    @Getter
     private final HttpStatus httpStatus;
 }

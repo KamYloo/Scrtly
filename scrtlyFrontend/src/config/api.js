@@ -2,45 +2,38 @@ export const BASE_API_URL = "http://localhost:8080"
 
 export const fetchWithAuth = async (url, options = {}, errorType) => {
     let headers = {
-        'Authorization': `Bearer ${localStorage.getItem('refreshToken')}`,
+        // Jeśli nie przesyłamy FormData, ustaw Content-Type
         ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
         ...options.headers,
     };
 
     try {
-        let response = await fetch(`${BASE_API_URL}${url}`, { ...options, headers, credentials: 'include' });
+        // Pierwsze zapytanie z ciasteczkami
+        let response = await fetch(`${BASE_API_URL}${url}`, {
+            ...options,
+            headers,
+            credentials: 'include'
+        });
 
         if (response.status === 401) {
-            const refreshToken = localStorage.getItem('refreshToken');
-            if (refreshToken) {
-                const refreshResponse = await fetch(`${BASE_API_URL}/api/auth/refresh`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ token: refreshToken }),
+            // Próba odświeżenia tokenów – ciasteczka będą przesłane automatycznie
+            const refreshResponse = await fetch(`${BASE_API_URL}/api/auth/refresh`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include'
+            });
+
+            if (refreshResponse.ok) {
+                // Po pomyślnym odświeżeniu tokenów ponawiamy pierwotne zapytanie
+                response = await fetch(`${BASE_API_URL}${url}`, {
+                    ...options,
+                    headers,
                     credentials: 'include'
                 });
-
-                if (refreshResponse.ok) {
-                    const refreshResult = await refreshResponse.json();
-
-                    if (refreshResult.refreshToken) {
-                        localStorage.setItem('refreshToken', refreshResult.refreshToken);
-                        localStorage.setItem('user', JSON.stringify(refreshResult.user));
-                    }
-
-                    headers = {
-                        ...headers,
-                        'Authorization': `Bearer ${localStorage.getItem('refreshToken')}`
-                    };
-
-                    headers = { ...headers, 'Authorization': `Bearer ${refreshResult.refreshToken}` };
-                    response = await fetch(`${BASE_API_URL}${url}`, { ...options, headers, credentials: 'include' });
-                } else {
-                    localStorage.removeItem('refreshToken');
-                    localStorage.removeItem('user');
-                    window.location.href = "/login";
-                    return { error: true, message: 'Sesja wygasła. Zaloguj się ponownie.' };
-                }
+            } else {
+                // W przypadku niepowodzenia przekierowujemy do logowania
+                window.location.href = "/login";
+                return { error: true, message: 'Sesja wygasła. Zaloguj się ponownie.' };
             }
         }
 
@@ -59,6 +52,7 @@ export const fetchWithAuth = async (url, options = {}, errorType) => {
 };
 
 
+
 export const dispatchAction = async (
     dispatch,
     actionTypeRequest,
@@ -67,14 +61,13 @@ export const dispatchAction = async (
     url,
     options = {}
 ) => {
-
     dispatch({ type: actionTypeRequest });
     try {
         const result = await fetchWithAuth(url, options, actionTypeRequest);
+
         console.log(result);
 
-        if (result.refreshToken) {
-            localStorage.setItem('refreshToken', result.refreshToken);
+        if (result.user) {
             localStorage.setItem('user', JSON.stringify(result.user));
         }
 
@@ -90,5 +83,6 @@ export const dispatchAction = async (
         throw error;
     }
 };
+
 
 

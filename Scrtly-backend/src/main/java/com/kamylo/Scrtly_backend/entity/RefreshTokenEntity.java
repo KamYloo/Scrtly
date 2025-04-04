@@ -19,6 +19,9 @@ public class RefreshTokenEntity {
     @Column(name = "id", nullable = false)
     private Long id;
 
+    @Column(nullable = false, unique = true)
+    private String tokenId;
+
     private String token;
 
     private Instant expiryDate;

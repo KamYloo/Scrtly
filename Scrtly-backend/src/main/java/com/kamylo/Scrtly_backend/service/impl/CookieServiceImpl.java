@@ -16,6 +16,7 @@ public class CookieServiceImpl implements CookieService {
         cookie.setSecure(false);
         cookie.setPath("/");
         cookie.setMaxAge(24 * 60 * 60);
+        cookie.setAttribute("SameSite", "Strict");
         return cookie;
     }
 
@@ -26,17 +27,17 @@ public class CookieServiceImpl implements CookieService {
         cookie.setSecure(false);
         cookie.setPath("/");
         cookie.setMaxAge(0);
+        cookie.setAttribute("SameSite", "Strict");
         return cookie;
     }
 
-    public String getJwtCookie(HttpServletRequest request){
-        String jwt = "";
+    @Override
+    public String getCookieValue(HttpServletRequest request, String cookieName) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("jwt")) {
-                    jwt = cookie.getValue();
-                    return jwt;
+                if (cookie.getName().equals(cookieName)) {
+                    return cookie.getValue();
                 }
             }
         }

@@ -79,7 +79,7 @@ public class AuthServiceImpl implements AuthService {
         String email = loginRequest.getEmail();
         Map<String, String> objects = new HashMap<>();
         objects.put("jwt", jwtService.generateToken(email));
-        objects.put("refresh", refreshTokenService.createRefreshToken(email).getToken());
+        objects.put("refresh", refreshTokenService.createRefreshToken(email).getRefreshToken());
         return objects;
     }
 }

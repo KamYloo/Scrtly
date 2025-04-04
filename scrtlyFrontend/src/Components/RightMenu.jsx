@@ -31,7 +31,7 @@ function RightMenu() {
   }
 
   const handleProfileClick = () => {
-    if (localStorage.getItem("refreshToken")) {
+    if (localStorage.getItem("user")) {
       navigate(`/profile/${userData?.nickName}`)
     } else {
       navigate('/login')
@@ -63,7 +63,7 @@ function RightMenu() {
             <div className="profileImg" onClick={handleProfileClick}>
                 <img src={userData?.profilePicture || ''} alt="" />
         </div>
-        {localStorage.getItem("refreshToken") ? (
+        {localStorage.getItem("user") ? (
           <p className='loginBtn' onClick={handleLogout}>Logout</p>
         ) : (
           <p className='loginBtn' onClick={() => navigate('/login')}>Login</p>
