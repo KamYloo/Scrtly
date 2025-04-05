@@ -31,27 +31,36 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     @Transactional
     public RefreshTokenResponse createRefreshToken(String email){
-        UserEntity userEntity = userRepository.findByEmail(email).orElseThrow(
-                ()->new RuntimeException("User not found"));
+        UserEntity userEntity = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
+        Optional<RefreshTokenEntity> existingTokenOpt = refreshTokenRepo.findByUser(userEntity);
         String tokenId = UUID.randomUUID().toString();
         String rawTokenPart = UUID.randomUUID().toString();
         String hashedToken = passwordEncoder.encode(rawTokenPart);
-        System.out.println("jebac "+hashedToken);
+        Instant expiryDate = Instant.now().plusMillis(7 * 24 * 60 * 60 * 1000);
 
-        RefreshTokenEntity tokenEntity  = RefreshTokenEntity.builder()
-                .user(userEntity)
-                .tokenId(tokenId)
-                .token(hashedToken)
-                .expiryDate(Instant.now().plusMillis(7 * 24 * 60 * 60 * 1000))
-                .build();
+        RefreshTokenEntity tokenEntity;
+        if(existingTokenOpt.isPresent()){
+            tokenEntity = existingTokenOpt.get();
+            tokenEntity.setTokenId(tokenId);
+            tokenEntity.setToken(hashedToken);
+            tokenEntity.setExpiryDate(expiryDate);
+        } else {
+            tokenEntity = RefreshTokenEntity.builder()
+                    .user(userEntity)
+                    .tokenId(tokenId)
+                    .token(hashedToken)
+                    .expiryDate(expiryDate)
+                    .build();
+        }
         refreshTokenRepo.save(tokenEntity);
 
         RefreshTokenResponse response = new RefreshTokenResponse();
         response.setRefreshToken(tokenId + "." + rawTokenPart);
-
         return response;
     }
+
 
     @Transactional
     public void deleteByUserEmail(String email) {
@@ -87,9 +96,10 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     }
 
 
+    @Transactional
     public RefreshTokenEntity verifyExpiration(RefreshTokenEntity token){
         if (token.getExpiryDate().compareTo(Instant.now()) < 0) {
-            refreshTokenRepo.delete(token);
+            refreshTokenRepo.deleteById(token.getId());
             throw new CustomException(BusinessErrorCodes.TOKEN_EXPIRED);
         }
         return token;

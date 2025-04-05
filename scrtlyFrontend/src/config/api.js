@@ -2,13 +2,11 @@ export const BASE_API_URL = "http://localhost:8080"
 
 export const fetchWithAuth = async (url, options = {}, errorType) => {
     let headers = {
-        // Jeśli nie przesyłamy FormData, ustaw Content-Type
         ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
         ...options.headers,
     };
 
     try {
-        // Pierwsze zapytanie z ciasteczkami
         let response = await fetch(`${BASE_API_URL}${url}`, {
             ...options,
             headers,
@@ -16,7 +14,6 @@ export const fetchWithAuth = async (url, options = {}, errorType) => {
         });
 
         if (response.status === 401) {
-            // Próba odświeżenia tokenów – ciasteczka będą przesłane automatycznie
             const refreshResponse = await fetch(`${BASE_API_URL}/api/auth/refresh`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -24,14 +21,12 @@ export const fetchWithAuth = async (url, options = {}, errorType) => {
             });
 
             if (refreshResponse.ok) {
-                // Po pomyślnym odświeżeniu tokenów ponawiamy pierwotne zapytanie
                 response = await fetch(`${BASE_API_URL}${url}`, {
                     ...options,
                     headers,
                     credentials: 'include'
                 });
             } else {
-                // W przypadku niepowodzenia przekierowujemy do logowania
                 window.location.href = "/login";
                 return { error: true, message: 'Sesja wygasła. Zaloguj się ponownie.' };
             }

@@ -2,7 +2,6 @@ package com.kamylo.Scrtly_backend.controller;
 
 import com.kamylo.Scrtly_backend.dto.UserDto;
 import com.kamylo.Scrtly_backend.dto.request.LoginRequestDto;
-import com.kamylo.Scrtly_backend.dto.request.RefreshTokenRequestDto;
 import com.kamylo.Scrtly_backend.dto.request.RegisterRequestDto;
 import com.kamylo.Scrtly_backend.dto.response.LoginResponseDto;
 import com.kamylo.Scrtly_backend.dto.response.RefreshTokenResponse;
@@ -52,7 +51,6 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ResponseEntity<?> refresh(HttpServletRequest request, HttpServletResponse response) {
-        cookieService.deleteCookie("jwt");
         String rawRefreshToken = cookieService.getCookieValue(request, "refresh");
         try {
             RefreshTokenEntity token = refreshTokenService.findByToken(rawRefreshToken);
@@ -60,14 +58,13 @@ public class AuthController {
 
             UserEntity user = token.getUser();
             String jwtToken = jwtService.generateToken(user.getEmail());
-            refreshTokenService.deleteByUserEmail(user.getEmail());
             RefreshTokenResponse newRefreshToken  = refreshTokenService.createRefreshToken(user.getEmail());
             response.addCookie(cookieService.getNewCookie("jwt", jwtToken));
             response.addCookie(cookieService.getNewCookie("refresh", newRefreshToken.getRefreshToken()));
             return new ResponseEntity<>("Tokens refreshed successfully", HttpStatus.OK);
         } catch (CustomException e) {
-//            response.addCookie(cookieService.deleteCookie("jwt"));
-//            response.addCookie(cookieService.deleteCookie("refresh"));
+            response.addCookie(cookieService.deleteCookie("jwt"));
+            response.addCookie(cookieService.deleteCookie("refresh"));
             return new ResponseEntity<>("Refresh token expired", HttpStatus.BAD_REQUEST);
         }
     }
