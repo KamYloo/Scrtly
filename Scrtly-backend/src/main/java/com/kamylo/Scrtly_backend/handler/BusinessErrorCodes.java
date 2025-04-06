@@ -41,7 +41,11 @@ public enum BusinessErrorCodes {
     STORY_NOT_FOUND(332, "Story not found", HttpStatus.NOT_FOUND),
     STORY_MISMATCH(333, "No user permissions for this story", HttpStatus.FORBIDDEN),
     NOTIFICATION_NOT_FOUND(334, "Notification not found", HttpStatus.NOT_FOUND),
-    NOTIFICATION_MISMATCH(335, "No user permissions for this notification", HttpStatus.FORBIDDEN),;
+    NOTIFICATION_MISMATCH(335, "No user permissions for this notification", HttpStatus.FORBIDDEN),
+    USER_IS_ENABLE(336, "User is already activated", HttpStatus.BAD_REQUEST),
+    ACCOUNT_LOCKED(337, "User account locked", HttpStatus.FORBIDDEN),
+    ACCOUNT_DISABLED(338, "User account is disable", HttpStatus.FORBIDDEN),
+    ;
     private final int code;
     private final String description;
     private final HttpStatus httpStatus;

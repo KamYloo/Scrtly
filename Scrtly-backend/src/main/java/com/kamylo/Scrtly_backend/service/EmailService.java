@@ -1,5 +1,8 @@
 package com.kamylo.Scrtly_backend.service;
 
+import com.kamylo.Scrtly_backend.email.EmailTemplateName;
+import jakarta.mail.MessagingException;
+
 public interface EmailService {
-    void sendActivationEmail(String to, String subject, String activationLink, String message);
+    void sendEmail(String to, String username, EmailTemplateName emailTemplate, String confirmationURL, String subject) throws MessagingException;
 }

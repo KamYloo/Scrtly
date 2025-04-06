@@ -10,14 +10,17 @@ import com.kamylo.Scrtly_backend.entity.UserEntity;
 import com.kamylo.Scrtly_backend.handler.CustomException;
 import com.kamylo.Scrtly_backend.mappers.Mapper;
 import com.kamylo.Scrtly_backend.service.*;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.Map;
 
 @RestController
@@ -31,14 +34,17 @@ public class AuthController {
     private final RefreshTokenService refreshTokenService;
     private final Mapper<UserEntity, UserDto> mapper;
 
+    @Value("${mailing.frontend.redirect-url}")
+    private String redirectUrl;
+
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody @Valid RegisterRequestDto registerRequest) {
+    public ResponseEntity<?> register(@RequestBody @Valid RegisterRequestDto registerRequest) throws MessagingException {
         UserDto createdUser = authService.createUser(registerRequest);
         return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody @Valid LoginRequestDto loginRequest, HttpServletResponse response) {
+    public ResponseEntity<?> login(@RequestBody @Valid LoginRequestDto loginRequest, HttpServletResponse response) throws MessagingException{
         Map<String, String> tokens  = authService.verify(loginRequest);
         response.addCookie(cookieService.getNewCookie("jwt", tokens .get("jwt")));
         response.addCookie(cookieService.getNewCookie("refresh", tokens.get("refresh")));
@@ -69,8 +75,6 @@ public class AuthController {
         }
     }
 
-
-
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
         String jwt = cookieService.getCookieValue(request, "jwt");
@@ -81,4 +85,11 @@ public class AuthController {
         return new ResponseEntity<>("Logged out successfully", HttpStatus.OK);
     }
 
+    @GetMapping("/active/{id}/{token}")
+    public ResponseEntity<?> active_account(@PathVariable Long id, @PathVariable String token, HttpServletResponse response)
+            throws MessagingException, IOException {
+        authService.activateUser(id, token);
+        response.sendRedirect(redirectUrl);
+        return new ResponseEntity<>("account has been activated ", HttpStatus.OK);
+    }
 }
