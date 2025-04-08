@@ -7,6 +7,9 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.Optional;
+
 @Service
 public class CookieServiceImpl implements CookieService {
     @Override
@@ -33,15 +36,11 @@ public class CookieServiceImpl implements CookieService {
 
     @Override
     public String getCookieValue(HttpServletRequest request, String cookieName) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals(cookieName)) {
-                    return cookie.getValue();
-                }
-            }
-        }
-        throw new CustomException(BusinessErrorCodes.BAD_COOKIE);
+        return Arrays.stream(Optional.ofNullable(request.getCookies()).orElse(new Cookie[0]))
+                .filter(cookie -> cookie.getName().equals(cookieName))
+                .findFirst()
+                .map(Cookie::getValue)
+                .orElseThrow(() -> new CustomException(BusinessErrorCodes.BAD_COOKIE));
     }
 
 }
