@@ -45,6 +45,7 @@ public enum BusinessErrorCodes {
     USER_IS_ENABLE(336, "User is already activated", HttpStatus.BAD_REQUEST),
     ACCOUNT_LOCKED(337, "User account locked", HttpStatus.FORBIDDEN),
     ACCOUNT_DISABLED(338, "User account is disable", HttpStatus.FORBIDDEN),
+    INVALID_TOKEN(339,"Invalid jwt token", HttpStatus.BAD_REQUEST),
     ;
     private final int code;
     private final String description;

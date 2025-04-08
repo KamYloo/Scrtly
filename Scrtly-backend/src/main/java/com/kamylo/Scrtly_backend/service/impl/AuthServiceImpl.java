@@ -3,9 +3,11 @@ package com.kamylo.Scrtly_backend.service.impl;
 import com.kamylo.Scrtly_backend.dto.UserDto;
 import com.kamylo.Scrtly_backend.dto.request.LoginRequestDto;
 import com.kamylo.Scrtly_backend.dto.request.RegisterRequestDto;
+import com.kamylo.Scrtly_backend.dto.request.RestPasswordRequest;
 import com.kamylo.Scrtly_backend.email.EmailTemplateName;
 import com.kamylo.Scrtly_backend.entity.ActivationToken;
 import com.kamylo.Scrtly_backend.entity.ArtistEntity;
+import com.kamylo.Scrtly_backend.entity.PasswordResetToken;
 import com.kamylo.Scrtly_backend.entity.UserEntity;
 import com.kamylo.Scrtly_backend.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.handler.CustomException;
@@ -36,10 +38,14 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final EmailService emailService;
     private final ActivationTokenService activationTokenService;
+    private final PasswordResetTokenService passwordResetTokenService;
     private final Mapper<UserEntity, UserDto> mapper;
 
     @Value("${mailing.backend.activation-url}")
     private String activationUrl;
+
+    @Value("${mailing.backend.reset-password-url}")
+    private String resetPasswordUrl;
 
     @Override
     public UserDto createUser(RegisterRequestDto registerRequest) throws MessagingException{
@@ -115,7 +121,7 @@ public class AuthServiceImpl implements AuthService {
 
         ActivationToken activationToken = activationTokenService.getActivationTokenByUser(userEntity);
         if(!token.equals(activationToken.getToken())) {
-            throw new MessagingException("Invalid activation token");
+            throw new CustomException(BusinessErrorCodes.INVALID_TOKEN);
         }
         else if(activationTokenService.verifyExpiration(activationToken)){
             activationTokenService.deleteActivationToken(activationToken);
@@ -128,6 +134,38 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+    @Override
+    public void forgotPassword(String email) throws MessagingException {
+        UserEntity user = userRepository.findByEmail(email).orElseThrow(
+                () -> new UsernameNotFoundException("User not found"));
+        passwordResetTokenService.createToken(user);
+        sendPasswordRestEmail(user);
+    }
+
+    @Override
+    public void restPassword(Long userId, String token, RestPasswordRequest restPasswordRequest) {
+        UserEntity user = userRepository.findById(userId).orElseThrow(
+                () -> new UsernameNotFoundException("User not found"));
+
+        if(!restPasswordRequest.getPassword().equals(restPasswordRequest.getPasswordConfirmation())){
+            throw new CustomException(BusinessErrorCodes.NEW_PASSWORD_DOES_NOT_MATCH);
+        }
+
+        PasswordResetToken resetToken = passwordResetTokenService.getTokenByUser(user);
+
+        if(!resetToken.getToken().equals(token)){
+            throw new CustomException(BusinessErrorCodes.INVALID_TOKEN);
+        }
+
+        if(passwordResetTokenService.tokenExpired(resetToken)){
+            passwordResetTokenService.deleteToken(resetToken);
+            throw new CustomException(BusinessErrorCodes.TOKEN_EXPIRED);
+        }
+
+        user.setPassword(passwordEncoder.encode(restPasswordRequest.getPassword()));
+        userRepository.save(user);
+    }
+
     private void sendValidationEmail(UserEntity user) throws MessagingException {
         ActivationToken activationToken = activationTokenService.getActivationTokenByUser(user);
         emailService.sendEmail(
@@ -136,6 +174,17 @@ public class AuthServiceImpl implements AuthService {
                 EmailTemplateName.ACTIVATE_ACCOUNT,
                 generateURL(activationUrl, user.getId(), activationToken.getToken()),
                 "Account activation"
+        );
+    }
+
+    private void sendPasswordRestEmail(UserEntity user) throws MessagingException {
+        PasswordResetToken passwordResetToken = passwordResetTokenService.getTokenByUser(user);
+        emailService.sendEmail(
+                user.getEmail(),
+                user.getFullName(),
+                EmailTemplateName.RESET_PASSWORD,
+                generateURL(resetPasswordUrl, user.getId(), passwordResetToken.getToken()),
+                "Reset password"
         );
     }
 

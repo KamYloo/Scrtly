@@ -3,6 +3,7 @@ package com.kamylo.Scrtly_backend.controller;
 import com.kamylo.Scrtly_backend.dto.UserDto;
 import com.kamylo.Scrtly_backend.dto.request.LoginRequestDto;
 import com.kamylo.Scrtly_backend.dto.request.RegisterRequestDto;
+import com.kamylo.Scrtly_backend.dto.request.RestPasswordRequest;
 import com.kamylo.Scrtly_backend.dto.response.LoginResponseDto;
 import com.kamylo.Scrtly_backend.dto.response.RefreshTokenResponse;
 import com.kamylo.Scrtly_backend.entity.RefreshTokenEntity;
@@ -85,11 +86,27 @@ public class AuthController {
         return new ResponseEntity<>("Logged out successfully", HttpStatus.OK);
     }
 
-    @GetMapping("/active/{id}/{token}")
-    public ResponseEntity<?> active_account(@PathVariable Long id, @PathVariable String token, HttpServletResponse response)
+    @GetMapping("/active/{userId}/{token}")
+    public ResponseEntity<?> active_account(@PathVariable Long userId, @PathVariable String token, HttpServletResponse response)
             throws MessagingException, IOException {
-        authService.activateUser(id, token);
+        authService.activateUser(userId, token);
         response.sendRedirect(redirectUrl);
-        return new ResponseEntity<>("account has been activated ", HttpStatus.OK);
+        return new ResponseEntity<>("account has been activated", HttpStatus.OK);
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestParam("email") String email) throws MessagingException {
+        authService.forgotPassword(email);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/reset-password/{userId}/{token}")
+    public ResponseEntity<?> reset_password(
+            @PathVariable Long userId,
+            @PathVariable String token,
+            @RequestBody RestPasswordRequest restPasswordRequest
+    ) {
+        authService.restPassword(userId, token, restPasswordRequest);
+        return new ResponseEntity<>("Password has been rested", HttpStatus.OK);
     }
 }
