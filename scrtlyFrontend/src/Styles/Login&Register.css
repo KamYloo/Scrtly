@@ -112,7 +112,7 @@
             font-weight: 700;
         }
 
-        .registerLink {
+        .registerLink, .forgotLink {
             font-size: 14.5px;
             text-align: center;
             margin: 20px 0 15px;

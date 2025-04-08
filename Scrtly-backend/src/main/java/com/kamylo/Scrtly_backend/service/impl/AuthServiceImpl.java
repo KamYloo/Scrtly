@@ -164,6 +164,7 @@ public class AuthServiceImpl implements AuthService {
 
         user.setPassword(passwordEncoder.encode(restPasswordRequest.getPassword()));
         userRepository.save(user);
+        passwordResetTokenService.deleteToken(resetToken);
     }
 
     private void sendValidationEmail(UserEntity user) throws MessagingException {

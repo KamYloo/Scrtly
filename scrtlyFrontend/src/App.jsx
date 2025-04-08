@@ -18,6 +18,8 @@ import {PlayListForm} from "./Components/PlayListComponents/PlayListForm.jsx";
 import {PlayList} from "./Components/PlayListComponents/PlayList.jsx";
 import {Home} from "./Components/Home.jsx";
 import NotificationsListener from "./Components/NotificationsListener.jsx";
+import {ChangePassword} from "./pages/ChangePassword.jsx";
+import {ForgotPassword} from "./pages/ForgotPassword.jsx";
 
 function App() {
   const [createPlayList, setCreatePlayList] = useState(false)
@@ -55,6 +57,19 @@ function App() {
 
           <Route path="/register" element={
             <div className="loginLayout"><Register />
+              <div className="background"></div>
+            </div>
+          } />
+
+          <Route path="/change-password/:userId/:token" element={
+            <div className="loginLayout"><ChangePassword  />
+              <div className="background"></div>
+            </div>
+          } />
+
+          <Route path="/forgot-password" element={
+            <div className='loginLayout'>
+              <ForgotPassword />
               <div className="background"></div>
             </div>
           } />

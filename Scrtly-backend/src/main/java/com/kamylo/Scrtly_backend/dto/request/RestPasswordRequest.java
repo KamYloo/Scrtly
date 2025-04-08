@@ -7,10 +7,10 @@ import lombok.Data;
 @Data
 public class RestPasswordRequest {
     @NotNull(message = "Password is required")
-    @Size(min = 6, message = "Password should be 8 characters long min")
+    @Size(min = 6, message = "Password should be 6 characters long min")
     private String password;
 
     @NotNull(message = "Password confirmation is required")
-    @Size(min = 6, message = "Password confirmation should be 8 characters long min")
+    @Size(min = 6, message = "Password confirmation should be 6 characters long min")
     private String passwordConfirmation;
 }

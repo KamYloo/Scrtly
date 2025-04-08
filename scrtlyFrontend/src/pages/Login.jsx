@@ -50,27 +50,33 @@ function Login() {
                 <i className='cancel' ><Link to="/"><MdCancel /></Link></i>
                 <form onSubmit={handleLogin}>
                     <div className="title">
-                        <img src={logo} alt="" />
+                        <img src={logo} alt=""/>
                         <h1>Login</h1>
                     </div>
                     <div className="inputBox">
-                        <input type="email" name="email" value={inputData.email} onChange={(e) => handleChange(e)} placeholder='Email address' required />
-                        <FaUser className='icon' />
+                        <input type="email" name="email" value={inputData.email} onChange={(e) => handleChange(e)}
+                               placeholder='Email address' required/>
+                        <FaUser className='icon'/>
                         {errors.email && <p className="error">{errors.email}</p>}
                     </div>
                     <div className="inputBox">
-                        <input type="password" name="password" value={inputData.password} onChange={(e) => handleChange(e)} placeholder='Password' required />
-                        <FaLock className='icon' />
+                        <input type="password" name="password" value={inputData.password}
+                               onChange={(e) => handleChange(e)} placeholder='Password' required/>
+                        <FaLock className='icon'/>
                         {errors.password && <p className="error">{errors.password}</p>}
                     </div>
                     <button type='submit'>Login</button>
+                    <div className="forgotLink">
+                        <p>Don't remember the password? <Link to="/forgot-password">Change Password</Link></p>
+                    </div>
                     <div className="registerLink">
                         <p>Don't have an account? <Link to="/register">Register</Link></p>
                     </div>
+
                 </form>
             </div>
         </div>
     );
 }
 
-export { Login };
+export {Login};

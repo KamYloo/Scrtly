@@ -18,7 +18,12 @@ import {
     FIND_USER_ERROR,
     REGISTER_SUCCESS,
     LOGIN_SUCCESS,
-    REQUEST_USER_SUCCESS, FIND_USER_SUCCESS, SEARCH_USER_SUCCESS, UPDATE_USER_SUCCESS, FOLLOW_USER_SUCCESS
+    REQUEST_USER_SUCCESS,
+    FIND_USER_SUCCESS,
+    SEARCH_USER_SUCCESS,
+    UPDATE_USER_SUCCESS,
+    FOLLOW_USER_SUCCESS,
+    FORGOT_PASSWORD_REQUEST, FORGOT_PASSWORD_SUCCESS, FORGOT_PASSWORD_ERROR
 } from "./ActionType"
 
 
@@ -60,6 +65,14 @@ export const logoutAction = () => async (dispatch) => {
         dispatch({ type: LOGOUT_ERROR, payload: error.message });
     }
 }
+
+export const forgotPasswordAction = (email) => async (dispatch) => {
+    await dispatchAction(dispatch, FORGOT_PASSWORD_REQUEST, FORGOT_PASSWORD_SUCCESS, FORGOT_PASSWORD_ERROR, `/api/auth/forgot-password?email=${email}`,
+        {
+            method: 'POST',
+        }
+    );
+};
 
 export const currentUser = () => async (dispatch) => {
     await dispatchAction(dispatch, REQUEST_USER, REQUEST_USER_SUCCESS, REQUEST_USER_ERROR, `/api/users/profile`, {

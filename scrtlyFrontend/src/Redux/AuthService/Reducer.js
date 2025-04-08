@@ -1,12 +1,31 @@
 import {
     FIND_USER_ERROR,
-    FIND_USER_REQUEST, FIND_USER_SUCCESS, FOLLOW_USER_ERROR,
-    FOLLOW_USER_REQUEST, FOLLOW_USER_SUCCESS, LOGIN_ERROR,
-    LOGIN_REQUEST, LOGIN_SUCCESS, LOGOUT_ERROR, LOGOUT_REQUEST, LOGOUT_SUCCESS, REGISTER_ERROR,
-    REGISTER_REQUEST, REGISTER_SUCCESS,
-    REQUEST_USER, REQUEST_USER_ERROR, REQUEST_USER_SUCCESS, SEARCH_USER_ERROR,
-    SEARCH_USER_REQUEST, SEARCH_USER_SUCCESS, UPDATE_USER_ERROR,
-    UPDATE_USER_REQUEST, UPDATE_USER_SUCCESS
+    FIND_USER_REQUEST,
+    FIND_USER_SUCCESS,
+    FOLLOW_USER_ERROR,
+    FOLLOW_USER_REQUEST,
+    FOLLOW_USER_SUCCESS,
+    FORGOT_PASSWORD_ERROR,
+    FORGOT_PASSWORD_REQUEST,
+    FORGOT_PASSWORD_SUCCESS,
+    LOGIN_ERROR,
+    LOGIN_REQUEST,
+    LOGIN_SUCCESS,
+    LOGOUT_ERROR,
+    LOGOUT_REQUEST,
+    LOGOUT_SUCCESS,
+    REGISTER_ERROR,
+    REGISTER_REQUEST,
+    REGISTER_SUCCESS,
+    REQUEST_USER,
+    REQUEST_USER_ERROR,
+    REQUEST_USER_SUCCESS,
+    SEARCH_USER_ERROR,
+    SEARCH_USER_REQUEST,
+    SEARCH_USER_SUCCESS,
+    UPDATE_USER_ERROR,
+    UPDATE_USER_REQUEST,
+    UPDATE_USER_SUCCESS
 } from "./ActionType.js";
 
 const initialValue= {
@@ -19,6 +38,7 @@ const initialValue= {
     searchResults:null,
     updateUser:null,
     findUser:null,
+    forgotPassword: null,
 }
 
 export const authReducer=(state=initialValue, {type,payload})=>{
@@ -77,6 +97,13 @@ export const authReducer=(state=initialValue, {type,payload})=>{
         case FOLLOW_USER_SUCCESS:
             return { ...state, loading: false, findUser: payload };
         case FOLLOW_USER_ERROR:
+            return { ...state, loading: false, error: payload };
+
+        case FORGOT_PASSWORD_REQUEST:
+            return { ...state, loading: true, error: null };
+        case FORGOT_PASSWORD_SUCCESS:
+            return { ...state, loading: false, forgotPassword: payload };
+        case FORGOT_PASSWORD_ERROR:
             return { ...state, loading: false, error: payload };
 
         default:
