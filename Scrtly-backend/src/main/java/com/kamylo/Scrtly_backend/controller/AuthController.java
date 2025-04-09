@@ -88,7 +88,7 @@ public class AuthController {
 
     @GetMapping("/active/{userId}/{token}")
     public ResponseEntity<?> active_account(@PathVariable Long userId, @PathVariable String token, HttpServletResponse response)
-            throws MessagingException, IOException {
+            throws IOException {
         authService.activateUser(userId, token);
         response.sendRedirect(redirectUrl);
         return new ResponseEntity<>("account has been activated", HttpStatus.OK);

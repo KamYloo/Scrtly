@@ -113,7 +113,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void activateUser(Long id, String token) throws MessagingException {
+    public void activateUser(Long id, String token) {
         UserEntity userEntity = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         if(userEntity.isEnabled())

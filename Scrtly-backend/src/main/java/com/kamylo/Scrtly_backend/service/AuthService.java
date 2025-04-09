@@ -11,7 +11,7 @@ import java.util.Map;
 public interface AuthService {
     UserDto createUser(RegisterRequestDto registerRequest) throws MessagingException;
     Map<String, String> verify(LoginRequestDto loginRequest) throws MessagingException;
-    void activateUser(Long id, String token) throws MessagingException;
+    void activateUser(Long id, String token);
     void forgotPassword(String email) throws MessagingException;
     void restPassword(Long userId, String token, RestPasswordRequest restPasswordRequest);
 }
