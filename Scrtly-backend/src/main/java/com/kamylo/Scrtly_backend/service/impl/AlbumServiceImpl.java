@@ -6,6 +6,7 @@ import com.kamylo.Scrtly_backend.dto.SongDto;
 import com.kamylo.Scrtly_backend.entity.AlbumEntity;
 import com.kamylo.Scrtly_backend.entity.ArtistEntity;
 import com.kamylo.Scrtly_backend.entity.SongEntity;
+import com.kamylo.Scrtly_backend.entity.UserEntity;
 import com.kamylo.Scrtly_backend.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.handler.CustomException;
 import com.kamylo.Scrtly_backend.mappers.Mapper;
@@ -43,7 +44,7 @@ public class AlbumServiceImpl implements AlbumService {
         if (!userRoleService.isArtist(username)) {
             throw new CustomException(BusinessErrorCodes.ARTIST_UNAUTHORIZED);
         }
-        ArtistEntity artist = (ArtistEntity) userService.findUserByEmail(username);
+        UserEntity artist = userService.findUserByEmail(username);
 
         String imagePath = null;
         if (!albumImage.isEmpty()) {
@@ -106,7 +107,7 @@ public class AlbumServiceImpl implements AlbumService {
 
         AlbumEntity albumEntity =albumRepository.findById(albumId).orElseThrow(
                 () -> new CustomException(BusinessErrorCodes.ALBUM_NOT_FOUND));
-        ArtistEntity artist = (ArtistEntity) userService.findUserByEmail(username);
+        UserEntity artist = userService.findUserByEmail(username);
 
         if (!artist.getId().equals(albumEntity.getArtist().getId())) {
             throw new CustomException(BusinessErrorCodes.ARTIST_MISMATCH);

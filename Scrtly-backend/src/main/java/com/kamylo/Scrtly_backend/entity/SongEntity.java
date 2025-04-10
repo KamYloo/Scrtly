@@ -32,7 +32,7 @@ public class SongEntity {
 
     @ManyToOne
     @JoinColumn(name = "artist_id", nullable = false)
-    private ArtistEntity artist;
+    private UserEntity artist;
 
     @ManyToMany(mappedBy = "songs")
     private Set<PlayListEntity> playlists = new HashSet<>();

@@ -53,7 +53,7 @@ public class SongServiceImpl implements SongService {
             throw new CustomException(BusinessErrorCodes.ARTIST_UNAUTHORIZED);
         }
 
-        ArtistEntity artist = (ArtistEntity) userService.findUserByEmail(username);
+        UserEntity artist = userService.findUserByEmail(username);
         AlbumEntity album = albumMapper.mapFrom(albumService.getAlbum(songRequest.getAlbumId()));
 
         String imagePath = null;
@@ -133,7 +133,7 @@ public class SongServiceImpl implements SongService {
         if (!userRoleService.isArtist(username)) {
             throw new CustomException(BusinessErrorCodes.ARTIST_UNAUTHORIZED);
         }
-        ArtistEntity artist = (ArtistEntity) userService.findUserByEmail(username);
+        UserEntity artist = userService.findUserByEmail(username);
         return artist.getId().equals(song.getArtist().getId());
     }
 }

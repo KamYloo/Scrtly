@@ -5,13 +5,11 @@ import com.kamylo.Scrtly_backend.dto.request.LoginRequestDto;
 import com.kamylo.Scrtly_backend.dto.request.RegisterRequestDto;
 import com.kamylo.Scrtly_backend.dto.request.RestPasswordRequest;
 import com.kamylo.Scrtly_backend.email.EmailTemplateName;
-import com.kamylo.Scrtly_backend.entity.ActivationToken;
-import com.kamylo.Scrtly_backend.entity.ArtistEntity;
-import com.kamylo.Scrtly_backend.entity.PasswordResetToken;
-import com.kamylo.Scrtly_backend.entity.UserEntity;
+import com.kamylo.Scrtly_backend.entity.*;
 import com.kamylo.Scrtly_backend.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.handler.CustomException;
 import com.kamylo.Scrtly_backend.mappers.Mapper;
+import com.kamylo.Scrtly_backend.repository.RolesRepository;
 import com.kamylo.Scrtly_backend.repository.UserRepository;
 import com.kamylo.Scrtly_backend.service.*;
 import jakarta.mail.MessagingException;
@@ -26,12 +24,14 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
+    private final RolesRepository rolesRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
@@ -60,28 +60,19 @@ public class AuthServiceImpl implements AuthService {
                 });
         UserEntity user;
 
-        if ("Artist".equalsIgnoreCase(registerRequest.getRole())) {
-            user = ArtistEntity.builder()
-                    .fullName(registerRequest.getFullName())
-                    .nickName(registerRequest.getNickName())
-                    .email(registerRequest.getEmail())
-                    .password(passwordEncoder.encode(registerRequest.getPassword()))
-                    .role(registerRequest.getRole())
-                    .artistName(registerRequest.getArtistName())
-                    .accountLocked(false)
-                    .enable(false)
-                    .build();
-        } else {
-            user = UserEntity.builder()
-                    .fullName(registerRequest.getFullName())
-                    .nickName(registerRequest.getNickName())
-                    .email(registerRequest.getEmail())
-                    .password(passwordEncoder.encode(registerRequest.getPassword()))
-                    .role(registerRequest.getRole())
-                    .accountLocked(false)
-                    .enable(false)
-                    .build();
-        }
+        RoleEntity role = rolesRepository.findByName("USER").orElseThrow(
+                () -> new RuntimeException("Role not found"));
+
+        user = UserEntity.builder()
+                .fullName(registerRequest.getFullName())
+                .nickName(registerRequest.getNickName())
+                .email(registerRequest.getEmail())
+                .password(passwordEncoder.encode(registerRequest.getPassword()))
+                .roles(Set.of(role))
+                .accountLocked(false)
+                .enable(false)
+                .build();
+
         UserEntity savedUser = userRepository.save(user);
         activationTokenService.createActivationToken(savedUser);
         sendValidationEmail(savedUser);

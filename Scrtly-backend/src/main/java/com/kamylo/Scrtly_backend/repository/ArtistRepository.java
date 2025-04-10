@@ -10,6 +10,5 @@ import java.util.Set;
 
 @Repository
 public interface ArtistRepository extends JpaRepository<ArtistEntity, Long> {
-    @Query("select a from ArtistEntity a where a.fullName like %:artistName%")
     Set<ArtistEntity> findByArtistName(@Param("artistName") String artistName);
 }

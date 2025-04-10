@@ -31,7 +31,7 @@ public class AlbumEntity {
 
     @ManyToOne
     @JoinColumn(name = "artist_id", nullable = false)
-    private ArtistEntity artist;
+    private UserEntity artist;
 
     @OneToMany(mappedBy = "album", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SongEntity> songs = new ArrayList<>();

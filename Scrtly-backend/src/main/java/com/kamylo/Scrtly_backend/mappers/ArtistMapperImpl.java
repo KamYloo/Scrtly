@@ -15,7 +15,7 @@ public class ArtistMapperImpl implements Mapper<ArtistEntity, ArtistDto> {
     @Override
     public ArtistDto mapTo(ArtistEntity artistEntity) {
         ArtistDto artistDto = modelMapper.map(artistEntity, ArtistDto.class);
-        artistDto.setTotalFans(artistEntity.getFollowers() != null ? artistEntity.getFollowers().size() : 0);
+        artistDto.setTotalFans(artistEntity.getUser().getFollowers() != null ? artistEntity.getUser().getFollowers().size() : 0);
         return artistDto;
     }
 

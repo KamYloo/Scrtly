@@ -10,6 +10,7 @@ import com.kamylo.Scrtly_backend.handler.CustomException;
 import com.kamylo.Scrtly_backend.mappers.Mapper;
 import com.kamylo.Scrtly_backend.repository.ArtistRepository;
 import com.kamylo.Scrtly_backend.repository.SongRepository;
+import com.kamylo.Scrtly_backend.repository.UserRepository;
 import com.kamylo.Scrtly_backend.service.ArtistService;
 import com.kamylo.Scrtly_backend.service.FileService;
 import com.kamylo.Scrtly_backend.service.UserRoleService;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
 public class ArtistServiceImpl implements ArtistService {
 
     private final ArtistRepository artistRepository;
+    private final UserRepository userRepository;
     private final SongRepository songRepository;
     private final UserService userService;
     private final UserRoleService userRoleService;
@@ -56,7 +58,7 @@ public class ArtistServiceImpl implements ArtistService {
                 () -> new CustomException(BusinessErrorCodes.ARTIST_NOT_FOUND));
         UserEntity user = userService.findUserByEmail(username);
         ArtistDto artistDto = artistMapper.mapTo(artistEntity);
-        artistDto.setObserved(ArtistUtil.isArtistFollowed(artistEntity, user.getId()));
+        artistDto.setObserved(ArtistUtil.isArtistFollowed(artistEntity.getUser(), user.getId()));
         return artistDto;
     }
 
@@ -74,17 +76,25 @@ public class ArtistServiceImpl implements ArtistService {
         if (!userRoleService.isArtist(username)) {
             throw new CustomException(BusinessErrorCodes.ARTIST_UNAUTHORIZED);
         }
-        ArtistEntity artist = (ArtistEntity) userService.findUserByEmail(username);
+        UserEntity user = userService.findUserByEmail(username);
+
+        ArtistEntity artistEntity = user.getArtistEntity();
+        if (artistEntity == null) {
+            artistEntity= ArtistEntity.builder()
+                    .user(user)
+                    .build();
+            user.setArtistEntity(artistEntity);
+        }
 
         if (artistBio != null) {
-            artist.setArtistBio(artistBio);
+            artistEntity.setArtistBio(artistBio);
         }
         if (bannerImg != null && !bannerImg.isEmpty()) {
-            String imagePath = fileService.updateFile(bannerImg, artist.getBannerImg(), "artistBanners/");
-            artist.setBannerImg(imagePath);
+            String imagePath = fileService.updateFile(bannerImg, artistEntity.getBannerImg(), "artistBanners/");
+            artistEntity.setBannerImg(imagePath);
         }
-
-        return artistMapper.mapTo(artistRepository.save(artist));
+        userRepository.save(user);
+        return artistMapper.mapTo(artistEntity);
     }
 
     @Override
