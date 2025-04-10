@@ -43,7 +43,6 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests( auth -> {
-
                             auth.requestMatchers(
                                     "/public/**",
                                     "/uploads/**",
@@ -58,8 +57,13 @@ public class SecurityConfig implements WebMvcConfigurer {
                                     "/webjars/**",
                                     "/swagger-ui.html",
 
-                                    "/auth/**"
+                                    "/auth/**",
+                                    "/admin/artist/verify/**"
                             ).permitAll();
+
+                            auth.requestMatchers(
+                                    "/admin/**"
+                            ).hasAuthority("ADMIN");
 
                             auth.anyRequest().authenticated();
                         }

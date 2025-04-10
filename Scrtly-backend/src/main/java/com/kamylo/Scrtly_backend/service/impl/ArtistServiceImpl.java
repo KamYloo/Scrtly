@@ -79,12 +79,6 @@ public class ArtistServiceImpl implements ArtistService {
         UserEntity user = userService.findUserByEmail(username);
 
         ArtistEntity artistEntity = user.getArtistEntity();
-        if (artistEntity == null) {
-            artistEntity= ArtistEntity.builder()
-                    .user(user)
-                    .build();
-            user.setArtistEntity(artistEntity);
-        }
 
         if (artistBio != null) {
             artistEntity.setArtistBio(artistBio);

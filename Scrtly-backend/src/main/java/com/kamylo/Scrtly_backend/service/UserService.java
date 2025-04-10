@@ -16,4 +16,5 @@ public interface UserService {
      UserDto followUser(Long userId, String username);
      UserDto updateUser(String username, UserRequestDto userRequestDto, MultipartFile userImage);
      Set<UserDto> searchUser(String query);
+     void requestArtistVerification(String username);
 }

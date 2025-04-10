@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artist Verification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #007bff;
+        }
+        .greeting, .message {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .activation-link {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .activation-link a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .details {
+            font-size: 15px;
+            margin: 15px 0;
+        }
+        .footer {
+            font-size: 14px;
+            text-align: center;
+            color: #777;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Artist Verification</h1>
+    <p class="greeting" th:text="'Hello, ' + ${username} + ','">Hello, Administrator,</p>
+    <p class="message">
+        We have received a request to verify a user as an artist.
+        Below are the user's details:
+    </p>
+    <!--<div class="details">
+        <p><strong>Username:</strong> <span th:text="${artistUsername}">username</span></p>
+        <p><strong>Email:</strong> <span th:text="${artistEmail}">email@example.com</span></p>
+    </div>-->
+    <p class="message">
+        To verify this artist, please click on the button below:
+    </p>
+    <div class="activation-link">
+        <a th:href="${confirmationUrl}" target="_blank">Verify Artist</a>
+    </div>
+    <p class="message">
+        If you are not an administrator or do not recognize this request, please ignore this email.
+    </p>
+    <div class="footer">
+        <p>Best regards,</p>
+        <p>The ScrtlyMusic Team</p>
+    </div>
+</div>
+</body>
+</html>

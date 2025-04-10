@@ -1,21 +1,30 @@
 package com.kamylo.Scrtly_backend.service.impl;
 import com.kamylo.Scrtly_backend.dto.UserDto;
+import com.kamylo.Scrtly_backend.email.EmailTemplateName;
+import com.kamylo.Scrtly_backend.entity.ArtistVerificationToken;
+import com.kamylo.Scrtly_backend.entity.PasswordResetToken;
 import com.kamylo.Scrtly_backend.entity.UserEntity;
 import com.kamylo.Scrtly_backend.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.handler.CustomException;
 import com.kamylo.Scrtly_backend.mappers.Mapper;
 import com.kamylo.Scrtly_backend.repository.UserRepository;
 import com.kamylo.Scrtly_backend.dto.request.UserRequestDto;
+import com.kamylo.Scrtly_backend.service.ArtistVerificationTokenService;
+import com.kamylo.Scrtly_backend.service.EmailService;
 import com.kamylo.Scrtly_backend.service.FileService;
 import com.kamylo.Scrtly_backend.service.UserService;
 import com.kamylo.Scrtly_backend.utils.UserLikeChecker;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -27,6 +36,11 @@ public class UserServiceImpl implements UserService {
     private final FileService fileService;
     private final Mapper<UserEntity, UserDto> mapper;
     private final UserLikeChecker userLikeChecker;
+    private final ArtistVerificationTokenService artistVerificationTokenService;
+    private final EmailService emailService;
+
+    @Value("${mailing.backend.artistVerification-url}")
+    private String artistVerificationUrl;
 
     @Override
     public UserEntity findUserByEmail(String email) {
@@ -108,5 +122,49 @@ public class UserServiceImpl implements UserService {
         return userRepository.searchUser(query).stream()
                 .map(mapper::mapTo)
                 .collect(Collectors.toCollection(HashSet::new));
+    }
+
+    @Override
+    @Transactional
+    public void requestArtistVerification(String username) {
+        UserEntity user = findUserByEmail(username);
+
+        if (user.getRoles().stream().anyMatch(role -> role.getName().equalsIgnoreCase("ARTIST"))) {
+            throw new CustomException(BusinessErrorCodes.USER_ALREADY_ARTIST);
+        }
+
+        ArtistVerificationToken token = artistVerificationTokenService.getTokenByUser(user);
+
+        if (token == null) {
+            token = artistVerificationTokenService.createArtistVerificationToken(user);
+        }
+
+        List<UserEntity> adminList = userRepository.findAll().stream()
+                .filter(admin -> admin.getRoles().stream()
+                        .anyMatch(role -> role.getName().equalsIgnoreCase("ADMIN")))
+                .toList();
+
+        ArtistVerificationToken finalToken = token;
+        adminList.forEach(admin -> {
+            try {
+                sendArtistVerificationEmail(user, admin, finalToken);
+            } catch (MessagingException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private void sendArtistVerificationEmail(UserEntity user, UserEntity admin, ArtistVerificationToken artistVerificationToken) throws MessagingException {
+        emailService.sendEmail(
+                admin.getEmail(),
+                admin.getFullName(),
+                EmailTemplateName.ARTIST_VERIFICATION,
+                generateURL(artistVerificationUrl, user.getId(), artistVerificationToken.getToken()),
+                "Artist Verification"
+        );
+    }
+
+    private String generateURL(String baseUrl, Long user_id, String token){
+        return String.format("%s/%s/%s", baseUrl ,user_id, token);
     }
 }

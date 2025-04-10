@@ -10,7 +10,7 @@ import toast from "react-hot-toast";
 
 function Register() {
     const [inputData, setInputData] = useState({
-        fullName: "",nickName: "", email: "", password: "", confirmPassword: "", role: "User", artistName: ""
+        fullName: "",nickName: "", email: "", password: "", confirmPassword: ""
     });
     const [errors, setErrors] = useState({});
     const dispatch = useDispatch();
@@ -30,7 +30,6 @@ function Register() {
         if (!inputData.password) newErrors.password = "Password is required.";
         if (inputData.password.length < 6) newErrors.password = "Password must be at least 6 characters.";
         if (inputData.password !== inputData.confirmPassword) newErrors.confirmPassword = "Passwords do not match.";
-        if (inputData.role === "Artist" && !inputData.artistName) newErrors.artistName = "Artist Name is required.";
 
         return newErrors;
     };
@@ -91,20 +90,6 @@ function Register() {
                         <FaLock className='icon'/>
                         {errors.confirmPassword && <p className="error">{errors.confirmPassword}</p>}
                     </div>
-                    <div className="inputBox">
-                        <select value={inputData.role} onChange={(e) => handleChange(e)} name="role">
-                            <option value="User">User</option>
-                            <option value="Artist">Artist</option>
-                        </select>
-                    </div>
-                    {inputData.role === "Artist" && (
-                        <div className="inputBox">
-                            <input type="text" value={inputData.artistName} name="artistName"
-                                   onChange={(e) => handleChange(e)} placeholder='Artist Name' required/>
-                            <FaMusic className='icon'/>
-                            {errors.artistName && <p className="error">{errors.artistName}</p>}
-                        </div>
-                    )}
 
                     <button type='submit'>Register</button>
                 </form>

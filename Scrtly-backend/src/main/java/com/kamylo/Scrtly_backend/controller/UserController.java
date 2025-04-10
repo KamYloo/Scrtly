@@ -3,6 +3,7 @@ package com.kamylo.Scrtly_backend.controller;
 import com.kamylo.Scrtly_backend.dto.UserDto;
 import com.kamylo.Scrtly_backend.dto.request.UserRequestDto;
 import com.kamylo.Scrtly_backend.service.UserService;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,5 +45,11 @@ public class UserController {
     public ResponseEntity<UserDto> followUser(@PathVariable Long userId, Principal principal) {
         UserDto user = userService.followUser(userId, principal.getName());
         return ResponseEntity.ok(user);
+    }
+
+    @PostMapping("/verify-request")
+    public ResponseEntity<?> forgotPassword(Principal principal) {
+        userService.requestArtistVerification(principal.getName());
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
