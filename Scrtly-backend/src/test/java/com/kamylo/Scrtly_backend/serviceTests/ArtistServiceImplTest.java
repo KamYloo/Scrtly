@@ -12,6 +12,7 @@ import com.kamylo.Scrtly_backend.mappers.Mapper;
 import com.kamylo.Scrtly_backend.mappers.SongMapperImpl;
 import com.kamylo.Scrtly_backend.repository.ArtistRepository;
 import com.kamylo.Scrtly_backend.repository.SongRepository;
+import com.kamylo.Scrtly_backend.repository.UserRepository;
 import com.kamylo.Scrtly_backend.service.FileService;
 import com.kamylo.Scrtly_backend.service.UserRoleService;
 import com.kamylo.Scrtly_backend.service.UserService;
@@ -19,31 +20,33 @@ import com.kamylo.Scrtly_backend.service.impl.ArtistServiceImpl;
 import com.kamylo.Scrtly_backend.utils.ArtistUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.modelmapper.ModelMapper;
-import org.mockito.InjectMocks;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.InjectMocks;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(org.mockito.junit.jupiter.MockitoExtension.class)
 class ArtistServiceImplTest {
 
     @Mock
     private ArtistRepository artistRepository;
     @Mock
     private SongRepository songRepository;
+    @Mock
+    private UserRepository userRepository;
     @Mock
     private UserService userService;
     @Mock
@@ -59,12 +62,17 @@ class ArtistServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
         artistMapper = new ArtistMapperImpl(new ModelMapper());
         songMapper = new SongMapperImpl(new ModelMapper());
         artistService = new ArtistServiceImpl(
-                artistRepository, songRepository, userService,
-                userRoleService, artistMapper, songMapper, fileService
+                artistRepository,
+                userRepository,
+                songRepository,
+                userService,
+                userRoleService,
+                artistMapper,
+                songMapper,
+                fileService
         );
     }
 
@@ -72,7 +80,7 @@ class ArtistServiceImplTest {
     void getArtists_shouldReturnArtists() {
         Pageable pageable = PageRequest.of(0, 10);
         ArtistEntity artistEntity = new ArtistEntity();
-        ArtistDto artistDto = new ArtistDto();
+        ArtistDto expectedDto = artistMapper.mapTo(artistEntity);
         Page<ArtistEntity> artistPage = new PageImpl<>(Collections.singletonList(artistEntity));
 
         when(artistRepository.findAll(pageable)).thenReturn(artistPage);
@@ -81,27 +89,32 @@ class ArtistServiceImplTest {
 
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
-        assertEquals(artistDto, result.getContent().get(0));
+        assertEquals(expectedDto, result.getContent().get(0));
     }
 
     @Test
     void getArtistById_shouldReturnArtist_whenArtistExists() {
         Long artistId = 1L;
         ArtistEntity artistEntity = new ArtistEntity();
-        ArtistDto artistDto = new ArtistDto();
+
+        UserEntity user = new UserEntity();
+        user.setFollowers(new HashSet<>());
+        artistEntity.setUser(user);
+
+        ArtistDto expectedDto = artistMapper.mapTo(artistEntity);
 
         when(artistRepository.findById(artistId)).thenReturn(Optional.of(artistEntity));
 
         ArtistDto result = artistService.getArtistById(artistId);
 
         assertNotNull(result);
-        assertEquals(artistDto, result);
+        assertEquals(expectedDto, result);
     }
+
 
     @Test
     void getArtistById_shouldThrowException_whenArtistDoesNotExist() {
         Long artistId = 1L;
-
         when(artistRepository.findById(artistId)).thenReturn(Optional.empty());
 
         CustomException exception = assertThrows(CustomException.class, () -> artistService.getArtistById(artistId));
@@ -113,27 +126,45 @@ class ArtistServiceImplTest {
         Long artistId = 1L;
         String username = "user@example.com";
         ArtistEntity artistEntity = new ArtistEntity();
+        UserEntity artistUser = new UserEntity();
+        artistUser.setId(2L);
+        artistEntity.setUser(artistUser);
+        ArtistDto expectedDto = artistMapper.mapTo(artistEntity);
+
         UserEntity userEntity = new UserEntity();
         userEntity.setId(1L);
-        ArtistDto artistDto = new ArtistDto();
 
         when(artistRepository.findById(artistId)).thenReturn(Optional.of(artistEntity));
         when(userService.findUserByEmail(username)).thenReturn(userEntity);
-        // Mock the ArtistUtil.isArtistFollowed method
-        mockStatic(ArtistUtil.class);
-        when(ArtistUtil.isArtistFollowed(artistEntity, userEntity.getId())).thenReturn(true);
 
-        ArtistDto result = artistService.getArtistProfile(artistId, username);
+        try (MockedStatic<ArtistUtil> artistUtilMock = Mockito.mockStatic(ArtistUtil.class)) {
+            artistUtilMock.when(() -> ArtistUtil.isArtistFollowed(artistEntity.getUser(), userEntity.getId()))
+                    .thenReturn(true);
 
-        assertNotNull(result);
-        assertTrue(result.isObserved());
+            ArtistDto result = artistService.getArtistProfile(artistId, username);
+            assertNotNull(result);
+            assertTrue(result.isObserved());
+        }
+    }
+
+    @Test
+    void getArtistProfile_shouldThrowException_whenArtistDoesNotExist() {
+        Long artistId = 1L;
+        String username = "user@example.com";
+
+        when(artistRepository.findById(artistId)).thenReturn(Optional.empty());
+
+        CustomException exception = assertThrows(CustomException.class,
+                () -> artistService.getArtistProfile(artistId, username));
+
+        assertEquals(BusinessErrorCodes.ARTIST_NOT_FOUND, exception.getErrorCode());
     }
 
     @Test
     void searchArtistsByName_shouldReturnArtists() {
         String artistName = "Test Artist";
         ArtistEntity artistEntity = new ArtistEntity();
-        ArtistDto artistDto = new ArtistDto();
+        ArtistDto expectedDto = artistMapper.mapTo(artistEntity);
         Set<ArtistEntity> artistEntities = new HashSet<>(Collections.singletonList(artistEntity));
 
         when(artistRepository.findByArtistName(artistName)).thenReturn(artistEntities);
@@ -142,31 +173,40 @@ class ArtistServiceImplTest {
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertTrue(result.contains(artistDto));
+        assertTrue(result.contains(expectedDto));
     }
 
     @Test
-    void updateArtist_shouldUpdateArtist_whenUserIsArtist() {
+    void updateArtist_shouldUpdateArtist_whenUserIsArtist() throws Exception {
         String username = "artist@example.com";
         MultipartFile bannerImg = mock(MultipartFile.class);
-        String artistBio = "New Bio";
+        String newArtistBio = "New Bio";
+        String oldBannerPath = "old/path/to/banner";
+        String newBannerPath = "new/path/to/banner";
+
+        // Budujemy encję artysty powiązaną z użytkownikiem
         ArtistEntity artistEntity = new ArtistEntity();
-        artistEntity.setBannerImg("old/path/to/banner");
-        ArtistDto artistDto = new ArtistDto();
-        artistDto.setArtistBio("New Bio");
-        artistDto.setBannerImg("new/path/to/banner");
+        artistEntity.setArtistBio("Old Bio");
+        artistEntity.setBannerImg(oldBannerPath);
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(1L);
+        userEntity.setArtistEntity(artistEntity);
+
+        ArtistDto expectedDto = artistMapper.mapTo(artistEntity);
+        expectedDto.setArtistBio(newArtistBio);
+        expectedDto.setBannerImg(newBannerPath);
 
         when(userRoleService.isArtist(username)).thenReturn(true);
-        when(userService.findUserByEmail(username)).thenReturn(artistEntity);
-        when(fileService.updateFile(bannerImg, "old/path/to/banner", "artistBanners/")).thenReturn("new/path/to/banner");
-        when(artistRepository.save(artistEntity)).thenReturn(artistEntity);
+        when(userService.findUserByEmail(username)).thenReturn(userEntity);
+        when(fileService.updateFile(bannerImg, oldBannerPath, "artistBanners/")).thenReturn(newBannerPath);
+        when(userRepository.save(userEntity)).thenReturn(userEntity);
 
-        ArtistDto result = artistService.updateArtist(username, bannerImg, artistBio);
+        ArtistDto result = artistService.updateArtist(username, bannerImg, newArtistBio);
 
         assertNotNull(result);
-        assertEquals(artistDto, result);
-        assertEquals("New Bio", artistEntity.getArtistBio());
-        assertEquals("new/path/to/banner", artistEntity.getBannerImg());
+        assertEquals(newArtistBio, artistEntity.getArtistBio());
+        assertEquals(newBannerPath, artistEntity.getBannerImg());
+        assertEquals(expectedDto, result);
     }
 
     @Test
@@ -183,94 +223,97 @@ class ArtistServiceImplTest {
     }
 
     @Test
+    void updateArtist_shouldUpdateOnlyBio_whenBannerIsNull() throws Exception {
+        String username = "artist@example.com";
+        MultipartFile bannerImg = null;
+        String newArtistBio = "Updated Bio";
+        String currentBanner = "old/path/to/banner";
+
+        ArtistEntity artistEntity = new ArtistEntity();
+        artistEntity.setArtistBio("Old Bio");
+        artistEntity.setBannerImg(currentBanner);
+        UserEntity userEntity = new UserEntity();
+        userEntity.setArtistEntity(artistEntity);
+
+        when(userRoleService.isArtist(username)).thenReturn(true);
+        when(userService.findUserByEmail(username)).thenReturn(userEntity);
+        when(userRepository.save(userEntity)).thenReturn(userEntity);
+
+        ArtistDto result = artistService.updateArtist(username, bannerImg, newArtistBio);
+
+        assertNotNull(result);
+        assertEquals(newArtistBio, artistEntity.getArtistBio());
+        assertEquals(currentBanner, artistEntity.getBannerImg());
+    }
+
+    @Test
+    void updateArtist_shouldUpdateOnlyBanner_whenBioIsNull() throws Exception {
+        String username = "artist@example.com";
+        MultipartFile bannerImg = mock(MultipartFile.class);
+        String currentBanner = "old/path/to/banner";
+        String newBannerPath = "new/path/to/banner";
+
+        ArtistEntity artistEntity = new ArtistEntity();
+        artistEntity.setBannerImg(currentBanner);
+        artistEntity.setArtistBio("Existing Bio");
+        UserEntity userEntity = new UserEntity();
+        userEntity.setArtistEntity(artistEntity);
+
+        when(userRoleService.isArtist(username)).thenReturn(true);
+        when(userService.findUserByEmail(username)).thenReturn(userEntity);
+        when(bannerImg.isEmpty()).thenReturn(false);
+        when(fileService.updateFile(bannerImg, currentBanner, "artistBanners/")).thenReturn(newBannerPath);
+        when(userRepository.save(userEntity)).thenReturn(userEntity);
+
+        ArtistDto result = artistService.updateArtist(username, bannerImg, null);
+
+        assertNotNull(result);
+        assertEquals(newBannerPath, artistEntity.getBannerImg());
+        assertEquals("Existing Bio", artistEntity.getArtistBio());
+    }
+
+    @Test
+    void updateArtist_shouldNotUpdateAnything_whenBothAreNull() throws Exception {
+        String username = "artist@example.com";
+        MultipartFile bannerImg = null;
+        String artistBio = null;
+        ArtistEntity artistEntity = new ArtistEntity();
+        artistEntity.setArtistBio("Old Bio");
+        artistEntity.setBannerImg("old/path/to/banner");
+        UserEntity userEntity = new UserEntity();
+        userEntity.setArtistEntity(artistEntity);
+
+        when(userRoleService.isArtist(username)).thenReturn(true);
+        when(userService.findUserByEmail(username)).thenReturn(userEntity);
+        when(userRepository.save(userEntity)).thenReturn(userEntity);
+
+        ArtistDto result = artistService.updateArtist(username, bannerImg, artistBio);
+
+        assertNotNull(result);
+        assertEquals("Old Bio", artistEntity.getArtistBio());
+        assertEquals("old/path/to/banner", artistEntity.getBannerImg());
+    }
+
+    @Test
     void getArtistTracks_shouldReturnTracks() {
         Long artistId = 1L;
         Pageable pageable = PageRequest.of(0, 10);
         ArtistEntity artistEntity = new ArtistEntity();
-        SongEntity songEntity = new SongEntity();
-        SongDto songDto = new SongDto();
-        Page<SongEntity> songPage = new PageImpl<>(Collections.singletonList(songEntity));
 
         when(artistRepository.findById(artistId)).thenReturn(Optional.of(artistEntity));
+
+        SongEntity songEntity = new SongEntity();
+        SongDto expectedSongDto = songMapper.mapTo(songEntity);
+        Page<SongEntity> songPage = new PageImpl<>(Collections.singletonList(songEntity));
+
         when(songRepository.findByArtistId(artistId, pageable)).thenReturn(songPage);
 
         Page<SongDto> result = artistService.getArtistTracks(artistId, pageable);
 
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
-        assertEquals(songDto, result.getContent().get(0));
+        assertEquals(expectedSongDto, result.getContent().get(0));
     }
 
-    @Test
-    void updateArtist_shouldUpdateOnlyBio_whenBannerIsNull() {
-        String username = "artist@example.com";
-        MultipartFile bannerImg = null;
-        String artistBio = "Updated Bio";
-        ArtistEntity artistEntity = new ArtistEntity();
-        artistEntity.setBannerImg("old/path/to/banner");
-        artistEntity.setArtistBio("Old Bio");
-
-        when(userRoleService.isArtist(username)).thenReturn(true);
-        when(userService.findUserByEmail(username)).thenReturn(artistEntity);
-        when(artistRepository.save(any(ArtistEntity.class))).thenReturn(artistEntity);
-
-        ArtistDto result = artistService.updateArtist(username, bannerImg, artistBio);
-
-        assertNotNull(result);
-        assertEquals(artistBio, result.getArtistBio());
-        assertEquals("old/path/to/banner", result.getBannerImg());
-    }
-
-    @Test
-    void updateArtist_shouldUpdateOnlyBanner_whenBioIsNull() {
-        String username = "artist@example.com";
-        MultipartFile bannerImg = mock(MultipartFile.class);
-        String artistBio = null;
-        ArtistEntity artistEntity = new ArtistEntity();
-        artistEntity.setBannerImg("old/path/to/banner");
-
-        when(userRoleService.isArtist(username)).thenReturn(true);
-        when(userService.findUserByEmail(username)).thenReturn(artistEntity);
-        when(fileService.updateFile(bannerImg, "old/path/to/banner", "artistBanners/")).thenReturn("new/path/to/banner");
-        when(artistRepository.save(any(ArtistEntity.class))).thenReturn(artistEntity);
-
-        ArtistDto result = artistService.updateArtist(username, bannerImg, artistBio);
-
-        assertNotNull(result);
-        assertEquals("new/path/to/banner", result.getBannerImg());
-    }
-
-    @Test
-    void updateArtist_shouldNotUpdateAnything_whenBothAreNull() {
-        String username = "artist@example.com";
-        MultipartFile bannerImg = null;
-        String artistBio = null;
-        ArtistEntity artistEntity = new ArtistEntity();
-        artistEntity.setBannerImg("old/path/to/banner");
-        artistEntity.setArtistBio("Old Bio");
-
-        when(userRoleService.isArtist(username)).thenReturn(true);
-        when(userService.findUserByEmail(username)).thenReturn(artistEntity);
-        when(artistRepository.save(any(ArtistEntity.class))).thenReturn(artistEntity);
-
-        ArtistDto result = artistService.updateArtist(username, bannerImg, artistBio);
-
-        assertNotNull(result);
-        assertEquals("Old Bio", result.getArtistBio());
-        assertEquals("old/path/to/banner", result.getBannerImg());
-    }
-
-    @Test
-    void getArtistProfile_shouldThrowException_whenArtistDoesNotExist() {
-        Long artistId = 1L;
-        String username = "user@example.com";
-
-        when(artistRepository.findById(artistId)).thenReturn(Optional.empty());
-
-        CustomException exception = assertThrows(CustomException.class,
-                () -> artistService.getArtistProfile(artistId, username));
-
-        assertEquals(BusinessErrorCodes.ARTIST_NOT_FOUND, exception.getErrorCode());
-    }
 
 }
