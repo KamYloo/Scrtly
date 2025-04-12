@@ -21,6 +21,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,6 +49,7 @@ public class AuthServiceImpl implements AuthService {
     private String resetPasswordUrl;
 
     @Override
+    @Transactional
     public UserDto createUser(RegisterRequestDto registerRequest) throws MessagingException{
         userRepository.findByEmail(registerRequest.getEmail())
                 .ifPresent(email -> {
@@ -104,6 +106,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public void activateUser(Long id, String token) {
         UserEntity userEntity = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
@@ -134,6 +137,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public void restPassword(Long userId, String token, RestPasswordRequest restPasswordRequest) {
         UserEntity user = userRepository.findById(userId).orElseThrow(
                 () -> new UsernameNotFoundException("User not found"));
