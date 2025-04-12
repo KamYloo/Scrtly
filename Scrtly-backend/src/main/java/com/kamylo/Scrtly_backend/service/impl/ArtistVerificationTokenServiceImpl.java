@@ -16,11 +16,12 @@ public class ArtistVerificationTokenServiceImpl implements ArtistVerificationTok
     private static final long EXPIRATION_SECONDS = 86400;
 
     @Override
-    public ArtistVerificationToken createArtistVerificationToken(UserEntity user) {
+    public ArtistVerificationToken createArtistVerificationToken(UserEntity user, String requestedArtistName) {
         ArtistVerificationToken verificationToken = ArtistVerificationToken.builder()
                 .token(generateVerificationToken(20))
                 .user(user)
                 .expiryDate(Instant.now().plusSeconds(EXPIRATION_SECONDS))
+                .requestedArtistName(requestedArtistName)
                 .build();
         return tokenRepository.save(verificationToken);
     }

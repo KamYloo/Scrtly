@@ -1,6 +1,7 @@
 package com.kamylo.Scrtly_backend.service.impl;
 
 import com.kamylo.Scrtly_backend.email.EmailTemplateName;
+import com.kamylo.Scrtly_backend.entity.UserEntity;
 import com.kamylo.Scrtly_backend.service.EmailService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -23,7 +24,7 @@ public class EmailServiceImpl implements EmailService {
     private final SpringTemplateEngine templateEngine;
 
     @Override
-    public void sendEmail(String to, String username, EmailTemplateName emailTemplate, String confirmationURL, String subject) throws MessagingException {
+    public void sendEmail(String to, String username, EmailTemplateName emailTemplate, String confirmationURL, String subject, String artistName, UserEntity user) throws MessagingException {
         String templateName = emailTemplate == null ? "confirm-email" : emailTemplate.name();
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(
@@ -34,6 +35,14 @@ public class EmailServiceImpl implements EmailService {
         Map<String, Object> properties = new HashMap<>();
         properties.put("username", username);
         properties.put("confirmationUrl", confirmationURL);
+        if (artistName != null) {
+            properties.put("artistName", artistName);
+        }
+        if (user != null) {
+            properties.put("fullNameUser", user.getFullName());
+            properties.put("userEmail", user.getEmail());
+        }
+
 
         Context context = new Context();
         context.setVariables(properties);

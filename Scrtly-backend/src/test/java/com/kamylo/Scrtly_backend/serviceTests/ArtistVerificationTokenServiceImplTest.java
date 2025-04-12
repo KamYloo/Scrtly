@@ -39,11 +39,12 @@ class ArtistVerificationTokenServiceImplTest {
 
     @Test
     void testCreateArtistVerificationToken() {
+        String expectedArtistName = "Desired Artist";
         ArgumentCaptor<ArtistVerificationToken> tokenCaptor = ArgumentCaptor.forClass(ArtistVerificationToken.class);
         when(tokenRepository.save(any(ArtistVerificationToken.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
-        tokenService.createArtistVerificationToken(user);
+        tokenService.createArtistVerificationToken(user, expectedArtistName);
 
         verify(tokenRepository, times(1)).save(tokenCaptor.capture());
         ArtistVerificationToken capturedToken = tokenCaptor.getValue();
@@ -52,6 +53,8 @@ class ArtistVerificationTokenServiceImplTest {
         assertNotNull(capturedToken.getToken());
         assertEquals(20, capturedToken.getToken().length());
         assertTrue(capturedToken.getToken().matches("\\d{20}"));
+
+        assertEquals(expectedArtistName, capturedToken.getRequestedArtistName());
 
         Instant now = Instant.now();
         long diffSeconds = capturedToken.getExpiryDate().getEpochSecond() - now.getEpochSecond();
@@ -64,6 +67,7 @@ class ArtistVerificationTokenServiceImplTest {
                 .token("12345678901234567890")
                 .user(user)
                 .expiryDate(Instant.now().plusSeconds(86400))
+                .requestedArtistName("TestArtist")
                 .build();
         when(tokenRepository.findByUser(user)).thenReturn(Optional.of(token));
 
@@ -89,7 +93,7 @@ class ArtistVerificationTokenServiceImplTest {
                 .build();
 
         boolean expired = tokenService.tokenExpired(token);
-        assertTrue(expired, "Token powinien być oznaczony jako wygasły.");
+        assertTrue(expired);
     }
 
     @Test
@@ -99,7 +103,7 @@ class ArtistVerificationTokenServiceImplTest {
                 .build();
 
         boolean expired = tokenService.tokenExpired(token);
-        assertFalse(expired, "Token nie powinien być oznaczony jako wygasły.");
+        assertFalse(expired);
     }
 
     @Test

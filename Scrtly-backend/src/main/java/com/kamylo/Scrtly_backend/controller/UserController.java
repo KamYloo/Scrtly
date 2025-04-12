@@ -1,6 +1,7 @@
 package com.kamylo.Scrtly_backend.controller;
 
 import com.kamylo.Scrtly_backend.dto.UserDto;
+import com.kamylo.Scrtly_backend.dto.request.ArtistVerificationRequest;
 import com.kamylo.Scrtly_backend.dto.request.UserRequestDto;
 import com.kamylo.Scrtly_backend.service.UserService;
 import jakarta.mail.MessagingException;
@@ -48,8 +49,8 @@ public class UserController {
     }
 
     @PostMapping("/verify-request")
-    public ResponseEntity<?> forgotPassword(Principal principal) {
-        userService.requestArtistVerification(principal.getName());
+    public ResponseEntity<?> verifyAsArtist(@RequestBody ArtistVerificationRequest request, Principal principal) {
+        userService.requestArtistVerification(principal.getName(), request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

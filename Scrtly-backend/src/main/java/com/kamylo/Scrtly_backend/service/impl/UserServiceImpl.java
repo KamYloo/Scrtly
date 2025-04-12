@@ -1,5 +1,6 @@
 package com.kamylo.Scrtly_backend.service.impl;
 import com.kamylo.Scrtly_backend.dto.UserDto;
+import com.kamylo.Scrtly_backend.dto.request.ArtistVerificationRequest;
 import com.kamylo.Scrtly_backend.email.EmailTemplateName;
 import com.kamylo.Scrtly_backend.entity.ArtistVerificationToken;
 import com.kamylo.Scrtly_backend.entity.PasswordResetToken;
@@ -126,7 +127,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void requestArtistVerification(String username) {
+    public void requestArtistVerification(String username, ArtistVerificationRequest request) {
         UserEntity user = findUserByEmail(username);
 
         if (user.getRoles().stream().anyMatch(role -> role.getName().equalsIgnoreCase("ARTIST"))) {
@@ -136,7 +137,7 @@ public class UserServiceImpl implements UserService {
         ArtistVerificationToken token = artistVerificationTokenService.getTokenByUser(user);
 
         if (token == null) {
-            token = artistVerificationTokenService.createArtistVerificationToken(user);
+            token = artistVerificationTokenService.createArtistVerificationToken(user, request.getRequestedArtistName());
         }
 
         List<UserEntity> adminList = userRepository.findAll().stream()
@@ -160,7 +161,9 @@ public class UserServiceImpl implements UserService {
                 admin.getFullName(),
                 EmailTemplateName.ARTIST_VERIFICATION,
                 generateURL(artistVerificationUrl, user.getId(), artistVerificationToken.getToken()),
-                "Artist Verification"
+                "Artist Verification",
+                artistVerificationToken.getRequestedArtistName(),
+                user
         );
     }
 

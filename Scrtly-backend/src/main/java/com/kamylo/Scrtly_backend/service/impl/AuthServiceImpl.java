@@ -165,7 +165,9 @@ public class AuthServiceImpl implements AuthService {
                 user.getFullName(),
                 EmailTemplateName.ACTIVATE_ACCOUNT,
                 generateURL(activationUrl, user.getId(), activationToken.getToken()),
-                "Account activation"
+                "Account activation",
+                null,
+                null
         );
     }
 
@@ -176,7 +178,9 @@ public class AuthServiceImpl implements AuthService {
                 user.getFullName(),
                 EmailTemplateName.RESET_PASSWORD,
                 generateURL(resetPasswordUrl, user.getId(), passwordResetToken.getToken()),
-                "Reset password"
+                "Reset password",
+                null,
+                null
         );
     }
 

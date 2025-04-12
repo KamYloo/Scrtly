@@ -1,6 +1,7 @@
 package com.kamylo.Scrtly_backend.service;
 
 import com.kamylo.Scrtly_backend.dto.UserDto;
+import com.kamylo.Scrtly_backend.dto.request.ArtistVerificationRequest;
 import com.kamylo.Scrtly_backend.entity.UserEntity;
 import com.kamylo.Scrtly_backend.dto.request.UserRequestDto;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,5 +17,5 @@ public interface UserService {
      UserDto followUser(Long userId, String username);
      UserDto updateUser(String username, UserRequestDto userRequestDto, MultipartFile userImage);
      Set<UserDto> searchUser(String query);
-     void requestArtistVerification(String username);
+     void requestArtistVerification(String username, ArtistVerificationRequest request);
 }
