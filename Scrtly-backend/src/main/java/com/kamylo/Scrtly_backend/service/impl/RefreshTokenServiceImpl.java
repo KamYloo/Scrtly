@@ -72,7 +72,6 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     public RefreshTokenEntity findByToken(String rawToken){
         String decodedToken = URLDecoder.decode(rawToken, StandardCharsets.UTF_8);
-        System.out.println("Decoded token: " + decodedToken);
 
         int dotIndex = decodedToken.indexOf(".");
         if (dotIndex == -1) {
@@ -82,8 +81,6 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         String tokenId = decodedToken.substring(0, dotIndex);
         String rawTokenPart = decodedToken.substring(dotIndex + 1);
 
-        System.out.println("Extracted tokenId: " + tokenId);
-        System.out.println("Extracted rawTokenPart: " + rawTokenPart);
 
         RefreshTokenEntity token = refreshTokenRepo.findByTokenId(tokenId)
                 .orElseThrow(() -> new CustomException(BusinessErrorCodes.BAD_JWT_TOKEN));
