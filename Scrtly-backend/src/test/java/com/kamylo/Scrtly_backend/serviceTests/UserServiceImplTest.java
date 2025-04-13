@@ -1,14 +1,20 @@
 package com.kamylo.Scrtly_backend.serviceTests;
 
 import com.kamylo.Scrtly_backend.dto.UserDto;
+import com.kamylo.Scrtly_backend.dto.request.ArtistVerificationRequest;
+import com.kamylo.Scrtly_backend.dto.request.UserRequestDto;
+import com.kamylo.Scrtly_backend.email.EmailTemplateName;
+import com.kamylo.Scrtly_backend.entity.ArtistVerificationToken;
+import com.kamylo.Scrtly_backend.entity.RoleEntity;
 import com.kamylo.Scrtly_backend.entity.UserEntity;
 import com.kamylo.Scrtly_backend.handler.CustomException;
 import com.kamylo.Scrtly_backend.mappers.Mapper;
 import com.kamylo.Scrtly_backend.repository.UserRepository;
-import com.kamylo.Scrtly_backend.dto.request.UserRequestDto;
+import com.kamylo.Scrtly_backend.service.EmailService;
 import com.kamylo.Scrtly_backend.service.FileService;
 import com.kamylo.Scrtly_backend.service.impl.UserServiceImpl;
 import com.kamylo.Scrtly_backend.utils.UserLikeChecker;
+import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,11 +23,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,6 +38,8 @@ class UserServiceImplTest {
     @Mock private Mapper<UserEntity, UserDto> mapper;
     @Mock private UserLikeChecker userLikeChecker;
     @Mock private MultipartFile multipartFile;
+    @Mock private com.kamylo.Scrtly_backend.service.ArtistVerificationTokenService artistVerificationTokenService;
+    @Mock private EmailService emailService;
 
     @InjectMocks private UserServiceImpl userService;
 
@@ -46,6 +54,7 @@ class UserServiceImplTest {
         user.setEmail("user@example.com");
         user.setNickName("User1");
         user.setFullName("Test User");
+        user.setRoles(new HashSet<>());
 
         anotherUser = new UserEntity();
         anotherUser.setId(2L);
@@ -71,7 +80,6 @@ class UserServiceImplTest {
         assertEquals("User not found", ex.getMessage());
     }
 
-
     @Test
     void findUserById_shouldReturnUser() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
@@ -92,7 +100,6 @@ class UserServiceImplTest {
         when(mapper.mapTo(user)).thenReturn(userDto);
         assertEquals(userDto, userService.findUserByNickname("User1"));
     }
-
 
     @Test
     void findUserByNickname_shouldThrowException_whenUserNotFound() {
@@ -234,9 +241,7 @@ class UserServiceImplTest {
 
     @Test
     void getUserProfile_shouldThrowException_whenNickNameNotFound() {
-        // Gdy użytkownik o danym nickname nie istnieje
         when(userRepository.findByNickName("nonexistentNick")).thenReturn(Optional.empty());
-        // Dla reqUser stubbing nie jest istotny, bo metoda przerwie działanie już przy nickname
         UsernameNotFoundException exception = assertThrows(UsernameNotFoundException.class,
                 () -> userService.getUserProfile("nonexistentNick", "req@example.com"));
         assertEquals("User not found", exception.getMessage());
@@ -244,7 +249,6 @@ class UserServiceImplTest {
 
     @Test
     void getUserProfile_shouldThrowException_whenReqUserNotFound() {
-        // Gdy nickname istnieje, ale reqUser (użytkownik żądający) nie istnieje
         when(userRepository.findByNickName("existingNick")).thenReturn(Optional.of(user));
         when(userRepository.findByEmail("nonexistentReq@example.com")).thenReturn(Optional.empty());
         UsernameNotFoundException exception = assertThrows(UsernameNotFoundException.class,
@@ -252,5 +256,55 @@ class UserServiceImplTest {
         assertEquals("User not found", exception.getMessage());
     }
 
+    @Test
+    void requestArtistVerification_shouldSendEmailToAdmins() throws MessagingException {
+        ArtistVerificationRequest request = new ArtistVerificationRequest();
+        request.setRequestedArtistName("requestedArtist");
 
+        ArtistVerificationToken tokenInstance = new ArtistVerificationToken();
+        tokenInstance.setToken("testToken");
+        tokenInstance.setRequestedArtistName("requestedArtist");
+
+        when(artistVerificationTokenService.getTokenByUser(user)).thenReturn(null);
+        when(artistVerificationTokenService.createArtistVerificationToken(user, "requestedArtist")).thenReturn(tokenInstance);
+
+        RoleEntity adminRole = new RoleEntity();
+        adminRole.setName("ADMIN");
+        Set<RoleEntity> adminRoles = new HashSet<>();
+        adminRoles.add(adminRole);
+        UserEntity admin = new UserEntity();
+        admin.setId(100L);
+        admin.setEmail("admin@example.com");
+        admin.setFullName("Admin User");
+        admin.setRoles(adminRoles);
+
+        when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
+        when(userRepository.findAll()).thenReturn(List.of(admin));
+
+        userService.requestArtistVerification("user@example.com", request);
+
+        verify(emailService, times(1)).sendEmail(eq("admin@example.com"),
+                eq("Admin User"),
+                eq(EmailTemplateName.ARTIST_VERIFICATION),
+                anyString(),
+                eq("Artist Verification"),
+                eq("requestedArtist"),
+                eq(user));
+    }
+
+    @Test
+    void requestArtistVerification_shouldThrowException_whenUserIsAlreadyArtist() {
+        RoleEntity artistRole = new RoleEntity();
+        artistRole.setName("ARTIST");
+        Set<RoleEntity> roles = new HashSet<>();
+        roles.add(artistRole);
+        user.setRoles(roles);
+
+        ArtistVerificationRequest request = new ArtistVerificationRequest();
+        request.setRequestedArtistName("requestedArtist");
+
+        when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
+        assertThrows(CustomException.class, () ->
+                userService.requestArtistVerification("user@example.com", request));
+    }
 }
