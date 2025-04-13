@@ -1,6 +1,5 @@
 package com.kamylo.Scrtly_backend.service.impl;
 
-import com.kamylo.Scrtly_backend.handler.CustomException;
 import com.kamylo.Scrtly_backend.service.JwtService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -69,7 +68,7 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public boolean validateJwtToken(String authToken) throws CustomException {
+    public boolean validateJwtToken(String authToken) {
         try {
             Jwts.parser()
                     .verifyWith(getKey())
