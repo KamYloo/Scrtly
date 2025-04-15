@@ -16,7 +16,7 @@ import java.security.Principal;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/artists")
+@RequestMapping("/artist")
 public class ArtistController {
     private final ArtistService artistService;
 

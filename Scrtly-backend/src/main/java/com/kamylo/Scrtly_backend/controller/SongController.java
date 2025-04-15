@@ -16,7 +16,7 @@ import java.util.Set;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/songs")
+@RequestMapping("/song")
 public class SongController {
 
     private final SongService songService;

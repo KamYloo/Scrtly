@@ -3,6 +3,7 @@ package com.kamylo.Scrtly_backend.handler;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -84,10 +85,21 @@ public class GlobalExceptionHandler {
                 );
     }
 
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ExceptionResponse> handleAccessDeniedException(AccessDeniedException exp) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(
+                        ExceptionResponse.builder()
+                                .businessErrornDescription("No Permissions: You do not have the required role")
+                                .error(exp.getMessage())
+                                .build()
+                );
+    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionResponse> handlerException(Exception exp) {
-        exp.printStackTrace();
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .contentType(MediaType.APPLICATION_JSON)

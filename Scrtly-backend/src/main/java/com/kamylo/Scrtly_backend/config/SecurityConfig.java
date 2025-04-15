@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -64,6 +65,15 @@ public class SecurityConfig implements WebMvcConfigurer {
                             auth.requestMatchers(
                                     "/admin/**"
                             ).hasAuthority("ADMIN");
+
+                            auth.requestMatchers(HttpMethod.GET,"/artist/**").permitAll();
+                            auth.requestMatchers("/artist/update").hasAnyAuthority("ARTIST", "ADMIN");
+
+                            auth.requestMatchers(HttpMethod.GET,"/album/**").permitAll();
+                            auth.requestMatchers("/album/create", "/album/delete/**").hasAnyAuthority("ARTIST", "ADMIN");
+
+                            auth.requestMatchers(HttpMethod.GET,"/song/**").permitAll();
+                            auth.requestMatchers("/song/upload", "/song/delete/**").hasAnyAuthority("ARTIST", "ADMIN");
 
                             auth.anyRequest().authenticated();
                         }

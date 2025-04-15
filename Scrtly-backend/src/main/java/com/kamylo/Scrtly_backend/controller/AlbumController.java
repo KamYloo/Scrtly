@@ -20,7 +20,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/albums")
+@RequestMapping("/album")
 public class AlbumController {
 
     private final AlbumService albumService;
