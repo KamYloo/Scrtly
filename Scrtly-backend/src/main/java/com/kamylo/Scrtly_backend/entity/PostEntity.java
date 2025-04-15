@@ -2,7 +2,11 @@ package com.kamylo.Scrtly_backend.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,33 +20,42 @@ import java.util.Set;
 @NoArgsConstructor
 @Builder
 @Data
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class PostEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @NotBlank(message = "Image must not be blank")
+    @Size(max = 255, message = "Image URL cannot exceed 255 characters")
+    @Column(nullable = false, length = 255)
     private String image;
+
+    @NotBlank(message = "Description must not be blank")
+    @Size(max = 1000, message = "Description cannot exceed 1000 characters")
+    @Column(nullable = false, length = 1000)
     private String description;
+
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
     private LocalDateTime creationDate;
+
+    @LastModifiedDate
+    @Column(nullable = false)
     private LocalDateTime updateDate;
 
-    @ManyToOne()
-    @JoinColumn(name = "user_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
-    private Set<LikeEntity> likes =  new HashSet<>();
-
+    private Set<LikeEntity> likes = new HashSet<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
-    private List<CommentEntity> comments =  new ArrayList<>();
+    private List<CommentEntity> comments = new ArrayList<>();
 
-    @PrePersist
-    protected void onCreate() {
-        creationDate = LocalDateTime.now();
-        updateDate = LocalDateTime.now();
-    }
 
 }

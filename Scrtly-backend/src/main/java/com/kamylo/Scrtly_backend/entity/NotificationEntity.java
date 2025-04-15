@@ -3,6 +3,8 @@ package com.kamylo.Scrtly_backend.entity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kamylo.Scrtly_backend.entity.enums.NotificationType;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -23,10 +25,15 @@ public class NotificationEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Notification message must not be blank")
+    @Size(max = 1000, message = "Notification message cannot exceed 1000 characters")
+    @Column(nullable = false)
     private String message;
+
     private boolean seen;
 
     @CreatedDate
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdDate;
 
     @LastModifiedDate
@@ -40,14 +47,12 @@ public class NotificationEntity {
 
     private Integer count;
 
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipient_id", nullable = false)
     private UserEntity recipient;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     @JsonIgnoreProperties({"likes", "comments"})
     private PostEntity post;
-
 }

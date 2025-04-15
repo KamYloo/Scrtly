@@ -1,6 +1,8 @@
 package com.kamylo.Scrtly_backend.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -21,6 +23,8 @@ public class ChatMessageEntity {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
+    @NotBlank(message = "Message text must not be blank")
+    @Size(max = 1000, message = "Message text cannot exceed 1000 characters")
     @Column(nullable = false)
     private String messageText;
 
@@ -30,11 +34,11 @@ public class ChatMessageEntity {
     @LastModifiedDate
     private LocalDateTime lastModifiedDate;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chatRoom_id", nullable = false)
     private ChatRoomEntity chatRoom;
 }

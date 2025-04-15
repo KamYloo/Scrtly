@@ -6,17 +6,18 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 
 @Entity(name = "user")
 @Table(name = "user")
@@ -34,23 +35,32 @@ public class UserEntity implements UserDetails, Principal {
     @Column(name = "id", nullable = false)
     private Long id;
 
+    @NotBlank
+    @Size(max = 100)
     private String fullName;
 
+    @NotBlank
+    @Size(max = 50)
     @Column(unique = true)
     private String nickName;
 
+    @NotBlank
+    @Email
+    @Size(max = 100)
     @Column(unique = true)
     private String email;
 
     private String profilePicture;
 
+    @Size(max = 500)
     private String description;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @NotBlank
+    @Size(min = 6, max = 100)
     private String password;
 
     private boolean accountLocked;
-
     private boolean enable;
 
     @CreatedDate
@@ -110,12 +120,11 @@ public class UserEntity implements UserDetails, Principal {
         return this.email;
     }
 
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.roles.stream()
-                .map(r -> new SimpleGrantedAuthority(r.getName()))
-                .collect(Collectors.toList());
+            .map(r -> new SimpleGrantedAuthority(r.getName()))
+            .collect(Collectors.toList());
     }
 
     @Override

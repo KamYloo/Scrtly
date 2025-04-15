@@ -11,16 +11,18 @@ import java.util.Objects;
 @NoArgsConstructor
 @Builder
 @Data
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class SongLikeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "song_id", nullable = false)
     private SongEntity song;
 
@@ -28,8 +30,8 @@ public class SongLikeEntity {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        SongLikeEntity songLike = (SongLikeEntity) o;
-        return Objects.equals(id, songLike.id);
+        SongLikeEntity that = (SongLikeEntity) o;
+        return Objects.equals(id, that.id);
     }
 
     @Override
