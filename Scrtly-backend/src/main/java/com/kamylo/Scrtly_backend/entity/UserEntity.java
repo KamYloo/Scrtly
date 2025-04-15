@@ -29,7 +29,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 public class UserEntity implements UserDetails, Principal {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     @Column(name = "id", nullable = false)
     private Long id;
