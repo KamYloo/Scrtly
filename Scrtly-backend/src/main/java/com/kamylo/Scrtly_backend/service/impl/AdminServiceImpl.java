@@ -44,7 +44,7 @@ public class AdminServiceImpl implements AdminService {
             user.getRoles().add(role);
             ArtistEntity artistEntity = ArtistEntity.builder()
                     .user(user)
-                    .artistName(artistVerificationToken.getRequestedArtistName())
+                    .pseudonym(artistVerificationToken.getRequestedArtistName())
                     .artistBio(null)
                     .bannerImg(null)
                     .build();

@@ -167,7 +167,7 @@ class ArtistServiceImplTest {
         ArtistDto expectedDto = artistMapper.mapTo(artistEntity);
         Set<ArtistEntity> artistEntities = new HashSet<>(Collections.singletonList(artistEntity));
 
-        when(artistRepository.findByArtistName(artistName)).thenReturn(artistEntities);
+        when(artistRepository.findByPseudonym(artistName)).thenReturn(artistEntities);
 
         Set<ArtistDto> result = artistService.searchArtistsByName(artistName);
 

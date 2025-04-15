@@ -41,9 +41,7 @@ public class AlbumServiceImpl implements AlbumService {
     @Override
     @Transactional
     public AlbumDto createAlbum(String title, MultipartFile albumImage, String username) {
-        if (!userRoleService.isArtist(username)) {
-            throw new CustomException(BusinessErrorCodes.ARTIST_UNAUTHORIZED);
-        }
+        validateArtistOrAdmin(username);
         UserEntity artist = userService.findUserByEmail(username);
 
         String imagePath = null;
@@ -68,8 +66,8 @@ public class AlbumServiceImpl implements AlbumService {
 
     @Override
     public AlbumDto getAlbum(Integer albumId) {
-        AlbumEntity album = albumRepository.findById(albumId).orElseThrow(
-                () -> new CustomException(BusinessErrorCodes.ALBUM_NOT_FOUND));
+        AlbumEntity album = albumRepository.findById(albumId)
+                .orElseThrow(() -> new CustomException(BusinessErrorCodes.ALBUM_NOT_FOUND));
         return albumMapper.mapTo(album);
     }
 
@@ -84,9 +82,12 @@ public class AlbumServiceImpl implements AlbumService {
 
     @Override
     public List<AlbumDto> getAlbumsByArtist(Long artistId) {
-        ArtistEntity artistEntity = artistRepository.findById(artistId).orElseThrow(
-                () -> new CustomException(BusinessErrorCodes.ARTIST_NOT_FOUND));
-        return albumRepository.findByArtistId(artistEntity.getId()).stream().map(albumMapper::mapTo).toList();
+        ArtistEntity artistEntity = artistRepository.findById(artistId)
+                .orElseThrow(() -> new CustomException(BusinessErrorCodes.ARTIST_NOT_FOUND));
+        return albumRepository.findByArtistId(artistEntity.getId())
+                .stream()
+                .map(albumMapper::mapTo)
+                .toList();
     }
 
     @Override
@@ -95,31 +96,34 @@ public class AlbumServiceImpl implements AlbumService {
         if (albumEntity == null) {
             throw new CustomException(BusinessErrorCodes.ALBUM_NOT_FOUND);
         }
-        return songRepository.findByAlbumId(albumEntity.getId()).stream().map(songMapper::mapTo).toList();
+        return songRepository.findByAlbumId(albumEntity.getId())
+                .stream()
+                .map(songMapper::mapTo)
+                .toList();
     }
 
     @Override
     @Transactional
     public void deleteAlbum(Integer albumId, String username) {
-        if (!userRoleService.isArtist(username)) {
-            throw new CustomException(BusinessErrorCodes.ARTIST_UNAUTHORIZED);
-        }
-
-        AlbumEntity albumEntity =albumRepository.findById(albumId).orElseThrow(
-                () -> new CustomException(BusinessErrorCodes.ALBUM_NOT_FOUND));
+        validateArtistOrAdmin(username);
+        AlbumEntity albumEntity = albumRepository.findById(albumId)
+                .orElseThrow(() -> new CustomException(BusinessErrorCodes.ALBUM_NOT_FOUND));
         UserEntity artist = userService.findUserByEmail(username);
 
-        if (!artist.getId().equals(albumEntity.getArtist().getId())) {
+        if (!artist.getId().equals(albumEntity.getArtist().getId()) && !userRoleService.isAdmin(username)) {
             throw new CustomException(BusinessErrorCodes.ARTIST_MISMATCH);
         }
-        albumEntity.getSongs()
-                .forEach(song -> {
-                    fileService.deleteFile(song.getTrack());
-                    fileService.deleteFile(song.getImageSong());
-                });
+        albumEntity.getSongs().forEach(song -> {
+            fileService.deleteFile(song.getTrack());
+            fileService.deleteFile(song.getImageSong());
+        });
         fileService.deleteFile(albumEntity.getCoverImage());
         albumRepository.deleteById(albumId);
     }
 
-
+    private void validateArtistOrAdmin(String username) {
+        if (!(userRoleService.isArtist(username) || userRoleService.isAdmin(username))) {
+            throw new CustomException(BusinessErrorCodes.ARTIST_UNAUTHORIZED);
+        }
+    }
 }

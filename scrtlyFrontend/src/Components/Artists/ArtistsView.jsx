@@ -17,7 +17,7 @@ function ArtistsView() {
     const [searchQuery, setSearchQuery] = useState('');
 
     const filteredArtists = artist?.artists.content.filter(artistItem =>
-        artistItem.artistName.toLowerCase().includes(searchQuery.toLowerCase())
+        artistItem.pseudonym.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     useEffect(() => {
@@ -55,7 +55,7 @@ function ArtistsView() {
                         <img src={item.profilePicture} alt=""/>
                         <img className='check' src={Verification} alt=""/>
                     </div>
-                    <p>{item?.artistName}</p>
+                    <p>{item?.pseudonym}</p>
                 </div>
                 ))}
             </div>

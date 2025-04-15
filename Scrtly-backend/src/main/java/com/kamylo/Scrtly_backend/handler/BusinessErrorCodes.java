@@ -17,7 +17,7 @@ public enum BusinessErrorCodes {
     FOLLOW_ERROR(308, "You cannot follow yourself.", HttpStatus.BAD_REQUEST),
     IMAGE_NOT_FOUND(309, "Image not found", HttpStatus.NOT_FOUND),
     IMAGE_FETCH_FAILED(310, "Failed to fetch image", HttpStatus.INTERNAL_SERVER_ERROR),
-    ARTIST_UNAUTHORIZED(311, "User is not an artist", HttpStatus.UNAUTHORIZED),
+    ARTIST_UNAUTHORIZED(311, "User is not an artist or admin", HttpStatus.UNAUTHORIZED),
     ARTIST_NOT_FOUND(312, "Artist not found", HttpStatus.NOT_FOUND),
     ALBUM_NOT_FOUND(313, "Album not found", HttpStatus.NOT_FOUND),
     ARTIST_MISMATCH(314, "Artist no permissions", HttpStatus.UNAUTHORIZED),

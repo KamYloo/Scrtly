@@ -41,7 +41,7 @@ function Banner({artist}) {
                 <div className="artist">
                     <div className="left">
                         <div className="name">
-                            <h2>{artist.findArtist?.artistName}</h2>
+                            <h2>{artist.findArtist?.pseudonym}</h2>
                             <img src={Verification} alt=""/>
                         </div>
                         <p><i><FaHeadphones/></i> 12,132,5478 <span>Monthly listeners</span></p>

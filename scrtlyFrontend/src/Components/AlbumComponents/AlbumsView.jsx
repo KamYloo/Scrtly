@@ -51,7 +51,7 @@ function AlbumsView() {
                     <div className="album" key={item.id} onClick={() => navigate(`/album/${item.id}`)}>
                         <i className="play"><FaCirclePlay/></i>
                         <img src={item?.albumImage || ''} alt=""/>
-                        <span>{item?.artist.artistName}</span>
+                        <span>{item?.artist.pseudonym}</span>
                         <p>{item?.title}</p>
                     </div>
                 ))}

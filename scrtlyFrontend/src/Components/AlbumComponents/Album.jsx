@@ -66,7 +66,7 @@ function Album({ volume, onTrackChange}) {
                 <div className="albumData">
                     <p>Album</p>
                     <h1 className='albumName'>{album.findAlbum?.title}</h1>
-                    <p className='stats'>{album.findAlbum?.artist.artistName} • {album.findAlbum?.tracksCount} Songs <span>• {album.findAlbum?.releaseDate} • {formatTime(album.findAlbum?.totalDuration)}</span> </p>
+                    <p className='stats'>{album.findAlbum?.artist.pseudonym} • {album.findAlbum?.tracksCount} Songs <span>• {album.findAlbum?.releaseDate} • {formatTime(album.findAlbum?.totalDuration)}</span> </p>
                 </div>
                 {album.findAlbum?.artist.id === userData?.id && (
                 <div className="buttons">

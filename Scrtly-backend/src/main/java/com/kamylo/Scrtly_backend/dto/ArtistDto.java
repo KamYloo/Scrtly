@@ -14,7 +14,7 @@ import java.util.Set;
 @NoArgsConstructor
 public class ArtistDto {
     private Long id;
-    private String artistName;
+    private String pseudonym;
     private String bannerImg;
     private String artistBio;
     private String profilePicture;

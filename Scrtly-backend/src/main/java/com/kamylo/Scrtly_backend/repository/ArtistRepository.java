@@ -10,5 +10,5 @@ import java.util.Set;
 
 @Repository
 public interface ArtistRepository extends JpaRepository<ArtistEntity, Long> {
-    Set<ArtistEntity> findByArtistName(@Param("artistName") String artistName);
+    Set<ArtistEntity> findByPseudonym(@Param("pseudonym") String pseudonym);
 }

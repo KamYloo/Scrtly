@@ -18,7 +18,7 @@ public class ArtistEntity {
     @Id
     private Long id;
 
-    private String artistName;
+    private String pseudonym;
     private String bannerImg;
     private String artistBio;
 

@@ -63,8 +63,8 @@ public class ArtistServiceImpl implements ArtistService {
     }
 
     @Override
-    public Set<ArtistDto> searchArtistsByName(String artistName) {
-        Set<ArtistEntity> artists = artistRepository.findByArtistName(artistName);
+    public Set<ArtistDto> searchArtistsByName(String pseudonym) {
+        Set<ArtistEntity> artists = artistRepository.findByPseudonym(pseudonym);
         return artists.stream()
                 .map(artistMapper::mapTo)
                 .collect(Collectors.toCollection(HashSet::new));

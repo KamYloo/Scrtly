@@ -2,16 +2,15 @@ package com.kamylo.Scrtly_backend.service.impl;
 
 import com.kamylo.Scrtly_backend.dto.AlbumDto;
 import com.kamylo.Scrtly_backend.dto.SongDto;
-import com.kamylo.Scrtly_backend.entity.*;
+import com.kamylo.Scrtly_backend.dto.request.SongRequest;
+import com.kamylo.Scrtly_backend.entity.AlbumEntity;
+import com.kamylo.Scrtly_backend.entity.SongEntity;
+import com.kamylo.Scrtly_backend.entity.UserEntity;
 import com.kamylo.Scrtly_backend.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.handler.CustomException;
 import com.kamylo.Scrtly_backend.mappers.Mapper;
 import com.kamylo.Scrtly_backend.repository.SongRepository;
-import com.kamylo.Scrtly_backend.dto.request.SongRequest;
-import com.kamylo.Scrtly_backend.service.AlbumService;
-import com.kamylo.Scrtly_backend.service.SongService;
-import com.kamylo.Scrtly_backend.service.UserRoleService;
-import com.kamylo.Scrtly_backend.service.UserService;
+import com.kamylo.Scrtly_backend.service.*;
 import javazoom.jl.decoder.Bitstream;
 import javazoom.jl.decoder.BitstreamException;
 import javazoom.jl.decoder.Header;
@@ -36,7 +35,7 @@ import java.util.stream.Collectors;
 public class SongServiceImpl implements SongService {
 
     private final SongRepository songRepository;
-    private final FileServiceImpl fileService;
+    private final FileService fileService;
     private final UserService userService;
     private final UserRoleService userRoleService;
     private final AlbumService albumService;
@@ -49,9 +48,7 @@ public class SongServiceImpl implements SongService {
     @Override
     @Transactional
     public SongDto createSong(SongRequest songRequest, String username, MultipartFile imageSong, MultipartFile audioFile) throws IOException, UnsupportedAudioFileException {
-        if (!userRoleService.isArtist(username)) {
-            throw new CustomException(BusinessErrorCodes.ARTIST_UNAUTHORIZED);
-        }
+        validateArtistOrAdmin(username);
 
         UserEntity artist = userService.findUserByEmail(username);
         AlbumEntity album = albumMapper.mapFrom(albumService.getAlbum(songRequest.getAlbumId()));
@@ -67,7 +64,7 @@ public class SongServiceImpl implements SongService {
             audioPath = fileService.saveFile(audioFile, "audio/");
             String srcAudio = "";
             if (audioPath.startsWith(cdnBaseUrl)) {
-                srcAudio = audioPath.replace(cdnBaseUrl+"audio/", "");
+                srcAudio = audioPath.replace(cdnBaseUrl + "audio/", "");
             }
             duration = getAudioDuration(new File("uploads/audio/" + srcAudio));
         }
@@ -87,14 +84,18 @@ public class SongServiceImpl implements SongService {
 
     @Override
     public Set<SongDto> searchSongByTitle(String title) {
-        return songRepository.findByTitle(title).stream().map(songMapper::mapTo).collect(Collectors.toSet());
+        return songRepository.findByTitle(title)
+                .stream()
+                .map(songMapper::mapTo)
+                .collect(Collectors.toSet());
     }
 
     @Override
+    @Transactional
     public void deleteSong(Long songId, String username) {
-
-        SongEntity songEntity = songRepository.findById(songId).orElseThrow(
-                () -> new CustomException(BusinessErrorCodes.SONG_NOT_FOUND));
+        validateArtistOrAdmin(username);
+        SongEntity songEntity = songRepository.findById(songId)
+                .orElseThrow(() -> new CustomException(BusinessErrorCodes.SONG_NOT_FOUND));
 
         if (validateSongOwnership(username, songEntity)) {
             songRepository.delete(songEntity);
@@ -129,11 +130,17 @@ public class SongServiceImpl implements SongService {
         }
     }
 
-    private boolean validateSongOwnership(String username, SongEntity song) {
-        if (!userRoleService.isArtist(username)) {
+    private void validateArtistOrAdmin(String username) {
+        if (!(userRoleService.isArtist(username) || userRoleService.isAdmin(username))) {
             throw new CustomException(BusinessErrorCodes.ARTIST_UNAUTHORIZED);
         }
-        UserEntity artist = userService.findUserByEmail(username);
-        return artist.getId().equals(song.getArtist().getId());
+    }
+
+    private boolean validateSongOwnership(String username, SongEntity song) {
+         if (userRoleService.isAdmin(username)) {
+            return true;
+        }
+        UserEntity user = userService.findUserByEmail(username);
+        return user.getId().equals(song.getArtist().getId());
     }
 }
