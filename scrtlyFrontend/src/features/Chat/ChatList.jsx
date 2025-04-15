@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { UserInfo } from './UserInfo'
-import { ChatUsersList } from './ChatUsersList'
+import { UserInfo } from './UserInfo.jsx'
+import { ChatUsersList } from './ChatUsersList.jsx'
 
 
 // eslint-disable-next-line react/prop-types

@@ -1,7 +1,7 @@
 import React from 'react'
 import { FaUser } from "react-icons/fa";
 import {BASE_API_URL} from "../../config/api.js";
-import Verification from "../../img/check.png";
+import Verification from "../../assets/check.png";
 import {useNavigate} from "react-router-dom";
 
 // eslint-disable-next-line react/prop-types

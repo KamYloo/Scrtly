@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react'
-import '../../Styles/ChatView.css'
-import { ChatList } from './ChatList'
-import { Chat } from './Chat'
+import '../Styles/ChatView.css'
+import { ChatList } from '../features/Chat/ChatList.jsx'
+import { Chat } from '../features/Chat/Chat.jsx'
 import {useDispatch, useSelector} from "react-redux";
-import {getUserChats} from "../../Redux/Chat/Action.js";
+import {getUserChats} from "../Redux/Chat/Action.js";
 
 function ChatView() {
     const [currentChat, setCurrentChat] = useState(null);

@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 
-import {sendNotification} from "../Redux/NotificationService/Action.js";
-import {connectWebSocket} from "../utils/websocketClient.js";
+import {sendNotification} from "../../Redux/NotificationService/Action.js";
+import {connectWebSocket} from "../../utils/websocketClient.js";
 
 
 const NotificationsListener = () => {

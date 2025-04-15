@@ -1,13 +1,13 @@
 import React, {useEffect, useState} from 'react'
-import "../../Styles/AlbumsView&&ArtistsView.css"
-import AlbumBanner from '../../img/albumBanner.png'
+import "../Styles/AlbumsView&&ArtistsView.css"
+import AlbumBanner from '../assets/albumBanner.png'
 import { BiSearchAlt } from "react-icons/bi";
 import { FaCirclePlay } from "react-icons/fa6";
 import {useDispatch, useSelector} from "react-redux";
-import {getAllAlbums} from "../../Redux/Album/Action.js";
+import {getAllAlbums} from "../Redux/Album/Action.js";
 import {useNavigate} from "react-router-dom";
-import Spinner from "../Spinner.jsx";
-import ErrorAlert from "../ErrorAlert.jsx";
+import Spinner from "../Components/Spinner.jsx";
+import ErrorAlert from "../Components/ErrorAlert.jsx";
 
 function AlbumsView() {
     const dispatch = useDispatch()

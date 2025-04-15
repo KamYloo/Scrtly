@@ -1,13 +1,13 @@
 import React, {useEffect, useState} from 'react'
 import toast from 'react-hot-toast';
 import "../../Styles/Album&&PlayList.css"
-import { AudioList } from '../SongComponents/AudioList.jsx'
+import { AudioList } from '../Song/AudioList.jsx'
 import {useNavigate, useParams} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {deleteAlbum, getAlbum, getAlbumTracks} from "../../Redux/Album/Action.js";
-import {AddSong} from "../SongComponents/addSong.jsx";
-import Spinner from "../Spinner.jsx";
-import ErrorAlert from "../ErrorAlert.jsx";
+import {AddSong} from "../Song/addSong.jsx";
+import Spinner from "../../Components/Spinner.jsx";
+import ErrorAlert from "../../Components/ErrorAlert.jsx";
 
 // eslint-disable-next-line react/prop-types
 function Album({ volume, onTrackChange}) {

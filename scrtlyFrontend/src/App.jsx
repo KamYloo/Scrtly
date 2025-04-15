@@ -3,21 +3,21 @@ import React, {useState } from 'react'
 import {Toaster} from "react-hot-toast";
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { LeftMenu } from './Components/LeftMenu'
-import { Artist } from './Components/Artists/Artist.jsx'
+import { Artist } from './features/Artist/Artist.jsx'
 import { RightMenu } from './Components/RightMenu'
-import { ChatView } from './Components/ChatComponents/ChatView'
+import { ChatView } from './pages/ChatView.jsx'
 import { Login } from './pages/Login.jsx';
 import { Register } from './pages/Register.jsx';
-import { Profile } from './Components/AuthComponents/Profile';
-import { ArtistsView } from './Components/Artists/ArtistsView.jsx'
-import { Discover } from './Components/DiscoverComponents/Discover.jsx'
-import { ProfileEdit } from "./Components/AuthComponents/ProfileEdit.jsx";
-import {AlbumsView} from "./Components/AlbumComponents/AlbumsView.jsx";
-import {Album} from "./Components/AlbumComponents/Album.jsx";
-import {PlayListForm} from "./Components/PlayListComponents/PlayListForm.jsx";
-import {PlayList} from "./Components/PlayListComponents/PlayList.jsx";
-import {Home} from "./Components/Home.jsx";
-import NotificationsListener from "./Components/NotificationsListener.jsx";
+import { Profile } from './features/User/Profile';
+import { ArtistsView } from './pages/ArtistsView.jsx'
+import { Discover } from './pages/Discover.jsx'
+import { ProfileEdit } from "./features/User/ProfileEdit.jsx";
+import {AlbumsView} from "./pages/AlbumsView.jsx";
+import {Album} from "./features/Album/Album.jsx";
+import {PlayListForm} from "./features/PlayList/PlayListForm.jsx";
+import {PlayList} from "./features/PlayList/PlayList.jsx";
+import {Home} from "./pages/Home.jsx";
+import NotificationsListener from "./features/Notification/NotificationsListener.jsx";
 import {ChangePassword} from "./pages/ChangePassword.jsx";
 import {ForgotPassword} from "./pages/ForgotPassword.jsx";
 

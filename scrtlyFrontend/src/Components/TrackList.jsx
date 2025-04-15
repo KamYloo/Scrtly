@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { BsFillVolumeUpFill, BsMusicNoteList } from 'react-icons/bs'
 import { FaDesktop } from 'react-icons/fa'
-import TrackImg from "../img/track.png"
+import TrackImg from "../assets/track.png"
 
 function TrackList({ onVolumeChange, songName, artist }) {
     const [volume, setVolume] = useState(0.5);

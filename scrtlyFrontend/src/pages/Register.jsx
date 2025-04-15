@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import logo from '../img/logo.png'
+import logo from '../assets/logo.png'
 import {FaUser, FaLock, FaEnvelope, FaMusic} from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
 import '../Styles/Login&Register.css'

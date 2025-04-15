@@ -3,7 +3,7 @@ import { RiUserSearchFill } from "react-icons/ri";
 import { MdDeleteSweep } from "react-icons/md";
 import { BsPlus } from "react-icons/bs";
 import { FaMinus } from "react-icons/fa";
-import { AddUser } from './AddUser';
+import { AddUser } from './AddUser.jsx';
 import { useDispatch } from "react-redux";
 import { deleteChat } from "../../Redux/Chat/Action.js";
 import { useNavigate } from "react-router-dom";

@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import '../Styles/Login&Register.css';
 import {BASE_API_URL} from "../config/api.js";
-import logo from "../img/logo.png"; // Upewnij się, że ścieżka do CSS jest prawidłowa
+import logo from "../assets/logo.png"; // Upewnij się, że ścieżka do CSS jest prawidłowa
 
 function ChangePassword() {
     const { userId, token } = useParams();

@@ -4,8 +4,8 @@ import { IoIosSettings } from "react-icons/io";
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import {findUser, followUser} from "../../Redux/AuthService/Action.js";
 import { useDispatch, useSelector } from "react-redux";
-import Spinner from "../Spinner.jsx";
-import ErrorAlert from "../ErrorAlert.jsx";
+import Spinner from "../../Components/Spinner.jsx";
+import ErrorAlert from "../../Components/ErrorAlert.jsx";
 
 function ProfileInfo() {
     const navigate = useNavigate();

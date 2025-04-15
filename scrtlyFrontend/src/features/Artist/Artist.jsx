@@ -3,15 +3,15 @@ import '../../Styles/Middle.css'
 import '../../Styles/form.css'
 import { Banner } from './Banner.jsx'
 import { FaUsers } from 'react-icons/fa'
-import { AudioList } from '../SongComponents/AudioList.jsx'
+import { AudioList } from '../Song/AudioList.jsx'
 import {useDispatch, useSelector} from "react-redux";
 import {Link, Route, Routes, useParams} from "react-router-dom";
 import {findArtistById, getArtistTracks} from "../../Redux/Artist/Action.js";
 import {ArtistAlbums} from "./ArtistAlbums.jsx";
 import {Fans} from "./Fans.jsx";
 import {AboutArtist} from "./AboutArtist.jsx";
-import Spinner from "../Spinner.jsx";
-import ErrorAlert from "../ErrorAlert.jsx";
+import Spinner from "../../Components/Spinner.jsx";
+import ErrorAlert from "../../Components/ErrorAlert.jsx";
 
 
 function Artist({ volume, onTrackChange}) {

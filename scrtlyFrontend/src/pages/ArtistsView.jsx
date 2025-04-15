@@ -1,14 +1,14 @@
 import React, {useEffect, useState} from 'react'
-import "../../Styles/AlbumsView&&ArtistsView.css"
-import ArtistBanner from '../../img/ArtistsBanner.png'
-import Verification from '../../img/check.png'
+import "../Styles/AlbumsView&&ArtistsView.css"
+import ArtistBanner from '../assets/ArtistsBanner.png'
+import Verification from '../assets/check.png'
 import { BiSearchAlt } from "react-icons/bi";
 import { FaHeadphones } from "react-icons/fa";
 import {useDispatch, useSelector} from "react-redux";
 import {useNavigate} from "react-router-dom";
-import {getAllArtists} from "../../Redux/Artist/Action.js";
-import Spinner from "../Spinner.jsx";
-import ErrorAlert from "../ErrorAlert.jsx";
+import {getAllArtists} from "../Redux/Artist/Action.js";
+import Spinner from "../Components/Spinner.jsx";
+import ErrorAlert from "../Components/ErrorAlert.jsx";
 
 function ArtistsView() {
     const dispatch = useDispatch()

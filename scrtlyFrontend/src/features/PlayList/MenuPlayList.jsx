@@ -5,8 +5,8 @@ import {useDispatch, useSelector} from "react-redux";
 import {useNavigate} from "react-router-dom";
 import {deletePlayList, getUserPlayLists} from "../../Redux/PlayList/Action.js";
 import toast from "react-hot-toast";
-import Spinner from "../Spinner.jsx";
-import ErrorAlert from "../ErrorAlert.jsx";
+import Spinner from "../../Components/Spinner.jsx";
+import ErrorAlert from "../../Components/ErrorAlert.jsx";
 
 function MenuPlayList({setCreatePlayList}) {
     const dispatch = useDispatch();

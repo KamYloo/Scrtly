@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import logo from '../img/logo.png';
+import logo from '../assets/logo.png';
 import { MdCancel } from 'react-icons/md';
 import '../Styles/Login&Register.css';
 import { useDispatch, useSelector } from 'react-redux';

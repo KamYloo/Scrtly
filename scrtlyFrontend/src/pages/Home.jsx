@@ -1,7 +1,7 @@
 import React from 'react'
 import "../Styles/home.css"
 import { FaRegHeart, FaPlay } from "react-icons/fa";
-import album from "../img/album.jpg"
+import album from "../assets/album.jpg"
 import { FaCirclePlay } from "react-icons/fa6";
 import { FaRegSquarePlus } from "react-icons/fa6";
 function Home() {

@@ -4,7 +4,7 @@ import {AiFillLike, AiOutlineLike} from "react-icons/ai";
 import { TfiCommentAlt } from "react-icons/tfi";
 import { FaEllipsisH } from "react-icons/fa";
 import { MdOutlineMenuOpen } from "react-icons/md";
-import { Post } from './Post';
+import { Post } from './Post.jsx';
 import {useDispatch, useSelector} from "react-redux";
 import {deletePost, getAllPosts, likePost} from "../../Redux/Post/Action.js";
 import { formatDistanceToNow } from 'date-fns'

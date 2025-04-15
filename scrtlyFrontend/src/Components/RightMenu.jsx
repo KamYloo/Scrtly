@@ -4,7 +4,7 @@ import '../Styles/RightMenu.css'
 import { FaBell, FaCogs, FaCrown, FaRegHeart, FaSun } from 'react-icons/fa'
 import {useDispatch, useSelector} from "react-redux";
 import {logoutAction} from "../Redux/AuthService/Action.js";
-import {NotificationsList} from "./NotificationsList.jsx";
+import {NotificationsList} from "../features/Notification/NotificationsList.jsx";
 import toast from "react-hot-toast";
 import {getNotifications} from "../Redux/NotificationService/Action.js";
 

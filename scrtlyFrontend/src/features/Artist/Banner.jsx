@@ -1,9 +1,9 @@
 import React, {useState} from 'react'
 
-import Verification from '../../img/check.png'
+import Verification from '../../assets/check.png'
 import { FaEllipsisH, FaHeadphones, FaCheck } from 'react-icons/fa'
 import {EditArtist} from "./EditArtist.jsx";
-import {CreateAlbum} from "../AlbumComponents/CreateAlbum.jsx";
+import {CreateAlbum} from "../Album/CreateAlbum.jsx";
 import {useDispatch} from "react-redux";
 import {followUser} from "../../Redux/AuthService/Action.js";
 

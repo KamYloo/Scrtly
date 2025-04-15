@@ -1,6 +1,6 @@
 import React from 'react'
 import {MdCancel} from "react-icons/md";
-import {deleteNotification} from "../Redux/NotificationService/Action.js";
+import {deleteNotification} from "../../Redux/NotificationService/Action.js";
 import {useDispatch} from "react-redux";
 
 function NotificationsList({ notifications }) {

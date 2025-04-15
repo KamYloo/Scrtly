@@ -1,5 +1,5 @@
 import React from 'react'
-import { Comments } from './Comments'
+import { Comments } from './Comments.jsx'
 import { MdCancel } from "react-icons/md";
 
 function Post({post, onClose }) {

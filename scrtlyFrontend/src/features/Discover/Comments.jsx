@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react'
 import { AiOutlineLike,  AiFillLike } from "react-icons/ai";
-import { AddComment } from './AddComment';
+import { AddComment } from './AddComment.jsx';
 import {useDispatch, useSelector} from "react-redux";
 import {getAllPostComments, likeComment} from "../../Redux/Comment/Action.js";
 import {formatDistanceToNow} from "date-fns";

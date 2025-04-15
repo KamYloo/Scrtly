@@ -1,13 +1,13 @@
 import React, {useEffect, useState} from 'react'
 import "../../Styles/Album&&PlayList.css"
-import { AudioList } from '../SongComponents/AudioList.jsx'
+import { AudioList } from '../Song/AudioList.jsx'
 import {useParams} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {getPlayList, getPlayListTracks} from "../../Redux/PlayList/Action.js";
 import {AddSongToPlayList} from "./AddSongToPlayList.jsx";
 import {PlayListForm} from "./PlayListForm.jsx";
-import Spinner from "../Spinner.jsx";
-import ErrorAlert from "../ErrorAlert.jsx";
+import Spinner from "../../Components/Spinner.jsx";
+import ErrorAlert from "../../Components/ErrorAlert.jsx";
 
 // eslint-disable-next-line react/prop-types
 function PlayList({ volume, onTrackChange}) {

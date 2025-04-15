@@ -1,12 +1,12 @@
 import React from 'react'
 import '../Styles/LeftMenu.css'
-import logo from '../img/logo.png'
+import logo from '../assets/logo.png'
 
 import { FaEllipsisH } from "react-icons/fa";
 import { BiSearchAlt } from "react-icons/bi";
 import { Menu } from './Menu';
 import { MenuList } from './MenuList';
-import { MenuPlayList } from './PlayListComponents/MenuPlayList.jsx';
+import { MenuPlayList } from '../features/PlayList/MenuPlayList.jsx';
 import { TrackList } from './TrackList';
 
 function LeftMenu({ onVolumeChange, currentTrack, setCreatePlayList}) {
