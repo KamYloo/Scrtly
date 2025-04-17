@@ -23,12 +23,12 @@ import {
     SEARCH_USER_SUCCESS,
     UPDATE_USER_SUCCESS,
     FOLLOW_USER_SUCCESS,
-    FORGOT_PASSWORD_REQUEST, FORGOT_PASSWORD_SUCCESS, FORGOT_PASSWORD_ERROR
+    FORGOT_PASSWORD_REQUEST, FORGOT_PASSWORD_SUCCESS, FORGOT_PASSWORD_ERROR, LOGOUT_SUCCESS
 } from "./ActionType"
 
 
 export const registerAction = (data) => async (dispatch) => {
-    await dispatchAction(dispatch, REGISTER_REQUEST, REGISTER_SUCCESS, REGISTER_ERROR, '/api/auth/register',
+    await  dispatchAction(dispatch, REGISTER_REQUEST, REGISTER_SUCCESS, REGISTER_ERROR, '/api/auth/register',
         {
             method: 'POST',
             body: JSON.stringify(data),
@@ -47,24 +47,13 @@ export const loginAction = (data) => async (dispatch) => {
 };
 
 export const logoutAction = () => async (dispatch) => {
-    try {
-        const res = await fetch(`${BASE_API_URL}/api/auth/logout`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            credentials: 'include'
-        })
-
-        const resData = await res.text()
-        localStorage.removeItem("user")
-        dispatch({ type: LOGOUT_REQUEST, payload: resData })
-
-    } catch (error) {
-        console.log("catch error ", error)
-        dispatch({ type: LOGOUT_ERROR, payload: error.message });
-    }
-}
+    await dispatchAction(dispatch, LOGOUT_REQUEST, LOGOUT_SUCCESS, LOGOUT_ERROR, '/api/auth/logout',
+        {
+            method: 'POST',
+            credentials: 'include',
+        }
+    );
+};
 
 export const forgotPasswordAction = (email) => async (dispatch) => {
     await dispatchAction(dispatch, FORGOT_PASSWORD_REQUEST, FORGOT_PASSWORD_SUCCESS, FORGOT_PASSWORD_ERROR, `/api/auth/forgot-password?email=${email}`,

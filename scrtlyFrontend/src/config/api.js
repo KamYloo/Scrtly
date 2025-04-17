@@ -13,6 +13,12 @@ export const fetchWithAuth = async (url, options = {}, errorType) => {
             credentials: 'include'
         });
 
+        if (url === '/api/auth/login' && response.status === 401) {
+            const errorData = await response.json();
+            const msg = errorData.error || errorData.businessErrornDescription;
+            return { error: true, message: msg };
+        }
+
         if (response.status === 401) {
             const refreshResponse = await fetch(`${BASE_API_URL}/api/auth/refresh`, {
                 method: 'POST',
@@ -28,13 +34,19 @@ export const fetchWithAuth = async (url, options = {}, errorType) => {
                 });
             } else {
                 window.location.href = "/login";
-                return { error: true, message: 'Sesja wygasła. Zaloguj się ponownie.' };
+                return { error: true, message: 'Your session has expired. Please log in again' };
             }
         }
 
         if (!response.ok) {
             const errorData = await response.json();
-            return { error: true, message: errorData.message || 'Request failed' };
+            const serverMessage =
+                errorData.message ||
+                errorData.businessErrornDescription ||
+                errorData.error ||                    // backup
+                (errorData.validationErrors && errorData.validationErrors.join(', ')) ||
+                'Request failed';
+            return { error: true, message: serverMessage };
         }
 
         const contentType = response.headers.get('content-type');
