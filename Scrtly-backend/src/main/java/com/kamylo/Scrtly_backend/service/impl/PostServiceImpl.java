@@ -11,10 +11,12 @@ import com.kamylo.Scrtly_backend.repository.PostRepository;
 import com.kamylo.Scrtly_backend.service.NotificationService;
 import com.kamylo.Scrtly_backend.service.PostService;
 import com.kamylo.Scrtly_backend.service.UserService;
+import com.kamylo.Scrtly_backend.specification.PostSpecification;
 import com.kamylo.Scrtly_backend.utils.UserLikeChecker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -91,12 +93,21 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Page<PostDto> getPosts(Pageable pageable, String username) {
+    public Page<PostDto> getPosts(Pageable pageable, String username, Integer minLikes, Integer maxLikes) {
         UserEntity user = userService.findUserByEmail(username);
-        return postRepository.findAll(pageable).map(postEntity -> {
-            PostDto postDto = postMapper.mapTo(postEntity);
-            postDto.setLikedByUser(userLikeChecker.isPostLikedByUser(postEntity, user.getId()));
-            return postDto;
+
+        Specification<PostEntity> spec = Specification
+                .where(PostSpecification.hasMinLikes(minLikes))
+                .and(PostSpecification.hasMaxLikes(maxLikes));
+
+        Page<PostEntity> page = postRepository.findAll(spec, pageable);
+
+        return page.map(postEntity -> {
+            PostDto dto = postMapper.mapTo(postEntity);
+            dto.setLikedByUser(
+                    userLikeChecker.isPostLikedByUser(postEntity, user.getId())
+            );
+            return dto;
         });
     }
 

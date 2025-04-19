@@ -11,5 +11,5 @@ public interface PostService {
     PostDto updatePost(Long postId, String username, MultipartFile file, String description);
     void deletePost(Long postId, String username);
     Page<PostDto> getPostsByUser(String nickName, Pageable pageable);
-    Page<PostDto> getPosts(Pageable pageable, String username) ;
+    Page<PostDto> getPosts(Pageable pageable, String username, Integer minLikes, Integer maxLikes);
 }

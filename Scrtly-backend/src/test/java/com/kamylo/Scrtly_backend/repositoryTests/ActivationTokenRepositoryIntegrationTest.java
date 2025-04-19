@@ -10,7 +10,10 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.Instant;
 import java.util.Optional;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -45,6 +48,7 @@ public class ActivationTokenRepositoryIntegrationTest {
         ActivationToken token = new ActivationToken();
         token.setToken("abc123");
         token.setUser(tokenUser);
+        token.setExpiryDate(LocalDateTime.now().plusHours(1).atZone(ZoneId.systemDefault()).toInstant());
         activationTokenRepository.save(token);
 
         Optional<ActivationToken> result = activationTokenRepository.findByToken("abc123");
@@ -60,6 +64,7 @@ public class ActivationTokenRepositoryIntegrationTest {
         ActivationToken token = new ActivationToken();
         token.setToken("def456");
         token.setUser(secondaryUser);
+        token.setExpiryDate(LocalDateTime.now().plusHours(1).atZone(ZoneId.systemDefault()).toInstant());
         activationTokenRepository.save(token);
 
         Optional<ActivationToken> result = activationTokenRepository.findByUser(secondaryUser);

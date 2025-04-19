@@ -5,6 +5,7 @@ import com.kamylo.Scrtly_backend.response.PagedResponse;
 import com.kamylo.Scrtly_backend.service.PostService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -42,9 +43,17 @@ public class PostController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<PagedResponse<PostDto>> getAllPosts(@PageableDefault(size = 10, sort = "creationDate", direction = Sort.Direction.DESC) Pageable pageable,
-                                                              Principal principal) {
-        Page<PostDto> posts = postService.getPosts(pageable, principal.getName());
+    public ResponseEntity<PagedResponse<PostDto>> getAllPosts(
+            @RequestParam(value = "minLikes", required = false) Integer minLikes,
+            @RequestParam(value = "maxLikes", required = false) Integer maxLikes,
+            @RequestParam(value = "sortDir", defaultValue = "DESC") Sort.Direction sortDir,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            Principal principal) {
+        Sort sort = Sort.by(sortDir, "creationDate", "updateDate");
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<PostDto> posts = postService.getPosts(pageable, principal.getName(), minLikes, maxLikes);
         return new ResponseEntity<>(PagedResponse.of(posts), HttpStatus.OK);
 
     }
