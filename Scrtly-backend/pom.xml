@@ -174,18 +174,8 @@
 	</dependencies>
 
 	<build>
+		<finalName>Scrtly-backend-app</finalName>
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.13.0</version>
-				<configuration>
-					<executable>C:\Program Files\Java\jdk-19\bin\javac</executable>
-					<verbose>true</verbose>
-					<fork>true</fork>
-				</configuration>
-			</plugin>
-
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
