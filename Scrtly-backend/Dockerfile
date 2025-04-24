@@ -1,17 +1,28 @@
-# Używamy oficjalnego obrazu OpenJDK 19 jako bazy
-FROM eclipse-temurin:19-jdk
+FROM maven:latest AS build
 
-# Ustawiamy katalog roboczy w kontenerze
+# Set the working directory
 WORKDIR /app
 
-# Kopiujemy plik JAR do kontenera
-COPY target/Scrtly-backend-0.0.1-SNAPSHOT.jar app.jar
+# Copy the pom.xml file
+COPY pom.xml /app/
 
-# Ustawiamy zmienną środowiskową dla Spring Boot
-ENV SPRING_PROFILES_ACTIVE=docker
+# Copy the source code
+COPY src /app/src
 
-# Otwieramy port, na którym działa aplikacja
-EXPOSE 8080
+# Build the application
+RUN mvn clean package -DskipTests
 
-# Uruchamiamy aplikację Spring Boot
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+# Stage 2: Run the application
+FROM openjdk:19-jdk
+
+# Set the working directory
+WORKDIR /app
+
+# Copy the built jar file from the build stage (the name comes from pom.xml)
+COPY --from=build /app/target/Scrtly-backend-app.jar /app/Scrtly-backend-app.jar
+
+# Expose the port the app runs on
+EXPOSE 5001
+
+# Command to run the application
+ENTRYPOINT ["java", "-jar", "/app/Scrtly-backend-app.jar"]
