@@ -1,0 +1,65 @@
+services:
+  postgres:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports: 
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - scrtly-net
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBIT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBIT_PASS}
+    ports:
+      - "15672:15672"
+    networks:
+      - scrtly-net
+      
+  backend:
+    image: kamyloo/scrtly-backend
+    restart: always
+    ports: 
+      - "5001:5001"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      SECRET_KEY: ${SECRET_KEY}
+    depends_on:
+      - postgres
+      - rabbitmq
+    networks:
+      - scrtly-net
+
+  frontend:
+    image: kamyloo/scrtly-frontend
+    restart: always
+    ports: 
+      - "5002:5002"
+    environment:
+      VITE_APP_BACKEND_URL: https://localhost:5001/api
+    depends_on:
+      - backend
+    networks:
+      - scrtly-net
+
+volumes:
+  pgdata:
+
+networks:
+  scrtly-net:
+    driver: bridge
