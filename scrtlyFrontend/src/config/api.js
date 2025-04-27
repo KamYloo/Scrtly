@@ -1,4 +1,6 @@
-export const BASE_API_URL = "http://145.239.91.66:5001"
+export const BASE_API_URL = import.meta.env.DEV
+    ? ''
+    : import.meta.env.VITE_API_BASE_URL;
 
 export const fetchWithAuth = async (url, options = {}, errorType) => {
     let headers = {
