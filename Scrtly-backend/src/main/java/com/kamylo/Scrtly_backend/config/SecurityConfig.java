@@ -89,7 +89,8 @@ public class SecurityConfig implements WebMvcConfigurer {
             cfg.setAllowedOrigins(Arrays.asList(
                     "http://localhost:3000",
                     "http://localhost:5173",
-                    "http://localhost:5174"
+                    "http://localhost:5174",
+                    "http://145.239.91.66:5002"
             ));
             cfg.setAllowedMethods(Collections.singletonList("*"));
             cfg.setAllowCredentials(true);
