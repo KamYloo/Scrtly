@@ -55,7 +55,7 @@ services:
     ports: 
       - "5002:5002"
     environment:
-      VITE_APP_BACKEND_URL: "http://145.239.91.66:5001/api"
+      VITE_APP_BACKEND_URL: "${VITE_APP_BACKEND_URL}"
     depends_on:
       - backend
     networks:
