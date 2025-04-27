@@ -12,21 +12,21 @@ import {
 } from "./ActionType.js";
 
 export const findArtistById = (artistId) => async (dispatch) => {
-    await dispatchAction(dispatch, FIND_ARTIST_BY_ID_REQUEST, FIND_ARTIST_BY_ID_SUCCESS, FIND_ARTIST_BY_ID_ERROR, `/api/artist/${artistId}`, {
+    await dispatchAction(dispatch, FIND_ARTIST_BY_ID_REQUEST, FIND_ARTIST_BY_ID_SUCCESS, FIND_ARTIST_BY_ID_ERROR, `/artist/${artistId}`, {
         method: 'GET',
         credentials: 'include',
     });
 }
 
 export const getAllArtists = () => async (dispatch) => {
-    await dispatchAction(dispatch, GET_ALL_ARTISTS_REQUEST, GET_ALL_ARTISTS_SUCCESS, GET_ALL_ARTISTS_ERROR, '/api/artist/all', {
+    await dispatchAction(dispatch, GET_ALL_ARTISTS_REQUEST, GET_ALL_ARTISTS_SUCCESS, GET_ALL_ARTISTS_ERROR, '/artist/all', {
         method: 'GET',
         credentials: 'include',
     });
 };
 
 export const updateArtist = (formData) => async (dispatch) => {
-    await dispatchAction(dispatch, FIND_ARTIST_BY_ID_REQUEST, FIND_ARTIST_BY_ID_SUCCESS, FIND_ARTIST_BY_ID_ERROR, '/api/artist/update', {
+    await dispatchAction(dispatch, FIND_ARTIST_BY_ID_REQUEST, FIND_ARTIST_BY_ID_SUCCESS, FIND_ARTIST_BY_ID_ERROR, '/artist/update', {
         method: 'PUT',
         body: formData,
         credentials: 'include',
@@ -34,7 +34,7 @@ export const updateArtist = (formData) => async (dispatch) => {
 };
 
 export const getArtistTracks = (artistId) => async (dispatch) => {
-    await dispatchAction(dispatch, GET_ARTIST_TRACKS_REQUEST, GET_ARTIST_TRACKS_SUCCESS, GET_ARTIST_TRACKS_ERROR, `/api/artist/${artistId}/tracks`, {
+    await dispatchAction(dispatch, GET_ARTIST_TRACKS_REQUEST, GET_ARTIST_TRACKS_SUCCESS, GET_ARTIST_TRACKS_ERROR, `/artist/${artistId}/tracks`, {
         method: 'GET',
         credentials: 'include',
     });

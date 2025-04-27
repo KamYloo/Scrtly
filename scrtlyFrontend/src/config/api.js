@@ -15,7 +15,7 @@ export const fetchWithAuth = async (url, options = {}, errorType) => {
         });
 
         if (response.status === 401) {
-            const refreshResponse = await fetch(`${BASE_API_URL}/api/auth/refresh`, {
+            const refreshResponse = await fetch(`${BASE_API_URL}/auth/refresh`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include'

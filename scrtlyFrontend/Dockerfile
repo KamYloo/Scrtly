@@ -4,7 +4,7 @@ FROM node:lts-alpine
 WORKDIR /app
 
 # Pass the environment variable during build process
-ARG VITE_APP_BACKEND_URL="http://145.239.91.66:5001/api"
+ARG VITE_APP_BACKEND_URL
 ENV VITE_APP_BACKEND_URL=${VITE_APP_BACKEND_URL}
 
 
