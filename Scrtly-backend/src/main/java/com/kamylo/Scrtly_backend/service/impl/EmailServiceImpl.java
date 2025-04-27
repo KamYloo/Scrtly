@@ -25,7 +25,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendEmail(String to, String username, EmailTemplateName emailTemplate, String confirmationURL, String subject, String artistName, UserEntity user) throws MessagingException {
-        String templateName = emailTemplate == null ? "confirm-email" : emailTemplate.name();
+        String templateName = emailTemplate == null ? "confirm-email" : emailTemplate.getName();
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(
                 mimeMessage,
