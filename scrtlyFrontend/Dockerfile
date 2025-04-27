@@ -23,4 +23,5 @@ RUN npm run build
 RUN npm install -g serve
 
 # Serve the app using serve on port 5002
-CMD ["serve", "-s", "dist", "-l", "5002"]
+CMD ["serve", "-s", "dist", "-l", "0.0.0.0:5002"]
+
