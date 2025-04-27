@@ -26,6 +26,8 @@ jobs:
           context: scrtlyFrontend/
           push: true
           tags: kamyloo/scrtly-frontend:latest
+          build-args: |
+            VITE_APP_BACKEND_URL=http://145.239.91.66:5001/api
 
       - name: Build and push Docker image for backend project
         uses: docker/build-push-action@v5
