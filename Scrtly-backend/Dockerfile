@@ -3,9 +3,6 @@ FROM maven:latest AS build
 # Set the working directory
 WORKDIR /app
 
-COPY pom.xml ./
-RUN mvn dependency:go-offline -B
-
 # Copy the pom.xml file
 COPY pom.xml /app/
 
