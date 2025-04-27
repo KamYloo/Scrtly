@@ -1,11 +1,11 @@
-INSERT INTO role (id, name)
+INSERT INTO roles (id, name)
 SELECT 1, 'ADMIN'
-    WHERE NOT EXISTS (SELECT 1 FROM role WHERE id = 1);
+    WHERE NOT EXISTS (SELECT 1 FROM roles WHERE id = 1);
 
-INSERT INTO role (id, name)
+INSERT INTO roles (id, name)
 SELECT 2, 'USER'
-    WHERE NOT EXISTS (SELECT 1 FROM role WHERE id = 2);
+    WHERE NOT EXISTS (SELECT 1 FROM roles WHERE id = 2);
 
-INSERT INTO role (id, name)
+INSERT INTO roles (id, name)
 SELECT 3, 'ARTIST'
-    WHERE NOT EXISTS (SELECT 1 FROM role WHERE id = 3);
+    WHERE NOT EXISTS (SELECT 1 FROM roles WHERE id = 3);
