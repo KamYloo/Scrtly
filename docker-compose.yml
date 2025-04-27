@@ -51,9 +51,6 @@ services:
 
   frontend:
     image: kamyloo/scrtly-frontend
-    build:
-      args:
-        - VITE_APP_BACKEND_URL=http://145.239.91.66:5001/api
     restart: always
     ports: 
       - "5002:5002"
