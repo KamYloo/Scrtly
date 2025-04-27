@@ -3,6 +3,7 @@ export const BASE_API_URL = import.meta.env.VITE_APP_BACKEND_URL;
 console.log("fdsggggg" + BASE_API_URL);
 
 export const fetchWithAuth = async (url, options = {}, errorType) => {
+    console.log("fdsggggg" + BASE_API_URL);
     let headers = {
         ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
         ...options.headers,

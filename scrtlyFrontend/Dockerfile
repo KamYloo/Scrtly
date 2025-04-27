@@ -5,7 +5,7 @@ WORKDIR /app
 
 # Pass the environment variable during build process
 ARG VITE_APP_BACKEND_URL
-ENV VITE_APP_BACKEND_URL=${VITE_APP_BACKEND_URL}
+ENV VITE_APP_BACKEND_URL="http://145.239.91.66:5001/api"
 
 # Copy package.json and package-lock.json to install dependencies
 COPY package*.json ./
