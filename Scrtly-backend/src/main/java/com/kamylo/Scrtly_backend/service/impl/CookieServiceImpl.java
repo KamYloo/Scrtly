@@ -16,7 +16,7 @@ public class CookieServiceImpl implements CookieService {
     public Cookie getNewCookie(String arg, String value) {
         Cookie cookie = new Cookie(arg, value);
         cookie.setHttpOnly(true);
-        cookie.setSecure(false);
+        cookie.setSecure(true);
         cookie.setPath("/");
         cookie.setMaxAge(24 * 60 * 60);
         cookie.setAttribute("SameSite", "Strict");
@@ -27,7 +27,7 @@ public class CookieServiceImpl implements CookieService {
     public Cookie deleteCookie(String arg) {
         Cookie cookie = new Cookie(arg, null);
         cookie.setHttpOnly(true);
-        cookie.setSecure(false);
+        cookie.setSecure(true);
         cookie.setPath("/");
         cookie.setMaxAge(0);
         cookie.setAttribute("SameSite", "Strict");

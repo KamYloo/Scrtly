@@ -87,7 +87,8 @@ public class SecurityConfig implements WebMvcConfigurer {
         return request -> {
             CorsConfiguration cfg = new CorsConfiguration();
             cfg.setAllowedOrigins(Arrays.asList(
-                    "http://145.239.91.66:5002"
+                    "https://145.239.91.66:5002",
+                    "https://frontend.zuvoria.pl"
             ));
             cfg.setAllowedMethods(Collections.singletonList("*"));
             cfg.setAllowCredentials(true);
