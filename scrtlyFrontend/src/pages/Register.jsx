@@ -1,55 +1,60 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import logo from '../assets/logo.png'
-import {FaUser, FaLock, FaEnvelope, FaMusic} from "react-icons/fa";
+import {FaUser, FaLock, FaEnvelope} from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
 import '../Styles/Login&Register.css'
 import { Link, useNavigate } from 'react-router-dom'
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {registerAction} from "../Redux/AuthService/Action.js";
 import toast from "react-hot-toast";
 
 function Register() {
-    const [inputData, setInputData] = useState({
-        fullName: "",nickName: "", email: "", password: "", confirmPassword: ""
-    });
-    const [errors, setErrors] = useState({});
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
+    const { loading, error, registerResponse } = useSelector(s => s.auth)
+
+    const [inputData, setInputData] = useState({ fullName: '', nickName: '', email: '', password: '', confirmPassword: '' })
+    const [formErrors, setFormErrors] = useState({})
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setInputData((values) => ({ ...values, [name]: value }));
     };
 
-    const validate = () => {
-        const newErrors = {};
-        if (!inputData.fullName) newErrors.fullName = "Full Name is required.";
-        if (!inputData.email) newErrors.email = "Email is required.";
-        if (!inputData.nickName) newErrors.email = "NickName is required.";
-        if (!/^\S+@\S+\.\S+$/.test(inputData.email)) newErrors.email = "Invalid email format.";
-        if (!inputData.password) newErrors.password = "Password is required.";
-        if (inputData.password.length < 6) newErrors.password = "Password must be at least 6 characters.";
-        if (inputData.password !== inputData.confirmPassword) newErrors.confirmPassword = "Passwords do not match.";
-
-        return newErrors;
-    };
-
-    const handleSignup = async (e) => {
-        e.preventDefault();
-        const formErrors = validate();
-        if (Object.keys(formErrors).length === 0) {
-            dispatch(registerAction(inputData))
-                .then(()=> {
-                    navigate("/login");
-                    toast.success('You have registered successfully.');
-                })
-                .catch(() => {
-                    toast.error("Failed to register. Please try again.");
-                })
-        } else {
-            setErrors(formErrors);
+    useEffect(() => {
+        if (error) {
+            toast.error(error)
         }
-    };
+    }, [error])
+
+    useEffect(() => {
+        if (registerResponse) {
+            toast.success('You have registered successfully.')
+            navigate('/login')
+        }
+    }, [registerResponse, navigate])
+
+    const validate = () => {
+        const errs = {}
+        if (!inputData.fullName) errs.fullName = 'Full Name is required.'
+        if (!inputData.nickName) errs.nickName = 'NickName is required.'
+        if (!inputData.email) errs.email = 'Email is required.'
+        if (inputData.email && !/^\S+@\S+\.\S+$/.test(inputData.email)) errs.email = 'Invalid email format.'
+        if (!inputData.password) errs.password = 'Password is required.'
+        if (inputData.password && inputData.password.length < 6) errs.password = 'Password must be at least 6 characters.'
+        if (inputData.password !== inputData.confirmPassword) errs.confirmPassword = 'Passwords do not match.'
+        return errs
+    }
+
+    const handleSignup = (e) => {
+        e.preventDefault()
+        const errs = validate()
+        if (Object.keys(errs).length) {
+            setFormErrors(errs)
+        } else {
+            dispatch(registerAction(inputData))
+        }
+    }
 
     return (
         <div className='login r'>
@@ -64,34 +69,36 @@ function Register() {
                         <input type="text" value={inputData.fullName} name="fullName"
                                onChange={(e) => handleChange(e)} placeholder='FullName' required/>
                         <FaUser className='icon'/>
-                        {errors.fullName && <p className="error">{errors.fullName}</p>}
+                        {formErrors.fullName && <p className="error">{formErrors.fullName}</p>}
                     </div>
                     <div className="inputBox">
                         <input type="text" value={inputData.nickName} name="nickName"
                                onChange={(e) => handleChange(e)} placeholder='NickName' required/>
                         <FaUser className='icon'/>
-                        {errors.nickName && <p className="error">{errors.nickName}</p>}
+                        {formErrors.nickName && <p className="error">{formErrors.nickName}</p>}
                     </div>
                     <div className="inputBox">
                         <input type="email" value={inputData.email} name="email"
                                onChange={(e) => handleChange(e)} placeholder='Email' required/>
                         <FaEnvelope className='icon'/>
-                        {errors.email && <p className="error">{errors.email}</p>}
+                        {formErrors.email && <p className="error">{formErrors.email}</p>}
                     </div>
                     <div className="inputBox">
                         <input type="password" value={inputData.password} name="password"
                                onChange={(e) => handleChange(e)} placeholder='Password' required/>
                         <FaLock className='icon'/>
-                        {errors.password && <p className="error">{errors.password}</p>}
+                        {formErrors.password && <p className="error">{formErrors.password}</p>}
                     </div>
                     <div className="inputBox">
                         <input type="password" value={inputData.confirmPassword} name="confirmPassword"
                                onChange={(e) => handleChange(e)} placeholder='Confirm Password' required/>
                         <FaLock className='icon'/>
-                        {errors.confirmPassword && <p className="error">{errors.confirmPassword}</p>}
+                        {formErrors.confirmPassword && <p className="error">{formErrors.confirmPassword}</p>}
                     </div>
 
-                    <button type='submit'>Register</button>
+                    <button type="submit" disabled={loading}>
+                        {loading ? 'Registering…' : 'Register'}
+                    </button>
                 </form>
                 <div className="registerLink">
                     <p>Already have an account? <Link to="/login">Login</Link></p>

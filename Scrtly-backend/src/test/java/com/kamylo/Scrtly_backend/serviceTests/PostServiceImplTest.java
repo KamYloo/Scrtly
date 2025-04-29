@@ -21,6 +21,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
@@ -454,18 +455,22 @@ class PostServiceImplTest {
         Pageable pageable = mock(Pageable.class);
         UserEntity user = new UserEntity();
         user.setId(1L);
-
-        PostEntity postEntity = PostEntity.builder().id(1L).description("Test post").build();
+        
+        PostEntity postEntity = PostEntity.builder()
+                .id(1L)
+                .description("Test post")
+                .build();
         PostDto postDto = new PostDto();
         postDto.setDescription("Test post");
-
+        
         when(userService.findUserByEmail(username)).thenReturn(user);
-        when(postRepository.findAll(pageable)).thenReturn(new PageImpl<>(Collections.singletonList(postEntity)));
+        when(postRepository.findAll(any(Specification.class), eq(pageable)))
+                .thenReturn(new PageImpl<>(Collections.singletonList(postEntity)));
         when(postMapper.mapTo(any(PostEntity.class))).thenReturn(postDto);
-        when(userLikeChecker.isPostLikedByUser(any(), anyLong())).thenReturn(true);
-
-        Page<PostDto> result = postService.getPosts(pageable, username);
-
+        when(userLikeChecker.isPostLikedByUser(any(), eq(user.getId()))).thenReturn(true);
+        
+        Page<PostDto> result = postService.getPosts(pageable, username, null, null);
+        
         assertFalse(result.isEmpty());
         assertTrue(result.getContent().get(0).isLikedByUser());
     }

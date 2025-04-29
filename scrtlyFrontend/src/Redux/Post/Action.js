@@ -28,11 +28,23 @@ export const updatePost = (formData) => async (dispatch) => {
     });
 }
 
-export const getAllPosts = () => async (dispatch) => {
-    await dispatchAction(dispatch, GET_ALL_POSTS_REQUEST, GET_ALL_POSTS_SUCCESS, GET_ALL_POSTS_ERROR, '/posts/all', {
-        method: 'GET',
-        credentials: 'include',
-    });
+export const getAllPosts = ({ minLikes, maxLikes, sortDir, page, size } = {}) => async (dispatch) => {
+    let query = [];
+    if (minLikes != null) query.push(`minLikes=${minLikes}`);
+    if (maxLikes != null) query.push(`maxLikes=${maxLikes}`);
+    if (sortDir) query.push(`sortDir=${sortDir}`);
+    if (page != null) query.push(`page=${page}`);
+    if (size != null) query.push(`size=${size}`);
+    const queryString = query.length > 0 ? '?' + query.join('&') : '';
+
+    await dispatchAction(
+        dispatch,
+        GET_ALL_POSTS_REQUEST,
+        GET_ALL_POSTS_SUCCESS,
+        GET_ALL_POSTS_ERROR,
+        '/posts/all' + queryString,
+        { method: 'GET', credentials: 'include' }
+    );
 };
 
 export const getPostsByUser = (nickName) => async (dispatch) => {
