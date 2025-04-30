@@ -68,6 +68,8 @@ services:
       - /etc/letsencrypt:/etc/letsencrypt
       - /var/www/certbot:/var/www/certbot
     command: certonly --webroot -w /var/www/certbot --keep-until-expiring --email ${CERTBOT_EMAIL} -d ${CERTBOT_DOMAIN1} -d ${CERTBOT_DOMAIN2} --agree-tos
+    networks:
+      - scrtly-net
 
   watchtower:
     image: containrrr/watchtower
@@ -79,6 +81,8 @@ services:
       - REPO_USER=${DOCKER_HUB_USERNAME}
       - REPO_PASS=${DOCKER_HUB_ACCESS_TOKEN}
     command: --interval 300  # Checks for updates every 5 minutes
+    networks:
+      - scrtly-net
 
 volumes:
   pgdata:
