@@ -46,8 +46,11 @@ services:
     depends_on:
       - postgres
       - rabbitmq
+    volumes:
+      - uploads:/uploads
     networks:
       - scrtly-net
+
 
   frontend:
     image: kamyloo/scrtly-frontend
@@ -88,6 +91,7 @@ volumes:
   pgdata:
   certbot-ssl:
   certbot-challenge:
+  uploads:
 
 networks:
   scrtly-net:
