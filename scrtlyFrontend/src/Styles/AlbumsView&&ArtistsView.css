@@ -213,7 +213,9 @@
     }
 }
 
-@media screen and (max-width: 550px) {
+
+
+@media screen and (max-width: 748px) {
     .albumsView, .artistsView {
         .searchBox {
             .search {
@@ -231,6 +233,15 @@
                 height: 37vh;
             }
         }
+    }
+
+    .albumDetail .audioList {
+        padding: 10px 5px;
+        height: calc(100vh - 100px);
+    }
+
+    .albumDetail .audioList .songsBox {
+        height: calc(100% - 160px);
     }
 
 }

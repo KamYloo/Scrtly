@@ -1,5 +1,6 @@
 package com.kamylo.Scrtly_backend.serviceTests;
 
+import com.kamylo.Scrtly_backend.dto.Minimal.UserMinimalDto;
 import com.kamylo.Scrtly_backend.dto.StoryDto;
 import com.kamylo.Scrtly_backend.entity.StoryEntity;
 import com.kamylo.Scrtly_backend.entity.UserEntity;
@@ -130,34 +131,56 @@ public class StoryServiceImplTest {
 
     @Test
     void getGroupedStoriesByFollowedUsers_shouldReturnGroupedStories() {
+        UserEntity user1 = new UserEntity();
+        user1.setId(1L);
+        user1.setEmail("user1@example.com");
+        user1.setNickName("nick1");
+
         UserEntity user2 = new UserEntity();
         user2.setId(2L);
         user2.setEmail("user2@example.com");
+        user2.setNickName("nick2");
 
-        StoryEntity story1 = StoryEntity.builder().image("path1").user(user).build();
-        StoryEntity story2 = StoryEntity.builder().image("path2").user(user2).build();
+        StoryEntity story1 = StoryEntity.builder()
+                .image("path1")
+                .user(user1)
+                .build();
+        StoryEntity story2 = StoryEntity.builder()
+                .image("path2")
+                .user(user2)
+                .build();
+
+        UserMinimalDto minimal1 = new UserMinimalDto();
+        minimal1.setNickName("nick1");
+        UserMinimalDto minimal2 = new UserMinimalDto();
+        minimal2.setNickName("nick2");
 
         StoryDto dto1 = new StoryDto();
         dto1.setImage("path1");
+        dto1.setUser(minimal1);
+
         StoryDto dto2 = new StoryDto();
         dto2.setImage("path2");
+        dto2.setUser(minimal2);
 
-        when(userService.findUserByEmail("user@example.com")).thenReturn(user);
-        when(storyRepository.getStoriesByFollowedUsers(user.getId()))
+        when(userService.findUserByEmail("user@example.com")).thenReturn(user1);
+        when(storyRepository.getStoriesByFollowedUsers(user1.getId()))
                 .thenReturn(Arrays.asList(story1, story2));
         when(storyMapper.mapTo(story1)).thenReturn(dto1);
         when(storyMapper.mapTo(story2)).thenReturn(dto2);
 
-        Map<UserEntity, List<StoryDto>> result = storyService.getGroupedStoriesByFollowedUsers("user@example.com");
+        Map<String, List<StoryDto>> result =
+                storyService.getGroupedStoriesByFollowedUsers("user@example.com");
 
         assertNotNull(result);
-        assertTrue(result.containsKey(user));
-        assertTrue(result.containsKey(user2));
-        assertEquals(1, result.get(user).size());
-        assertEquals(1, result.get(user2).size());
-        assertEquals(dto1, result.get(user).get(0));
-        assertEquals(dto2, result.get(user2).get(0));
+        assertTrue(result.containsKey("nick1"));
+        assertTrue(result.containsKey("nick2"));
+        assertEquals(1, result.get("nick1").size());
+        assertEquals(1, result.get("nick2").size());
+        assertEquals(dto1, result.get("nick1").get(0));
+        assertEquals(dto2, result.get("nick2").get(0));
     }
+
 
 
     @Test

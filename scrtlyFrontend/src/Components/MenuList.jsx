@@ -1,6 +1,6 @@
 import React from 'react'
 import { BsJournalAlbum } from 'react-icons/bs'
-import { FaRocketchat, FaHome, FaPodcast, FaMicrophoneAlt, FaBroadcastTower } from 'react-icons/fa'
+import { FaRocketchat, FaHome, FaMicrophoneAlt } from 'react-icons/fa'
 import { BiPulse } from 'react-icons/bi'
 
 const MenuList = [
@@ -30,18 +30,6 @@ const MenuList = [
     },
     {
         id: 5,
-        icon: <FaPodcast />,
-        name: "Podcast",
-        route: "/podcast",
-    },
-    {
-        id: 6,
-        icon: <FaBroadcastTower />,
-        name: "Radio",
-        route: "/radio",
-    },
-    {
-        id: 7,
         icon: <BiPulse />,
         name: "Discover",
          route: "/discover",

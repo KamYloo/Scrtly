@@ -26,7 +26,7 @@ function MenuPlayList({setCreatePlayList}) {
     }
 
     useEffect(() => {
-        if (localStorage.getItem("refreshToken")) {
+        if (localStorage.getItem("user")) {
             dispatch(getUserPlayLists());
         }
     }, [dispatch, playList.createPlayList, playList.deletePlayList, song.likedSong]);

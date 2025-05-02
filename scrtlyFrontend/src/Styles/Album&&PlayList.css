@@ -83,6 +83,18 @@
             }
         }
     }
+
+    .audioList {
+        padding: 10px 30px;
+        position: relative;
+        height: calc(100vh - 100px);
+        overflow: hidden;
+    }
+
+    .audioList .songsBox {
+        height: calc(100% - 100px);
+        overflow-y: auto;
+    }
 }
 
 
@@ -222,6 +234,19 @@
     }
 }
 
+@media screen and (max-width: 748px){
+    .albumDetail, .playListDetail {
+        .audioList {
+            padding: 10px 5px;
+            height: calc(100vh - 100px);
+        }
+
+        .audioList .songsBox {
+            height: calc(100% - 160px);
+        }
+    }
+}
+
 @media screen and (max-width : 550px) {
     .albumDetail, .playListDetail {
         .topSection {
@@ -246,9 +271,6 @@
                 }
             }
 
-        }
-        .audioList .songsBox {
-            height: 370px;
         }
     }
 }

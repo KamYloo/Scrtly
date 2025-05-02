@@ -11,7 +11,7 @@ import SockJS from "sockjs-client/dist/sockjs";
 import { useNavigate } from "react-router-dom";
 import {BASE_API_URL} from "../../config/api.js";
 
-function Chat({ chat }) {
+function Chat({ chat, onBack }) {
     const [open, setOpen] = useState(false);
     const [text, setText] = useState("");
     const [stompClient, setStompClient] = useState(null);
@@ -143,13 +143,15 @@ function Chat({ chat }) {
         }
     };
 
-    const otherPerson =  chat.participants.find(user => user.id !== userData?.id)
+    const otherPerson = chat.participants.find(user => user.id !== userData?.id);
     return (
         <div className='chat'>
             <div className="top">
                 <div className="user">
+                    {onBack && (
+                        <button className="backBtn" onClick={onBack}>Back</button>
+                    )}
                     {chat?.participants && chat.participants.length === 2 ? (
-
                         <>
                             <img
                                 src={otherPerson?.profilePicture}
@@ -165,14 +167,13 @@ function Chat({ chat }) {
                         <div className="userData">
                             <span>{chat.chatRoomName}</span>
                         </div>
-
                     )}
-            </div>
+                </div>
 
-            <div className="icons">
-                <i><FaPhoneAlt/></i>
-                <i><BsCameraVideoFill/></i>
-                    <i><FaInfoCircle/></i>
+                <div className="icons">
+                    <i><FaPhoneAlt /></i>
+                    <i><BsCameraVideoFill /></i>
+                    <i><FaInfoCircle /></i>
                 </div>
             </div>
             <div className="center" ref={messagesContainerRef} onScroll={handleScroll}>
@@ -181,12 +182,18 @@ function Chat({ chat }) {
                         className={item.user.id === userData?.id ? "messageOwn" : "message"}
                         key={`${item.id}-${index}`}
                     >
+                        <img
+                            src={otherPerson?.profilePicture}
+                            alt={otherPerson?.fullName}
+                            onClick={() => navigate(`/profile/${otherPerson?.nickName}`)}
+                        />
                         <div className="text">
                             <p>
                                 <strong>{item.user.nickName}:</strong>
                                 {editingMessageId === item.id ? (
                                     <input
                                         type="text"
+                                        className="editMessageInput"
                                         value={editingMessageText}
                                         onChange={(e) => setEditingMessageText(e.target.value)}
                                         onKeyPress={(e) => e.key === "Enter" && handleEditMessage()}
@@ -220,8 +227,8 @@ function Chat({ chat }) {
             </div>
             <div className="bottom">
                 <div className="icons">
-                    <i><FaImage /></i>
-                    <i><FaCamera /></i>
+                    <i><FaImage/></i>
+                    <i><FaCamera/></i>
                     <i><FaMicrophone /></i>
                 </div>
                 <input
@@ -234,12 +241,14 @@ function Chat({ chat }) {
                 <div className="emoji">
                     <i onClick={() => setOpen(prev => !prev)}><BsEmojiSmileFill /></i>
                     {open && (
-                        <EmojiPicker
-                            onEmojiClick={(e) => {
-                                setText(prev => prev + e.emoji);
-                                setOpen(false);
-                            }}
-                        />
+                        <div className="emojiPickerWrapper">
+                            <EmojiPicker
+                                onEmojiClick={(e) => {
+                                    setText(prev => prev + e.emoji);
+                                    setOpen(false);
+                                }}
+                            />
+                        </div>
                     )}
                 </div>
                 <button className='sendButton' onClick={handleCreateNewMessage}>Send</button>

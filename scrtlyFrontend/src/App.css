@@ -17,3 +17,10 @@
   filter: grayscale(100);
   z-index: -1;
 }
+
+@media screen and (max-width: 748px) {
+  .App.mobile {
+    top: 60px;
+    bottom: 60px;
+  }
+}

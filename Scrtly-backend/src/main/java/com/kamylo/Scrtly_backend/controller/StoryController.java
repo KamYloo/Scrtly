@@ -1,7 +1,6 @@
 package com.kamylo.Scrtly_backend.controller;
 
 import com.kamylo.Scrtly_backend.dto.StoryDto;
-import com.kamylo.Scrtly_backend.entity.UserEntity;
 import com.kamylo.Scrtly_backend.service.StoryService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -33,8 +32,8 @@ public class StoryController {
     }
 
     @GetMapping("/followed")
-    public ResponseEntity<Map<UserEntity, List<StoryDto>>> getStoriesByFollowedUsers(Principal principal) {
-        Map<UserEntity, List<StoryDto>> groupedStories = storyService.getGroupedStoriesByFollowedUsers(principal.getName());
+    public ResponseEntity<Map<String, List<StoryDto>>> getStoriesByFollowedUsers(Principal principal) {
+        Map<String, List<StoryDto>> groupedStories = storyService.getGroupedStoriesByFollowedUsers(principal.getName());
         return new ResponseEntity<>(groupedStories, HttpStatus.OK);
     }
 

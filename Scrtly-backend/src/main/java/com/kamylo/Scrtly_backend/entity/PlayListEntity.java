@@ -26,12 +26,10 @@ public class PlayListEntity {
 
     @NotBlank(message = "Title must not be blank")
     @Size(max = 255, message = "Title cannot exceed 255 characters")
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String title;
-
-    @NotBlank(message = "Cover image must not be blank")
+    
     @Size(max = 255, message = "Cover image URL must be at most 255 characters")
-    @Column(nullable = false, length = 255)
     private String coverImage;
 
     @CreatedDate
