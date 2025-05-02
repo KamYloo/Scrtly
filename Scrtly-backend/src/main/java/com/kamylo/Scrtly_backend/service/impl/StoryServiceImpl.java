@@ -55,13 +55,17 @@ public class StoryServiceImpl implements StoryService {
     }
 
     @Override
-    public Map<UserEntity, List<StoryDto>> getGroupedStoriesByFollowedUsers(String username) {
+    public Map<String, List<StoryDto>> getGroupedStoriesByFollowedUsers(String username) {
         UserEntity user = userService.findUserByEmail(username);
         List<StoryEntity> stories = storyRepository.getStoriesByFollowedUsers(user.getId());
-        return stories.stream()
+        List<StoryDto> dtoList = stories.stream()
+                .map(storyMapper::mapTo)
+                .collect(Collectors.toList());
+
+        return dtoList.stream()
                 .collect(Collectors.groupingBy(
-                        StoryEntity::getUser,
-                        Collectors.mapping(storyMapper::mapTo, Collectors.toList())
+                        dto -> dto.getUser().getNickName(),
+                        Collectors.toList()
                 ));
     }
 
