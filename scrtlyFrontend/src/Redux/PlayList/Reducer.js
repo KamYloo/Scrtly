@@ -5,11 +5,10 @@ import {
     DELETE_PLAYLIST_REQUEST, DELETE_PLAYLIST_SUCCESS, DELETE_SONG_FROM_PLAYLIST_ERROR,
     DELETE_SONG_FROM_PLAYLIST_REQUEST, DELETE_SONG_FROM_PLAYLIST_SUCCESS, GET_PLAYLIST_ERROR,
     GET_PLAYLIST_REQUEST,
-    GET_PLAYLIST_SUCCESS, GET_PLAYLIST_TRACK_ERROR, GET_PLAYLIST_TRACK_SUCCESS,
-    GET_PLAYLIST_TRACKS_REQUEST,
-    GET_USER_PLAYLIST_SUCCESS,
+    GET_PLAYLIST_SUCCESS, GET_PLAYLIST_TRACKS_ERROR,
+    GET_PLAYLIST_TRACKS_REQUEST, GET_PLAYLIST_TRACKS_SUCCESS,
     GET_USER_PLAYLISTS_ERROR,
-    GET_USER_PLAYLISTS_REQUEST, UPDATE_PLAYLIST_ERROR,
+    GET_USER_PLAYLISTS_REQUEST, GET_USER_PLAYLISTS_SUCCESS, UPDATE_PLAYLIST_ERROR,
     UPDATE_PLAYLIST_REQUEST, UPDATE_PLAYLIST_SUCCESS, UPLOAD_SONG_TO_PLAYLIST_ERROR,
     UPLOAD_SONG_TO_PLAYLIST_REQUEST, UPLOAD_SONG_TO_PLAYLIST_SUCCESS,
 } from "./ActionType.js";
@@ -50,7 +49,7 @@ export const playListReducer=(state=initialValue, {type,payload})=>{
 
         case GET_USER_PLAYLISTS_REQUEST:
             return { ...state, loading: true, error: null };
-        case GET_USER_PLAYLIST_SUCCESS:
+        case GET_USER_PLAYLISTS_SUCCESS:
             return { ...state, loading: false, playLists: payload };
         case GET_USER_PLAYLISTS_ERROR:
             return { ...state, loading: false, error: payload };
@@ -64,9 +63,9 @@ export const playListReducer=(state=initialValue, {type,payload})=>{
 
         case GET_PLAYLIST_TRACKS_REQUEST:
             return { ...state, loading: true, error: null };
-        case GET_PLAYLIST_TRACK_SUCCESS:
+        case GET_PLAYLIST_TRACKS_SUCCESS:
             return { ...state, loading: false, songs: payload };
-        case GET_PLAYLIST_TRACK_ERROR:
+        case GET_PLAYLIST_TRACKS_ERROR:
             return { ...state, loading: false, error: payload };
 
         case UPLOAD_SONG_TO_PLAYLIST_REQUEST:

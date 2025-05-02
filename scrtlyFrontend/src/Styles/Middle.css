@@ -153,6 +153,7 @@
     padding: 15px 25px;
     background: rgb(44, 44, 44);
     z-index: 2;
+    height: 5.5vh;
 }
 
 .mainBox .menuList ul {
@@ -215,6 +216,8 @@
 
 .audioList {
     padding: 10px 30px;
+    position: relative;
+    height: calc(72.5vh - 100px);
 }
 
 .audioList .title {
@@ -228,7 +231,7 @@
 }
 
 .songsBox {
-    height: 45vh;
+    height: calc(100% - 100px);
     overflow-y: scroll;
     overflow-x: hidden;
 }
@@ -423,7 +426,7 @@
     }
 
     .audioList .songsBox {
-        height: 220px;
+        height: calc(100% - 160px);
     }
 
     .audioList .songs .song .section {
@@ -442,11 +445,6 @@
     }
 }
 
-@media screen and (max-height: 800px) {
-    .songsBox {
-       height: 40vh;
-    }
-}
 
 @media screen and (max-width: 950px) {
     .Banner {
