@@ -1,670 +1,684 @@
 .chatView {
-    height: 100vh;
-    z-index: 1;
-    flex-grow: 1;
-    background: rgba(31, 31, 31, 0.596);
-    backdrop-filter: blur(3px);
-    transition: all 0.3s ease;
-    display: flex;
-
-    .chatNone {
-        flex: 3;
-        color: rgba(255, 255, 255, 0.651);
-        text-align: center;
-        margin-top: 10vh;
-        font-size: 30px;
-    }
-}
-
-.chatView .chat{
-    flex: 3;
-    border-left: 1px solid rgb(136, 136, 136);
-    border-right: 1px solid rgb(136, 136, 136);
-    height: 100%;
-    display: flex;
-    flex-direction: column;
+  height: 100vh;
+  width: calc(100vw - 380px);
+  z-index: 1;
+  flex-grow: 1;
+  background: rgba(31, 31, 31, 0.596);
+  backdrop-filter: blur(3px);
+  transition: all 0.3s ease;
+  display: flex;
 }
 
 .chatView .chatList {
-    flex: 1;
-    display: flex;
-    height: 100vh;
-    flex-direction: column;
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+  width: 30%;
+  border-right: 1px solid rgb(136, 136, 136);
+}
+
+.chatView .chat {
+  width: 70%;
+  border-left: 1px solid rgb(136, 136, 136);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.chatView .chatNone {
+  flex: 3;
+  color: rgba(255, 255, 255, 0.651);
+  text-align: center;
+  margin-top: 10vh;
+  font-size: 30px;
 }
 
 .chatView .chatList .userInfo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+}
+
+.userInfo .user {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  img {
+    width: 50px;
+    height: 50px;
+    background: rgb(98, 98, 104);
+    border-radius: 50%;
+    object-fit: cover;
+    cursor: pointer;
+  }
+
+  h2 {
+    color: white;
+    font-size: 22px;
+    font-weight: bold;
+  }
+}
+
+.userInfo .icons {
+  display: flex;
+  gap: 20px;
+
+  i {
+    width: 20px;
+    color: white;
+  }
+}
+
+.chatUserList {
+  flex: 1;
+  overflow: scroll;
+
+  .search {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+
+    .searchBar {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(10, 10, 10, 0.63);
+      border-radius: 10px;
+      padding: 10px;
+      max-width: 100%;
+
+      input {
+        background-color: transparent;
+        outline: none;
+        border: none;
+        color: white;
+        width: 100%;
+      }
+
+      i {
+        color: white;
+      }
+    }
+
+    .addUserBtn {
+      width: 36px;
+      height: 36px;
+      background: rgba(10, 10, 10, 0.63);
+      padding: 5px;
+      border-radius: 10px;
+      cursor: pointer;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+    }
+  }
+
+  .userItem {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    cursor: pointer;
+    border-bottom: 1px solid rgb(136, 136, 136);
+
+    img {
+      height: 50px;
+      width: 50px;
+      background: rgb(15, 15, 15);
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    .text {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+
+      span {
+        font-weight: 500;
+        color: white;
+      }
+
+      p {
+        font-size: 14px;
+        font-weight: 300;
+        color: white;
+      }
+    }
+
+    i {
+      color: white;
+      font-size: 24px;
+      margin-left: auto;
+      transition: 0.3s ease-in-out;
+    }
+    i:hover {
+      color: red;
+    }
+  }
+}
+
+.chat {
+  .top {
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 20px;
+    border-bottom: 1px solid rgb(136, 136, 136);
 
-    .chatListBtn {
-        display: none;
-        color: white;
-        margin-right: 15px;
-        font-size: 24px;
-        cursor: pointer;
-    }
-}
+    .user {
+      display: flex;
+      align-items: center;
+      gap: 20px;
 
-.userInfo .user {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-
-    img {
-        width: 50px;
-        height: 50px;
-        background: rgb(98, 98, 104);
+      img {
+        height: 60px;
+        width: 60px;
         border-radius: 50%;
+        background: rgb(0, 0, 0);
         object-fit: cover;
         cursor: pointer;
-    }
+      }
 
-    h2 {
-        color: white;
-        font-size: 22px;
-        font-weight: bold;
-    }
-}
-
-.userInfo .icons {
-    display: flex;
-    gap: 20px;
-
-    i {
-        width: 20px;
-        color: white;
-    }
-}
-
-.chatUserList {
-    flex: 1;
-    overflow: scroll;
-
-    .search {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-        padding: 20px;
-
-        .searchBar {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            background: rgba(10, 10, 10, 0.63);
-            border-radius: 10px;
-            padding: 10px;
-
-            input {
-                background-color: transparent;
-                outline: none;
-                border: none;
-                color: white;
-                flex: 1;
-            }
-
-            i {
-                color: white;
-            }
-        }
-
-        .addUserBtn {
-            width: 36px;
-            height: 36px;
-            background: rgba(10, 10, 10, 0.63);
-            padding: 5px;
-            border-radius: 10px;
-            cursor: pointer;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 30px;
-        }
-    }
-
-    .userItem {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-        padding: 20px;
-        cursor: pointer;
-        border-bottom: 1px solid rgb(136, 136, 136);
-
-        img {
-            height: 50px;
-            width: 50px;
-            background: rgb(15, 15, 15);
-            object-fit: cover;
-            border-radius: 50%;
-        }
-
-        .text {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-
-            span {
-                font-weight: 500;
-                color: white;
-            }
-
-            p {
-                font-size: 14px;
-                font-weight: 300;
-                color: white;
-            }
-        }
-
-        i {
-            color: white;
-            font-size: 24px;
-            margin-left: auto;
-            transition: 0.3s ease-in-out;
-        }
-        i:hover {
-            color: red;
-        }
-    }
-
-}
-
-
-.chat {
-    .top {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 20px;
-        border-bottom: 1px solid rgb(136, 136, 136);
-
-        .user {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-
-            img {
-                height: 60px;
-                width: 60px;
-                border-radius: 50%;
-                background: rgb(0, 0, 0);
-                object-fit: cover;
-                cursor: pointer;
-            }
-
-            .userData {
-                display: flex;
-                flex-direction: column;
-                gap: 5px;
-
-                span {
-                    font-size: 18px;
-                    color: white;
-                    font-weight: bold;
-                }
-
-                p {
-                    font-weight: 300;
-                    font-size: 14px;
-                    color: gray;
-                }
-            }
-        }
-
-        .icons {
-            display: flex;
-            gap: 20px;
-
-            i {
-                color: white;
-                font-size: 16px;
-            }
-        }
-    }
-
-    .center {
-        padding: 20px;
-        flex: 1;
-        overflow: scroll;
+      .userData {
         display: flex;
         flex-direction: column;
-        gap: 20px;
+        gap: 5px;
 
-        .message {
-            max-width: 60%;
-            display: flex;
-            gap: 20px;
-
-
-            img {
-                width: 40px;
-                height: 40px;
-                background: rgb(0, 0, 0);
-                object-fit: cover;
-                border-radius: 50%;
-                cursor: pointer;
-            }
-
-
+        span {
+          font-size: 18px;
+          color: white;
+          font-weight: bold;
         }
 
-        .text {
-            display: flex;
-            flex: 1;
-            flex-direction: column;
-            gap: 5px;
-
-            img {
-                width: 100%;
-                height: 300px;
-                border-radius: 10px;
-                object-fit: cover;
-            }
-
-            p {
-                background: rgb(52, 52, 54);
-                padding: 20px;
-                border-radius: 10px;
-                color: white;
-            }
-
-            span {
-                color: white;
-                font-size: 13px;
-            }
-
-            .info {
-                display: flex;
-                justify-content: space-between;
-                gap: 2vh;
-
-                button {
-                    display: none;
-                    border: none;
-                    outline: none;
-                    padding: 5px 10px;
-                    border-radius: 8px;
-                    font-weight: bold;
-                    transition: 0.3s ease-in-out;
-                    cursor: pointer;
-                }
-                button:hover {
-                    color: aqua;
-                    background: rgba(9, 9, 9, 0.75);
-                }
-            }
+        p {
+          font-weight: 300;
+          font-size: 14px;
+          color: gray;
         }
-
-        .messageOwn {
-            align-self: flex-end;
-
-            img {
-                display: none;
-            }
-
-            .text {
-                gap: 5px;
-
-                p {
-                    background: rgb(154, 156, 156);
-                    color: black;
-                }
-            }
-
-            .info button {
-                display: block;
-            }
-        }
+      }
     }
 
-    .bottom {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+    .icons {
+      display: flex;
+      gap: 20px;
+
+      i {
+        color: white;
+        font-size: 16px;
+      }
+    }
+  }
+
+  .center {
+    width: 100%;
+    padding: 20px;
+    flex: 1;
+    overflow: scroll;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    .message {
+      max-width: 70%;
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      align-items: center;
+
+      img {
+        width: 40px;
+        height: 40px;
+        background: rgb(0, 0, 0);
+        object-fit: cover;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+    }
+
+    .text {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      gap: 5px;
+
+      img {
+        width: 100%;
+        height: 300px;
+        border-radius: 10px;
+        object-fit: cover;
+      }
+
+      p {
+        background: rgb(52, 52, 54);
         padding: 20px;
-        border-top: 1px solid rgb(136, 136, 136);
-        gap: 20px;
-        margin-top: auto;
+        border-radius: 10px;
+        color: white;
+        word-wrap: break-word;
+        white-space: pre-wrap;
+        overflow-wrap: break-word;
+      }
 
-        .icons {
-            display: flex;
-            gap: 20px;
+      span {
+        color: white;
+        font-size: 13px;
+      }
+
+      .info {
+        display: flex;
+        justify-content: flex-start;
+        gap: 2vh;
+
+        button {
+          display: none;
+          border: none;
+          outline: none;
+          padding: 5px 10px;
+          border-radius: 8px;
+          font-weight: bold;
+          transition: 0.3s ease-in-out;
+          cursor: pointer;
         }
-
-        i {
-            color: white;
-            font-size: 18px;
-            cursor: pointer;
+        button:hover {
+          color: aqua;
+          background: rgba(9, 9, 9, 0.75);
         }
-
-        input {
-            flex: 1;
-            background: rgba(10, 10, 10, 0.63);
-            border: none;
-            outline: none;
-            color: white;
-            padding: 20px;
-            font-size: 16px;
-            border-radius: 10px;
-        }
-
-        .emoji {
-            position: relative;
-
-            .picker {
-                position: absolute;
-                z-index: 5;
-                bottom: 35px;
-                left: -225px;
-            }
-        }
-
-        .sendButton {
-            background: rgb(51, 51, 56);
-            padding: 10px 20px;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
+      }
     }
+
+    .messageOwn {
+      max-width: 70%;
+      align-self: flex-end;
+
+      img {
+        display: none;
+      }
+
+      .text {
+        gap: 5px;
+
+        .info {
+          justify-content: flex-end;
+        }
+
+        p {
+          background: rgb(154, 156, 156);
+          color: black;
+        }
+      }
+
+      .info button {
+        display: block;
+      }
+    }
+  }
+
+  .bottom {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-top: 1px solid rgb(136, 136, 136);
+    gap: 20px;
+    margin-top: auto;
+
+    .icons {
+      display: flex;
+      gap: 20px;
+    }
+
+    i {
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    input {
+      flex: 1;
+      background: rgba(10, 10, 10, 0.63);
+      border: none;
+      outline: none;
+      color: white;
+      padding: 20px;
+      font-size: 16px;
+      border-radius: 10px;
+    }
+
+    .emoji {
+      position: relative;
+
+      .emojiPickerWrapper {
+        position: absolute;
+        z-index: 5;
+        bottom: 45px;
+        left: -265px;
+      }
+    }
+
+    .sendButton {
+      background: rgb(51, 51, 56);
+      padding: 10px 20px;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  }
 }
 
 .addUser {
-    width: max-content;
-    height: max-content;
-    padding: 30px;
+  width: max-content;
+  height: max-content;
+  padding: 30px;
+  position: absolute;
+  border-radius: 10px;
+  background: rgba(19, 19, 20, 0.815);
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  margin: auto;
+
+  .cancel {
     position: absolute;
-    border-radius: 10px;
-    background: rgba(19, 19, 20, 0.815);
-    top: 0;
-    bottom: 0;
-    right: 0;
-    left: 0;
-    margin: auto;
+    font-size: 2vh;
+    right: 1vh;
+    top: 1vh;
+  }
 
-    .cancel {
-        position: absolute;
-        font-size: 2vh;
-        right: 1vh;
-        top: 1vh;
+  form {
+    display: flex;
+    gap: 20px;
+
+    input {
+      border: none;
+      outline: none;
+      padding: 15px;
+      border-radius: 10px;
     }
 
-    form {
-        display: flex;
-        gap: 20px;
+    button {
+      padding: 15px;
+      border-radius: 10px;
+      background: rgb(53, 53, 53);
+      border: none;
+      cursor: pointer;
+      color: white;
+    }
+  }
 
-        input {
-            border: none;
-            outline: none;
-            padding: 15px;
-            border-radius: 10px;
-        }
+  .user {
+    margin-top: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
-        button {
-            padding: 15px;
-            border-radius: 10px;
-            background: rgb(53, 53, 53);
-            border: none;
-            cursor: pointer;
-            color: white;
-        }
+    .detail {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+
+      img {
+        height: 50px;
+        width: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        background: black;
+      }
+
+      span {
+        color: white;
+      }
     }
 
-    .user {
-        margin-top: 50px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-
-        .detail {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-
-            img {
-                height: 50px;
-                width: 50px;
-                border-radius: 50%;
-                object-fit: cover;
-                background: black;
-            }
-
-            span {
-                color: white;
-            }
-        }
-
-        button {
-            padding: 10px;
-            border-radius: 10px;
-            background: rgb(53, 53, 53);
-            border: none;
-            cursor: pointer;
-            color: white;
-        }
+    button {
+      padding: 10px;
+      border-radius: 10px;
+      background: rgb(53, 53, 53);
+      border: none;
+      cursor: pointer;
+      color: white;
     }
+  }
 }
 
 .styledButton {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 10px;
-    background: rgb(53, 53, 53);
-    color: white;
-    cursor: pointer;
-    transition: background 0.3s ease-in-out;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  background: rgb(53, 53, 53);
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
 }
 
 .styledButton:hover {
-    background: rgba(53, 53, 53, 0.8);
+  background: rgba(53, 53, 53, 0.8);
 }
 
 .addUser .user.selected {
-    padding: 5px;
-    border-radius: 10px;
-    background: rgba(53, 53, 53, 0.8);
+  padding: 5px;
+  border-radius: 10px;
+  background: rgba(53, 53, 53, 0.8);
 }
 
 .addUser .groupNameInput {
-    margin: 20px 0;
+  margin: 20px 0;
 }
 
 .addUser .groupNameInput input {
-    width: 100%;
-    padding: 10px;
-    border-radius: 10px;
-    border: none;
-    outline: none;
-    background: rgba(10, 10, 10, 0.63);
-    color: white;
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  background: rgba(10, 10, 10, 0.63);
+  color: white;
 }
 
 .addUser {
-    text-align: center;
+  text-align: center;
 }
 
+.editMessageInput {
+  padding: 10px;
+  background: rgba(52, 52, 54, 0.8);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+  font-size: 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
 
+.editMessageInput:focus {
+  outline: none;
+  border-color: aqua;
+}
 
-@media screen and (max-width: 1200px) {
-    .chatList {
-        z-index: 6;
-        background: rgb(37, 37, 37);
-    }
+@media screen and (max-width: 1080px) {
+  .chatList {
+    z-index: 6;
+    background: rgb(37, 37, 37);
+  }
 
-    .chatView .chatList .userInfo {
-        padding: 10px;
+  .chatView .chatList.hidden {
+    width: 40px;
+    background: transparent;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease-in-out;
 
-        .user {
-            gap: 10px;
-
-            img {
-                height: 45px;
-                width: 45px;
-            }
-
-            h2 {
-                font-size: 18px;
-            }
-        }
-
-        .icons {
-            gap: 10px;
-            margin-left: 10px;
-
-            i {
-                width: 20px;
-            }
-        }
-
-        .chatListBtn {
-            display: block;
-        }
-
-    }
-
-    .chatView .chatList.hidden {
-        width: 40px;
-        background: transparent;
-        transform: translateX(-100%);
-        transition: transform 0.2s ease-in-out;
-
-        .userInfo {
-            .chatListBtn {
-                position: absolute;
-                top: 45%;
-                left: 50px;
-            }
-
-            .user,
-            .icons {
-                display: none;
-            }
-        }
-
-        .chatUserList {
-            display: none;
-        }
-    }
-
-    .chatView .chatList.visible {
-        position: absolute;
-        transform: translateX(0);
-        transition: transform 0.2s ease-in-out;
+    .userInfo {
+      .user,
+      .icons {
+        display: none;
+      }
     }
 
     .chatUserList {
-        .userItem {
-            gap: 15px;
+      display: none;
+    }
+  }
 
-            img {
-                height: 45px;
-                width: 45px;
-            }
+  .chatView .chatList.visible {
+    position: absolute;
+    transform: translateX(0);
+    transition: transform 0.2s ease-in-out;
+  }
 
-            .text {
-                gap: 5px;
-            }
+  .chatUserList {
+    .userItem {
+      gap: 15px;
+
+      img {
+        height: 45px;
+        width: 45px;
+      }
+
+      .text {
+        gap: 5px;
+      }
+    }
+  }
+
+  .chat .center {
+    padding: 20px;
+    gap: 20px;
+
+    .message {
+      gap: 10px;
+
+      img {
+        width: 30px;
+        height: 30px;
+      }
+
+      .text {
+        gap: 5px;
+
+        img {
+          width: 100%;
+          height: 300px;
         }
+      }
     }
 
-    .chat .top {
-        justify-content: left;
-        padding: 10px;
+    .messageOwn {
+      .text {
+        gap: 5px;
+      }
+    }
+  }
 
-        .user {
-            gap: 10px;
+  .chat .bottom {
+    gap: 10px;
+    padding: 10px;
 
-            img {
-                height: 45px;
-                width: 45px;
-            }
-
-            .userData {
-                gap: 5px;
-
-                span {
-                    max-width: 150px;
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                }
-
-                p {
-                    max-width: 150px;
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                }
-            }
-        }
-
-        .icons {
-            gap: 10px;
-            margin-left: 20%;
-        }
+    .icons {
+      gap: 10px;
     }
 
-    .chat .center {
-        padding: 20px;
-        gap: 20px;
-
-        .message {
-            max-width: 40%;
-            gap: 10px;
-
-            img {
-                width: 30px;
-                height: 30px;
-            }
-
-            .text {
-                gap: 5px;
-
-                img {
-                    width: 100%;
-                    height: 300px;
-                }
-
-                p {
-                    padding: 10px;
-                    max-width: 72%;
-
-                    word-wrap: break-word;
-
-                    white-space: normal;
-
-                }
-            }
-        }
-
-
-        .messageOwn {
-
-            .text {
-                gap: 5px;
-            }
-        }
+    input {
+      padding: 15px 20px;
     }
 
-    .chat .bottom {
-        gap: 10px;
-        padding: 10px;
-        justify-content: left;
-
-        .icons {
-            gap: 10px;
-        }
-
-        input {
-            padding: 15px;
-            max-width: 38%;
-        }
-
-        .sendButton {
-            padding: 10px 10px;
-        }
+    .sendButton {
+      padding: 10px 10px;
     }
+  }
+
+  .chatView {
+    flex-direction: column;
+  }
+  .chatView .chatList {
+    width: 100%;
+    border-right: none;
+  }
+  .chatView .chat {
+    width: 100%;
+    padding-bottom: 60px;
+  }
+  .chatView.mobile-mode .chat {
+    display: none;
+  }
+  .chat .top .backBtn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 16px;
+    padding: 10px;
+    cursor: pointer;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .chatView .chatList .userInfo {
+    padding: 10px;
+
+    .user {
+      gap: 10px;
+
+      img {
+        height: 45px;
+        width: 45px;
+      }
+
+      h2 {
+        font-size: 18px;
+      }
+    }
+
+    .icons {
+      gap: 10px;
+      margin-left: 10px;
+
+      i {
+        width: 20px;
+      }
+    }
+  }
+
+  .chat .top {
+    padding: 10px;
+
+    .user {
+      gap: 10px;
+
+      img {
+        height: 45px;
+        width: 45px;
+      }
+
+      .userData {
+        gap: 5px;
+
+        span {
+          max-width: 150px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        p {
+          max-width: 150px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+    }
+
+    .icons {
+      gap: 10px;
+      margin-left: 20%;
+    }
+  }
 }

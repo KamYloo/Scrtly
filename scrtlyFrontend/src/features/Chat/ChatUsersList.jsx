@@ -25,7 +25,6 @@ function ChatUsersList({ chat, onChatSelect }) {
     const filteredChats = chat?.chats?.filter(chatItem => {
         if (!chatItem.participants || chatItem.participants.length === 0) return false;
         const otherParticipants = chatItem.participants.filter(user => user.id !== userData?.id);
-        // Dla czatu grupowego używamy nazwy czatu, dla indywidualnego nazwy użytkownika
         const displayName = chatItem.chatRoomName || (otherParticipants[0]?.fullName || '');
         return displayName.toLowerCase().includes(searchQuery.toLowerCase());
     });
