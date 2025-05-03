@@ -374,6 +374,7 @@
 @media screen and (max-width : 748px) {
     .mainBox {
         min-width: 380px;
+        height: calc(100vh - 60px);
     }
 
     .mainBox .content {
@@ -426,7 +427,7 @@
     }
 
     .audioList .songsBox {
-        height: calc(100% - 160px);
+        height: calc(100% - 220px);
     }
 
     .audioList .songs .song .section {

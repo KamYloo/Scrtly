@@ -1,296 +1,335 @@
 .list {
-    position: absolute;
-    right: 10px;
-    top: 40px;
-    width: 120px;
-    background: white;
-    list-style: none;
-    padding: 5px;
-    border-radius: 10px;
-    z-index: 10;
+  position: absolute;
+  right: 10px;
+  top: 40px;
+  width: 120px;
+  background: white;
+  list-style: none;
+  padding: 5px;
+  border-radius: 10px;
+  z-index: 10;
 
-    .option {
-        display: flex;
-        justify-content: center;
-        width: 100%;
-        height: 3vh;
-        background: #fff;
-        padding: 0 5vh;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: 0.3s;
-        text-align: center;
-        font-size: 14px;
-        font-weight: bold;
-    }
-
-
-    .option:hover {
-        background: aqua;
-    }
-}
-
-.editArtist, .createAlbum, .addSong, .createPlayList, .editPost{
+  .option {
     display: flex;
     justify-content: center;
+    width: 100%;
+    height: 3vh;
+    background: #fff;
+    padding: 0 5vh;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+  }
+
+  .option:hover {
+    background: aqua;
+  }
+}
+
+.editArtist,
+.createAlbum,
+.addSong,
+.createPlayList,
+.editPost {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  border: 2px solid white;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.9);
+  width: max-content;
+  height: max-content;
+  padding: 30px;
+  position: absolute;
+  top: 350px;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  margin: auto;
+  z-index: 5;
+
+  .title {
+    width: 65vh;
+    padding: 20px;
+    text-align: center;
+
+    h2 {
+      font-size: xx-large;
+      color: white;
+      font-family: cursive;
+      text-shadow: 5px 0 20px black;
+    }
+  }
+
+  form {
+    width: 100%;
+    display: flex;
     flex-direction: column;
     align-items: center;
-    border: 2px solid white;
-    border-radius: 10px;
-    background: rgba(0, 0, 0, 0.9);
-    width: max-content;
-    height: max-content;
-    padding: 30px;
-    position: absolute;
-    top: 350px;
-    bottom: 0;
-    right: 0;
-    left: 0;
-    margin: auto;
-    z-index: 5;
+    justify-content: center;
+    .editPic,
+    .editAudio {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      margin: 20px;
+      border-radius: 10px;
+      background: rgba(54, 54, 54, 0.644);
 
-
-    .title {
-        width: 65vh;
-        padding: 20px;
-        text-align: center;
-
-        h2 {
-            font-size: xx-large;
-            color: white;
-            font-family: cursive;
-            text-shadow: 5px 0 20px black;
-        }
-    }
-
-    form {
-        width: 100%;
+      .left {
         display: flex;
-        flex-direction: column;
         align-items: center;
-        justify-content: center;
-        .editPic, .editAudio{
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-            margin: 20px;
-            border-radius: 10px;
-            background: rgba(54, 54, 54, 0.644);
+        gap: 20px;
 
-            .left {
-                display: flex;
-                align-items: center;
-                gap: 20px;
-
-                img {
-                    width: 140px;
-                    height: 70px;
-                    background: rgb(29, 29, 31);
-                    border-radius: 10px;
-                    object-fit: cover;
-                }
-
-                .trackImg {
-                    width: 70px;
-                }
-
-                .postImg {
-                    width: 240px;
-                    height: 150px;
-                }
-
-                span {
-                    font-size: 12px;
-                    font-weight: bold;
-                    color: white;
-                    max-width: 20vh;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-
-                }
-            }
-
-            .right {
-                input {
-                    display: none;
-                }
-
-                button {
-                    outline: none;
-                    border: none;
-                    padding: 10px;
-                    background: aqua;
-                    color: black;
-                    font-size: 13px;
-                    font-weight: bold;
-                    border-radius: 10px;
-                    cursor: pointer;
-                    transition: 0.3s;
-                }
-
-                button:hover {
-                    background: rgb(4, 214, 214);
-                }
-            }
+        img {
+          width: 140px;
+          height: 70px;
+          background: rgb(29, 29, 31);
+          border-radius: 10px;
+          object-fit: cover;
         }
 
-        .editLongText, .editShortText {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            margin: 20px;
-            border-radius: 10px;
-            background: rgba(54, 54, 54, 0.644);
-            gap: 10px;
-
-            h4 {
-                font-size: 18px;
-                font-weight: bold;
-                color: white;
-            }
-
-            textarea, input {
-                border: none;
-                outline: none;
-                border-radius: 10px;
-                padding: 10px;
-                height: 12vh;
-                background: rgba(0, 0, 0, 0.404);
-                color: rgb(184, 179, 179);
-                font-size: 14px;
-            }
-
-            input {
-                height: 3vh;
-            }
-
+        .trackImg {
+          width: 70px;
         }
+
+        .postImg {
+          width: 240px;
+          height: 150px;
+        }
+
+        span {
+          font-size: 12px;
+          font-weight: bold;
+          color: white;
+          max-width: 20vh;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+
+      .right {
+        input {
+          display: none;
+        }
+
+        button {
+          outline: none;
+          border: none;
+          padding: 10px;
+          background: aqua;
+          color: black;
+          font-size: 13px;
+          font-weight: bold;
+          border-radius: 10px;
+          cursor: pointer;
+          transition: 0.3s;
+        }
+
+        button:hover {
+          background: rgb(4, 214, 214);
+        }
+      }
     }
 
-    .submit {
-        outline: none;
-        border: none;
-        padding: 10px 40px;
-        border-radius: 10px;
-        background: aqua;
-        color: black;
-        font-size: 13px;
+    .editLongText,
+    .editShortText {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      margin: 20px;
+      border-radius: 10px;
+      background: rgba(54, 54, 54, 0.644);
+      gap: 10px;
+
+      h4 {
+        font-size: 18px;
         font-weight: bold;
-        cursor: pointer;
-        transition: 0.3s;
-    }
+        color: white;
+      }
 
-    .submit:hover {
-        background: rgb(4, 214, 214);
+      textarea,
+      input {
+        border: none;
+        outline: none;
+        border-radius: 10px;
+        padding: 10px;
+        height: 12vh;
+        background: rgba(0, 0, 0, 0.404);
+        color: rgb(184, 179, 179);
+        font-size: 14px;
+      }
+
+      input {
+        height: 3vh;
+      }
     }
+  }
+
+  .submit {
+    outline: none;
+    border: none;
+    padding: 10px 40px;
+    border-radius: 10px;
+    background: aqua;
+    color: black;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .submit:hover {
+    background: rgb(4, 214, 214);
+  }
 }
 
 .editPost {
-    top: 0;
+  top: 0;
 }
 
 .createPlayList {
-    top: 0;
+  top: 0;
 }
 
-.createAlbum, .createPlayList {
-    width: 50vh;
+.createAlbum,
+.createPlayList {
+  width: 50vh;
 }
 
 .addSong {
-    top: 12vh;
+  top: 12vh;
 }
 
 .searchSong {
-    width: max-content;
-    height: max-content;
-    padding: 30px;
-    position: absolute;
-    border-radius: 10px;
-    background: rgba(19, 19, 20, 0.815);
-    top: 0;
-    bottom: 0;
-    right: 0;
-    left: 0;
-    margin: auto;
+  width: max-content;
+  height: max-content;
+  padding: 30px;
+  position: absolute;
+  border-radius: 10px;
+  background: rgba(19, 19, 20, 0.815);
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  margin: auto;
 
-    form {
-        display: flex;
-        gap: 20px;
+  form {
+    display: flex;
+    gap: 20px;
 
-        input {
-            border: none;
-            outline: none;
-            padding: 15px;
-            border-radius: 10px;
-        }
-
-        button {
-            padding: 15px;
-            border-radius: 10px;
-            background: rgb(53, 53, 53);
-            border: none;
-            cursor: pointer;
-            color: white;
-        }
+    input {
+      border: none;
+      outline: none;
+      padding: 15px;
+      border-radius: 10px;
     }
 
-    .song {
-        margin-top: 50px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-
-        .detail {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-
-            img {
-                height: 50px;
-                width: 50px;
-                border-radius: 10%;
-                object-fit: cover;
-                background: black;
-            }
-
-            .songData {
-                span {
-                    color: white;
-                    font-size: 16px;
-                }
-
-                p {
-                    color: rgba(255, 255, 255, 0.53);
-                    font-size: 11px;
-                }
-            }
-
-        }
-
-        button {
-            padding: 10px;
-            border-radius: 10px;
-            background: rgb(53, 53, 53);
-            border: none;
-            cursor: pointer;
-            color: white;
-        }
+    button {
+      padding: 15px;
+      border-radius: 10px;
+      background: rgb(53, 53, 53);
+      border: none;
+      cursor: pointer;
+      color: white;
     }
+  }
+
+  .song {
+    margin-top: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .detail {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+
+      img {
+        height: 50px;
+        width: 50px;
+        border-radius: 10%;
+        object-fit: cover;
+        background: black;
+      }
+
+      .songData {
+        span {
+          color: white;
+          font-size: 16px;
+        }
+
+        p {
+          color: rgba(255, 255, 255, 0.53);
+          font-size: 11px;
+        }
+      }
+    }
+
+    button {
+      padding: 10px;
+      border-radius: 10px;
+      background: rgb(53, 53, 53);
+      border: none;
+      cursor: pointer;
+      color: white;
+    }
+  }
 }
 
+@media screen and (max-width: 768px) {
+  .createAlbum,
+  .editArtist,
+  .addSong,
+  .createPlayList{
+    width: 90%;
+    padding: 20px;
+    top: 10vh;
+    left: 5%;
+    right: 5%;
+    margin: 0 auto;
+  }
 
-@media screen and (max-width : 550px) {
-    .createAlbum, .editArtist, .addSong, .createPlayList {
-        background: rgba(0, 0, 0, 0.77);
-        top: 40vh;
-    }
+  .createAlbum .title,
+  .editArtist .title,
+  .addSong .title,
+  .createPlayList .title{
+    width: 100%;
+    padding: 10px;
+  }
 
-    .editArtist, .addSong {
-        top: 10vh;
-        width: 50vh;
-    }
+  form {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 550px) {
+  .createAlbum,
+  .editArtist,
+  .addSong,
+  .createPlayList {
+    background: rgba(0, 0, 0, 0.77);
+    width: 90%;
+    top: 5vh;
+    left: 5%;
+    right: 5%;
+    padding: 15px;
+    margin: 0 auto;
+  }
+
+  /* Opcjonalnie zmniejszenie rozmiaru tytułu */
+
+  /* Dodatkowe dostosowanie formularza */
+  form {
+    width: 100%;
+    padding: 0 5px;
+  }
 }

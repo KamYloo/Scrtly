@@ -166,6 +166,7 @@
 
 .chat {
   .top {
+    height: 10%;
     width: 100%;
     display: flex;
     align-items: center;
@@ -220,8 +221,8 @@
   .center {
     width: 100%;
     padding: 20px;
-    flex: 1;
-    overflow: scroll;
+    height: 80%;
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -321,6 +322,7 @@
   }
 
   .bottom {
+    height: 10%;
     width: 100%;
     display: flex;
     justify-content: space-between;
@@ -342,7 +344,6 @@
     }
 
     input {
-      flex: 1;
       background: rgba(10, 10, 10, 0.63);
       border: none;
       outline: none;
@@ -350,6 +351,7 @@
       padding: 20px;
       font-size: 16px;
       border-radius: 10px;
+      min-width: 50%;
     }
 
     .emoji {
@@ -505,6 +507,7 @@
 }
 
 @media screen and (max-width: 1080px) {
+
   .chatList {
     z-index: 6;
     background: rgb(37, 37, 37);
@@ -604,7 +607,6 @@
   }
   .chatView .chat {
     width: 100%;
-    padding-bottom: 60px;
   }
   .chatView.mobile-mode .chat {
     display: none;
@@ -619,7 +621,11 @@
   }
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 748px) {
+  .chatView {
+    height: calc(100vh - 120px);
+  }
+
   .chatView .chatList .userInfo {
     padding: 10px;
 
