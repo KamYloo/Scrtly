@@ -217,7 +217,7 @@
 
 @media screen and (max-width: 748px) {
     .albumsView, .artistsView {
-        height: calc(100vh - 120px);
+        height: calc(100dvh - 120px);
         .searchBox {
             .search {
                 width: 60%;

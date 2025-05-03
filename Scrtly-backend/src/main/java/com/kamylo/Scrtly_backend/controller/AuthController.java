@@ -48,8 +48,8 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid LoginRequestDto loginRequest, HttpServletResponse response) throws MessagingException{
         Map<String, String> tokens  = authService.verify(loginRequest);
-        response.addCookie(cookieService.getNewCookie("jwt", tokens .get("jwt")));
-        response.addCookie(cookieService.getNewCookie("refresh", tokens.get("refresh")));
+        response.addCookie(cookieService.getNewCookie("jwt", tokens.get("jwt"), 24 * 60 * 60));
+        response.addCookie(cookieService.getNewCookie("refresh", tokens.get("refresh"), 7 * 24 * 60 * 60 * 1000));
         UserDto userDto = mapper.mapTo(userService.findUserByEmail(loginRequest.getEmail()));
         LoginResponseDto responseDto = LoginResponseDto.builder()
                 .user(userDto)
@@ -67,8 +67,8 @@ public class AuthController {
             UserEntity user = token.getUser();
             String jwtToken = jwtService.generateToken(user.getEmail());
             RefreshTokenResponse newRefreshToken  = refreshTokenService.createRefreshToken(user.getEmail());
-            response.addCookie(cookieService.getNewCookie("jwt", jwtToken));
-            response.addCookie(cookieService.getNewCookie("refresh", newRefreshToken.getRefreshToken()));
+            response.addCookie(cookieService.getNewCookie("jwt", jwtToken, 24 * 60 * 60));
+            response.addCookie(cookieService.getNewCookie("refresh", newRefreshToken.getRefreshToken(), 7 * 24 * 60 * 60 * 1000));
             return new ResponseEntity<>("Tokens refreshed successfully", HttpStatus.OK);
         } catch (CustomException e) {
             response.addCookie(cookieService.deleteCookie("jwt"));

@@ -374,7 +374,7 @@
 @media screen and (max-width : 748px) {
     .mainBox {
         min-width: 380px;
-        height: calc(100vh - 60px);
+        height: calc(100dvh - 60px);
     }
 
     .mainBox .content {

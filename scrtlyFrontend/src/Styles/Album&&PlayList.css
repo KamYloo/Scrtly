@@ -236,7 +236,7 @@
 
 @media screen and (max-width: 748px){
     .albumDetail, .playListDetail {
-        height: calc(100vh - 60px);
+        height: calc(100dvh - 60px);
         .audioList {
             padding: 10px 5px;
             height: calc(100vh - 100px);
