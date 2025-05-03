@@ -66,7 +66,7 @@ public class SongServiceImpl implements SongService {
             if (audioPath.startsWith(cdnBaseUrl)) {
                 srcAudio = audioPath.replace(cdnBaseUrl + "audio/", "");
             }
-            duration = getAudioDuration(new File("uploads/audio/" + srcAudio));
+            duration = getAudioDuration(new File("/uploads/audio/" + srcAudio));
         }
 
         SongEntity songEntity = SongEntity.builder()
