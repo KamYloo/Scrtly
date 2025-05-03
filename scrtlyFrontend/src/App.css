@@ -22,5 +22,6 @@
   .App.mobile {
     top: 60px;
     bottom: 60px;
+    height: auto;
   }
 }

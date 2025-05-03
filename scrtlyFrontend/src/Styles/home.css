@@ -1,6 +1,6 @@
 .homeBox {
     height: 100vh;
-    width: 100vh;
+    width: 100vw;
     z-index: 1;
     flex-grow: 1;
     background: rgba(0, 0, 0, 0.137);
@@ -271,7 +271,7 @@
                     }
 
                     i {
-                        color: 919191;
+                        color: #919191;
                         cursor: pointer;
                     }
                 }
@@ -622,12 +622,18 @@
     }
 }
 
-@media screen and (max-height: 760px) {
+@media screen and (max-height: 740px) {
     .favouriteArtists {
         .artists {
             .item:nth-child(5) {
                 display: block;
             }
         }
+    }
+}
+
+@media screen and (max-width: 748px) {
+    .homeBox {
+        height: calc(100vh - 120px);
     }
 }

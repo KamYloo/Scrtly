@@ -1,6 +1,6 @@
 .albumsView, .artistsView, .artistAlbums, .fans{
     height: 100vh;
-    width: 100vh;
+    width: 100vw;
     z-index: 1;
     flex-grow: 1;
     background: rgba(7, 7, 7, 0.575);
@@ -217,6 +217,7 @@
 
 @media screen and (max-width: 748px) {
     .albumsView, .artistsView {
+        height: calc(100vh - 120px);
         .searchBox {
             .search {
                 width: 60%;
