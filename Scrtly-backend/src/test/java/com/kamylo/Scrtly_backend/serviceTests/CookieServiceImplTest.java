@@ -22,7 +22,7 @@ class CookieServiceImplTest {
     void testGetNewCookie() {
         String cookieName = "myCookie";
         String cookieValue = "myValue";
-        Cookie newCookie = cookieService.getNewCookie(cookieName, cookieValue);
+        Cookie newCookie = cookieService.getNewCookie(cookieName, cookieValue, 24 * 60 * 60);
 
         assertEquals(cookieName, newCookie.getName());
         assertEquals(cookieValue, newCookie.getValue());

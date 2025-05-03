@@ -623,7 +623,7 @@
 
 @media screen and (max-width: 748px) {
   .chatView {
-    height: calc(100vh - 120px);
+    height: calc(100dvh - 120px);
   }
 
   .chatView .chatList .userInfo {

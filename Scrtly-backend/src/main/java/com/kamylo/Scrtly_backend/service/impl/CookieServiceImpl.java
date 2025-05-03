@@ -13,12 +13,12 @@ import java.util.Optional;
 @Service
 public class CookieServiceImpl implements CookieService {
     @Override
-    public Cookie getNewCookie(String arg, String value) {
+    public Cookie getNewCookie(String arg, String value, int maxAgeSeconds) {
         Cookie cookie = new Cookie(arg, value);
         cookie.setHttpOnly(true);
         cookie.setSecure(false);
         cookie.setPath("/");
-        cookie.setMaxAge(24 * 60 * 60);
+        cookie.setMaxAge(maxAgeSeconds);
         cookie.setAttribute("SameSite", "Strict");
         return cookie;
     }
