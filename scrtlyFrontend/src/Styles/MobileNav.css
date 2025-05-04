@@ -104,13 +104,19 @@
 
 .badge {
   position: absolute;
-  top: -4px;
-  right: -6px;
+  top: 0;
+  right: 0;
   background: #45ab2e;
   color: white;
-  border-radius: 50%;
+  width: 1vh;
+  height: 1vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 100%;
   font-size: 10px;
   padding: 2px;
+    margin-right: 15px;
 }
 
 .mobileNotifications {
@@ -129,7 +135,7 @@
   font-size: 20px;
   color: #b1b1b1;
   cursor: pointer;
-  margin-right: 15px;
+  margin-right: 20px;
   transition: color 0.3s ease;
 }
 
@@ -149,6 +155,7 @@
     display: flex;
     flex-direction: column;
 }
+
 
 .modalHeader {
     display: flex;
@@ -173,6 +180,7 @@
     cursor: pointer;
 }
 
+
 .modalContent {
     flex: 1;
     padding: 15px;
@@ -180,17 +188,17 @@
 }
 
 .mobileNav-user-dropdown {
-  position: relative;
-  display: inline-block;
-  margin-left: 10px;
-  cursor: pointer;
+    position: relative;
+    display: inline-block;
+    margin-left: 10px;
+    cursor: pointer;
 }
 
 .mobileNav-userText {
-  color: #b1b1b1;
-  font-size: 14px;
-  margin: 0;
-  user-select: none;
+    color: #b1b1b1;
+    font-size: 14px;
+    margin: 0;
+    user-select: none;
     .mobileNav-menu {
         font-size: 20px;
         color: #b1b1b1;
@@ -202,26 +210,108 @@
 }
 
 .dropdown-menu {
-  position: absolute;
-  top: 190%;
-  right: -40%;
-  background: #1b1b1b;
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 5px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-  padding: 10px 0;
-  min-width: 120px;
-  z-index: 30;
+    position: absolute;
+    top: 190%;
+    right: -40%;
+    background: #1b1b1b;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 5px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    padding: 10px 0;
+    min-width: 120px;
+    z-index: 30;
 }
 
 .dropdown-item {
-  padding: 8px 15px;
-  color: #b1b1b1;
-  font-size: 14px;
-  white-space: nowrap;
+    padding: 8px 15px;
+    color: #b1b1b1;
+    font-size: 14px;
+    white-space: nowrap;
 }
 
 .dropdown-item:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.mobileNotificationsModal .notificationsBox {
+    position: static;
+    width: 100%;
+    height: auto;
+    background: rgba(18, 16, 16, 0.85);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2vh 1.5vh;
+}
+
+.mobileNotificationsModal .notificationsBox h5.notificationsHeading {
+    display: none;
+}
+
+.mobileNotificationsModal .notificationsBox hr {
+   display: none;
+}
+
+.mobileNotificationsModal .notificationsBox .notificationsList {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 2vh;
+    padding: 0;
+    margin: 0;
+    overflow-y: auto;
+}
+
+.mobileNotificationsModal .notificationsBox .notificationsListItem {
+    display: flex;
+    align-items: center;
+    gap: 0.5vh;
+    background: rgba(48, 48, 48, 0.83);
+    border-radius: 10px;
+    padding: 1vh;
+    color: rgba(255, 255, 255, 0.88);
+    width: 100%;
+    position: relative;
+}
+
+.mobileNotificationsModal .notificationsBox .notificationsListItem img {
+    width: 5vh;
+    height: 5vh;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+.mobileNotificationsModal .notificationsBox .notificationsListItem i {
+    position: absolute;
+    top: 0.5vh;
+    right: 0.5vh;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.mobileNotificationsModal .notificationsBox .notificationData {
+    width: 72%;
+    padding: 0 1vh;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.mobileNotificationsModal .notificationsBox .notificationData p {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: rgba(255, 255, 255, 0.88);
+    line-height: 1.2em;
+    max-height: 5em;
+    margin: 0;
+    word-break: break-word;
+    white-space: normal;
+}
+
+.mobileNotificationsModal .notificationsBox .notificationsListItem span {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.9em;
 }
