@@ -23,12 +23,21 @@ const initialValue = {
     likeComment:null,
 }
 
-export const commentReducer=(state=initialValue, {type,payload})=>{
+export const commentReducer = (state = initialValue, { type, payload }) => {
     switch (type) {
         case CREATE_COMMENT_REQUEST:
             return { ...state, loading: true, error: null };
         case CREATE_COMMENT_SUCCESS:
-            return { ...state, loading: false, createdComment: payload };
+            return {
+                ...state,
+                loading: false,
+                createdComment: payload,
+                comments: {
+                    ...state.comments,
+                    content: [payload, ...state.comments.content],
+                    totalElements: state.comments.totalElements + 1
+                }
+            };
         case CREATE_COMMENT_FAIL:
             return { ...state, loading: false, error: payload };
 
@@ -42,18 +51,39 @@ export const commentReducer=(state=initialValue, {type,payload})=>{
         case DELETE_COMMENT_REQUEST:
             return { ...state, loading: true, error: null };
         case DELETE_COMMENT_SUCCESS:
-            return { ...state, loading: false, deletedComment: payload };
+            return {
+                ...state,
+                loading: false,
+                deletedComment: payload,
+                comments: {
+                    ...state.comments,
+                    content: state.comments.content.filter(c => c.id !== payload),
+                    totalElements: state.comments.totalElements - 1
+                }
+            };
         case DELETE_COMMENT_FAIL:
             return { ...state, loading: false, error: payload };
 
         case Like_COMMENT_REQUEST:
             return { ...state, loading: true, error: null };
         case Like_COMMENT_SUCCESS:
-            return { ...state, loading: false, likeComment: payload };
+            return {
+                ...state,
+                loading: false,
+                likeComment: payload,
+                comments: {
+                    ...state.comments,
+                    content: state.comments.content.map(c =>
+                        c.id === payload.commentId
+                            ? { ...c, likedByUser: payload.likedByUser, likeCount: payload.likeCount }
+                            : c
+                    )
+                }
+            };
         case Like_COMMENT_FAIL:
             return { ...state, loading: false, error: payload };
 
         default:
             return state;
     }
-}
+};

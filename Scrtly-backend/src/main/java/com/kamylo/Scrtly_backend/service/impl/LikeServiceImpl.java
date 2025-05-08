@@ -1,6 +1,7 @@
 package com.kamylo.Scrtly_backend.service.impl;
 
-import com.kamylo.Scrtly_backend.dto.LikeDto;
+import com.kamylo.Scrtly_backend.dto.PostStatsDto;
+import com.kamylo.Scrtly_backend.dto.CommentStatsDto;
 import com.kamylo.Scrtly_backend.entity.CommentEntity;
 import com.kamylo.Scrtly_backend.entity.PostEntity;
 import com.kamylo.Scrtly_backend.entity.LikeEntity;
@@ -16,6 +17,7 @@ import com.kamylo.Scrtly_backend.repository.PostRepository;
 import com.kamylo.Scrtly_backend.service.LikeService;
 import com.kamylo.Scrtly_backend.service.NotificationService;
 import com.kamylo.Scrtly_backend.service.UserService;
+import com.kamylo.Scrtly_backend.utils.UserLikeChecker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -29,9 +31,11 @@ public class LikeServiceImpl implements LikeService {
     private final LikeRepository likeRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
-    private final Mapper<LikeEntity, LikeDto> likeMapper;
+    private final Mapper<LikeEntity, PostStatsDto> postLikeMapper;
+    private final Mapper<LikeEntity, CommentStatsDto> commentLikeMapper;
     private final ApplicationEventPublisher eventPublisher;
     private final NotificationService notificationService;
+    private final UserLikeChecker userLikeChecker;
 
    /* @Override
     public List<LikeEntity> getLikesByPost(Long postId) throws PostException {
@@ -53,7 +57,7 @@ public class LikeServiceImpl implements LikeService {
 
     @Override
     @Transactional
-    public LikeDto likePost(Long postId, String username) {
+    public PostStatsDto likePost(Long postId, String username) {
         UserEntity user = userService.findUserByEmail(username);
         LikeEntity checkLikeExistPost = likeRepository.isLikeExistPost(user.getId(), postId);
 
@@ -61,8 +65,11 @@ public class LikeServiceImpl implements LikeService {
             likeRepository.deleteById(checkLikeExistPost.getId());
             PostEntity post = postRepository.findById(postId).orElseThrow(
                     () -> new CustomException(BusinessErrorCodes.POST_NOT_FOUND));
+            post.getLikes().remove(checkLikeExistPost);
             notificationService.decrementNotification(post.getUser().getId(), postId, NotificationType.LIKE);
-            return likeMapper.mapTo(checkLikeExistPost);
+            PostStatsDto postStatsDto = postLikeMapper.mapTo(checkLikeExistPost);
+            postStatsDto.setLikedByUser(userLikeChecker.isPostLikedByUser(post, user.getId()));
+            return postStatsDto;
         }
 
         PostEntity post = postRepository.findById(postId).orElseThrow(
@@ -85,18 +92,25 @@ public class LikeServiceImpl implements LikeService {
                 username
         ));
 
-        return likeMapper.mapTo(like);
+        PostStatsDto postStatsDto = postLikeMapper.mapTo(like);
+        postStatsDto.setLikedByUser(userLikeChecker.isPostLikedByUser(post, user.getId()));
+        return postStatsDto;
     }
 
     @Override
     @Transactional
-    public LikeDto likeComment(Long commentId, String username) {
+    public CommentStatsDto likeComment(Long commentId, String username) {
         UserEntity user = userService.findUserByEmail(username);
         LikeEntity checkLikeExistComment = likeRepository.isLikeExistComment(user.getId(), commentId);
 
         if (checkLikeExistComment != null) {
             likeRepository.deleteById(checkLikeExistComment.getId());
-            return likeMapper.mapTo(checkLikeExistComment);
+            CommentEntity comment = commentRepository.findById(commentId).orElseThrow(
+                    () -> new CustomException(BusinessErrorCodes.COMMENT_NOT_FOUND));
+            comment.getLikes().remove(checkLikeExistComment);
+            CommentStatsDto commentStatsDto = commentLikeMapper.mapTo(checkLikeExistComment);
+            commentStatsDto.setLikedByUser(userLikeChecker.isCommentLikedByUser(comment, user.getId()));
+            return commentStatsDto;
         }
 
         CommentEntity comment = commentRepository.findById(commentId).orElseThrow(
@@ -110,6 +124,9 @@ public class LikeServiceImpl implements LikeService {
         LikeEntity savedLikeEntity = likeRepository.save(like);
         comment.getLikes().add(savedLikeEntity);
         commentRepository.save(comment);
-        return likeMapper.mapTo(like);
+
+        CommentStatsDto commentStatsDto = commentLikeMapper.mapTo(like);
+        commentStatsDto.setLikedByUser(userLikeChecker.isCommentLikedByUser(comment, user.getId()));
+        return commentStatsDto;
     }
 }

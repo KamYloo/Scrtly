@@ -54,7 +54,6 @@ function Feed() {
       dispatch(deletePost(postId))
       .then(() => {
         toast.success('Post deleted successfully.');
-        loadPosts();
       })
       .catch(() => {
         toast.error('Failed to delete post. Please try again.');
@@ -64,9 +63,6 @@ function Feed() {
 
   const likePostHandler = (postId) => {
     dispatch(likePost(postId))
-      .then(() => {
-        loadPosts();
-      });
   };
 
   const loadPosts = () => {
@@ -82,7 +78,7 @@ function Feed() {
 
   useEffect(() => {
     loadPosts();
-  }, [dispatch, post.likedPost, post.createdPost, post.deletedPost, comment.createdComment, comment.deletedComment, minLikesFilter, maxLikesFilter, sortOrder]);
+  }, [dispatch, minLikesFilter, maxLikesFilter, sortOrder]);
 
   if (post.loading) {
     return (

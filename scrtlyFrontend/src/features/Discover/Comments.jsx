@@ -24,7 +24,7 @@ function Comments({post}) {
 
             dispatch(getAllPostComments(post.id))
 
-    }, [dispatch, comment.likeComment, comment.createdComment, comment.deletedComment])
+    }, [dispatch])
 
     if (comment.loading) {
         return (
