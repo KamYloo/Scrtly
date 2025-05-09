@@ -2,7 +2,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    height: 100dvh;
     width: 100vh;
     flex-grow: 1;
 
@@ -28,5 +28,11 @@
 
     100% {
         transform: rotate(360deg);
+    }
+}
+
+@media screen and (max-width: 748px) {
+    .spinner-container {
+        height: calc(100dvh - 120px);
     }
 }

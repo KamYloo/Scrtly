@@ -38,7 +38,7 @@ function Artist({ volume, onTrackChange}) {
 
   useEffect(() => {
     dispatch(getArtistTracks(artistId))
-  }, [artistId, song.deletedSong, song.likedSong]);
+  }, [artistId]);
 
   if (artist.loading || song.loading) {
     return <Spinner />;

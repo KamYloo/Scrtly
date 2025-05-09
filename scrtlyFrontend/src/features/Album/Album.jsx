@@ -13,7 +13,7 @@ import ErrorAlert from "../../Components/ErrorAlert.jsx";
 function Album({ volume, onTrackChange}) {
     const {albumId} = useParams();
     const dispatch = useDispatch();
-    const {album, song} = useSelector(state => state);
+    const {album} = useSelector(state => state);
     const [addSong, setAddSong] = useState(false)
     const navigate = useNavigate();
     const userData = (() => { try { return JSON.parse(localStorage.getItem("user")) || null; } catch { return null; } })();
@@ -45,11 +45,11 @@ function Album({ volume, onTrackChange}) {
 
     useEffect(() => {
         dispatch(getAlbum(albumId))
-    }, [albumId, album.uploadSong, song.deletedSong,]);
+    }, [albumId]);
 
     useEffect(() => {
         dispatch(getAlbumTracks(albumId))
-    }, [albumId, album.uploadSong, song.deletedSong, song.likedSong]);
+    }, [albumId]);
 
 
     if (album.loading) {

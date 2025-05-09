@@ -9,7 +9,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -61,6 +60,6 @@ public class AlbumController {
     @DeleteMapping("/delete/{albumId}")
     public ResponseEntity<?> deleteAlbum(@PathVariable Integer albumId , Principal principal) {
         albumService.deleteAlbum(albumId, principal.getName());
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return ResponseEntity.ok(albumId);
     }
 }

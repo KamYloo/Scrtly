@@ -5,6 +5,14 @@ import {
     GET_ARTIST_TRACKS_REQUEST, GET_ARTIST_TRACKS_SUCCESS
 } from "./ActionType.js";
 import {FOLLOW_USER_ERROR, FOLLOW_USER_REQUEST, FOLLOW_USER_SUCCESS} from "../AuthService/ActionType.js";
+import {
+    DELETE_SONG_FAILURE,
+    DELETE_SONG_REQUEST,
+    DELETE_SONG_SUCCESS,
+    LIKE_SONG_ERROR,
+    LIKE_SONG_REQUEST,
+    LIKE_SONG_SUCCESS
+} from "../Song/ActionType.js";
 
 const initialValue= {
     loading: false,
@@ -25,7 +33,9 @@ const initialValue= {
         totalElements: 0,
         totalPages: 0,
     },
-    follow:null
+    follow:null,
+    likedSong: null,
+    deletedSong: null
 }
 
 export const artistReducer=(state=initialValue, {type,payload})=>{
@@ -56,6 +66,40 @@ export const artistReducer=(state=initialValue, {type,payload})=>{
         case FOLLOW_USER_SUCCESS:
             return { ...state, loading: false, follow: payload };
         case FOLLOW_USER_ERROR:
+            return { ...state, loading: false, error: payload };
+
+        case LIKE_SONG_REQUEST:
+            return { ...state, loading: true, error: null };
+        case LIKE_SONG_SUCCESS:
+            return {
+                ...state,
+                loading: false,
+                likeSong: payload,
+                songs: {
+                    ...state.songs,
+                    content: state.songs.content.map(song =>
+                        song.id === payload.song.id
+                            ? { ...song, favorite: payload.song.favorite }
+                            : song
+                        )
+                }
+            };
+        case LIKE_SONG_ERROR:
+            return { ...state, loading: false, error: payload };
+
+        case DELETE_SONG_REQUEST:
+            return { ...state, loading: true, error: null };
+        case DELETE_SONG_SUCCESS:
+            return {
+                ...state,
+                loading: false,
+                deletedSong: payload,
+                songs: {
+                    ...state.songs,
+                    content: state.songs.content.filter(song => song.id !== payload)
+                }
+            };
+        case DELETE_SONG_FAILURE:
             return { ...state, loading: false, error: payload };
 
         default:

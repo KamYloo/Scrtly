@@ -40,7 +40,7 @@ public class SongController {
     @DeleteMapping("/delete/{songId}")
     public ResponseEntity<?> deleteSongHandler(@PathVariable Long songId, Principal principal) {
        songService.deleteSong(songId, principal.getName());
-       return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return ResponseEntity.ok(songId);
     }
 
 }
