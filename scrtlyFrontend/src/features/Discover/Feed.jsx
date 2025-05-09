@@ -10,6 +10,7 @@ import { deletePost, getAllPosts, likePost } from "../../Redux/Post/Action.js";
 import { formatDistanceToNow } from 'date-fns'
 import { useNavigate } from "react-router-dom";
 import { EditPost } from "./EditPost.jsx";
+import Spinner from "../../Components/Spinner.jsx";
 
 function Feed() {
   const [selectedPost, setSelectedPost] = useState(false);
@@ -82,9 +83,7 @@ function Feed() {
 
   if (post.loading) {
     return (
-      <div className="feed">
-        <div className="spinner"></div>
-      </div>
+        <Spinner />
     );
   }
 

@@ -5,6 +5,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {getAllPostComments, likeComment} from "../../Redux/Comment/Action.js";
 import {formatDistanceToNow} from "date-fns";
 import {useNavigate} from "react-router-dom";
+import Spinner from "../../Components/Spinner.jsx";
 
 // eslint-disable-next-line react/prop-types
 function Comments({post}) {
@@ -28,8 +29,8 @@ function Comments({post}) {
 
     if (comment.loading) {
         return (
-            <div className="comments">
-                <div className="spinner"></div>
+            <div className="commentsSection">
+                <Spinner />
             </div>)
     }
 
