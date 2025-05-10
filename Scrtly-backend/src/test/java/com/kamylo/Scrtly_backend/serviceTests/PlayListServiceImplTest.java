@@ -340,9 +340,8 @@ class PlayListServiceImplTest {
 
     @Test
     void updatePlayList_shouldUpdateTitleAndImage_whenProvided() {
-        PlayListRequest request = new PlayListRequest();
-        request.setPlayListId(1);
-        request.setTitle("New Title");
+        Integer playListId = 1;
+        String title = "New Title";
 
         when(playListImage.isEmpty()).thenReturn(false);
 
@@ -358,7 +357,7 @@ class PlayListServiceImplTest {
         when(fileService.updateFile(any(), eq("old/path"), any())).thenReturn("new/image/path");
         when(playListRepository.save(any())).thenReturn(updatedPlayList);
 
-        PlayListDto result = playListService.updatePlayList(request, "user@example.com", playListImage);
+        PlayListDto result = playListService.updatePlayList(playListId, title, "user@example.com", playListImage);
 
         assertNotNull(result);
         assertEquals("New Title", result.getTitle());
@@ -367,15 +366,14 @@ class PlayListServiceImplTest {
 
     @Test
     void updatePlayList_shouldUpdateOnlyTitle_whenImageNullOrEmpty() {
-        PlayListRequest request = new PlayListRequest();
-        request.setPlayListId(1);
-        request.setTitle("New Title");
+        Integer playListId = 1;
+        String title = "New Title";
 
         when(playListRepository.findById(1)).thenReturn(Optional.of(playList));
         when(userService.findUserByEmail("user@example.com")).thenReturn(user);
         when(playListRepository.save(playList)).thenReturn(playList);
 
-        PlayListDto result = playListService.updatePlayList(request, "user@example.com", null);
+        PlayListDto result = playListService.updatePlayList(playListId, title, "user@example.com", null);
 
         assertNotNull(result, "DTO nie może być null");
         assertEquals("New Title", result.getTitle());
@@ -384,15 +382,14 @@ class PlayListServiceImplTest {
 
     @Test
     void updatePlayList_shouldThrowPlaylistMismatch_whenOwnershipInvalid() {
-        PlayListRequest request = new PlayListRequest();
-        request.setPlayListId(1);
-        request.setTitle("New Title");
+        Integer playListId = 1;
+        String title = "New Title";
 
         when(playListRepository.findById(1)).thenReturn(Optional.of(playList));
         when(userService.findUserByEmail("other@example.com")).thenReturn(anotherUser);
 
         CustomException ex = assertThrows(CustomException.class, () ->
-                playListService.updatePlayList(request, "other@example.com", playListImage)
+                playListService.updatePlayList(playListId, title, "other@example.com", playListImage)
         );
         assertEquals(BusinessErrorCodes.PLAYLIST_MISMATCH, ex.getErrorCode());
     }
@@ -473,15 +470,14 @@ class PlayListServiceImplTest {
 
     @Test
     void updatePlayList_shouldNotUpdateTitle_whenTitleIsEmpty() {
-        PlayListRequest request = new PlayListRequest();
-        request.setPlayListId(1);
-        request.setTitle("");
+        Integer playListId = 1;
+        String title = "New Title";
 
         when(playListRepository.findById(1)).thenReturn(Optional.of(playList));
         when(userService.findUserByEmail("user@example.com")).thenReturn(user);
         when(playListRepository.save(playList)).thenReturn(playList); // Stub save
 
-        PlayListDto result = playListService.updatePlayList(request, "user@example.com", null);
+        PlayListDto result = playListService.updatePlayList(playListId, title, "user@example.com", null);
 
         assertEquals("My Playlist", result.getTitle());
         verify(playListRepository).save(playList);
@@ -489,16 +485,15 @@ class PlayListServiceImplTest {
 
     @Test
     void updatePlayList_shouldNotUpdateImage_whenImageIsEmpty() {
-        PlayListRequest request = new PlayListRequest();
-        request.setPlayListId(1);
-        request.setTitle("New Title");
+        Integer playListId = 1;
+        String title = "New Title";
 
         when(playListImage.isEmpty()).thenReturn(true);
         when(playListRepository.findById(1)).thenReturn(Optional.of(playList));
         when(userService.findUserByEmail("user@example.com")).thenReturn(user);
-        when(playListRepository.save(playList)).thenReturn(playList); // Stub save
+        when(playListRepository.save(playList)).thenReturn(playList);
 
-        PlayListDto result = playListService.updatePlayList(request, "user@example.com", playListImage);
+        PlayListDto result = playListService.updatePlayList(playListId, title, "user@example.com", playListImage);
 
         verify(fileService, never()).updateFile(any(), anyString(), anyString());
         assertEquals("old/path", result.getCoverImage());

@@ -19,7 +19,12 @@ export const storyReducer = (state = initialValue, {type, payload}) => {
         case STORY_CREATE_REQUEST:
             return { ...state, loading: true, error: null };
         case STORY_CREATE_SUCCESS:
-            return { ...state, loading: false, createdStory: payload };
+            return {
+                ...state,
+                loading: false,
+                createdStory: payload,
+                stories: [payload, ...state.stories]
+            };
         case STORY_CREATE_FAILURE:
             return { ...state, loading: false, error: payload };
 

@@ -19,6 +19,6 @@ public interface PlayListService {
     void removeFromFavourites(UserEntity userEntity, SongEntity songEntity);
     void removeSongFromPlayList(Long songId, Integer playListId, String username);
     Page<SongDto> getPlayListTracks (Integer playListId, Pageable pageable);
-    PlayListDto updatePlayList(PlayListRequest playListRequest, String username, MultipartFile playListImage);
+    PlayListDto updatePlayList(Integer playListId, String title, String username, MultipartFile playListImage);
     void deletePlayList(Integer playListId, String username);
 }

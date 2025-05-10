@@ -13,7 +13,7 @@ function ArtistAlbums() {
 
     useEffect(() => {
         dispatch(getArtistAlbums(artistId))
-    }, [dispatch])
+    }, [artistId, dispatch])
 
     return (
         <div className='artistAlbums'>

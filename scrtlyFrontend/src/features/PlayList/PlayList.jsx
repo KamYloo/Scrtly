@@ -33,11 +33,11 @@ function PlayList({ volume, onTrackChange}) {
 
     useEffect(() => {
         dispatch(getPlayList(playListId))
-    }, [playListId, playList.uploadSong, playList.deletedSong]);
+    }, [playListId, playList.uploadSong, dispatch, playList.deletedSong]);
 
     useEffect(() => {
         dispatch(getPlayListTracks(playListId))
-    }, [playListId, playList.uploadSong, playList.deletedSong, song.likedSong]);
+    }, [playListId, playList.uploadSong, dispatch]);
 
 
     if (playList.loading || song.loading) {

@@ -45,11 +45,11 @@ function Album({ volume, onTrackChange}) {
 
     useEffect(() => {
         dispatch(getAlbum(albumId))
-    }, [albumId]);
+    }, [albumId, dispatch, album.uploadSong, album.deletedSong]);
 
     useEffect(() => {
         dispatch(getAlbumTracks(albumId))
-    }, [albumId]);
+    }, [albumId, dispatch]);
 
 
     if (album.loading) {

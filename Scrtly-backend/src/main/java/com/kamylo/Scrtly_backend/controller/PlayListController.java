@@ -70,21 +70,21 @@ public class PlayListController {
                                                               @PathVariable("songId") Long songId,
                                                               Principal principal) {
         playListService.removeSongFromPlayList(songId, playListId, principal.getName());
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return ResponseEntity.ok(songId);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<PlayListDto> updatePlayList(@RequestPart("playListDetails") PlayListRequest playListRequest,
+    public ResponseEntity<PlayListDto> updatePlayList(Integer playListId, String title,
                                                       @RequestPart(value = "file", required = false) MultipartFile file,
                                                       Principal principal) {
 
-        PlayListDto updatePlayList = playListService.updatePlayList(playListRequest, principal.getName(), file);
+        PlayListDto updatePlayList = playListService.updatePlayList(playListId, title, principal.getName(), file);
         return new ResponseEntity<>(updatePlayList, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{playListId}")
     public ResponseEntity<?> deletePlayList(@PathVariable Integer playListId, Principal principal) {
        playListService.deletePlayList(playListId, principal.getName());
-       return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+       return ResponseEntity.ok(playListId);
     }
 }
