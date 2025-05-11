@@ -1,933 +1,858 @@
 .discoverView {
-    height: 100vh;
-    width: calc(100vw - 380px);
-    z-index: 1;
-    flex-grow: 1;
-    background: rgba(31, 31, 31, 0.596);
-    backdrop-filter: blur(3px);
-    transition: all 0.3s ease;
-    display: flex;
-    flex-direction: column;
+  height: 100vh;
+  width: calc(100vw - 380px);
+  z-index: 1;
+  flex-grow: 1;
+  background: rgba(31, 31, 31, 0.596);
+  backdrop-filter: blur(3px);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
 }
 
 .discover {
+  display: flex;
+  flex-direction: column;
+
+  .stories {
+    width: 100%;
+    height: 18vh;
+    margin-top: 1vh;
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
 
-    .stories {
-        width: 100%;
-        height: 18vh;
-        margin-top: 1vh;
+    .scroll-button {
+      height: 5vh;
+      width: 3vh;
+      border: none;
+      outline: none;
+      align-items: center;
+      border-radius: 10px;
+      background: rgba(15, 15, 15, 0.651);
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .scroll-button:hover {
+      background: rgba(15, 15, 15, 0.511);
+    }
+
+    .scroll-button.left {
+      margin-right: 2vh;
+    }
+
+    .scroll-button.right {
+      margin-left: 2vh;
+    }
+
+    .box {
+      display: flex;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      white-space: nowrap;
+      background: rgba(15, 15, 15, 0.651);
+      border-radius: 10px;
+      box-shadow: rgba(0, 0, 0, 0.699) 0px 13px 27px -5px,
+        rgba(2, 2, 2, 0.671) 0px 8px 16px -8px;
+      width: 80%;
+      height: 15vh;
+      gap: 32px;
+      padding: 2vh;
+
+      .story.add-story {
+        img:hover {
+          filter: contrast(0.5);
+        }
+      }
+
+      .story {
         display: flex;
         align-items: center;
-        justify-content: center;
-        position: relative;
-
-        .scroll-button {
-            height: 5vh;
-            width: 3vh;
-            border: none;
-            outline: none;
-            align-items: center;
-            border-radius: 10px;
-            background: rgba(15, 15, 15, 0.651);
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .scroll-button:hover {
-            background: rgba(15, 15, 15, 0.511);
-        }
-
-        .scroll-button.left {
-            margin-right: 2vh;
-        }
-
-        .scroll-button.right {
-            margin-left: 2vh;
-        }
-
-        .box {
-            display: flex;
-            overflow-x: auto;
-            scroll-behavior: smooth;
-            white-space: nowrap;
-            background: rgba(15, 15, 15, 0.651);
-            border-radius: 10px;
-            box-shadow: rgba(0, 0, 0, 0.699) 0px 13px 27px -5px,
-                rgba(2, 2, 2, 0.671) 0px 8px 16px -8px;
-            width: 80%;
-            height: 15vh;
-            gap: 32px;
-            padding: 2vh;
-
-            .story.add-story {
-
-                img:hover {
-                    filter: contrast(0.5);
-                }
-            }
-
-            .story {
-                display: flex;
-                align-items: center;
-                flex-direction: column;
-                cursor: pointer;
-
-                img {
-                    width: 80px;
-                    height: 80px;
-                    background: rgb(59, 59, 65);
-                    border-radius: 50%;
-                    object-fit: cover;
-                    border: 2px solid aqua;
-                    transition: 0.3s ease;
-                }
-
-                span {
-                    color: white;
-                    font-weight: bold;
-                }
-            }
-        }
-    }
-
-    .addStory {
-        border: 2px solid white;
-        border-radius: 10px;
-        background: rgba(0, 0, 0, 0.411);
-        width: max-content;
-        height: max-content;
-        padding: 30px;
-        position: absolute;
-        top: 35vh;
-        bottom: 0;
-        right: 0;
-        left: 0;
-        margin: auto;
-        z-index: 8;
-
-        .title {
-            padding: 20px;
-            text-align: center;
-
-            h2 {
-                font-size: xx-large;
-                color: white;
-                font-family: cursive;
-                text-shadow: 5px 0 20px black;
-            }
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-
-            .pickImage {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 20px;
-                margin: 20px;
-                border-radius: 10px;
-                background: rgba(54, 54, 54, 0.644);
-
-                input {
-                    display: none;
-                }
-
-                button {
-                    outline: none;
-                    border: none;
-                    padding: 10px;
-                    background: aqua;
-                    color: black;
-                    font-size: 13px;
-                    font-weight: bold;
-                    border-radius: 10px;
-                    cursor: pointer;
-                    transition: 0.3s;
-                }
-
-                button:hover {
-                    background: rgb(4, 214, 214);
-                }
-
-            }
-            .submit {
-                outline: none;
-                border: none;
-                padding: 10px 40px;
-                border-radius: 10px;
-                background: aqua;
-                color: black;
-                font-size: 13px;
-                font-weight: bold;
-                cursor: pointer;
-                transition: 0.3s;
-            }
-
-            .submit:hover {
-                background: rgb(4, 214, 214);
-            }
-        }
-
-    }
-
-    .story-viewer-modal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.8);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-    }
-
-    .close-button {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        font-size: 24px;
-        background: none;
-        border: none;
-        color: white;
-        cursor: pointer;
-    }
-
-    .nav-button {
-        background: none;
-        border: none;
-        color: white;
-        cursor: pointer;
-        font-size: 24px;
-    }
-
-    .nav-button.left {
-        position: absolute;
-        left: 20px;
-    }
-
-    .nav-button.right {
-        position: absolute;
-        right: 20px;
-    }
-
-    .story-content {
-        display: flex;
         flex-direction: column;
-        align-items: center;
-        position: relative;
-        justify-content: center;
-        gap: 20px;
+        cursor: pointer;
 
         img {
-            object-fit: cover;
-            border-radius: 10px;
-            max-width: 80%;
-            max-height: 80%;
+          width: 80px;
+          height: 80px;
+          background: rgb(59, 59, 65);
+          border-radius: 50%;
+          object-fit: cover;
+          border: 2px solid aqua;
+          transition: 0.3s ease;
         }
 
-        p {
-            font-size: xx-large;
-            font-weight: bold;
-            font-family: cursive;
-            color: white;
+        span {
+          color: white;
+          font-weight: bold;
         }
+      }
     }
+  }
 
-    .progress-bar {
-        top: 0;
-        left: 0;
-        width: 80%;
-        height: 4px;
-        background-color: rgba(255, 255, 255, 0.3);
-    }
-
-    .progress {
-        height: 100%;
-        background-color: white;
-        transition: width 0.1s linear;
-    }
-
-    .addPost {
-        width: 100%;
-        height: 16vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .addPost .context {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background: rgba(15, 15, 15, 0.651);
-        border-radius: 10px;
-        box-shadow: rgba(0, 0, 0, 0.699) 0px 13px 27px -5px,
-            rgba(2, 2, 2, 0.671) 0px 8px 16px -8px;
-        width: 65%;
-        height: 13vh;
-        padding: 2vh 4vh;
-        gap: 10px;
-
-        img {
-            width: 60px;
-            height: 60px;
-            background: rgb(59, 59, 65);
-            border-radius: 50%;
-            object-fit: cover;
-            cursor: pointer;
-        }
-
-        .middle {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-
-            textarea {
-                border: none;
-                outline: none;
-                border-radius: 10px;
-                background-color: rgba(0, 0, 0, 0.315);
-                padding: 10px;
-                width: 100%;
-                height: 6vh;
-                color: white;
-                font-size: 14px;
-                resize: vertical;
-
-            }
-
-            .attachments {
-                display: flex;
-                gap: 10px;
-                padding: 5px;
-
-                .attachment {
-                    display: flex;
-                    align-items: center;
-                    gap: 5px;
-                    color: rgba(255, 255, 255, 0.836);
-
-                    i {
-                        font-size: 18px;
-                    }
-
-                    span {
-                        font-size: 14px;
-                        cursor: pointer;
-                    }
-                }
-            }
-        }
-
-        .right {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-
-            button {
-                outline: none;
-                border: none;
-                padding: 8px;
-                background: aqua;
-                color: black;
-                font-size: 12px;
-                font-weight: bold;
-                border-radius: 10px;
-                cursor: pointer;
-                transition: 0.3s;
-            }
-
-            button:hover {
-                background: rgb(4, 214, 214);
-            }
-
-            .emoji {
-                cursor: pointer;
-                color: rgba(255, 255, 255, 0.836);
-                position: relative;
-                i {
-                    font-size: 20px;
-                }
-
-                .picker {
-                    position: absolute;
-                    right: 1vh;
-                    top: 4vh;
-                }
-            }
-        }
-    }
-
-    .feed {
-        width: 100%;
-        height: 61vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-
-
-        .posts {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            overflow: scroll;
-            background: rgba(15, 15, 15, 0.651);
-            border-radius: 10px;
-            box-shadow: rgba(0, 0, 0, 0.699) 0px 13px 27px -5px,
-                rgba(2, 2, 2, 0.671) 0px 8px 16px -8px;
-            width: 65%;
-            height: 59vh;
-            padding: 2vh 4vh;
-            gap: 10px;
-            position: relative;
-
-            .postsSettings {
-                color: white;
-                font-size: 3vh;
-                position: absolute;
-                top: 0.5vh;
-                right: 0.5vh;
-                cursor: pointer;
-            }
-
-            .filtredMenu {
-                z-index: 20;
-            }
-
-            ul {
-                display: flex;
-                flex-direction: column;
-                position: absolute;
-                right: 2vh;
-                top: 6vh;
-                list-style: none;
-                gap: 1vh;
-
-                li {
-                    width: 20vh;
-                    input {
-                        width: 100%;
-                        height: 100%;
-                        outline: none;
-                        border: none;
-                        background: rgb(255, 255, 255);
-                        color: #000000;
-                        font-size: 14px;
-                        font-weight: bold;
-                        padding: 1vh 2vh;
-                        border-radius: 15px;
-                    }
-
-                    select {
-                        width: 100%;
-                        height: 100%;
-                        color: #000000;
-                        font-size: 12px;
-                        background: white;
-                        outline: none;
-                        border: 2px solid rgba(255, 255, 255, 0.11);
-                        border-radius: 40px;
-                        padding: 1vh 1vh;
-                        cursor: pointer;
-                    }
-                }
-            }
-        }
-
-        .post {
-            display: flex;
-            flex-direction: column;
-            height: 59vh;
-            padding: 0 12vh;
-            width: 100%;
-            gap: 1vh;
-
-            .up {
-                width: 100%;
-                display: flex;
-                gap: 20px;
-                align-items: center;
-                position: relative;
-                i {
-                    right: 1vh;
-                    position: absolute;
-                    color: white;
-                    font-size: 22px;
-                    cursor: pointer;
-                }
-
-                ul {
-                    position: absolute;
-                    right: 0vh;
-                    top: 5vh;
-                    width: 7vh;
-                    background: white;
-                    list-style: none;
-                    padding: 5px;
-                    border-radius: 10px;
-
-                    .option {
-                        display: flex;
-                        justify-content: center;
-                        width: 100%;
-                        height: 3vh;
-                        background: #fff;
-                        padding: 0 1vh;
-                        border-radius: 5px;
-                        cursor: pointer;
-                        transition: 0.3s;
-                        text-align: center;
-                        font-size: 14px;
-                        font-weight: bold;
-                    }
-                    
-
-                    .option:hover {
-                        background: aqua;
-                    }
-                }
-
-                img {
-                    width: 40px;
-                    height: 40px;
-                    background: rgb(59, 59, 65);
-                    border-radius: 50%;
-                    object-fit: cover;
-                    border: 2px solid aqua;
-                    cursor: pointer;
-                }
-
-                .userData {
-                    color: rgba(255, 255, 255, 0.836);
-                    font-size: 18px;
-                    font-weight: 600;
-
-                    span {
-                        font-size: 11px;
-                        font-weight: 400;
-                    }
-                }
-            }
-
-            .middle {
-                width: 100%;
-                height: 38vh;
-
-                img {
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                    border-radius: 5px;
-                }
-            }
-
-            .description {
-                width: 100%;
-                height: 2vh;
-
-                p {
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
-                    color: white;
-                }
-            }
-
-            .bottom {
-                display: flex;
-                width: 100%;
-                gap: 30px;
-                padding: 5px;
-
-                .likes,
-                .comments {
-                    display: flex;
-                    align-items: center;
-                    gap: 5px;
-                    color: rgba(255, 255, 255, 0.836);
-                    cursor: pointer;
-
-                    i {
-                        font-size: 20px;
-                    }
-                }
-            }
-
-        }
-    }
-}
-
-.cancel {
-    position: absolute;
-    right: 1vh;
-    top: 1vh;
-    font-size: 24px;
-    color: wheat;
-    cursor: pointer;
-}
-
-.postView {
-    width: 90%;
-    max-width: 1200px;
-    height: auto;
-    padding: 20px;
-    position: absolute;
+  .addStory {
+    border: 2px solid white;
     border-radius: 10px;
-    background: rgba(19, 19, 20, 0.945);
-    top: 9vh;
+    background: rgba(0, 0, 0, 0.411);
+    width: max-content;
+    height: max-content;
+    padding: 30px;
+    position: absolute;
+    top: 35vh;
+    bottom: 0;
     right: 0;
     left: 0;
     margin: auto;
+    z-index: 8;
+
+    .title {
+      padding: 20px;
+      text-align: center;
+
+      h2 {
+        font-size: xx-large;
+        color: white;
+        font-family: cursive;
+        text-shadow: 5px 0 20px black;
+      }
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      .pickImage {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        margin: 20px;
+        border-radius: 10px;
+        background: rgba(54, 54, 54, 0.644);
+
+        input {
+          display: none;
+        }
+
+        button {
+          outline: none;
+          border: none;
+          padding: 10px;
+          background: aqua;
+          color: black;
+          font-size: 13px;
+          font-weight: bold;
+          border-radius: 10px;
+          cursor: pointer;
+          transition: 0.3s;
+        }
+
+        button:hover {
+          background: rgb(4, 214, 214);
+        }
+      }
+      .submit {
+        outline: none;
+        border: none;
+        padding: 10px 40px;
+        border-radius: 10px;
+        background: aqua;
+        color: black;
+        font-size: 13px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      .submit:hover {
+        background: rgb(4, 214, 214);
+      }
+    }
+  }
+
+  .story-viewer-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
     display: flex;
-    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+
+  .close-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 24px;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+  }
+
+  .nav-button {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 24px;
+  }
+
+  .nav-button.left {
+    position: absolute;
+    left: 20px;
+  }
+
+  .nav-button.right {
+    position: absolute;
+    right: 20px;
+  }
+
+  .story-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    justify-content: center;
     gap: 20px;
 
-    .imgPost {
-        flex: 5;
+    img {
+      object-fit: cover;
+      border-radius: 10px;
+      max-width: 80%;
+      max-height: 80%;
+    }
+
+    p {
+      font-size: xx-large;
+      font-weight: bold;
+      font-family: cursive;
+      color: white;
+    }
+  }
+
+  .progress-bar {
+    top: 0;
+    left: 0;
+    width: 80%;
+    height: 4px;
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+
+  .progress {
+    height: 100%;
+    background-color: white;
+    transition: width 0.1s linear;
+  }
+
+  .addPost {
+    width: 100%;
+    height: 16vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .addPost .context {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(15, 15, 15, 0.651);
+    border-radius: 10px;
+    box-shadow: rgba(0, 0, 0, 0.699) 0px 13px 27px -5px,
+      rgba(2, 2, 2, 0.671) 0px 8px 16px -8px;
+    width: 65%;
+    height: 13vh;
+    padding: 2vh 4vh;
+    gap: 10px;
+
+    img {
+      width: 60px;
+      height: 60px;
+      background: rgb(59, 59, 65);
+      border-radius: 50%;
+      object-fit: cover;
+      cursor: pointer;
+    }
+
+    .middle {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+
+      textarea {
+        border: none;
+        outline: none;
+        border-radius: 10px;
+        background-color: rgba(0, 0, 0, 0.315);
+        padding: 10px;
         width: 100%;
-        max-width: 100vh;
-        max-height: 60vh;
-        img {
+        height: 6vh;
+        color: white;
+        font-size: 14px;
+        resize: vertical;
+      }
+
+      .attachments {
+        display: flex;
+        gap: 10px;
+        padding: 5px;
+
+        .attachment {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          color: rgba(255, 255, 255, 0.836);
+
+          i {
+            font-size: 18px;
+          }
+
+          span {
+            font-size: 14px;
+            cursor: pointer;
+          }
+        }
+      }
+    }
+
+    .right {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+
+      button {
+        outline: none;
+        border: none;
+        padding: 8px;
+        background: aqua;
+        color: black;
+        font-size: 12px;
+        font-weight: bold;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      button:hover {
+        background: rgb(4, 214, 214);
+      }
+
+      .emoji {
+        cursor: pointer;
+        color: rgba(255, 255, 255, 0.836);
+        position: relative;
+        i {
+          font-size: 20px;
+        }
+
+        .picker {
+          position: absolute;
+          right: 1vh;
+          top: 4vh;
+        }
+      }
+    }
+  }
+
+  .feed {
+    width: 100%;
+    height: 61vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .posts {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow: scroll;
+      background: rgba(15, 15, 15, 0.651);
+      border-radius: 10px;
+      box-shadow: rgba(0, 0, 0, 0.699) 0px 13px 27px -5px,
+        rgba(2, 2, 2, 0.671) 0px 8px 16px -8px;
+      width: 65%;
+      height: 59vh;
+      padding: 2vh 4vh;
+      gap: 10px;
+      position: relative;
+
+      .postsSettings {
+        color: white;
+        font-size: 3vh;
+        position: absolute;
+        top: 0.5vh;
+        right: 0.5vh;
+        cursor: pointer;
+      }
+
+      .filtredMenu {
+        z-index: 20;
+      }
+
+      ul {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        right: 2vh;
+        top: 6vh;
+        list-style: none;
+        gap: 1vh;
+
+        li {
+          width: 20vh;
+          input {
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            border-radius: 5px;
+            outline: none;
+            border: none;
+            background: rgb(255, 255, 255);
+            color: #000000;
+            font-size: 14px;
+            font-weight: bold;
+            padding: 1vh 2vh;
+            border-radius: 15px;
+          }
+
+          select {
+            width: 100%;
+            height: 100%;
+            color: #000000;
+            font-size: 12px;
+            background: white;
+            outline: none;
+            border: 2px solid rgba(255, 255, 255, 0.11);
+            border-radius: 40px;
+            padding: 1vh 1vh;
+            cursor: pointer;
+          }
         }
+      }
     }
 
-    .commentsSection {
-        flex: 2;
+    .post {
+      display: flex;
+      flex-direction: column;
+      height: 59vh;
+      padding: 0 12vh;
+      width: 100%;
+      gap: 1vh;
+
+      .up {
         width: 100%;
-        max-width: 400px;
-        height: 60vh;
-        overflow-y: auto;
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        position: relative;
+        i {
+          right: 1vh;
+          position: absolute;
+          color: white;
+          font-size: 22px;
+          cursor: pointer;
+        }
+
+        ul {
+          position: absolute;
+          right: 0vh;
+          top: 5vh;
+          width: 7vh;
+          background: white;
+          list-style: none;
+          padding: 5px;
+          border-radius: 10px;
+
+          .option {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            height: 3vh;
+            background: #fff;
+            padding: 0 1vh;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+          }
+
+          .option:hover {
+            background: aqua;
+          }
+        }
 
         img {
-            width: 45px;
-            height: 45px;
-            background: rgb(59, 59, 65);
-            border-radius: 50%;
-            object-fit: cover;
-            cursor: pointer;
+          width: 40px;
+          height: 40px;
+          background: rgb(59, 59, 65);
+          border-radius: 50%;
+          object-fit: cover;
+          border: 2px solid aqua;
+          cursor: pointer;
         }
+
+        .userData {
+          color: rgba(255, 255, 255, 0.836);
+          font-size: 18px;
+          font-weight: 600;
+
+          span {
+            font-size: 11px;
+            font-weight: 400;
+          }
+        }
+      }
+
+      .middle {
+        width: 100%;
+        height: 38vh;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          border-radius: 5px;
+        }
+      }
+
+      .description {
+        width: 100%;
+        height: 2vh;
 
         p {
-            color: rgba(255, 255, 255, 0.952);
-            font-size: 16px;
-            font-weight: bold;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          color: white;
         }
+      }
 
-        .up {
-            display: flex;
-            align-items: center;
-            gap: 2vh;
-        }
+      .bottom {
+        display: flex;
+        width: 100%;
+        gap: 30px;
+        padding: 5px;
 
-        .line {
-            display: block;
-            margin-top: 1.5vh;
-        }
-
+        .likes,
         .comments {
-            margin-top: 1vh;
-            height: 41vh;
-            overflow-y: auto;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          color: rgba(255, 255, 255, 0.836);
+          cursor: pointer;
+
+          i {
+            font-size: 20px;
+          }
         }
-
-        .comment {
-            display: flex;
-            gap: 10px;
-            align-items: flex-start;
-            margin-bottom: 10px;
-            position: relative;
-
-            .context {
-                display: flex;
-                flex-direction: column;
-                color: rgba(255, 255, 255, 0.719);
-
-                span {
-                    font-size: 13px;
-                    display: block;
-                    word-break: break-word;
-                    max-width: 100%;
-                    white-space: normal;
-                }
-
-                .info {
-                    color: rgba(255, 255, 255, 0.425);
-                    display: flex;
-                    gap: 1vh;
-                }
-            }
-
-            i {
-                position: absolute;
-                right: 3vh;
-                font-size: 25px;
-                color: white;
-                margin-left: 2vh;
-                margin-top: 1vh;
-                cursor: pointer;
-            }
-        }
-
-        .addComment {
-            margin-top: 2vh;
-            display: flex;
-            align-items: center;
-            width: 100%;
-            justify-content: space-between;
-            gap: 1vh;
-
-            .emoji {
-                i {
-                    color: white;
-                    font-size: 20px;
-                    cursor: pointer;
-                }
-
-                .picker{
-                    position: absolute;
-                    right: 1vh;
-                    bottom: 10vh;
-                }
-            }
-            button {
-                outline: none;
-                border: none;
-                padding: 8px;
-                background: aqua;
-                color: black;
-                font-size: 12px;
-                font-weight: bold;
-                border-radius: 10px;
-                cursor: pointer;
-                transition: 0.3s;
-            }
-
-            button:hover {
-                background: rgb(4, 214, 214);
-            }
-
-            textarea {
-                border: none;
-                outline: none;
-                border-radius: 10px;
-                background-color: rgba(77, 77, 77, 0.315);
-                padding: 10px;
-                width: 80%;
-                height: 6vh;
-                color: white;
-                font-size: 14px;
-                resize: vertical;
-            }
-        }
+      }
     }
+  }
 }
 
-@media screen and (max-height : 900px) {
-    .discover {
-
-        .stories {
-           .box {
-               height: auto;
-
-               .story {
-                   img {
-                       width: 70px;
-                       height: 70px;
-                   }
-
-               }
-           }
-
-        }
-        .feed {
-            .posts {
-
-            }
-        }
-    }
-
+.cancel {
+  position: absolute;
+  right: 1vh;
+  top: 1vh;
+  font-size: 24px;
+  color: wheat;
+  cursor: pointer;
 }
 
-@media screen and (max-width : 1700px) and (min-height: 900px) {
-    .discover {
-        .feed {
-            .posts {
-              .post {
-                  padding: 0;
-              }
-            }
-        }
+.postView {
+  width: 90%;
+  max-width: 1200px;
+  height: auto;
+  padding: 20px;
+  position: absolute;
+  border-radius: 10px;
+  background: rgba(19, 19, 20, 0.945);
+  top: 9vh;
+  right: 0;
+  left: 0;
+  margin: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+
+  .imgPost {
+    flex: 5;
+    width: 100%;
+    max-width: 100vh;
+    max-height: 60vh;
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 5px;
     }
+  }
+
+  .commentsSection {
+    flex: 2;
+    width: 100%;
+    max-width: 400px;
+    height: 60vh;
+    overflow-y: auto;
+
+    img {
+      width: 45px;
+      height: 45px;
+      background: rgb(59, 59, 65);
+      border-radius: 50%;
+      object-fit: cover;
+      cursor: pointer;
+    }
+
+    p {
+      color: rgba(255, 255, 255, 0.952);
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .up {
+      display: flex;
+      align-items: center;
+      gap: 2vh;
+    }
+
+    .line {
+      display: block;
+      margin-top: 1.5vh;
+    }
+
+    .comments {
+      margin-top: 1vh;
+      height: 41vh;
+      overflow-y: auto;
+    }
+
+    .comment {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      margin-bottom: 10px;
+      position: relative;
+
+      .context {
+        display: flex;
+        flex-direction: column;
+        color: rgba(255, 255, 255, 0.719);
+
+        span {
+          font-size: 13px;
+          display: block;
+          word-break: break-word;
+          max-width: 100%;
+          white-space: normal;
+        }
+
+        .info {
+          color: rgba(255, 255, 255, 0.425);
+          display: flex;
+          gap: 1vh;
+        }
+      }
+
+      i {
+        position: absolute;
+        right: 3vh;
+        font-size: 25px;
+        color: white;
+        margin-left: 2vh;
+        margin-top: 1vh;
+        cursor: pointer;
+      }
+    }
+
+    .addComment {
+      margin-top: 2vh;
+      display: flex;
+      align-items: center;
+      width: 100%;
+      justify-content: space-between;
+      gap: 1vh;
+
+      .emoji {
+        i {
+          color: white;
+          font-size: 20px;
+          cursor: pointer;
+        }
+
+        .picker {
+          position: absolute;
+          right: 1vh;
+          bottom: 10vh;
+        }
+      }
+      button {
+        outline: none;
+        border: none;
+        padding: 8px;
+        background: aqua;
+        color: black;
+        font-size: 12px;
+        font-weight: bold;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      button:hover {
+        background: rgb(4, 214, 214);
+      }
+
+      textarea {
+        border: none;
+        outline: none;
+        border-radius: 10px;
+        background-color: rgba(77, 77, 77, 0.315);
+        padding: 10px;
+        width: 80%;
+        height: 6vh;
+        color: white;
+        font-size: 14px;
+        resize: vertical;
+      }
+    }
+  }
 }
 
-@media screen and (max-width : 1200px) and (max-height: 900px) {
-    .discover {
-        .feed {
-            .posts {
-                .post {
-                    padding: 0;
-                }
-            }
-        }
-    }
+.commentContainer {
+  margin-bottom: 15px;
 }
 
-@media screen and (max-width : 1400px) {
-    .discoverView {
-        width: 50vh;
-    }
-    .discover {
-        .feed {
-            .posts {
-                width: 80%;
-            }
-        }
-        .addPost .context {
-            width: 80%;
-        }
-    }
+.repliesContainer {
+  margin-left: 60px;
+  margin-top: 5px;
+  white-space: normal;
+  word-break: break-word;
 }
 
+.repliesContainer .comment.reply i {
+  font-size: 20px;
+}
 
-@media screen and (max-width : 748px) {
+.repliesContainer .comment.reply .context span {
+  white-space: normal;
+  overflow-wrap: break-word;
+  max-width: 75%;
+}
 
-    .discover {
-        .stories {
-            width: 100%;
-            height: 16vh;
-            margin-top: 1vh;
+.commentActions {
+  display: flex;
+  gap: 10px;
+  margin-left: 60px;
+  margin-top: 5px;
+}
 
-            .box {
-                width: 100%;
-                height: 12vh;
-                gap: 34px;
-                padding: 2vh;
+.toggleRepliesBtn,
+.replyBtn {
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0;
+}
 
-                .story {
-                    img {
-                        width: 50px;
-                        height: 50px;
-                    }
+.toggleRepliesBtn:hover,
+.replyBtn:hover {
+  text-decoration: underline;
+}
 
-                    span {
-                        font-size: 14px;
-                    }
-                }
-            }
+.replyingTo {
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.replyingTo button {
+  outline: none;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 10px;
+  background: aqua;
+  color: black;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.replyingTo button:hover {
+  background: rgb(4, 214, 214);
+}
+
+@media screen and (max-height: 900px) {
+  .discover {
+    .stories {
+      .box {
+        height: auto;
+
+        .story {
+          img {
+            width: 70px;
+            height: 70px;
+          }
         }
+      }
+    }
+    .feed {
+      .posts {
+      }
+    }
+  }
+}
 
-        .addPost .context {
-            width: 100%;
-            height: 13vh;
-            padding: 1vh 2vh;
-
-            img {
-                width: 40px;
-                height: 40px;
-            }
-
-            .middle {
-                textarea {
-                    font-size: 12px;
-                }
-
-                .attachments {
-                    .attachment {
-                        i {
-                            font-size: 14px;
-                        }
-
-                        span {
-                            font-size: 12px;
-                        }
-                    }
-                }
-            }
-
-            .right {
-                .emoji {
-                    i {
-                        font-size: 16px;
-                    }
-                }
-            }
+@media screen and (max-width: 1700px) and (min-height: 900px) {
+  .discover {
+    .feed {
+      .posts {
+        .post {
+          padding: 0;
         }
+      }
+    }
+  }
+}
 
-        .feed {
-            .posts {
-                width: 100%;
-                height: 60vh;
-                padding: 2vh 2vh;
-                .postsSettings {
-                    font-size: 2.5vh;
-                }
-            }
-
-            .post {
-                width: 100%;
-                height: 59vh;
-                padding: 0 0.5vh;
-
-                .up {
-                    gap: 10px;
-
-                    img {
-                        width: 40px;
-                        height: 40px;
-                    }
-
-                    .userData {
-                        font-size: 16px;
-
-                        span {
-                            font-size: 10px;
-                        }
-                    }
-                }
-
-                .description {
-                    width: 100%;
-                    height: 2vh;
-
-                    p {
-                        font-size: 14px;
-                    }
-                }
-
-                .bottom {
-
-                    .likes,
-                    .comments {
-
-                        gap: 5px;
-
-                        i {
-                            font-size: 16px;
-                        }
-
-                        span {
-                            font-size: 14px;
-                        }
-                    }
-                }
-
-            }
+@media screen and (max-width: 1200px) and (max-height: 900px) {
+  .discover {
+    .feed {
+      .posts {
+        .post {
+          padding: 0;
         }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 1400px) {
+  .discoverView {
+    width: 50vh;
+  }
+  .discover {
+    .feed {
+      .posts {
+        width: 80%;
+      }
 
         .postView {
             width: 100%;
@@ -942,11 +867,10 @@
         .imgPost {
             width: 100%;
             max-height: 40vh;
-            flex: 7;
         }
 
         .commentsSection {
-            flex: 5;
+            flex: 7;
             display: flex;
             flex-direction: column;
             max-width: 100%;
@@ -962,8 +886,7 @@
             }
 
             .comments {
-                flex: 3;
-                max-height: 25dvh;
+                max-height: 30dvh;
             }
 
             .addComment {
@@ -971,6 +894,131 @@
             }
         }
     }
+    .addPost .context {
+      width: 80%;
+    }
+  }
+}
 
+@media screen and (max-width: 748px) {
+  .discover {
+    .stories {
+      width: 100%;
+      height: 16vh;
+      margin-top: 1vh;
 
+      .box {
+        width: 100%;
+        height: 12vh;
+        gap: 34px;
+        padding: 2vh;
+
+        .story {
+          img {
+            width: 50px;
+            height: 50px;
+          }
+
+          span {
+            font-size: 14px;
+          }
+        }
+      }
+    }
+
+    .addPost .context {
+      width: 100%;
+      height: 13vh;
+      padding: 1vh 2vh;
+
+      img {
+        width: 40px;
+        height: 40px;
+      }
+
+      .middle {
+        textarea {
+          font-size: 12px;
+        }
+
+        .attachments {
+          .attachment {
+            i {
+              font-size: 14px;
+            }
+
+            span {
+              font-size: 12px;
+            }
+          }
+        }
+      }
+
+      .right {
+        .emoji {
+          i {
+            font-size: 16px;
+          }
+        }
+      }
+    }
+
+    .feed {
+      .posts {
+        width: 100%;
+        height: 60vh;
+        padding: 2vh 2vh;
+        .postsSettings {
+          font-size: 2.5vh;
+        }
+      }
+
+      .post {
+        width: 100%;
+        height: 59vh;
+        padding: 0 0.5vh;
+
+        .up {
+          gap: 10px;
+
+          img {
+            width: 40px;
+            height: 40px;
+          }
+
+          .userData {
+            font-size: 16px;
+
+            span {
+              font-size: 10px;
+            }
+          }
+        }
+
+        .description {
+          width: 100%;
+          height: 2vh;
+
+          p {
+            font-size: 14px;
+          }
+        }
+
+        .bottom {
+          .likes,
+          .comments {
+            gap: 5px;
+
+            i {
+              font-size: 16px;
+            }
+
+            span {
+              font-size: 14px;
+            }
+          }
+        }
+      }
+    }
+  }
 }

@@ -1,9 +1,18 @@
 import {dispatchAction} from "../../config/api.js";
 import {
     CREATE_COMMENT_FAIL,
-    CREATE_COMMENT_REQUEST, CREATE_COMMENT_SUCCESS, DELETE_COMMENT_FAIL, DELETE_COMMENT_REQUEST, DELETE_COMMENT_SUCCESS,
+    CREATE_COMMENT_REQUEST,
+    CREATE_COMMENT_SUCCESS,
+    DELETE_COMMENT_FAIL,
+    DELETE_COMMENT_REQUEST,
+    DELETE_COMMENT_SUCCESS,
     GET_POST_COMMENT_REQUEST,
-    GET_POST_COMMENTS_FAIL, GET_POST_COMMENTS_SUCCESS, Like_COMMENT_FAIL, Like_COMMENT_REQUEST, Like_COMMENT_SUCCESS,
+    GET_POST_COMMENTS_FAIL,
+    GET_POST_COMMENTS_SUCCESS, GET_REPLIES_FAIL,
+    GET_REPLIES_REQUEST, GET_REPLIES_SUCCESS,
+    Like_COMMENT_FAIL,
+    Like_COMMENT_REQUEST,
+    Like_COMMENT_SUCCESS,
 } from "./ActionType.js";
 
 export const createComment = (data) => async (dispatch) => {
@@ -34,3 +43,11 @@ export const deleteComment = (commentId) => async (dispatch) => {
         credentials: 'include',
     });
 };
+
+export const getReplies = (parentCommentId, page = 0, size = 10) => async (dispatch) => {
+    return await dispatchAction(dispatch, GET_REPLIES_REQUEST, GET_REPLIES_SUCCESS, GET_REPLIES_FAIL,
+        `/api/comments/replies/${parentCommentId}?page=${page}&size=${size}`, {
+            method: 'GET',
+            credentials: 'include',
+        });
+}

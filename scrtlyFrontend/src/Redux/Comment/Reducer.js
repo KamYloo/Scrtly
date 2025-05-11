@@ -1,10 +1,19 @@
 
 import {
     CREATE_COMMENT_FAIL,
-    CREATE_COMMENT_REQUEST, CREATE_COMMENT_SUCCESS, DELETE_COMMENT_FAIL,
-    DELETE_COMMENT_REQUEST, DELETE_COMMENT_SUCCESS,
-    GET_POST_COMMENT_REQUEST, GET_POST_COMMENTS_FAIL, GET_POST_COMMENTS_SUCCESS, Like_COMMENT_FAIL,
-    Like_COMMENT_REQUEST, Like_COMMENT_SUCCESS
+    CREATE_COMMENT_REQUEST,
+    CREATE_COMMENT_SUCCESS,
+    DELETE_COMMENT_FAIL,
+    DELETE_COMMENT_REQUEST,
+    DELETE_COMMENT_SUCCESS,
+    GET_POST_COMMENT_REQUEST,
+    GET_POST_COMMENTS_FAIL,
+    GET_POST_COMMENTS_SUCCESS, GET_REPLIES_FAIL,
+    GET_REPLIES_REQUEST,
+    GET_REPLIES_SUCCESS,
+    Like_COMMENT_FAIL,
+    Like_COMMENT_REQUEST,
+    Like_COMMENT_SUCCESS
 } from "./ActionType.js";
 
 
@@ -21,6 +30,13 @@ const initialValue = {
     },
     deletedComment:null,
     likeComment:null,
+    replies: {
+        content: [],
+        pageNumber: 0,
+        pageSize: 10,
+        totalElements: 0,
+        totalPages: 0,
+    },
 }
 
 export const commentReducer = (state = initialValue, { type, payload }) => {
@@ -36,6 +52,11 @@ export const commentReducer = (state = initialValue, { type, payload }) => {
                     ...state.comments,
                     content: [payload, ...state.comments.content],
                     totalElements: state.comments.totalElements + 1
+                },
+                replies: {
+                    ...state.replies,
+                    content: [payload, ...state.replies.content],
+                    totalElements: state.replies.totalElements + 1
                 }
             };
         case CREATE_COMMENT_FAIL:
@@ -78,9 +99,24 @@ export const commentReducer = (state = initialValue, { type, payload }) => {
                             ? { ...c, likedByUser: payload.likedByUser, likeCount: payload.likeCount }
                             : c
                     )
+                },
+                replies: {
+                    ...state.replies,
+                    content: state.replies.content.map(c =>
+                        c.id === payload.commentId
+                            ? { ...c, likedByUser: payload.likedByUser, likeCount: payload.likeCount }
+                            : c
+                    )
                 }
             };
         case Like_COMMENT_FAIL:
+            return { ...state, loading: false, error: payload };
+
+        case GET_REPLIES_REQUEST:
+            return { ...state, loading: true, error: null };
+        case GET_REPLIES_SUCCESS:
+            return { ...state, loading: false, replies: payload };
+        case GET_REPLIES_FAIL:
             return { ...state, loading: false, error: payload };
 
         default:

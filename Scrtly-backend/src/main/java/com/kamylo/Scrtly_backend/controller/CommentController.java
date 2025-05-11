@@ -7,6 +7,7 @@ import com.kamylo.Scrtly_backend.service.CommentService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +33,17 @@ public class CommentController {
         Page<CommentDto> comments = commentService.getCommentsByPostId(postId, sortBy, pageable, principal.getName());
         return new ResponseEntity<>(PagedResponse.of(comments), HttpStatus.OK);
     }
+
+    @GetMapping("/replies/{parentCommentId}")
+    public ResponseEntity<PagedResponse<CommentDto>> getReplies(@PathVariable Long parentCommentId,
+                                                                @PageableDefault(size = 10) Pageable pageable,
+                                                                Principal principal) {
+        PagedResponse<CommentDto> replies = PagedResponse.of(
+                commentService.getReplies(parentCommentId, pageable, principal.getName())
+        );
+        return new ResponseEntity<>(replies, HttpStatus.OK);
+    }
+
 
     @PutMapping("/update/{commentId}")
     public ResponseEntity<CommentDto> updateComment(@PathVariable Long commentId ,@RequestParam String content , Principal principal) {
