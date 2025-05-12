@@ -155,6 +155,7 @@
           background: rgb(4, 214, 214);
         }
       }
+
       .submit {
         outline: none;
         border: none;
@@ -351,6 +352,7 @@
         cursor: pointer;
         color: rgba(255, 255, 255, 0.836);
         position: relative;
+
         i {
           font-size: 20px;
         }
@@ -410,6 +412,7 @@
 
         li {
           width: 20vh;
+
           input {
             width: 100%;
             height: 100%;
@@ -453,6 +456,7 @@
         gap: 20px;
         align-items: center;
         position: relative;
+
         i {
           right: 1vh;
           position: absolute;
@@ -590,6 +594,7 @@
     width: 100%;
     max-width: 100vh;
     max-height: 60vh;
+
     img {
       width: 100%;
       height: 100%;
@@ -639,12 +644,13 @@
 
     .comment {
       display: flex;
+      align-items: center;
       gap: 10px;
-      align-items: flex-start;
       margin-bottom: 10px;
       position: relative;
 
       .context {
+        flex: 1;
         display: flex;
         flex-direction: column;
         color: rgba(255, 255, 255, 0.719);
@@ -673,6 +679,33 @@
         margin-top: 1vh;
         cursor: pointer;
       }
+
+      .commentIcons {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-left: auto;
+        position: relative; /* Make sure it doesn't inherit absolute positioning */
+      }
+
+      .commentIcons i {
+        position: static; /* Remove absolute positioning */
+        font-size: 1.2rem;
+        color: white;
+        margin: 0; /* Remove extra margins */
+        cursor: pointer;
+      }
+    }
+
+    .commentIcons {
+      display: flex;
+      align-items: center;
+      margin-left: auto;
+    }
+
+    .commentIcons i {
+      cursor: pointer;
+      font-size: 1.2rem;
     }
 
     .addComment {
@@ -696,6 +729,7 @@
           bottom: 10vh;
         }
       }
+
       button {
         outline: none;
         border: none;
@@ -813,9 +847,9 @@
         }
       }
     }
+
     .feed {
-      .posts {
-      }
+      .posts {}
     }
   }
 }
@@ -848,52 +882,54 @@
   .discoverView {
     width: 50vh;
   }
+
   .discover {
     .feed {
       .posts {
         width: 80%;
       }
 
-        .postView {
-            width: 100%;
-            height: calc(100dvh - 180px);
-            background: rgba(19, 19, 20, 0.98);
-            top: 5vh;
-            flex-direction: column;
-            padding: 10px;
-            gap: 10px;
+      .postView {
+        width: 100%;
+        height: calc(100dvh - 180px);
+        background: rgba(19, 19, 20, 0.98);
+        top: 5vh;
+        flex-direction: column;
+        padding: 10px;
+        gap: 10px;
+      }
+
+      .imgPost {
+        width: 100%;
+        max-height: 40vh;
+      }
+
+      .commentsSection {
+        flex: 7;
+        display: flex;
+        flex-direction: column;
+        max-width: 100%;
+        overflow-y: hidden;
+
+        img {
+          width: 35px;
+          height: 35px;
         }
 
-        .imgPost {
-            width: 100%;
-            max-height: 40vh;
+        p {
+          font-size: 15px;
         }
 
-        .commentsSection {
-            flex: 7;
-            display: flex;
-            flex-direction: column;
-            max-width: 100%;
-            overflow-y: hidden;
-
-            img {
-                width: 35px;
-                height: 35px;
-            }
-
-            p {
-                font-size: 15px;
-            }
-
-            .comments {
-                max-height: 30dvh;
-            }
-
-            .addComment {
-                flex-shrink: 0;
-            }
+        .comments {
+          max-height: 30dvh;
         }
+
+        .addComment {
+          flex-shrink: 0;
+        }
+      }
     }
+
     .addPost .context {
       width: 80%;
     }
@@ -968,6 +1004,7 @@
         width: 100%;
         height: 60vh;
         padding: 2vh 2vh;
+
         .postsSettings {
           font-size: 2.5vh;
         }
@@ -1005,6 +1042,7 @@
         }
 
         .bottom {
+
           .likes,
           .comments {
             gap: 5px;

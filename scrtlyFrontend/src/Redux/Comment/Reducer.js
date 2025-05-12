@@ -80,6 +80,11 @@ export const commentReducer = (state = initialValue, { type, payload }) => {
                     ...state.comments,
                     content: state.comments.content.filter(c => c.id !== payload),
                     totalElements: state.comments.totalElements - 1
+                },
+                replies: {
+                    ...state.replies,
+                    content: state.replies.content.filter(c => c.id !== payload),
+                    totalElements: state.replies.totalElements - 1
                 }
             };
         case DELETE_COMMENT_FAIL:

@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { AiOutlineLike, AiFillLike } from "react-icons/ai";
+import { AiOutlineLike, AiFillLike, AiOutlineDelete } from "react-icons/ai";
 import { AddComment } from './AddComment.jsx';
 import { useDispatch, useSelector } from "react-redux";
-import { getAllPostComments, likeComment, getReplies } from "../../Redux/Comment/Action.js";
+import { getAllPostComments, likeComment, deleteComment, getReplies } from "../../Redux/Comment/Action.js";
 import { formatDistanceToNow } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../../Components/Spinner.jsx";
@@ -11,6 +11,8 @@ function Comments({ post }) {
     const { comment } = useSelector(store => store)
     const dispatch = useDispatch()
     const navigate = useNavigate();
+
+    const userData = (() => { try { return JSON.parse(localStorage.getItem("user")) || null; } catch { return null; } })();
 
     const [activeReplyInputId, setActiveReplyInputId] = useState(null);
     const [activeRepliesId, setActiveRepliesId] = useState(null);
@@ -24,6 +26,12 @@ function Comments({ post }) {
     const formatTimeAgo = (timestamp) => formatDistanceToNow(new Date(timestamp), { addSuffix: true });
 
     const likeCommentHandler = (commentId) => dispatch(likeComment(commentId));
+
+    const handleDeleteComment = (commentId) => {
+        if (window.confirm("Are you sure you want to delete this comment?")) {
+            dispatch(deleteComment(commentId));
+        }
+    };
 
     const loadReplies = async (commentId, page = 0) => {
         setIsLoadingReplies(true);
@@ -90,6 +98,12 @@ function Comments({ post }) {
         }
     }, [comment.createdComment, activeRepliesId]);
 
+    useEffect(() => {
+        if (comment.deletedComment && activeRepliesId) {
+            // Filter out the deleted reply from the repliesData list
+            setRepliesData(prev => prev.filter(reply => reply.id !== comment.deletedComment));
+        }
+    }, [comment.deletedComment, activeRepliesId]);
 
     return (
         <div className='commentsSection'>
@@ -127,9 +141,16 @@ function Comments({ post }) {
                                     <span>{item.likeCount} likes</span>
                                 </div>
                             </div>
-                            <i onClick={() => likeCommentHandler(item.id)}>
-                                {item.likedByUser ? <AiFillLike /> : <AiOutlineLike />}
-                            </i>
+                            <div className="commentIcons">
+                                <i onClick={() => likeCommentHandler(item.id)}>
+                                    {item.likedByUser ? <AiFillLike /> : <AiOutlineLike />}
+                                </i>
+                                {item.user?.nickName === userData.nickName && (
+                                    <i onClick={() => handleDeleteComment(item.id)} style={{ marginLeft: '10px' }}>
+                                        <AiOutlineDelete />
+                                    </i>
+                                )}
+                            </div>
                         </div>
                         <div className="commentActions">
                             <button className="toggleRepliesBtn" onClick={() => toggleReplies(item.id)}>
@@ -150,9 +171,16 @@ function Comments({ post }) {
                                                 <span>{reply.likeCount} likes</span>
                                             </div>
                                         </div>
-                                        <i onClick={() => likeCommentHandler(reply.id)}>
-                                            {reply.likedByUser ? <AiFillLike /> : <AiOutlineLike />}
-                                        </i>
+                                        <div className="commentIcons">
+                                            <i onClick={() => likeCommentHandler(reply.id)}>
+                                                {reply.likedByUser ? <AiFillLike /> : <AiOutlineLike />}
+                                            </i>
+                                            {reply.user?.nickName === userData.nickName && (
+                                                <i onClick={() => handleDeleteComment(reply.id)} style={{ marginLeft: '10px' }}>
+                                                    <AiOutlineDelete />
+                                                </i>
+                                            )}
+                                        </div>
                                     </div>
                                 ))}
                                 {isLoadingReplies && <Spinner />}
