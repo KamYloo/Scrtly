@@ -89,7 +89,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Page<CommentDto> getCommentsByPostId(Long postId, String sortBy, Pageable pageable, String username) {
-        UserEntity user = userService.findUserByEmail(username);
+        UserEntity user = (username != null) ? userService.findUserByEmail(username) : null;
         Specification<CommentEntity> spec = Specification.where(CommentSpecification.byPostId(postId));
         if ("latest".equalsIgnoreCase(sortBy)) {
             spec = spec.and(CommentSpecification.orderByLatestActivity());
@@ -99,17 +99,25 @@ public class CommentServiceImpl implements CommentService {
 
         return commentRepository.findAll(spec, pageable).map(commentEntity -> {
             CommentDto commentDto = commentMapper.mapTo(commentEntity);
-            commentDto.setLikedByUser(userLikeChecker.isCommentLikedByUser(commentEntity, user.getId()));
+            if (user != null) {
+                commentDto.setLikedByUser(
+                        userLikeChecker.isCommentLikedByUser(commentEntity, user.getId())
+                );
+            }
             return commentDto;
         });
     }
 
     @Override
     public Page<CommentDto> getReplies(Long parentCommentId, Pageable pageable, String username) {
-        UserEntity user = userService.findUserByEmail(username);
+        UserEntity user = (username != null) ? userService.findUserByEmail(username) : null;
         return commentRepository.findByParentCommentId(parentCommentId, pageable).map(commentEntity -> {
             CommentDto commentDto = commentMapper.mapTo(commentEntity);
-            commentDto.setLikedByUser(userLikeChecker.isCommentLikedByUser(commentEntity, user.getId()));
+            if (user != null) {
+                commentDto.setLikedByUser(
+                        userLikeChecker.isCommentLikedByUser(commentEntity, user.getId())
+                );
+            }
             return commentDto;
         });
     }

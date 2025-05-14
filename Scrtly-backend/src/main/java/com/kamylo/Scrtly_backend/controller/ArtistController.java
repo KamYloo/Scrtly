@@ -22,7 +22,8 @@ public class ArtistController {
 
     @GetMapping("/{artistId}")
     public ResponseEntity<ArtistDto> getArtist(@PathVariable Long artistId, Principal principal) {
-        ArtistDto artist = artistService.getArtistProfile(artistId, principal.getName());
+        String username = (principal != null ? principal.getName() : null);
+        ArtistDto artist = artistService.getArtistProfile(artistId, username);
         return new ResponseEntity<>(artist, HttpStatus.OK);
     }
 

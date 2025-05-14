@@ -145,7 +145,7 @@ function Comments({ post }) {
                                 <i onClick={() => likeCommentHandler(item.id)}>
                                     {item.likedByUser ? <AiFillLike /> : <AiOutlineLike />}
                                 </i>
-                                {item.user?.nickName === userData.nickName && (
+                                {item.user?.nickName === userData?.nickName && (
                                     <i onClick={() => handleDeleteComment(item.id)} style={{ marginLeft: '10px' }}>
                                         <AiOutlineDelete />
                                     </i>
@@ -175,7 +175,7 @@ function Comments({ post }) {
                                             <i onClick={() => likeCommentHandler(reply.id)}>
                                                 {reply.likedByUser ? <AiFillLike /> : <AiOutlineLike />}
                                             </i>
-                                            {reply.user?.nickName === userData.nickName && (
+                                            {reply.user?.nickName === userData?.nickName && (
                                                 <i onClick={() => handleDeleteComment(reply.id)} style={{ marginLeft: '10px' }}>
                                                     <AiOutlineDelete />
                                                 </i>

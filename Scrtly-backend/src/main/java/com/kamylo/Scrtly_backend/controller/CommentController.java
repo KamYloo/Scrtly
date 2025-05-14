@@ -30,7 +30,8 @@ public class CommentController {
                                                                  @RequestParam(defaultValue = "all") String sortBy,
                                                                  Pageable pageable,
                                                                  Principal principal)  {
-        Page<CommentDto> comments = commentService.getCommentsByPostId(postId, sortBy, pageable, principal.getName());
+        String username = (principal != null ? principal.getName() : null);
+        Page<CommentDto> comments = commentService.getCommentsByPostId(postId, sortBy, pageable, username);
         return new ResponseEntity<>(PagedResponse.of(comments), HttpStatus.OK);
     }
 
@@ -38,12 +39,10 @@ public class CommentController {
     public ResponseEntity<PagedResponse<CommentDto>> getReplies(@PathVariable Long parentCommentId,
                                                                 @PageableDefault(size = 10) Pageable pageable,
                                                                 Principal principal) {
-        PagedResponse<CommentDto> replies = PagedResponse.of(
-                commentService.getReplies(parentCommentId, pageable, principal.getName())
-        );
-        return new ResponseEntity<>(replies, HttpStatus.OK);
+        String username = (principal != null ? principal.getName() : null);
+        Page<CommentDto> replies = commentService.getReplies(parentCommentId, pageable, username);
+        return new ResponseEntity<>(PagedResponse.of(replies), HttpStatus.OK);
     }
-
 
     @PutMapping("/update/{commentId}")
     public ResponseEntity<CommentDto> updateComment(@PathVariable Long commentId ,@RequestParam String content , Principal principal) {

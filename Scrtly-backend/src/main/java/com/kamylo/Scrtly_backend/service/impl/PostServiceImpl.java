@@ -94,7 +94,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Page<PostDto> getPosts(Pageable pageable, String username, Integer minLikes, Integer maxLikes) {
-        UserEntity user = userService.findUserByEmail(username);
+        UserEntity user = (username != null) ? userService.findUserByEmail(username) : null;
 
         Specification<PostEntity> spec = Specification
                 .where(PostSpecification.hasMinLikes(minLikes))
@@ -104,9 +104,11 @@ public class PostServiceImpl implements PostService {
 
         return page.map(postEntity -> {
             PostDto dto = postMapper.mapTo(postEntity);
-            dto.setLikedByUser(
-                    userLikeChecker.isPostLikedByUser(postEntity, user.getId())
-            );
+            if (user != null) {
+                dto.setLikedByUser(
+                        userLikeChecker.isPostLikedByUser(postEntity, user.getId())
+                );
+            }
             return dto;
         });
     }
