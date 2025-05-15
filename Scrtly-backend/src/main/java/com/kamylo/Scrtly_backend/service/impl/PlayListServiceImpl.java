@@ -132,12 +132,12 @@ public class PlayListServiceImpl implements PlayListService {
 
     @Override
     @Transactional
-    public PlayListDto updatePlayList(PlayListRequest playListRequest, String username, MultipartFile playListImage) {
-        PlayListEntity playListEntity = playListRepository.findById(playListRequest.getPlayListId())
+    public PlayListDto updatePlayList(Integer playListId, String title, String username, MultipartFile playListImage) {
+        PlayListEntity playListEntity = playListRepository.findById(playListId)
                 .orElseThrow(() -> new CustomException(BusinessErrorCodes.PLAYLIST_NOT_FOUND));
         if (validatePlayListOwnership(username, playListEntity)) {
-            if (playListRequest.getTitle() != null && !playListRequest.getTitle().isEmpty()) {
-                playListEntity.setTitle(playListRequest.getTitle());
+            if (title != null && !title.isEmpty()) {
+                playListEntity.setTitle(title);
             }
             if (playListImage != null && !playListImage.isEmpty()) {
                 String imagePath = fileService.updateFile(playListImage, playListEntity.getCoverImage(), "playListImages/");

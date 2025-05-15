@@ -11,6 +11,13 @@ import {
     GET_ARTIST_ALBUMS_SUCCESS, UPLOAD_SONG_ERROR,
     UPLOAD_SONG_REQUEST, UPLOAD_SONG_SUCCESS,
 } from "./ActionType.js";
+import {
+    DELETE_SONG_FAILURE,
+    DELETE_SONG_REQUEST, DELETE_SONG_SUCCESS,
+    LIKE_SONG_ERROR,
+    LIKE_SONG_REQUEST,
+    LIKE_SONG_SUCCESS
+} from "../Song/ActionType.js";
 
 const initialValue= {
     loading: false,
@@ -28,6 +35,8 @@ const initialValue= {
     deleteAlbum: null,
     songs: [],
     uploadSong: null,
+    likedSong: null,
+    deletedSong: null
 }
 
 export const albumReducer=(state=initialValue, {type,payload})=>{
@@ -39,10 +48,21 @@ export const albumReducer=(state=initialValue, {type,payload})=>{
         case GET_ALBUM_TRACKS_REQUEST:
         case UPLOAD_SONG_REQUEST:
         case DELETE_ALBUM_REQUEST:
+        case LIKE_SONG_REQUEST:
+        case DELETE_SONG_REQUEST:
             return { ...state, loading: true, error: null };
 
         case CREATE_ALBUM_SUCCESS:
-            return { ...state, loading: false, createAlbum: payload };
+            return {
+                ...state,
+                loading: false,
+                createAlbum: payload,
+                albums: {
+                    ...state.albums,
+                    content: [payload, ...state.albums.content],
+                    totalElements: state.albums.totalElements + 1
+                }
+            };
         case GET_ALL_ALBUMS_SUCCESS:
             return { ...state, loading: false, albums: payload };
         case GET_ARTIST_ALBUMS_SUCCESS:
@@ -52,9 +72,41 @@ export const albumReducer=(state=initialValue, {type,payload})=>{
         case GET_ALBUM_TRACKS_SUCCESS:
             return { ...state, loading: false, songs: payload };
         case UPLOAD_SONG_SUCCESS:
-            return { ...state, loading: false, uploadSong: payload };
+            return {
+                ...state,
+                loading: false,
+                uploadSong: payload,
+                songs: [payload, ...state.songs]
+            };
         case DELETE_ALBUM_SUCCESS:
-            return { ...state, loading: false, deleteAlbum: payload };
+            return {
+                ...state,
+                loading: false,
+                deleteAlbum: payload,
+                albums: {
+                    ...state.albums,
+                    content: state.albums.content.filter(a => a.id !== payload),
+                    totalElements: state.albums.totalElements - 1
+                }
+            };
+        case LIKE_SONG_SUCCESS:
+            return {
+                ...state,
+                loading: false,
+                likeSong: payload,
+                songs: state.songs.map(song =>
+                    song.id === payload.song.id
+                        ? { ...song, favorite: payload.song.favorite }
+                        : song
+                )
+            };
+        case DELETE_SONG_SUCCESS:
+            return {
+                ...state,
+                loading: false,
+                deletedSong: payload,
+                songs: state.songs.filter(song => song.id !== payload)
+            };
 
         case CREATE_ALBUM_ERROR:
         case GET_ALL_ALBUMS_ERROR:
@@ -63,6 +115,8 @@ export const albumReducer=(state=initialValue, {type,payload})=>{
         case GET_ALBUM_TRACKS_ERROR:
         case UPLOAD_SONG_ERROR:
         case DELETE_ALBUM_ERROR:
+        case LIKE_SONG_ERROR:
+        case DELETE_SONG_FAILURE:
             return { ...state, loading: false, error: payload };
 
         default:

@@ -75,6 +75,10 @@ public class SecurityConfig implements WebMvcConfigurer {
                             auth.requestMatchers(HttpMethod.GET,"/song/**").permitAll();
                             auth.requestMatchers("/song/upload", "/song/delete/**").hasAnyAuthority("ARTIST", "ADMIN");
 
+                            auth.requestMatchers(HttpMethod.GET,"/posts/**").permitAll();
+                            auth.requestMatchers(HttpMethod.GET,"/comments/**").permitAll();
+                            auth.requestMatchers(HttpMethod.GET,"/user/profile/**").permitAll();
+
                             auth.anyRequest().authenticated();
                         }
                 )

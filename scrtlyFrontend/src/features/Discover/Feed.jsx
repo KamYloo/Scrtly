@@ -10,6 +10,7 @@ import { deletePost, getAllPosts, likePost } from "../../Redux/Post/Action.js";
 import { formatDistanceToNow } from 'date-fns'
 import { useNavigate } from "react-router-dom";
 import { EditPost } from "./EditPost.jsx";
+import Spinner from "../../Components/Spinner.jsx";
 
 function Feed() {
   const [selectedPost, setSelectedPost] = useState(false);
@@ -54,7 +55,6 @@ function Feed() {
       dispatch(deletePost(postId))
       .then(() => {
         toast.success('Post deleted successfully.');
-        loadPosts();
       })
       .catch(() => {
         toast.error('Failed to delete post. Please try again.');
@@ -64,9 +64,6 @@ function Feed() {
 
   const likePostHandler = (postId) => {
     dispatch(likePost(postId))
-      .then(() => {
-        loadPosts();
-      });
   };
 
   const loadPosts = () => {
@@ -82,13 +79,11 @@ function Feed() {
 
   useEffect(() => {
     loadPosts();
-  }, [dispatch, post.likedPost, post.createdPost, post.deletedPost, comment.createdComment, comment.deletedComment, minLikesFilter, maxLikesFilter, sortOrder]);
+  }, [dispatch, minLikesFilter, maxLikesFilter, sortOrder]);
 
   if (post.loading) {
     return (
-      <div className="feed">
-        <div className="spinner"></div>
-      </div>
+        <Spinner />
     );
   }
 

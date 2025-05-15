@@ -21,7 +21,7 @@ function AlbumsView() {
 
     useEffect(() => {
         dispatch(getAllAlbums())
-    }, [dispatch, album.deleteAlbum])
+    }, [dispatch])
 
     if (album.loading) {
         return <Spinner />;

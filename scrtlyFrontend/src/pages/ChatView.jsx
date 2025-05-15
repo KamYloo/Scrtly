@@ -13,7 +13,7 @@ function ChatView() {
 
   useEffect(() => {
     dispatch(getUserChats())
-  }, [chat.createdChat, chat.deletedChat, dispatch]);
+  }, [dispatch]);
 
   useEffect(() => {
     const handleResize = () => {

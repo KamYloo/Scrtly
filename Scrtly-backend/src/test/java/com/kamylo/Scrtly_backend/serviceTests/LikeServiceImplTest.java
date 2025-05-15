@@ -1,6 +1,7 @@
 package com.kamylo.Scrtly_backend.serviceTests;
 
-import com.kamylo.Scrtly_backend.dto.LikeDto;
+import com.kamylo.Scrtly_backend.dto.PostStatsDto;
+import com.kamylo.Scrtly_backend.dto.CommentStatsDto;
 import com.kamylo.Scrtly_backend.entity.CommentEntity;
 import com.kamylo.Scrtly_backend.entity.LikeEntity;
 import com.kamylo.Scrtly_backend.entity.PostEntity;
@@ -42,7 +43,7 @@ public class LikeServiceImplTest {
     private CommentRepository commentRepository;
 
     @Mock
-    private Mapper<LikeEntity, LikeDto> likeMapper;
+    private Mapper<LikeEntity, PostStatsDto> likeMapper;
 
     @Mock
     private ApplicationEventPublisher eventPublisher;
@@ -57,7 +58,7 @@ public class LikeServiceImplTest {
     private PostEntity post;
     private CommentEntity comment;
     private LikeEntity likeEntity;
-    private LikeDto likeDto;
+    private PostStatsDto likeDto;
 
     @BeforeEach
     void setUp() {
@@ -82,7 +83,7 @@ public class LikeServiceImplTest {
         likeEntity.setUser(user);
         likeEntity.setPost(post);
 
-        likeDto = new LikeDto();
+        likeDto = new PostStatsDto();
     }
 
 
@@ -93,7 +94,7 @@ public class LikeServiceImplTest {
         when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
         when(likeMapper.mapTo(likeEntity)).thenReturn(likeDto);
 
-        LikeDto result = likeService.likePost(post.getId(), "test@example.com");
+        PostStatsDto result = likeService.likePost(post.getId(), "test@example.com");
 
         verify(likeRepository, times(1)).deleteById(likeEntity.getId());
         verify(notificationService, times(1))
@@ -116,7 +117,7 @@ public class LikeServiceImplTest {
         });
         when(likeMapper.mapTo(any(LikeEntity.class))).thenReturn(likeDto);
 
-        LikeDto result = likeService.likePost(post.getId(), "test@example.com");
+        PostStatsDto result = likeService.likePost(post.getId(), "test@example.com");
 
         verify(likeRepository, times(1)).save(any(LikeEntity.class));
         verify(postRepository, times(1)).save(post);
@@ -147,7 +148,7 @@ public class LikeServiceImplTest {
         when(likeRepository.isLikeExistComment(user.getId(), comment.getId())).thenReturn(likeEntity);
         when(likeMapper.mapTo(likeEntity)).thenReturn(likeDto);
 
-        LikeDto result = likeService.likeComment(comment.getId(), "test@example.com");
+        CommentStatsDto result = likeService.likeComment(comment.getId(), "test@example.com");
 
         verify(likeRepository, times(1)).deleteById(likeEntity.getId());
         assertNotNull(result);
@@ -167,7 +168,7 @@ public class LikeServiceImplTest {
         });
         when(likeMapper.mapTo(any(LikeEntity.class))).thenReturn(likeDto);
 
-        LikeDto result = likeService.likeComment(comment.getId(), "test@example.com");
+        CommentStatsDto result = likeService.likeComment(comment.getId(), "test@example.com");
 
         verify(likeRepository, times(1)).save(any(LikeEntity.class));
         verify(commentRepository, times(1)).save(comment);

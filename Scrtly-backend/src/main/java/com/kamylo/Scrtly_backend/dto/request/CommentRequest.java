@@ -8,4 +8,5 @@ import lombok.*;
 public class CommentRequest {
     private Long postId;
     private String comment;
+    private Long parentCommentId;
 }

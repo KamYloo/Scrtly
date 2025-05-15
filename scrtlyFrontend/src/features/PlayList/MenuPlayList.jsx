@@ -11,7 +11,7 @@ import ErrorAlert from "../../Components/ErrorAlert.jsx";
 function MenuPlayList({setCreatePlayList}) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { playList, song} = useSelector(state => state);
+    const { playList } = useSelector(state => state);
 
     const deletePlayListHandler = (playListId) => {
         const confirmDelete = window.confirm('Are you sure you want to delete this playList?');
@@ -29,13 +29,11 @@ function MenuPlayList({setCreatePlayList}) {
         if (localStorage.getItem("user")) {
             dispatch(getUserPlayLists());
         }
-    }, [dispatch, playList.createPlayList, playList.deletePlayList, song.likedSong]);
+    }, [dispatch]);
 
     if (playList.loading) {
         return (
-            <div className="playListBox">
-                <div className="spinner"></div>
-            </div>)
+               <Spinner size={100}/>)
     }
 
     if (playList.error) {

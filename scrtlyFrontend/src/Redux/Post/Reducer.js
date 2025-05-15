@@ -7,11 +7,11 @@ import {
     POST_DELETE_REQUEST, POST_DELETE_SUCCESS, UPDATE_POST_ERROR, UPDATE_POST_REQUEST, UPDATE_POST_SUCCESS
 } from "./ActionType.js";
 
-const initialValue= {
+const initialValue = {
     loading: false,
     error: null,
-    createdPost:null,
-    deletedPost:null,
+    createdPost: null,
+    deletedPost: null,
     posts: {
         content: [],
         pageNumber: 0,
@@ -22,19 +22,41 @@ const initialValue= {
     likedPost: null,
 }
 
-export const postReducer=(state=initialValue, {type,payload})=>{
+export const postReducer = (state = initialValue, { type, payload }) => {
     switch (type) {
         case POST_CREATE_REQUEST:
             return { ...state, loading: true, error: null };
         case POST_CREATE_SUCCESS:
-            return { ...state, loading: false, createdPost: payload };
+            return {
+                ...state,
+                loading: false,
+                createdPost: payload,
+                posts: {
+                    ...state.posts,
+                    content: [payload, ...state.posts.content],
+                    totalElements: state.posts.totalElements + 1
+                }
+            };
         case POST_CREATE_ERROR:
             return { ...state, loading: false, error: payload };
 
         case UPDATE_POST_REQUEST:
             return { ...state, loading: true, error: null };
         case UPDATE_POST_SUCCESS:
-            return { ...state, loading: false, createdPost: payload };
+            return {
+                ...state,
+                loading: false,
+                createdPost: payload,
+                posts: {
+                    ...state.posts,
+                    content: state.posts.content.map(post =>
+                        post.id === payload.id
+                            ? payload
+                            : post
+                    )
+                }
+            };
+
         case UPDATE_POST_ERROR:
             return { ...state, loading: false, error: payload };
 
@@ -48,14 +70,38 @@ export const postReducer=(state=initialValue, {type,payload})=>{
         case POST_DELETE_REQUEST:
             return { ...state, loading: true, error: null };
         case POST_DELETE_SUCCESS:
-            return { ...state, loading: false, deletedPost: payload };
+            return {
+                ...state,
+                loading: false,
+                deletedPost: payload,
+                posts: {
+                    ...state.posts,
+                    content: state.posts.content.filter(p => p.id !== payload),
+                    totalElements: state.posts.totalElements - 1
+                }
+            };
+
         case POST_DELETE_ERROR:
             return { ...state, loading: false, error: payload };
 
         case LIKE_POST_REQUEST:
             return { ...state, loading: true, error: null };
         case LIKE_POST_SUCCESS:
-            return { ...state, loading: false, likedPost: payload };
+            return {
+                ...state,
+                loading: false,
+                likedPost: payload,
+                posts: {
+                    ...state.posts,
+                    content: state.posts.content.map(post =>
+                        post.id === payload.postId
+                            ? { ...post, likedByUser: payload.likedByUser, likeCount: payload.likeCount }
+                            : post
+                    )
+                }
+            };
+
+
         case LIKE_POST_ERROR:
             return { ...state, loading: false, error: payload };
 

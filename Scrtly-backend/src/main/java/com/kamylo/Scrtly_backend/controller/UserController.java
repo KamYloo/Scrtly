@@ -23,7 +23,8 @@ public class UserController {
 
     @GetMapping("/profile/{nickName}")
     public ResponseEntity<UserDto> getProfile(@PathVariable("nickName") String nickName, Principal principal) {
-        UserDto user = userService.getUserProfile(nickName, principal.getName());
+        String username = (principal != null ? principal.getName() : null);
+        UserDto user = userService.getUserProfile(nickName, username);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 

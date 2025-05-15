@@ -11,7 +11,7 @@ function ProfileInfo() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { nickName } = useParams();
-    const { auth } = useSelector(state => state);
+    const { auth, post } = useSelector(state => state);
     const location = useLocation();
     const userData = (() => { try { return JSON.parse(localStorage.getItem("user")) || null; } catch { return null; } })();
 
@@ -58,7 +58,7 @@ function ProfileInfo() {
                         <i><IoIosSettings/></i>
                     </div>
                     <div className="stats">
-                        <p>Posts: 45</p>
+                        <p>Posts: {post.posts.content.length}</p>
                         <p>{auth.findUser?.observersCount} Followers</p>
                         <p>Following: {auth.findUser?.observationsCount}</p>
                     </div>

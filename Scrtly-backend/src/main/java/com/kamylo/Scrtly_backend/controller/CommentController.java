@@ -7,6 +7,7 @@ import com.kamylo.Scrtly_backend.service.CommentService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,8 +30,18 @@ public class CommentController {
                                                                  @RequestParam(defaultValue = "all") String sortBy,
                                                                  Pageable pageable,
                                                                  Principal principal)  {
-        Page<CommentDto> comments = commentService.getCommentsByPostId(postId, sortBy, pageable, principal.getName());
+        String username = (principal != null ? principal.getName() : null);
+        Page<CommentDto> comments = commentService.getCommentsByPostId(postId, sortBy, pageable, username);
         return new ResponseEntity<>(PagedResponse.of(comments), HttpStatus.OK);
+    }
+
+    @GetMapping("/replies/{parentCommentId}")
+    public ResponseEntity<PagedResponse<CommentDto>> getReplies(@PathVariable Long parentCommentId,
+                                                                @PageableDefault(size = 10) Pageable pageable,
+                                                                Principal principal) {
+        String username = (principal != null ? principal.getName() : null);
+        Page<CommentDto> replies = commentService.getReplies(parentCommentId, pageable, username);
+        return new ResponseEntity<>(PagedResponse.of(replies), HttpStatus.OK);
     }
 
     @PutMapping("/update/{commentId}")
@@ -42,6 +53,6 @@ public class CommentController {
     @DeleteMapping("/delete/{commentId}")
     public ResponseEntity<?> deleteComment(@PathVariable Long commentId, Principal principal) {
         commentService.deleteComment(commentId, principal.getName());
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return ResponseEntity.ok(commentId);
     }
 }

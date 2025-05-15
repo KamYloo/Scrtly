@@ -85,7 +85,7 @@ function AudioList({ volume, onTrackChange, initialSongs , req_artist, isplayLis
                                 <div className="section">
                                     <p className="songName">
                                         {song?.title}
-                                        <span className='spanArtist'>{song?.artist.artistName}</span>
+                                        <span className='spanArtist'>{song.artist?.artistName}</span>
                                     </p>
                                     <div className="hits">
                                         <p className="hit">
@@ -113,13 +113,16 @@ function AudioList({ volume, onTrackChange, initialSongs , req_artist, isplayLis
                                                 songDeleteFromAlbumHandler(song.id)}}><BsTrash/></i>}
 
                                         {!isplayListSongs && <div className="addToPlayList">
-                                            <i className="addToPlayListBtn"
-                                               onClick={() => handleAddToPLayListToggle(song.id)}><FaRegSquarePlus/></i>
-                                            {addToPlayList === song.id && (
+                                            <i className="addToPlayListBtn" onClick={() => handleAddToPLayListToggle(song.id)}><FaRegSquarePlus/></i>
+                                            {addToPlayList === song.id && playList?.playLists?.content && (
                                                 <div className="playLists">
-                                                    {playList?.playLists.map((playList) => (<p key={playList.id}
-                                                                                               onClick={() => handleAddSong(playList.id, song.id)}>{playList?.title}</p>))}
-                                                </div>)}
+                                                    {playList.playLists.content.map((playlist) => (
+                                                        <p key={playlist.id} onClick={() => handleAddSong(playlist.id, song.id)}>
+                                                            {playlist.title}
+                                                        </p>
+                                                    ))}
+                                                </div>
+                                            )}
                                         </div>}
 
                                     </div>

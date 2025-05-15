@@ -39,7 +39,7 @@ public class ChatController {
     @DeleteMapping("/delete/{chatId}")
     public ResponseEntity<?> deleteChatHandler(@PathVariable Integer chatId, Principal principal) {
         chatService.deleteChat(chatId, principal.getName());
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return ResponseEntity.ok(chatId);
     }
 
 }

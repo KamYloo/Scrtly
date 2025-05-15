@@ -21,4 +21,5 @@ public class CommentDto {
     private PostMinimalDto post;
     private int likeCount;
     private boolean likedByUser;
+    private Long parentCommentId;
 }

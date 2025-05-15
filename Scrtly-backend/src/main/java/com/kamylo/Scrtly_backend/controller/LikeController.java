@@ -1,7 +1,8 @@
 package com.kamylo.Scrtly_backend.controller;
 
-import com.kamylo.Scrtly_backend.dto.LikeDto;
+import com.kamylo.Scrtly_backend.dto.PostStatsDto;
 import com.kamylo.Scrtly_backend.dto.SongLikeDto;
+import com.kamylo.Scrtly_backend.dto.CommentStatsDto;
 import com.kamylo.Scrtly_backend.service.LikeService;
 import com.kamylo.Scrtly_backend.service.SongLikeService;
 import lombok.AllArgsConstructor;
@@ -19,14 +20,14 @@ public class LikeController {
     private final SongLikeService songLikeService;
 
     @PutMapping("/post/{postId}/like")
-    public ResponseEntity<LikeDto> likePost (@PathVariable Long postId, Principal principal) {
-        LikeDto like = likeService.likePost(postId, principal.getName());
+    public ResponseEntity<PostStatsDto> likePost (@PathVariable Long postId, Principal principal) {
+        PostStatsDto like = likeService.likePost(postId, principal.getName());
         return new ResponseEntity<>(like, HttpStatus.OK);
     }
 
     @PutMapping("/comment/{commentId}/like")
-    public ResponseEntity<LikeDto> likeComment (@PathVariable Long commentId, Principal principal) {
-        LikeDto like = likeService.likeComment(commentId, principal.getName());
+    public ResponseEntity<CommentStatsDto> likeComment (@PathVariable Long commentId, Principal principal) {
+        CommentStatsDto like = likeService.likeComment(commentId, principal.getName());
         return new ResponseEntity<>(like, HttpStatus.OK);
     }
 

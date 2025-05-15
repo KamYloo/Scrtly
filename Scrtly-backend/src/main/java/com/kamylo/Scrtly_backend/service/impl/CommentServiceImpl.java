@@ -45,12 +45,22 @@ public class CommentServiceImpl implements CommentService {
        PostEntity post = postRepository.findById(commentRequest.getPostId()).orElseThrow(
                () -> new CustomException(BusinessErrorCodes.POST_NOT_FOUND));
 
-       CommentEntity commentEntity = CommentEntity.builder()
+       CommentEntity.CommentEntityBuilder commentBuilder = CommentEntity.builder()
                .user(user)
                .post(post)
-               .comment(commentRequest.getComment())
-               .build();
+               .comment(commentRequest.getComment());
 
+        if (commentRequest.getParentCommentId() != null) {
+            CommentEntity parentComment = commentRepository.findById(commentRequest.getParentCommentId())
+                    .orElseThrow(() -> new CustomException(BusinessErrorCodes.COMMENT_NOT_FOUND));
+
+            if (!parentComment.getPost().getId().equals(post.getId())) {
+                throw new CustomException(BusinessErrorCodes.COMMENT_MISMATCH);
+            }
+            commentBuilder.parentComment(parentComment);
+        }
+
+       CommentEntity commentEntity = commentBuilder.build();
        CommentEntity savedCommentEntity = commentRepository.save(commentEntity);
 
         eventPublisher.publishEvent(new NotificationEvent(
@@ -79,7 +89,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Page<CommentDto> getCommentsByPostId(Long postId, String sortBy, Pageable pageable, String username) {
-        UserEntity user = userService.findUserByEmail(username);
+        UserEntity user = (username != null) ? userService.findUserByEmail(username) : null;
         Specification<CommentEntity> spec = Specification.where(CommentSpecification.byPostId(postId));
         if ("latest".equalsIgnoreCase(sortBy)) {
             spec = spec.and(CommentSpecification.orderByLatestActivity());
@@ -89,7 +99,25 @@ public class CommentServiceImpl implements CommentService {
 
         return commentRepository.findAll(spec, pageable).map(commentEntity -> {
             CommentDto commentDto = commentMapper.mapTo(commentEntity);
-            commentDto.setLikedByUser(userLikeChecker.isCommentLikedByUser(commentEntity, user.getId()));
+            if (user != null) {
+                commentDto.setLikedByUser(
+                        userLikeChecker.isCommentLikedByUser(commentEntity, user.getId())
+                );
+            }
+            return commentDto;
+        });
+    }
+
+    @Override
+    public Page<CommentDto> getReplies(Long parentCommentId, Pageable pageable, String username) {
+        UserEntity user = (username != null) ? userService.findUserByEmail(username) : null;
+        return commentRepository.findByParentCommentId(parentCommentId, pageable).map(commentEntity -> {
+            CommentDto commentDto = commentMapper.mapTo(commentEntity);
+            if (user != null) {
+                commentDto.setLikedByUser(
+                        userLikeChecker.isCommentLikedByUser(commentEntity, user.getId())
+                );
+            }
             return commentDto;
         });
     }

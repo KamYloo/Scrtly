@@ -9,5 +9,6 @@ public interface CommentService {
     CommentDto createComment(CommentRequest commentRequest, String username);
     CommentDto updateComment(Long commentId, String content, String username);
     Page<CommentDto> getCommentsByPostId(Long postId, String sortBy, Pageable pageable, String username);
+    Page<CommentDto> getReplies(Long parentCommentId, Pageable pageable, String username);
     void deleteComment(Long commentId, String username);
 }

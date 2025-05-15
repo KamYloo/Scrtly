@@ -65,10 +65,11 @@ public class UserServiceImpl implements UserService {
     public UserDto getUserProfile(String nickname, String reqUsername) {
         UserEntity user = userRepository.findByNickName(nickname).orElseThrow(
                 ()->new UsernameNotFoundException("User not found"));
-        UserEntity reqUser = userRepository.findByEmail(reqUsername).orElseThrow(
-                ()->new UsernameNotFoundException("User not found"));
+        UserEntity reqUser = (reqUsername != null) ? findUserByEmail(reqUsername) : null;
+
         UserDto userDto = mapper.mapTo(user);
-        userDto.setObserved(userLikeChecker.isUserFollowed(user,reqUser.getId()));
+        if (reqUser != null)
+            userDto.setObserved(userLikeChecker.isUserFollowed(user,reqUser.getId()));
         return userDto;
     }
 

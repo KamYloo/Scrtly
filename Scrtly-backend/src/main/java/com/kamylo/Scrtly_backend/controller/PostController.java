@@ -53,14 +53,15 @@ public class PostController {
         Sort sort = Sort.by(sortDir, "creationDate", "updateDate");
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<PostDto> posts = postService.getPosts(pageable, principal.getName(), minLikes, maxLikes);
+        String username = (principal != null ? principal.getName() : null);
+        Page<PostDto> posts = postService.getPosts(pageable, username, minLikes, maxLikes);
         return new ResponseEntity<>(PagedResponse.of(posts), HttpStatus.OK);
-
     }
 
     @GetMapping("/{nickName}/all")
     public ResponseEntity<PagedResponse<PostDto>> getAllPostsByUser(@PathVariable String nickName,
-                                                           @PageableDefault(size = 10, sort = "creationDate", direction = Sort.Direction.DESC) Pageable pageable) {
+                                                                    @PageableDefault(size = 10, sort = "creationDate",
+                                                                    direction = Sort.Direction.DESC) Pageable pageable) {
         Page<PostDto> posts = postService.getPostsByUser(nickName, pageable);
         return new ResponseEntity<>(PagedResponse.of(posts), HttpStatus.OK);
     }
@@ -69,6 +70,6 @@ public class PostController {
     @DeleteMapping("/delete/{postId}")
     public ResponseEntity<?> deletePost(@PathVariable Long postId, Principal principal)  {
         postService.deletePost(postId, principal.getName());
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return ResponseEntity.ok(postId);
     }
 }

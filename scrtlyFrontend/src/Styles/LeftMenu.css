@@ -284,7 +284,7 @@
     transition: all 250ms linear;
 }
 
-@media screen and (max-width: 748px) {
+@media screen and (max-width: 1080px) {
     .LeftMenu {
         width: 64px;
         min-width: 64px;

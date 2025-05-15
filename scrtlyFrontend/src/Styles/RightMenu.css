@@ -166,7 +166,7 @@
 
 }
 
-@media screen and (max-width: 748px) {
+@media screen and (max-width: 1080px) {
     .rightMenu {
         min-width: 64px;
         width: 64px;

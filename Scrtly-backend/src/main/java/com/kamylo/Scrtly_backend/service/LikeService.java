@@ -1,11 +1,12 @@
 package com.kamylo.Scrtly_backend.service;
 
-import com.kamylo.Scrtly_backend.dto.LikeDto;
+import com.kamylo.Scrtly_backend.dto.PostStatsDto;
+import com.kamylo.Scrtly_backend.dto.CommentStatsDto;
 
 public interface LikeService {
-    LikeDto likePost(Long postId, String username);
+    PostStatsDto likePost(Long postId, String username);
 
-    LikeDto likeComment(Long commentId, String username);
+    CommentStatsDto likeComment(Long commentId, String username);
 
 //    public List<LikeEntity> getLikesByPost(Long postId);
 //
