@@ -46,7 +46,7 @@ export const deleteComment = (commentId) => async (dispatch) => {
 
 export const getReplies = (parentCommentId, page = 0, size = 10) => async (dispatch) => {
     return await dispatchAction(dispatch, GET_REPLIES_REQUEST, GET_REPLIES_SUCCESS, GET_REPLIES_FAIL,
-        `/api/comments/replies/${parentCommentId}?page=${page}&size=${size}`, {
+        `/comments/replies/${parentCommentId}?page=${page}&size=${size}`, {
             method: 'GET',
             credentials: 'include',
         });
