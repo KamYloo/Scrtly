@@ -86,7 +86,7 @@ class CommentServiceImplTest {
 
     @Test
     void createComment_shouldSaveCommentAndPublishEvent() {
-        CommentRequest request = new CommentRequest(1L, "New Comment");
+        CommentRequest request = new CommentRequest(1L, "New Comment",null);
 
         when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
         when(postRepository.findById(1L)).thenReturn(Optional.of(post));
@@ -102,7 +102,7 @@ class CommentServiceImplTest {
 
     @Test
     void createComment_shouldThrowExceptionWhenPostNotFound() {
-        CommentRequest request = new CommentRequest(1L, "New Comment");
+        CommentRequest request = new CommentRequest(1L, "New Comment", null);
 
         when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
         when(postRepository.findById(1L)).thenReturn(Optional.empty());
