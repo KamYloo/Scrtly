@@ -33,7 +33,8 @@ public class RefreshTokenEntity {
     @Column(nullable = false)
     private Instant expiryDate;
 
-    @OneToOne()
-    @JoinColumn(name = "user_id", nullable = false, referencedColumnName = "id")
+    @OneToOne(fetch = FetchType.LAZY)
+    @MapsId
+    @JoinColumn(name = "user_id")
     private UserEntity user;
 }

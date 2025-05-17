@@ -32,7 +32,7 @@ public class ActivationToken {
     @Column(nullable = false)
     private Instant expiryDate;
 
-    @OneToOne()
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "user_id", referencedColumnName = "id")
     private UserEntity user;
 }

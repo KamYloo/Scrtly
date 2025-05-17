@@ -29,9 +29,9 @@ public class ArtistEntity {
     @Size(max = 1000, message = "Artist bio cannot exceed 1000 characters")
     private String artistBio;
 
+
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
-    @JoinColumn(name = "id", nullable = false)
-    @NotNull(message = "User must not be null")
+    @JoinColumn(name = "id")
     private UserEntity user;
 }
