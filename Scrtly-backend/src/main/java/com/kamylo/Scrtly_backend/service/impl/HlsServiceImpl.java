@@ -30,8 +30,7 @@ public class HlsServiceImpl implements HlsService {
     private static final Map<String, Integer> AUDIO_RATES = Map.of(
             "64k", 64_000,
             "128k", 128_000,
-            "256k", 256_000,
-            "320k", 320_000
+            "256k", 256_000
     );
 
     @Async("hlsExecutor")
