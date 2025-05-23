@@ -3,10 +3,8 @@ package com.kamylo.Scrtly_backend.controller;
 import com.kamylo.Scrtly_backend.dto.SongDto;
 import com.kamylo.Scrtly_backend.dto.request.SongRequest;
 import com.kamylo.Scrtly_backend.service.SongService;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
@@ -23,8 +21,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.Set;
-
-import static org.aspectj.weaver.tools.cache.SimpleCacheFactory.path;
 
 @RequiredArgsConstructor
 @RestController
