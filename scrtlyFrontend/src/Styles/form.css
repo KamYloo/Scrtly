@@ -33,7 +33,8 @@
 .createAlbum,
 .addSong,
 .createPlayList,
-.editPost {
+.editPost,
+.verifyArtist{
   display: flex;
   justify-content: center;
   flex-direction: column;
@@ -289,7 +290,8 @@
   .createAlbum,
   .editArtist,
   .addSong,
-  .createPlayList{
+  .createPlayList,
+  .verifyArtist{
     width: 90%;
     padding: 20px;
     top: 10vh;
@@ -316,8 +318,8 @@
   .editArtist,
   .addSong,
   .createPlayList,
-  .editPost{
-    background: rgba(0, 0, 0, 0.77);
+  .editPost,
+  .verifyArtist{
     width: 90%;
     top: 5vh;
     left: 5%;
@@ -326,9 +328,6 @@
     margin: 0 auto;
   }
 
-  /* Opcjonalnie zmniejszenie rozmiaru tytułu */
-
-  /* Dodatkowe dostosowanie formularza */
   form {
     width: 100%;
     padding: 0 5px;
