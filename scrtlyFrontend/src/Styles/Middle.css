@@ -186,13 +186,13 @@
 }
 
 .mainBox .menuList ul li:hover::before,
-.mainBox .menuList ul li.active::before {
+.mainBox .menuList ul li a.active::before {
     width: 100%;
     transition: width 0.3s ease;
 }
 
 .mainBox .menuList ul li:hover a,
-.mainBox .menuList ul li.active a {
+.mainBox .menuList ul li a.active {
     color: white;
     transition: 0.3s;
 }
