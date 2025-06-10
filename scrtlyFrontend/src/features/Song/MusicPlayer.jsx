@@ -15,14 +15,18 @@ import { BsDownload } from 'react-icons/bs'
 import Hls from 'hls.js'
 
 export function MusicPlayer({
+                                trackSrc,
                                 hlsManifestUrl,
                                 imgSrc,
                                 auto = false,
                                 volume = 1.0,
                                 initialBufferSegments = 3,
-                                maxBufferSeconds = 15
+                                maxBufferSeconds = 15,
+                                onNext,
+                                onPrev,
+                                isLiked,
+                                onLike
                             }) {
-    const [isLoved, setLoved] = useState(false)
     const [isPlaying, setPlaying] = useState(false)
     const [duration, setDuration] = useState(0)
     const [currentTime, setCurrentTime] = useState(0)
@@ -38,17 +42,24 @@ export function MusicPlayer({
         const audio = audioRef.current
         if (!audio || !hlsManifestUrl) return
 
+        if (hlsRef.current) {
+            hlsRef.current.destroy()
+            hlsRef.current = null
+        }
+        initialBufferedRef.current = false
+
         if (Hls.isSupported()) {
             const hls = new Hls({ maxBufferLength: maxBufferSeconds, autoStartLoad: false })
             hlsRef.current = hls
             hls.attachMedia(audio)
             hls.loadSource(hlsManifestUrl)
 
-            const onLoadedMeta = () => {
+            const onMeta = () => {
                 setDuration(audio.duration)
                 if (progressRef.current) progressRef.current.max = audio.duration
+                if (auto) startPlayback()
             }
-            audio.addEventListener('loadedmetadata', onLoadedMeta)
+            audio.addEventListener('loadedmetadata', onMeta)
 
             hls.on(Hls.Events.FRAG_APPENDED, (_, data) => {
                 if (!initialBufferedRef.current && data.frag.sn >= initialBufferSegments - 1) {
@@ -59,32 +70,62 @@ export function MusicPlayer({
             })
 
             return () => {
-                audio.removeEventListener('loadedmetadata', onLoadedMeta)
+                audio.removeEventListener('loadedmetadata', onMeta)
                 hls.destroy()
                 clearTimeout(bufferTimeoutRef.current)
                 cancelAnimationFrame(rafRef.current)
             }
         }
 
-        if (audio.canPlayType('application/vnd.apple.mpegurl')) {
-            audio.src = hlsManifestUrl
-            const onNativeMeta = () => {
-                setDuration(audio.duration)
-                if (progressRef.current) progressRef.current.max = audio.duration
-                if (auto) startPlayback()
-            }
-            audio.addEventListener('loadedmetadata', onNativeMeta)
-            return () => audio.removeEventListener('loadedmetadata', onNativeMeta)
+        audio.src = hlsManifestUrl
+        const onNativeMeta = () => {
+            setDuration(audio.duration)
+            if (progressRef.current) progressRef.current.max = audio.duration
+            if (auto) startPlayback()
+        }
+        audio.addEventListener('loadedmetadata', onNativeMeta)
+        return () => {
+            audio.removeEventListener('loadedmetadata', onNativeMeta)
         }
     }, [hlsManifestUrl, auto, initialBufferSegments, maxBufferSeconds])
+
+    useEffect(() => {
+        const audio = audioRef.current
+        if (!audio) return
+
+        const handleEnded = () => {
+            setPlaying(false)
+            cancelAnimationFrame(rafRef.current)
+            if (onNext) onNext()
+        }
+        audio.addEventListener('ended', handleEnded)
+        return () => {
+            audio.removeEventListener('ended', handleEnded)
+        }
+    }, [onNext])
 
     useEffect(() => {
         if (audioRef.current) audioRef.current.volume = volume
     }, [volume])
 
+    useEffect(() => {
+        if (auto && audioRef.current) {
+            audioRef.current.currentTime = 0
+            startPlayback()
+        }
+    }, [hlsManifestUrl])
+
     const startPlayback = () => {
         const audio = audioRef.current
         if (!audio) return
+
+        const hls = hlsRef.current
+        if (hls && !initialBufferedRef.current) {
+            hls.startLoad(0)
+        } else if (hls) {
+            hls.startLoad(-1)
+        }
+
         audio.play()
         setPlaying(true)
         rafRef.current = requestAnimationFrame(updateWhilePlaying)
@@ -101,11 +142,6 @@ export function MusicPlayer({
             cancelAnimationFrame(rafRef.current)
             if (hls) hls.stopLoad()
         } else {
-            if (hls && !initialBufferedRef.current) {
-                hls.startLoad(0)
-            } else if (hls) {
-                hls.startLoad(-1)
-            }
             startPlayback()
         }
     }
@@ -116,7 +152,7 @@ export function MusicPlayer({
             const hls = hlsRef.current
             if (audio && hls && isPlaying) {
                 const end = audio.buffered.length
-                          ? audio.buffered.end(audio.buffered.length - 1)
+                    ? audio.buffered.end(audio.buffered.length - 1)
                     : 0
                 if (end - audio.currentTime < 5) {
                     hls.startLoad(-1)
@@ -130,10 +166,7 @@ export function MusicPlayer({
         const bar = progressRef.current
         if (audio && bar) {
             bar.value = audio.currentTime
-            bar.style.setProperty(
-                '--seek',
-                `${(audio.currentTime / audio.duration) * 100}%`
-            )
+            bar.style.setProperty('--seek', `${(audio.currentTime / audio.duration) * 100}%`)
             setCurrentTime(audio.currentTime)
             scheduleBufferCheck()
         }
@@ -152,9 +185,16 @@ export function MusicPlayer({
     const formatTime = sec => {
         const m = Math.floor(sec / 60)
         const s = Math.floor(sec % 60)
-        return `${m.toString().padStart(2, '0')}:${s
-            .toString()
-            .padStart(2, '0')}`
+        return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
+    }
+
+    const downloadSong = () => {
+        const link = document.createElement('a')
+        link.href = trackSrc
+        link.download = 'song.mp3'
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
     }
 
     return (
@@ -166,26 +206,26 @@ export function MusicPlayer({
                 <audio ref={audioRef} preload="metadata" />
                 <div className="top">
                     <div className="left">
-                        <div className="loved" onClick={() => setLoved(l => !l)}>
-                            {isLoved ? <FaHeart /> : <FaRegHeart />}
+                        <div className="loved" onClick={onLike}>
+                            {isLiked ? <FaHeart /> : <FaRegHeart/>}
                         </div>
-                        <BsDownload className="download" />
+                        <BsDownload className="download" onClick={downloadSong}/>
                     </div>
                     <div className="middle">
-                        <div className="back">
-                            <FaStepBackward />
-                            <FaBackward />
+                        <div className="back" onClick={onPrev}>
+                            <FaStepBackward/>
+                            <FaBackward/>
                         </div>
                         <div className="playPause" onClick={togglePlay}>
-                            {isPlaying ? <FaPause /> : <FaPlay />}
+                            {isPlaying ? <FaPause/> : <FaPlay/>}
                         </div>
-                        <div className="forward">
-                            <FaForward />
-                            <FaStepForward />
+                        <div className="forward" onClick={onNext}>
+                            <FaForward/>
+                            <FaStepForward/>
                         </div>
                     </div>
                     <div className="right">
-                        <FaShareAlt />
+                        <FaShareAlt/>
                     </div>
                 </div>
                 <div className="bottom">

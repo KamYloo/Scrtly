@@ -46,6 +46,10 @@
     justify-content: space-between;
 }
 
+.musicPlayer .songAttributes .top .left {
+    gap: 1vh;
+}
+
 .musicPlayer .songAttributes .top .left,
 .musicPlayer .songAttributes .top .right {
     display: flex;

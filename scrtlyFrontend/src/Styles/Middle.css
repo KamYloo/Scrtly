@@ -319,7 +319,7 @@
     color: red;
 }
 
-.songsBox .songs .song .section .hits .favourite i {
+.songsBox .songs .song .section .hits .favourite svg {
     color: rgb(74, 189, 28);
     filter: drop-shadow(0px 0px 4px rgb(74, 189, 28));
 }
@@ -369,6 +369,24 @@
         padding: 2vh 4vh;
         word-wrap: break-word;
     }
+}
+
+.songs .duration {
+    display: flex;
+    align-items: center;
+}
+
+.songs .duration .clock-icon {
+    margin-right: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.songs.playing {
+    box-shadow: 0 4px 8px rgba(44, 44, 51, 0.7);
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 5px;
+    transition: box-shadow 0.3s;
 }
 
 @media screen and (max-width : 748px) {
@@ -445,7 +463,6 @@
         justify-content: space-between;
     }
 }
-
 
 @media screen and (max-width: 950px) {
     .Banner {

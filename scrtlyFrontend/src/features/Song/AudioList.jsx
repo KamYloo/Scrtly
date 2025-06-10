@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, {useCallback, useState} from 'react'
 import { FaHeadphones, FaHeart, FaRegClock, FaRegHeart } from 'react-icons/fa'
 import { FaRegSquarePlus } from 'react-icons/fa6'
 import { MusicPlayer } from './MusicPlayer.jsx'
@@ -10,21 +10,22 @@ import toast from 'react-hot-toast'
 
 // eslint-disable-next-line react/prop-types
 function AudioList({ volume, onTrackChange, initialSongs, req_artist, isplayListSongs, playListId }) {
-    const [currentManifest, setCurrentManifest] = useState(initialSongs[0]?.hlsManifestUrl)
-    const [img, setImage] = useState(initialSongs[0]?.imageSong)
+    const [currentIndex, setCurrentIndex] = useState(0)
     const [auto, setAuto] = useState(false)
     const [addToPlayList, setAddToPlayList] = useState(null)
 
     const dispatch = useDispatch()
     const { playList } = useSelector((store) => store)
 
-    const setMainSong = (manifestUrl, imgSrc, songName, songArtist) => {
-        const encodedManifest = encodeURI(manifestUrl)
-        const encodedImg = encodeURI(imgSrc)
-        setCurrentManifest(encodedManifest)
-        setImage(encodedImg)
+    const currentSong = initialSongs[currentIndex] || {}
+
+    const setMainSong = (index) => {
+        setCurrentIndex(index)
         setAuto(true)
-        onTrackChange(songName, songArtist)
+        onTrackChange(
+            initialSongs[index]?.title,
+            initialSongs[index]?.artist?.artistName
+        )
     }
 
     function formatTime(seconds) {
@@ -61,20 +62,25 @@ function AudioList({ volume, onTrackChange, initialSongs, req_artist, isplayList
         dispatch(likeSong(songId))
     }
 
+    const handleNextSong = useCallback(() => {
+        const nextIndex = (currentIndex + 1) % initialSongs.length
+        setMainSong(nextIndex)
+    }, [currentIndex, initialSongs])
+
+    const handlePrevSong = useCallback(() => {
+        const prevIndex = (currentIndex - 1 + initialSongs.length) % initialSongs.length
+        setMainSong(prevIndex)
+    }, [currentIndex, initialSongs])
+
     return (
         <div className='audioList'>
             <h2 className='title'>The List <span>{initialSongs?.length} songs</span></h2>
             <div className='songsBox'>
                 {initialSongs?.map((songItem, index) => (
                     <div
-                        className='songs'
+                        className={`songs ${index === currentIndex ? 'playing' : ''}`}
                         key={songItem?.id}
-                        onClick={() => setMainSong(
-                            songItem?.hlsManifestUrl,
-                            songItem?.imageSong,
-                            songItem?.title,
-                            songItem?.artist.artistName
-                        )}
+                        onClick={() => setMainSong(index)}
                     >
                         <div className='count'>#{index + 1}</div>
                         <div className='song'>
@@ -87,10 +93,23 @@ function AudioList({ volume, onTrackChange, initialSongs, req_artist, isplayList
                                     <span className='spanArtist'>{songItem.artist?.artistName}</span>
                                 </p>
                                 <div className='hits'>
-                                    <p className='hit'><FaHeadphones /> 95,490,102</p>
-                                    <p className='duration'><FaRegClock />{formatTime(songItem?.duration)}</p>
+                                    <p className='hit'>
+                                        <FaHeadphones /> 95,490,102
+                                    </p>
+                                    <p className='duration'>
+                                        <span className="clock-icon">
+                                            <FaRegClock />
+                                        </span>
+                                        <span className="time-value">
+                                            {formatTime(songItem?.duration)}
+                                        </span>
+                                    </p>
                                     <div className='favourite' onClick={() => likeSongHandler(songItem.id)}>
-                                        {songItem?.favorite ? <FaHeart /> : <FaRegHeart />}
+                                        {songItem?.favorite ? (
+                                            <FaHeart />
+                                        ) : (
+                                            <FaRegHeart />
+                                        )}
                                     </div>
                                     {(req_artist || isplayListSongs) && (
                                         <i className='deleteSong' onClick={() => {
@@ -122,10 +141,15 @@ function AudioList({ volume, onTrackChange, initialSongs, req_artist, isplayList
                 ))}
             </div>
             <MusicPlayer
-                hlsManifestUrl={currentManifest}
-                imgSrc={img}
+                trackSrc={currentSong?.track}
+                hlsManifestUrl={currentSong?.hlsManifestUrl}
+                imgSrc={encodeURI(currentSong?.imageSong || '')}
                 auto={auto}
                 volume={volume}
+                onNext={handleNextSong}
+                onPrev={handlePrevSong}
+                isLiked={currentSong?.favorite}
+                onLike={() => likeSongHandler(currentSong?.id)}
             />
         </div>
     )
