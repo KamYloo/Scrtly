@@ -34,6 +34,13 @@ public class SongEntity {
     @Column(nullable = false, length = 255)
     private String track;
 
+    @Size(max = 512)
+    @Column(length = 512)
+    private String hlsManifestUrl;
+
+    @Column(length = 100)
+    private String contentType;
+
     private int duration;
 
     @NotBlank(message = "Image must not be blank")

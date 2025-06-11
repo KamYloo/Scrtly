@@ -3,23 +3,34 @@ package com.kamylo.Scrtly_backend.controller;
 import com.kamylo.Scrtly_backend.dto.SongDto;
 import com.kamylo.Scrtly_backend.dto.request.SongRequest;
 import com.kamylo.Scrtly_backend.service.SongService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.Set;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/song")
 public class SongController {
 
     private final SongService songService;
+
+    @Value("${application.hls.directory}")
+    private String hlsBasePath;
 
     @PostMapping("/upload")
     public ResponseEntity<SongDto> createSong(@RequestPart("songDetails")SongRequest songRequest,
@@ -35,6 +46,36 @@ public class SongController {
     public ResponseEntity<Set<SongDto>> searchSong(@RequestParam("title") String title) {
         Set<SongDto> songs = songService.searchSongByTitle(title);
         return new ResponseEntity<>(songs, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}/hls/master")
+    public ResponseEntity<Resource> getMasterManifest(@PathVariable Long id) throws MalformedURLException {
+        Path master = Paths.get(hlsBasePath, id.toString(), "master.m3u8");
+        if (!Files.exists(master)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        Resource resource = new UrlResource(master.toUri());
+        return ResponseEntity.ok()
+                .contentType(MediaType.valueOf("application/vnd.apple.mpegurl"))
+                .body(resource);
+    }
+
+    @GetMapping("/{id}/hls/{rate}/{segment}")
+    public ResponseEntity<Resource> getSegment(
+            @PathVariable Long id,
+            @PathVariable String rate,
+            @PathVariable String segment) throws MalformedURLException {
+
+        Path seg = Paths.get(hlsBasePath, id.toString(), rate, segment);
+
+        if (!Files.exists(seg)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        Resource resource = new UrlResource(seg.toUri());
+        return ResponseEntity.ok()
+                .contentType(MediaType.valueOf("video/MP2T"))
+                .body(resource);
     }
 
     @DeleteMapping("/delete/{songId}")

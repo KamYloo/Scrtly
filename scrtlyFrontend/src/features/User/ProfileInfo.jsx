@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import "../../Styles/Profile.css";
-import { IoIosSettings } from "react-icons/io";
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import {findUser, followUser} from "../../Redux/AuthService/Action.js";
+import { findUser, followUser } from "../../Redux/AuthService/Action.js";
 import { useDispatch, useSelector } from "react-redux";
 import Spinner from "../../Components/Spinner.jsx";
 import ErrorAlert from "../../Components/ErrorAlert.jsx";
+import ArtistVerificationModal from "./ArtistVerificationModal.jsx";
 
 function ProfileInfo() {
     const navigate = useNavigate();
@@ -13,12 +13,18 @@ function ProfileInfo() {
     const { nickName } = useParams();
     const { auth, post } = useSelector(state => state);
     const location = useLocation();
-    const userData = (() => { try { return JSON.parse(localStorage.getItem("user")) || null; } catch { return null; } })();
+    const [showVerifyModal, setShowVerifyModal] = useState(false);
+    const userData = (() => {
+        try { 
+            return JSON.parse(localStorage.getItem("user")) || null; 
+        } catch { 
+            return null; 
+        }
+    })();
 
     useEffect(() => {
         dispatch(findUser(nickName));
     }, [dispatch, nickName]);
-
 
     useEffect(() => {
         const searchParams = new URLSearchParams(location.search);
@@ -51,11 +57,15 @@ function ProfileInfo() {
                             </button>
                         )}
                         {auth.findUser?.id === userData?.id && (
-                            <button onClick={() => navigate("/profile/edit")}>
-                                Edit Profile
-                            </button>
+                            <>
+                                <button onClick={() => navigate("/profile/edit")}>
+                                    Edit Profile
+                                </button>
+                                <button onClick={() => setShowVerifyModal(true)} style={{ marginLeft: '10px' }}>
+                                    Verify
+                                </button>
+                            </>
                         )}
-                        <i><IoIosSettings/></i>
                     </div>
                     <div className="stats">
                         <p>Posts: {post.posts.content.length}</p>
@@ -68,6 +78,7 @@ function ProfileInfo() {
                     </div>
                 </div>
             </div>
+            {showVerifyModal && <ArtistVerificationModal onClose={() => setShowVerifyModal(false)} />}
         </div>
     );
 }

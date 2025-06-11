@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -46,7 +48,13 @@ public class PlayListEntity {
     @JoinTable(
             name = "playlist_songs",
             joinColumns = @JoinColumn(name = "playlist_id"),
-            inverseJoinColumns = @JoinColumn(name = "song_id")
+            inverseJoinColumns = @JoinColumn(name = "song_id",
+                    foreignKey = @ForeignKey(
+                            name = "FK_playlist_songs_song",
+                            foreignKeyDefinition =
+                                    "FOREIGN KEY(song_id) REFERENCES songs(id) ON DELETE CASCADE"
+                    ))
     )
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<SongEntity> songs = new HashSet<>();
 }

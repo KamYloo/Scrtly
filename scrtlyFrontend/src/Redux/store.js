@@ -11,9 +11,11 @@ import {albumReducer} from "./Album/Reducer.js";
 import {songReducer} from "./Song/Reducer.js";
 import {playListReducer} from "./PlayList/Reducer.js";
 import {notificationReducer} from "./NotificationService/Reducer.js";
+import {userReducer} from "./UserService/Reducer.js";
 
 const rootReducer = combineReducers({
     auth: authReducer,
+    userService: userReducer,
     artist: artistReducer,
     chat: chatReducer,
     chatMessage: chatMessageReducer,

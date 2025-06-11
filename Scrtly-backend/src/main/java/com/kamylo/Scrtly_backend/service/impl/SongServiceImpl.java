@@ -2,6 +2,7 @@ package com.kamylo.Scrtly_backend.service.impl;
 
 import com.kamylo.Scrtly_backend.dto.AlbumDto;
 import com.kamylo.Scrtly_backend.dto.SongDto;
+import com.kamylo.Scrtly_backend.dto.UserDto;
 import com.kamylo.Scrtly_backend.dto.request.SongRequest;
 import com.kamylo.Scrtly_backend.entity.AlbumEntity;
 import com.kamylo.Scrtly_backend.entity.SongEntity;
@@ -41,6 +42,10 @@ public class SongServiceImpl implements SongService {
     private final AlbumService albumService;
     private final Mapper<AlbumEntity, AlbumDto> albumMapper;
     private final Mapper<SongEntity, SongDto> songMapper;
+    private final HlsService hlsService;
+
+    @Value("${application.file.image-dir}")
+    private String storageBasePath;
 
     @Value("${application.file.cdn}")
     private String cdnBaseUrl;
@@ -76,9 +81,20 @@ public class SongServiceImpl implements SongService {
                 .imageSong(imagePath)
                 .track(audioPath)
                 .duration(duration)
+                .contentType(audioFile.getContentType())
                 .build();
 
         SongEntity savedSong = songRepository.save(songEntity);
+
+        String localAudioPath = savedSong.getTrack()
+                .replace(cdnBaseUrl + "audio/", storageBasePath + "audio/");
+
+        hlsService.generateHls(localAudioPath, savedSong.getId())
+                .thenAccept(manifestUrl -> {
+                    savedSong.setHlsManifestUrl(manifestUrl);
+                    songRepository.save(savedSong);
+                });
+
         return songMapper.mapTo(savedSong);
     }
 
@@ -98,9 +114,10 @@ public class SongServiceImpl implements SongService {
                 .orElseThrow(() -> new CustomException(BusinessErrorCodes.SONG_NOT_FOUND));
 
         if (validateSongOwnership(username, songEntity)) {
-            songRepository.delete(songEntity);
+            hlsService.deleteHlsFolder(songEntity.getId());
             fileService.deleteFile(songEntity.getImageSong());
             fileService.deleteFile(songEntity.getTrack());
+            songRepository.delete(songEntity);
         } else {
             throw new CustomException(BusinessErrorCodes.SONG_MISMATCH);
         }

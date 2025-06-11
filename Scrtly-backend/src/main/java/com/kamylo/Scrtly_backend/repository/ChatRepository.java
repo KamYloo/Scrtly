@@ -2,6 +2,7 @@ package com.kamylo.Scrtly_backend.repository;
 
 import com.kamylo.Scrtly_backend.entity.ChatRoomEntity;
 import com.kamylo.Scrtly_backend.entity.UserEntity;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,6 +12,7 @@ import java.util.List;
 @Repository
 public interface ChatRepository extends JpaRepository<ChatRoomEntity, Integer> {
 
+    @EntityGraph(attributePaths = "participants")
     @Query("SELECT c FROM ChatRoomEntity c JOIN c.participants p WHERE p.id = :userId")
     List<ChatRoomEntity> findChatRoomsByUserId(@Param("userId") Long userId);
 

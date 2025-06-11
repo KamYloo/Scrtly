@@ -24,7 +24,6 @@ public class UserRoleServiceImpl implements UserRoleService {
 
     private boolean hasRole(String username, String role) {
         UserEntity user = userService.findUserByEmail(username);
-        user.getAuthorities().forEach(auth -> System.out.println("Authority: " + auth.getAuthority()));
         return user.getAuthorities().stream()
                 .anyMatch(auth -> auth.getAuthority().equalsIgnoreCase(role));
     }

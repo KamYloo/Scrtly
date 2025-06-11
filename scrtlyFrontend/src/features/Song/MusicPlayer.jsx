@@ -1,132 +1,250 @@
 import React, { useState, useRef, useEffect } from 'react'
 import '../../Styles/MusicPlayer.css'
-import { FaBackward, FaForward, FaHeart, FaPause, FaPlay, FaRegHeart, FaShareAlt, FaStepBackward, FaStepForward } from 'react-icons/fa'
+import {
+    FaBackward,
+    FaForward,
+    FaHeart,
+    FaPause,
+    FaPlay,
+    FaRegHeart,
+    FaShareAlt,
+    FaStepBackward,
+    FaStepForward
+} from 'react-icons/fa'
 import { BsDownload } from 'react-icons/bs'
+import Hls from 'hls.js'
 
-function MusicPlayer({ song, imgSrc, auto, volume }) {
+export function MusicPlayer({
+                                trackSrc,
+                                hlsManifestUrl,
+                                imgSrc,
+                                auto = false,
+                                volume = 1.0,
+                                initialBufferSegments = 3,
+                                maxBufferSeconds = 15,
+                                onNext,
+                                onPrev,
+                                isLiked,
+                                onLike
+                            }) {
+    const [isPlaying, setPlaying] = useState(false)
+    const [duration, setDuration] = useState(0)
+    const [currentTime, setCurrentTime] = useState(0)
 
-    const [isLove, setLoved] = useState(false)
-    const [isPlaying, setPlay] = useState(false)
-    const [duration, setDuration] = useState(0);
-    const [currentTime, setCurrentTime] = useState(0);
-
-    const audioPlayer = useRef();
-    const progressBar = useRef();
-    const animationRef = useRef()
+    const audioRef = useRef(null)
+    const progressRef = useRef(null)
+    const rafRef = useRef(null)
+    const hlsRef = useRef(null)
+    const bufferTimeoutRef = useRef(null)
+    const initialBufferedRef = useRef(false)
 
     useEffect(() => {
-        const seconds = Math.floor(audioPlayer.current.duration)
-        setDuration(seconds)
-        progressBar.current.max = seconds
-    }, [audioPlayer?.current?.loadedmetada, audioPlayer?.current?.readyState])
+        const audio = audioRef.current
+        if (!audio || !hlsManifestUrl) return
 
-    useEffect(() => {
-        if (audioPlayer.current) {
-            audioPlayer.current.volume = volume;  // Ustawienie głośności audioPlayera
+        if (hlsRef.current) {
+            hlsRef.current.destroy()
+            hlsRef.current = null
         }
-    }, [volume]);
+        initialBufferedRef.current = false
 
-    const changePlayPause = () => {
-        const prevValue = isPlaying
-        if (!prevValue) {
-            audioPlayer.current.play()
-            animationRef.current = requestAnimationFrame(whilePlaying);
+        if (Hls.isSupported()) {
+            const hls = new Hls({ maxBufferLength: maxBufferSeconds, autoStartLoad: false })
+            hlsRef.current = hls
+            hls.attachMedia(audio)
+            hls.loadSource(hlsManifestUrl)
+
+            const onMeta = () => {
+                setDuration(audio.duration)
+                if (progressRef.current) progressRef.current.max = audio.duration
+                if (auto) startPlayback()
+            }
+            audio.addEventListener('loadedmetadata', onMeta)
+
+            hls.on(Hls.Events.FRAG_APPENDED, (_, data) => {
+                if (!initialBufferedRef.current && data.frag.sn >= initialBufferSegments - 1) {
+                    initialBufferedRef.current = true
+                    hls.stopLoad()
+                    if (auto) startPlayback()
+                }
+            })
+
+            return () => {
+                audio.removeEventListener('loadedmetadata', onMeta)
+                hls.destroy()
+                clearTimeout(bufferTimeoutRef.current)
+                cancelAnimationFrame(rafRef.current)
+            }
+        }
+
+        audio.src = hlsManifestUrl
+        const onNativeMeta = () => {
+            setDuration(audio.duration)
+            if (progressRef.current) progressRef.current.max = audio.duration
+            if (auto) startPlayback()
+        }
+        audio.addEventListener('loadedmetadata', onNativeMeta)
+        return () => {
+            audio.removeEventListener('loadedmetadata', onNativeMeta)
+        }
+    }, [hlsManifestUrl, auto, initialBufferSegments, maxBufferSeconds])
+
+    useEffect(() => {
+        const audio = audioRef.current
+        if (!audio) return
+
+        const handleEnded = () => {
+            setPlaying(false)
+            cancelAnimationFrame(rafRef.current)
+            if (onNext) onNext()
+        }
+        audio.addEventListener('ended', handleEnded)
+        return () => {
+            audio.removeEventListener('ended', handleEnded)
+        }
+    }, [onNext])
+
+    useEffect(() => {
+        if (audioRef.current) audioRef.current.volume = volume
+    }, [volume])
+
+    useEffect(() => {
+        if (auto && audioRef.current) {
+            audioRef.current.currentTime = 0
+            startPlayback()
+        }
+    }, [hlsManifestUrl])
+
+    const startPlayback = () => {
+        const audio = audioRef.current
+        if (!audio) return
+
+        const hls = hlsRef.current
+        if (hls && !initialBufferedRef.current) {
+            hls.startLoad(0)
+        } else if (hls) {
+            hls.startLoad(-1)
+        }
+
+        audio.play()
+        setPlaying(true)
+        rafRef.current = requestAnimationFrame(updateWhilePlaying)
+    }
+
+    const togglePlay = () => {
+        const audio = audioRef.current
+        const hls = hlsRef.current
+        if (!audio) return
+
+        if (isPlaying) {
+            audio.pause()
+            setPlaying(false)
+            cancelAnimationFrame(rafRef.current)
+            if (hls) hls.stopLoad()
         } else {
-            audioPlayer.current.pause()
-            cancelAnimationFrame(animationRef.current);
+            startPlayback()
         }
-
-        setPlay(!prevValue)
     }
 
-
-    const calculateTime = (sec) => {
-        const minutes = Math.floor(sec / 60)
-        const returnMin = minutes < 10 ? `0${minutes}` : `${minutes}`
-        const seconds = Math.floor(sec % 60)
-        const returnSec = seconds < 10 ? `0${seconds}` : `${seconds}`
-        return `${returnMin} : ${returnSec}`
+    const scheduleBufferCheck = () => {
+        bufferTimeoutRef.current = setTimeout(() => {
+            const audio = audioRef.current
+            const hls = hlsRef.current
+            if (audio && hls && isPlaying) {
+                const end = audio.buffered.length
+                    ? audio.buffered.end(audio.buffered.length - 1)
+                    : 0
+                if (end - audio.currentTime < 5) {
+                    hls.startLoad(-1)
+                }
+            }
+        }, 1000)
     }
 
-    const whilePlaying = () => {
-        progressBar.current.value = audioPlayer.current.currentTime
-        changeCurrentTime();
-        animationRef.current = requestAnimationFrame(whilePlaying)
+    const updateWhilePlaying = () => {
+        const audio = audioRef.current
+        const bar = progressRef.current
+        if (audio && bar) {
+            bar.value = audio.currentTime
+            bar.style.setProperty('--seek', `${(audio.currentTime / audio.duration) * 100}%`)
+            setCurrentTime(audio.currentTime)
+            scheduleBufferCheck()
+        }
+        rafRef.current = requestAnimationFrame(updateWhilePlaying)
     }
 
-    const changeProgress = () => {
-        audioPlayer.current.currentTime = progressBar.current.value
-        changeCurrentTime();
+    const onSeek = () => {
+        const audio = audioRef.current
+        const bar = progressRef.current
+        if (audio && bar) {
+            audio.currentTime = bar.value
+            setCurrentTime(bar.value)
+        }
     }
 
-    const changeCurrentTime = () => {
-        progressBar.current.style.setProperty('--player-played', `${(progressBar.current.value / duration) * 100}%`)
-        setCurrentTime(progressBar.current.value)
-    };
-
-    const changeLoved = () => {
-        setLoved(!isLove)
+    const formatTime = sec => {
+        const m = Math.floor(sec / 60)
+        const s = Math.floor(sec % 60)
+        return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
     }
 
+    const downloadSong = () => {
+        const link = document.createElement('a')
+        link.href = trackSrc
+        link.download = 'song.mp3'
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+    }
 
     return (
-        <div className='musicPlayer'>
+        <div className="musicPlayer">
             <div className="songImage">
-                <img src={imgSrc} alt="" />
+                <img src={imgSrc} alt="cover art" />
             </div>
             <div className="songAttributes">
-                <audio src={song} preload="metadata" ref={audioPlayer}></audio>
-
+                <audio ref={audioRef} preload="metadata" />
                 <div className="top">
                     <div className="left">
-                        <div className="loved" onClick={changeLoved}>
-                            {isLove ? (
-                                <i>
-                                    <FaHeart />
-                                </i>
-                            ) : (
-                                <i>
-                                    <FaRegHeart />
-                                </i>
-
-                            )}
+                        <div className="loved" onClick={onLike}>
+                            {isLiked ? <FaHeart /> : <FaRegHeart/>}
                         </div>
-                        <i className="download"><BsDownload /></i>
+                        <BsDownload className="download" onClick={downloadSong}/>
                     </div>
                     <div className="middle">
-                        <div className="back">
-                            <i><FaStepBackward /></i>
-                            <i><FaBackward /></i>
+                        <div className="back" onClick={onPrev}>
+                            <FaStepBackward/>
+                            <FaBackward/>
                         </div>
-                        <div className="playPause" onClick={changePlayPause}>
-                            {isPlaying ? (
-                                <i>
-                                    <FaPause />
-                                </i>
-                            ) : (
-                                <i>
-                                    <FaPlay />
-                                </i>
-                            )}
+                        <div className="playPause" onClick={togglePlay}>
+                            {isPlaying ? <FaPause/> : <FaPlay/>}
                         </div>
-                        <div className="forward">
-                            <i><FaForward /></i>
-                            <i><FaStepForward /></i>
+                        <div className="forward" onClick={onNext}>
+                            <FaForward/>
+                            <FaStepForward/>
                         </div>
                     </div>
-                    <div className="right"><i><FaShareAlt /></i></div>
+                    <div className="right">
+                        <FaShareAlt/>
+                    </div>
                 </div>
-
                 <div className="bottom">
-                    <div className="currentTime">{calculateTime(currentTime)}</div>
-                    <input type="range" className='progresBar' ref={progressBar} onChange={changeProgress} autoPlay={auto} />
-                    <div className="duration">{duration && !isNaN(duration) && calculateTime(duration)
-                        ? duration && !isNaN(duration) && calculateTime(duration)
-                        : "00:00"}</div>
+                    <div className="currentTime">{formatTime(currentTime)}</div>
+                    <input
+                        type="range"
+                        className="progresBar"
+                        ref={progressRef}
+                        min="0"
+                        max={duration}
+                        step="0.01"
+                        value={currentTime}
+                        onChange={onSeek}
+                    />
+                    <div className="duration">
+                        {duration ? formatTime(duration) : '00:00'}
+                    </div>
                 </div>
             </div>
         </div>
     )
 }
-
-export { MusicPlayer }

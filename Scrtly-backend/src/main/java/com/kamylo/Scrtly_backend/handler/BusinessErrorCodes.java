@@ -48,6 +48,7 @@ public enum BusinessErrorCodes {
     INVALID_TOKEN(339,"Invalid token", HttpStatus.BAD_REQUEST),
     USER_ALREADY_ARTIST(340,"User already artist", HttpStatus.BAD_REQUEST),
     VERIFICATION_ALREADY_REQUESTED(341,"verification has already been sent", HttpStatus.FORBIDDEN),
+    HLS_GENERATION_FAILED(342, "HLS generation failed", HttpStatus.INTERNAL_SERVER_ERROR),
     ;
     private final int code;
     private final String description;

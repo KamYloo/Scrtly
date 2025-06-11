@@ -10,4 +10,10 @@ public class CustomException extends RuntimeException {
         super(businessErrorCodes.getDescription());
         this.errorCode = businessErrorCodes;
     }
+
+    public CustomException(BusinessErrorCodes businessErrorCodes, Throwable cause) {
+        super(businessErrorCodes.getDescription(), cause);
+        this.errorCode = businessErrorCodes;
+    }
+
 }

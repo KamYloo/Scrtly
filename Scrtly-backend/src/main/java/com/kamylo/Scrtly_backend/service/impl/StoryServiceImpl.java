@@ -76,8 +76,8 @@ public class StoryServiceImpl implements StoryService {
                 () -> new CustomException(BusinessErrorCodes.STORY_NOT_FOUND));
 
         if (validateStoryOwnership(username, story)) {
-            storyRepository.deleteById(storyId);
             fileService.deleteFile(story.getImage());
+            storyRepository.deleteById(storyId);
         } else {
             throw new CustomException(BusinessErrorCodes.STORY_MISMATCH);
         }
