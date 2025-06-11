@@ -161,8 +161,8 @@ public class PlayListServiceImpl implements PlayListService {
                     songLikeRepository.deleteBySong(songEntity);
                 }
             }
-            playListRepository.delete(playListEntity);
             fileService.deleteFile(playListEntity.getCoverImage());
+            playListRepository.delete(playListEntity);
         } else {
             throw new CustomException(BusinessErrorCodes.PLAYLIST_MISMATCH);
         }

@@ -7,8 +7,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileSystemUtils;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -26,6 +28,9 @@ public class HlsServiceImpl implements HlsService {
 
     @Value("${application.file.cdn}")
     private String cdnBaseUrl;
+
+    @Value("${application.file.image-dir}")
+    private String storageBasePath;
 
     private static final Map<String, Integer> AUDIO_RATES = Map.of(
             "64k", 64_000,
@@ -78,6 +83,16 @@ public class HlsServiceImpl implements HlsService {
 
         } catch (IOException | InterruptedException e) {
             throw new CustomException(BusinessErrorCodes.HLS_GENERATION_FAILED, e);
+        }
+    }
+
+    @Override
+    public void deleteHlsFolder(Long songId) {
+        Path hlsDir = Paths.get(storageBasePath, "hls", songId.toString());
+        try {
+            FileSystemUtils.deleteRecursively(hlsDir);
+        } catch (IOException ex) {
+            throw new UncheckedIOException("Failed to delete HLS folder for song " + songId, ex);
         }
     }
 

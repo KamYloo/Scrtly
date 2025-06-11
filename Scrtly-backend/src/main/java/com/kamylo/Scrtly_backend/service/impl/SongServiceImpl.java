@@ -114,9 +114,10 @@ public class SongServiceImpl implements SongService {
                 .orElseThrow(() -> new CustomException(BusinessErrorCodes.SONG_NOT_FOUND));
 
         if (validateSongOwnership(username, songEntity)) {
-            songRepository.delete(songEntity);
+            hlsService.deleteHlsFolder(songEntity.getId());
             fileService.deleteFile(songEntity.getImageSong());
             fileService.deleteFile(songEntity.getTrack());
+            songRepository.delete(songEntity);
         } else {
             throw new CustomException(BusinessErrorCodes.SONG_MISMATCH);
         }
