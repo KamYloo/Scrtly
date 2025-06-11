@@ -15,6 +15,10 @@ RUN mvn clean package -DskipTests
 # Stage 2: Run the application
 FROM openjdk:19-jdk
 
+RUN apt-get update \
+    && apt-get install -y ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
 # Set the working directory
 WORKDIR /app
 
