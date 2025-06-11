@@ -13,11 +13,11 @@ COPY src /app/src
 RUN mvn clean package -DskipTests
 
 # Stage 2: Run the application
-FROM openjdk:19-jdk
+FROM openjdk:19-jdk-slim
 
 RUN apt-get update \
-    && apt-get install -y ffmpeg \
-    && rm -rf /var/lib/apt/lists/*
+ && apt-get install -y --no-install-recommends ffmpeg \
+ && rm -rf /var/lib/apt/lists/*
 
 # Set the working directory
 WORKDIR /app
