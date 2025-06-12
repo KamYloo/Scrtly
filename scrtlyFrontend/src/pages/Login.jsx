@@ -50,7 +50,7 @@ function Login() {
             toast.success("You have logged in successfully.");
             navigate("/home");
         }
-    }, [loginResponse, navigate]);
+    }, [dispatch, loginResponse, navigate]);
 
     return (
         <div className='login'>

@@ -7,13 +7,12 @@ import toast from "react-hot-toast";
 
 function ProfileEdit() {
   const dispatch = useDispatch()
-  const userData = (() => { try { return JSON.parse(localStorage.getItem("user")) || null; } catch { return null; } })();
-  const [fullName, setFullName] = useState(userData?.fullName || "")
-  const [description, setDescription] = useState(userData?.description || "")
+  const { loading, reqUser } = useSelector(state => state.auth);
+  const [fullName, setFullName] = useState(reqUser?.fullName || "")
+  const [description, setDescription] = useState(reqUser?.description || "")
   const [profilePicture, setProfilePicture] = useState(null)
-  const [preview, setPreview] = useState(userData?.profilePicture ? userData.profilePicture : '');
+  const [preview, setPreview] = useState(reqUser?.profilePicture ? reqUser.profilePicture : '');
   const navigate = useNavigate()
-  const { loading } = useSelector(state => state.auth);
 
   const handleFileChange = (e) => {
     setProfilePicture(e.target.files[0])
@@ -31,11 +30,9 @@ function ProfileEdit() {
     }
 
     dispatch(updateUser(formData))
-        .then((res) => {
-          const updatedUserData = { ...userData, profilePicture: res.profilePicture, description: res.description, fullName: res.fullName };
-          localStorage.setItem("user", JSON.stringify(updatedUserData));
+        .then(() => {
           toast.success('User updated successfully.');
-          navigate(`/profile/${userData?.nickName}?reload=true`);
+          navigate(`/profile/${reqUser?.nickName}?reload=true`);
         })
         .catch(() => {
           toast.error('Failed to update user. Please try again.');
@@ -63,7 +60,7 @@ function ProfileEdit() {
             <div className="editAvatar">
               <div className="left">
                 <img src={preview} alt=""/>
-                <p>{userData?.fullName || 'Name Surname'}</p>
+                <p>{reqUser?.fullName || 'Name Surname'}</p>
               </div>
               <div className="right">
                 <input type="file" onChange={handleFileChange}/>

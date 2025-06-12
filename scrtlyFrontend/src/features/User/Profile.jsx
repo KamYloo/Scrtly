@@ -3,7 +3,6 @@ import "../../Styles/Profile.css"
 import { ProfileInfo } from './ProfileInfo.jsx'
 import {useDispatch, useSelector} from "react-redux";
 import {getPostsByUser} from "../../Redux/Post/Action.js";
-import {BASE_API_URL} from "../../config/api.js";
 import {Post} from "../Discover/Post.jsx";
 import {useParams} from "react-router-dom";
 import Spinner from "../../Components/Spinner.jsx";

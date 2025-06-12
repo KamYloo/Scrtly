@@ -1,3 +1,5 @@
+import {LOGIN_SUCCESS, LOGOUT_SUCCESS} from "../Redux/AuthService/ActionType.js";
+
 export const BASE_API_URL = "http://localhost:8080"
 
 export const fetchWithAuth = async (url, options = {}, errorType) => {
@@ -13,7 +15,7 @@ export const fetchWithAuth = async (url, options = {}, errorType) => {
             credentials: 'include'
         });
 
-        if (url === '/api/auth/login' && response.status === 401) {
+        if (url === '/api/authService/login' && response.status === 401) {
             const errorData = await response.json();
             const msg = errorData.error || errorData.businessErrornDescription;
             return { error: true, message: msg };
@@ -43,7 +45,7 @@ export const fetchWithAuth = async (url, options = {}, errorType) => {
             const serverMessage =
                 errorData.message ||
                 errorData.businessErrornDescription ||
-                errorData.error ||                    // backup
+                errorData.error ||
                 (errorData.validationErrors && errorData.validationErrors.join(', ')) ||
                 'Request failed';
             return { error: true, message: serverMessage };
@@ -71,19 +73,19 @@ export const dispatchAction = async (
     dispatch({ type: actionTypeRequest });
     try {
         const result = await fetchWithAuth(url, options, actionTypeRequest);
-
-        console.log(result);
-
-        if (result.user) {
-            localStorage.setItem('user', JSON.stringify(result.user));
-        }
-
+        // console.log(result);
         if (result.error) {
             dispatch({ type: actionTypeError, payload: result.message });
             throw new Error(result.message);
         }
 
         dispatch({ type: actionTypeSuccess, payload: result });
+
+        if (actionTypeSuccess === LOGIN_SUCCESS) {
+            localStorage.setItem("isLoggedIn", "1");
+        } else if (actionTypeSuccess === LOGOUT_SUCCESS) {
+            localStorage.removeItem("isLoggedIn");
+        }
         return result;
     } catch (error) {
         dispatch({ type: actionTypeError, payload: error.message });

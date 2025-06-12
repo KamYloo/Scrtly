@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 
 import {sendNotification} from "../../Redux/NotificationService/Action.js";
 import {connectWebSocket} from "../../utils/websocketClient.js";
@@ -7,17 +7,17 @@ import {connectWebSocket} from "../../utils/websocketClient.js";
 
 const NotificationsListener = () => {
     const dispatch = useDispatch();
-    const userData = (() => { try { return JSON.parse(localStorage.getItem("user")) || null; } catch { return null; } })();
+    const { reqUser } = useSelector(state => state.auth);
 
     useEffect(() => {
-        if (userData) {
-            const client = connectWebSocket(userData.email, (notification) => {
+        if (reqUser) {
+            const client = connectWebSocket(reqUser.email, (notification) => {
                 dispatch(sendNotification(notification));
             });
 
             return () => client.deactivate();
         }
-    }, [userData, dispatch]);
+    }, [reqUser, dispatch]);
 
     return null;
 };

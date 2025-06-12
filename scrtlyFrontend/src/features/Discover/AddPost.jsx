@@ -13,7 +13,7 @@ function AddPost() {
   const [descriptionText, setDescriptionText] = useState('')
   const [filePic, setFilePic] = useState(null)
   const [openEmoji, setOpenEmoji] = useState(false)
-  const userData = (() => { try { return JSON.parse(localStorage.getItem("user")) || null; } catch { return null; } })();
+  const { reqUser } = useSelector(state => state.auth);
   const navigate = useNavigate();
   const { loading } = useSelector(state => state.post);
 
@@ -47,7 +47,7 @@ function AddPost() {
   return (
     <div className='addPost'>
       <div className="context">
-        <img src={userData?.profilePicture} alt="" onClick={() => navigate(`/profile/${userData?.nickName}`)}/>
+        <img src={reqUser?.profilePicture} alt="" onClick={() => navigate(`/profile/${reqUser?.nickName}`)}/>
         <div className="middle">
           <textarea type="text" value={descriptionText}
                     onChange={(e) => setDescriptionText(e.target.value)} />

@@ -87,6 +87,13 @@ public class AuthController {
         return new ResponseEntity<>("Logged out successfully", HttpStatus.OK);
     }
 
+    @GetMapping("/check")
+    public ResponseEntity<?> checkAuth(HttpServletRequest request){
+        String token = cookieService.getCookieValue(request, "jwt");
+        UserDto user = authService.verifyToken(token);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
     @GetMapping("/active/{userId}/{token}")
     public ResponseEntity<?> active_account(@PathVariable Long userId, @PathVariable String token, HttpServletResponse response)
             throws IOException {

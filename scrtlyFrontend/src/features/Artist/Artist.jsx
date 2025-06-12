@@ -16,14 +16,7 @@ import ErrorAlert from '../../Components/ErrorAlert.jsx'
 function Artist({ volume, onTrackChange }) {
   const { artistId } = useParams()
   const dispatch = useDispatch()
-  const { artist, song } = useSelector(state => state)
-  const userData = (() => {
-    try {
-      return JSON.parse(localStorage.getItem('user')) || null
-    } catch {
-      return null
-    }
-  })()
+  const { artist, song, auth } = useSelector(state => state)
 
   useEffect(() => {
     dispatch(findArtistById(artistId))
@@ -84,9 +77,9 @@ function Artist({ volume, onTrackChange }) {
         </div>
 
         <Routes>
-          <Route path="popular" element={<AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={artist?.songs.content} req_artist={artist.findArtist?.id === userData?.id}/>}/>
+          <Route path="popular" element={<AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={artist?.songs.content} req_artist={artist.findArtist?.id === auth.reqUser?.id}/>}/>
           <Route path="albums" element={<ArtistAlbums artistId={artistId} />} />
-          <Route path="songs" element={<AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={artist?.songs.content} req_artist={artist.findArtist?.id === userData?.id}/>}/>
+          <Route path="songs" element={<AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={artist?.songs.content} req_artist={artist.findArtist?.id === auth.reqUser?.id}/>}/>
           <Route path="fans" element={<Fans artistId={artistId} fans={artist.findArtist?.fans} />}/>
           <Route path="about" element={<AboutArtist artist={artist} artistBio={artist.findArtist?.artistBio} />}/>
         </Routes>

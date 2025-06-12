@@ -14,7 +14,7 @@ function Stories() {
   const [currentUserIndex, setCurrentUserIndex] = useState(0);
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
   const dispatch = useDispatch()
-  const userData = (() => { try { return JSON.parse(localStorage.getItem("user")) || null; } catch { return null; } })();
+  const { reqUser } = useSelector(state => state.auth);
   const {story} = useSelector(store => store);
 
     const handleScrollLeft = () => {
@@ -49,7 +49,7 @@ function Stories() {
         </button>
         <div className="box" ref={storyBoxRef}>
           <div className="story add-story" onClick={() => setAddStory(((prev) => !prev))}>
-            <img src={userData?.profilePicture } alt="Add story" />
+            <img src={reqUser?.profilePicture } alt="Add story" />
             <span>+ Story</span>
           </div>
             {Object.entries(story.stories).map(([user, stories], userIndex) => (

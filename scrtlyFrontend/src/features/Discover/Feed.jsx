@@ -23,7 +23,7 @@ function Feed() {
   const [sortOrder, setSortOrder] = useState('date-desc');
 
   const dispatch = useDispatch();
-  const { post, comment } = useSelector(store => store);
+  const { post } = useSelector(store => store);
   const navigate = useNavigate();
 
   const handleProfileClick = (nickName) => {

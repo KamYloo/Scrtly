@@ -14,13 +14,6 @@ function ProfileInfo() {
     const { auth, post } = useSelector(state => state);
     const location = useLocation();
     const [showVerifyModal, setShowVerifyModal] = useState(false);
-    const userData = (() => {
-        try { 
-            return JSON.parse(localStorage.getItem("user")) || null; 
-        } catch { 
-            return null; 
-        }
-    })();
 
     useEffect(() => {
         dispatch(findUser(nickName));
@@ -50,13 +43,13 @@ function ProfileInfo() {
                 <div className="right">
                     <div className="top">
                         <p>{auth.findUser?.fullName || 'Name Surname'}</p>
-                        {auth.findUser?.id !== userData?.id && (
+                        {auth.findUser?.id !== auth.reqUser?.id && (
                             <button className={auth.findUser?.observed ? 'following' : 'follow'}
                                     onClick={() => dispatch(followUser(auth.findUser?.id))}>
                                 {auth.findUser?.observed ? 'unFollow' : 'Follow'}
                             </button>
                         )}
-                        {auth.findUser?.id === userData?.id && (
+                        {auth.findUser?.id === auth.reqUser?.id && (
                             <>
                                 <button onClick={() => navigate("/profile/edit")}>
                                     Edit Profile

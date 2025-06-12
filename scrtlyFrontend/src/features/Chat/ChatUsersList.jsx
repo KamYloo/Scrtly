@@ -4,7 +4,7 @@ import { MdDeleteSweep } from "react-icons/md";
 import { BsPlus } from "react-icons/bs";
 import { FaMinus } from "react-icons/fa";
 import { AddUser } from './AddUser.jsx';
-import { useDispatch } from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import { deleteChat } from "../../Redux/Chat/Action.js";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -12,19 +12,13 @@ import toast from "react-hot-toast";
 function ChatUsersList({ chat, onChatSelect }) {
     const [addMode, setAddMode] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const userData = (() => {
-        try {
-            return JSON.parse(localStorage.getItem("user")) || null;
-        } catch {
-            return null;
-        }
-    })();
+    const { reqUser } = useSelector(state => state.auth);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const filteredChats = chat?.chats?.filter(chatItem => {
         if (!chatItem.participants || chatItem.participants.length === 0) return false;
-        const otherParticipants = chatItem.participants.filter(user => user.id !== userData?.id);
+        const otherParticipants = chatItem.participants.filter(user => user.id !== reqUser?.id);
         const displayName = chatItem.chatRoomName || (otherParticipants[0]?.fullName || '');
         return displayName.toLowerCase().includes(searchQuery.toLowerCase());
     });
@@ -67,7 +61,7 @@ function ChatUsersList({ chat, onChatSelect }) {
             <div className="userList">
                 {filteredChats && filteredChats.length > 0 ? (
                     filteredChats.map((chatItem) => {
-                        const otherParticipants = chatItem.participants.filter(user => user.id !== userData?.id);
+                        const otherParticipants = chatItem.participants.filter(user => user.id !== reqUser?.id);
                         const displayName = chatItem.chatRoomName || (otherParticipants[0]?.fullName || "Unknown User");
 
                         return (

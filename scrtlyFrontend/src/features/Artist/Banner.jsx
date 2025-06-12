@@ -4,7 +4,7 @@ import Verification from '../../assets/check.png'
 import { FaEllipsisH, FaHeadphones, FaCheck } from 'react-icons/fa'
 import {EditArtist} from "./EditArtist.jsx";
 import {CreateAlbum} from "../Album/CreateAlbum.jsx";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {followUser} from "../../Redux/AuthService/Action.js";
 
 // eslint-disable-next-line react/prop-types
@@ -13,7 +13,7 @@ function Banner({artist}) {
     const [editArtist, setEditArtist] = useState(false)
     const [createAlbum, setCreateAlbum] = useState(false)
     const dispatch = useDispatch()
-    const userData = (() => { try { return JSON.parse(localStorage.getItem("user")) || null; } catch { return null; } })();
+    const { reqUser } = useSelector(state => state.auth);
 
     return (
         <div className='banner'>
@@ -21,7 +21,7 @@ function Banner({artist}) {
             <div className="content">
                 <div className="top">
                     <p>Home <span>/Popular Artist</span></p>
-                    {artist.findArtist?.id === userData?.id && <i onClick={() => setMenu(((prev) => !prev))}><FaEllipsisH/></i>}
+                    {artist.findArtist?.id === reqUser?.id && <i onClick={() => setMenu(((prev) => !prev))}><FaEllipsisH/></i>}
                     {menu && <ul className="list">
                         <li onClick={() => {
                         setEditArtist(((prev) => !prev))
@@ -47,7 +47,7 @@ function Banner({artist}) {
                         <p><i><FaHeadphones/></i> 12,132,5478 <span>Monthly listeners</span></p>
                     </div>
                     <div className="right">
-                        {!artist.findArtist?.id === userData?.id && <button className={artist.findArtist?.followed ? 'following' : 'follow'}
+                        {!artist.findArtist?.id === reqUser?.id && <button className={artist.findArtist?.followed ? 'following' : 'follow'}
                         onClick={() => dispatch(followUser(artist.findArtist?.id))}><i><FaCheck/></i>{artist.findArtist?.observed ? 'Following': 'Follow'}</button>}
                     </div>
                 </div>
