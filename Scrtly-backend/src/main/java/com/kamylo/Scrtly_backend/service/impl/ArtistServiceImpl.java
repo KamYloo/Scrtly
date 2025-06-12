@@ -56,9 +56,14 @@ public class ArtistServiceImpl implements ArtistService {
     public ArtistDto getArtistProfile(Long artistId, String username) {
         ArtistEntity artistEntity = artistRepository.findById(artistId).orElseThrow(
                 () -> new CustomException(BusinessErrorCodes.ARTIST_NOT_FOUND));
-        UserEntity user = userService.findUserByEmail(username);
+        boolean observed = false;
+        if (username != null) {
+            UserEntity user = userService.findUserByEmail(username);
+            observed = ArtistUtil.isArtistFollowed(artistEntity.getUser(), user.getId());
+        }
+
         ArtistDto artistDto = artistMapper.mapTo(artistEntity);
-        artistDto.setObserved(ArtistUtil.isArtistFollowed(artistEntity.getUser(), user.getId()));
+        artistDto.setObserved(observed);
         return artistDto;
     }
 
