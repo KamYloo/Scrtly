@@ -1,4 +1,4 @@
-import {dispatchAction} from "../../config/api.js";
+import {dispatchAction} from "../api.js";
 import {
     CREATE_PLAYLIST_ERROR,
     CREATE_PLAYLIST_REQUEST,

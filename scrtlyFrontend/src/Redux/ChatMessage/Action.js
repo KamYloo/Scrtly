@@ -1,4 +1,4 @@
-import {dispatchAction} from "../../config/api.js";
+import {dispatchAction} from "../api.js";
 import {
     GET_ALL_MESSAGES_ERROR, GET_ALL_MESSAGES_REQUEST, GET_ALL_MESSAGES_SUCCESS
 } from "./ActionType.js";

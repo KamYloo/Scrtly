@@ -6,6 +6,8 @@ import {useDispatch, useSelector} from "react-redux";
 import {createPost} from "../../Redux/Post/Action.js";
 import {useNavigate} from "react-router-dom";
 import toast from "react-hot-toast";
+import defaultAvatar from "../../assets/user.jpg";
+
 
 
 function AddPost() {
@@ -13,7 +15,7 @@ function AddPost() {
   const [descriptionText, setDescriptionText] = useState('')
   const [filePic, setFilePic] = useState(null)
   const [openEmoji, setOpenEmoji] = useState(false)
-  const userData = (() => { try { return JSON.parse(localStorage.getItem("user")) || null; } catch { return null; } })();
+  const { reqUser } = useSelector(state => state.auth);
   const navigate = useNavigate();
   const { loading } = useSelector(state => state.post);
 
@@ -47,7 +49,7 @@ function AddPost() {
   return (
     <div className='addPost'>
       <div className="context">
-        <img src={userData?.profilePicture} alt="" onClick={() => navigate(`/profile/${userData?.nickName}`)}/>
+        <img src={reqUser?.profilePicture || defaultAvatar} alt="" onClick={() => navigate(`/profile/${reqUser?.nickName}`)}/>
         <div className="middle">
           <textarea type="text" value={descriptionText}
                     onChange={(e) => setDescriptionText(e.target.value)} />

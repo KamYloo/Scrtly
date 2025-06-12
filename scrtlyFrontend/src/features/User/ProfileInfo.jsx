@@ -4,8 +4,10 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { findUser, followUser } from "../../Redux/AuthService/Action.js";
 import { useDispatch, useSelector } from "react-redux";
 import Spinner from "../../Components/Spinner.jsx";
-import ErrorAlert from "../../Components/ErrorAlert.jsx";
+import ErrorOverlay from "../../Components/ErrorOverlay.jsx";
 import ArtistVerificationModal from "./ArtistVerificationModal.jsx";
+import defaultAvatar from "../../assets/user.jpg";
+
 
 function ProfileInfo() {
     const navigate = useNavigate();
@@ -14,13 +16,6 @@ function ProfileInfo() {
     const { auth, post } = useSelector(state => state);
     const location = useLocation();
     const [showVerifyModal, setShowVerifyModal] = useState(false);
-    const userData = (() => {
-        try { 
-            return JSON.parse(localStorage.getItem("user")) || null; 
-        } catch { 
-            return null; 
-        }
-    })();
 
     useEffect(() => {
         dispatch(findUser(nickName));
@@ -37,26 +32,26 @@ function ProfileInfo() {
         return <Spinner />;
     }
     if (auth.error) {
-        return <ErrorAlert message={auth.error} />;
+        return <ErrorOverlay message={auth.error} />;
     }
 
     return (
         <div className='profileInfo'>
             <div className="userData">
                 <img
-                    src={auth.findUser?.profilePicture || ''}
+                    src={auth.findUser?.profilePicture || defaultAvatar}
                     alt={auth.findUser?.fullName || 'Profile Picture'}
                 />
                 <div className="right">
                     <div className="top">
                         <p>{auth.findUser?.fullName || 'Name Surname'}</p>
-                        {auth.findUser?.id !== userData?.id && (
+                        {auth.findUser?.id !== auth.reqUser?.id && (
                             <button className={auth.findUser?.observed ? 'following' : 'follow'}
                                     onClick={() => dispatch(followUser(auth.findUser?.id))}>
                                 {auth.findUser?.observed ? 'unFollow' : 'Follow'}
                             </button>
                         )}
-                        {auth.findUser?.id === userData?.id && (
+                        {auth.findUser?.id === auth.reqUser?.id && (
                             <>
                                 <button onClick={() => navigate("/profile/edit")}>
                                     Edit Profile

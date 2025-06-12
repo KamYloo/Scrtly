@@ -11,6 +11,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { useNavigate } from "react-router-dom";
 import { EditPost } from "./EditPost.jsx";
 import Spinner from "../../Components/Spinner.jsx";
+import defaultAvatar from "../../assets/user.jpg";
 
 function Feed() {
   const [selectedPost, setSelectedPost] = useState(false);
@@ -23,7 +24,7 @@ function Feed() {
   const [sortOrder, setSortOrder] = useState('date-desc');
 
   const dispatch = useDispatch();
-  const { post, comment } = useSelector(store => store);
+  const { post } = useSelector(store => store);
   const navigate = useNavigate();
 
   const handleProfileClick = (nickName) => {
@@ -141,7 +142,7 @@ function Feed() {
         {post.posts.content.map((item) => (
           <div className="post" key={item.id}>
             <div className="up">
-              <img src={item.user?.profilePicture} alt=""
+              <img src={item.user?.profilePicture || defaultAvatar} alt=""
                    onClick={() => handleProfileClick(item.user.nickName)}/>
               <div className="userData">
                 <p>{item.user.fullName}</p>

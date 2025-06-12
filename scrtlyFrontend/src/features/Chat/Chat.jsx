@@ -10,6 +10,7 @@ import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client/dist/sockjs";
 import { useNavigate } from "react-router-dom";
 import {BASE_API_URL} from "../../config/api.js";
+import defaultAvatar from "../../assets/user.jpg";
 
 function Chat({ chat, onBack }) {
     const [open, setOpen] = useState(false);
@@ -17,16 +18,7 @@ function Chat({ chat, onBack }) {
     const [stompClient, setStompClient] = useState(null);
     const [editingMessageId, setEditingMessageId] = useState(null);
     const [editingMessageText, setEditingMessageText] = useState("");
-
-    const { chatMessage } = useSelector(store => store);
-    const userData = (() => {
-        try {
-            return JSON.parse(localStorage.getItem("user")) || null;
-        } catch {
-            return null;
-        }
-    })();
-
+    const { chatMessage, auth } = useSelector(store => store);
     const messagesEndRef = useRef(null);
     const messagesContainerRef = useRef(null);
     const prevScrollHeightRef = useRef(0);
@@ -143,7 +135,7 @@ function Chat({ chat, onBack }) {
         }
     };
 
-    const otherPerson = chat.participants.find(user => user.id !== userData?.id);
+    const otherPerson = chat.participants.find(user => user.id !== auth.reqUser?.id);
     return (
         <div className='chat'>
             <div className="top">
@@ -154,7 +146,7 @@ function Chat({ chat, onBack }) {
                     {chat?.participants && chat.participants.length === 2 ? (
                         <>
                             <img
-                                src={otherPerson?.profilePicture}
+                                src={otherPerson?.profilePicture || defaultAvatar}
                                 alt={otherPerson?.fullName}
                                 onClick={() => navigate(`/profile/${otherPerson?.nickName}`)}
                             />
@@ -179,11 +171,11 @@ function Chat({ chat, onBack }) {
             <div className="center" ref={messagesContainerRef} onScroll={handleScroll}>
                 {chatMessage.messages?.map((item, index) => (
                     <div
-                        className={item.user.id === userData?.id ? "messageOwn" : "message"}
+                        className={item.user.id === auth.reqUser?.id ? "messageOwn" : "message"}
                         key={`${item.id}-${index}`}
                     >
                         <img
-                            src={otherPerson?.profilePicture}
+                            src={otherPerson?.profilePicture || defaultAvatar}
                             alt={otherPerson?.fullName}
                             onClick={() => navigate(`/profile/${otherPerson?.nickName}`)}
                         />
@@ -204,7 +196,7 @@ function Chat({ chat, onBack }) {
                             </p>
                             <div className="info">
                                 <span>{item.lastModifiedDate ? formatTimeAgo(item.lastModifiedDate) : formatTimeAgo(item.createDate)}</span>
-                                {item.user.id === userData?.id && (
+                                {item.user.id === auth.reqUser?.id && (
                                     <>
                                         {editingMessageId === item.id ? (
                                             <>

@@ -162,6 +162,19 @@ public class AuthServiceImpl implements AuthService {
         passwordResetTokenService.deleteToken(resetToken);
     }
 
+    @Override
+    public UserDto verifyToken(String token) {
+        if(!jwtService.validateJwtToken(token)){
+            throw new CustomException(BusinessErrorCodes.INVALID_TOKEN);
+        }
+        String userName = jwtService.extractUserName(token);
+
+        UserEntity user = userRepository.findByEmail(userName).orElseThrow(
+                () -> new UsernameNotFoundException("User not found"));
+
+        return mapper.mapTo(user);
+    }
+
     private void sendValidationEmail(UserEntity user) throws MessagingException {
         ActivationToken activationToken = activationTokenService.getActivationTokenByUser(user);
         emailService.sendEmail(

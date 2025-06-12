@@ -1,4 +1,4 @@
-import {dispatchAction} from "../../config/api.js";
+import {dispatchAction} from "../api.js";
 import {
     CREATE_COMMENT_FAIL,
     CREATE_COMMENT_REQUEST,

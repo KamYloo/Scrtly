@@ -6,13 +6,13 @@ import { getAllPostComments, likeComment, deleteComment, getReplies } from "../.
 import { formatDistanceToNow } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../../Components/Spinner.jsx";
+import defaultAvatar from "../../assets/user.jpg";
+
 
 function Comments({ post }) {
-    const { comment } = useSelector(store => store)
+    const { comment, auth } = useSelector(store => store)
     const dispatch = useDispatch()
     const navigate = useNavigate();
-
-    const userData = (() => { try { return JSON.parse(localStorage.getItem("user")) || null; } catch { return null; } })();
 
     const [activeReplyInputId, setActiveReplyInputId] = useState(null);
     const [activeRepliesId, setActiveRepliesId] = useState(null);
@@ -108,7 +108,7 @@ function Comments({ post }) {
     return (
         <div className='commentsSection'>
             <div className="up">
-                <img src={post?.user.profilePicture} alt="" onClick={() => navigate(`/profile/${post?.user.nickName}`)} />
+                <img src={post?.user.profilePicture || defaultAvatar} alt="" onClick={() => navigate(`/profile/${post?.user.nickName}`)} />
                 <p>{post?.user.fullName}</p>
             </div>
             <hr className="line" />
@@ -122,7 +122,7 @@ function Comments({ post }) {
 
             <div className="comments">
                 <div className="comment Own">
-                    <img src={post?.user.profilePicture} alt="" onClick={() => navigate(`/profile/${post?.user.nickName}`)} />
+                    <img src={post?.user.profilePicture || defaultAvatar} alt="" onClick={() => navigate(`/profile/${post?.user.nickName}`)} />
                     <div className="context">
                         <p>{post.user.fullName}</p>
                         <span>{post.description}</span>
@@ -132,7 +132,7 @@ function Comments({ post }) {
                 {comment.comments.content.filter(c => !c.parentCommentId).map(item => (
                     <div key={item.id} className="commentContainer">
                         <div className="comment">
-                            <img src={item.user?.profilePicture} alt="" onClick={() => navigate(`/profile/${item.user.nickName}`)} />
+                            <img src={item.user?.profilePicture || defaultAvatar} alt="" onClick={() => navigate(`/profile/${item.user.nickName}`)} />
                             <div className="context">
                                 <p>{item.user.fullName}</p>
                                 <span>{item.comment}</span>
@@ -145,7 +145,7 @@ function Comments({ post }) {
                                 <i onClick={() => likeCommentHandler(item.id)}>
                                     {item.likedByUser ? <AiFillLike /> : <AiOutlineLike />}
                                 </i>
-                                {item.user?.nickName === userData?.nickName && (
+                                {item.user?.nickName === auth.reqUser?.nickName && (
                                     <i onClick={() => handleDeleteComment(item.id)} style={{ marginLeft: '10px' }}>
                                         <AiOutlineDelete />
                                     </i>
@@ -162,7 +162,7 @@ function Comments({ post }) {
                             <div className="repliesContainer" onScroll={handleRepliesScroll} ref={el => { repliesRefs.current[item.id] = el }} style={{ maxHeight: '300px', overflowY: 'auto', overflowAnchor: 'none' }}>
                                 {repliesData.map(reply => (
                                     <div key={reply.id} className="comment reply">
-                                        <img src={reply.user?.profilePicture} alt="" onClick={() => navigate(`/profile/${reply.user.nickName}`)} />
+                                        <img src={reply.user?.profilePicture || defaultAvatar} alt="" onClick={() => navigate(`/profile/${reply.user.nickName}`)} />
                                         <div className="context">
                                             <p>{reply.user.fullName}</p>
                                             <span>{reply.comment}</span>
@@ -175,7 +175,7 @@ function Comments({ post }) {
                                             <i onClick={() => likeCommentHandler(reply.id)}>
                                                 {reply.likedByUser ? <AiFillLike /> : <AiOutlineLike />}
                                             </i>
-                                            {reply.user?.nickName === userData?.nickName && (
+                                            {reply.user?.nickName === auth.reqUser?.nickName && (
                                                 <i onClick={() => handleDeleteComment(reply.id)} style={{ marginLeft: '10px' }}>
                                                     <AiOutlineDelete />
                                                 </i>

@@ -2,13 +2,14 @@ import React, {useEffect, useState} from 'react'
 import "../Styles/AlbumsView&&ArtistsView.css"
 import ArtistBanner from '../assets/ArtistsBanner.png'
 import Verification from '../assets/check.png'
+import defaultAvatar from "../assets/user.jpg";
 import { BiSearchAlt } from "react-icons/bi";
 import { FaHeadphones } from "react-icons/fa";
 import {useDispatch, useSelector} from "react-redux";
 import {useNavigate} from "react-router-dom";
 import {getAllArtists} from "../Redux/Artist/Action.js";
 import Spinner from "../Components/Spinner.jsx";
-import ErrorAlert from "../Components/ErrorAlert.jsx";
+import ErrorOverlay from "../Components/ErrorOverlay.jsx";
 
 function ArtistsView() {
     const dispatch = useDispatch()
@@ -28,7 +29,7 @@ function ArtistsView() {
         return <Spinner />;
     }
     if (artist.error) {
-        return <ErrorAlert message={artist.error} />;
+        return <ErrorOverlay message={artist.error} />;
     }
 
     return (
@@ -52,7 +53,7 @@ function ArtistsView() {
                 <div className="artist" key={item.id} onClick={() => navigate(`/artist/${item.id}/popular`)}>
                     <i className="listen"><FaHeadphones/></i>
                     <div className="imgPic">
-                        <img src={item.profilePicture} alt=""/>
+                        <img src={item.profilePicture || defaultAvatar} alt=""/>
                         <img className='check' src={Verification} alt=""/>
                     </div>
                     <p>{item?.pseudonym}</p>

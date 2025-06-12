@@ -14,4 +14,5 @@ public interface AuthService {
     void activateUser(Long id, String token);
     void forgotPassword(String email) throws MessagingException;
     void restPassword(Long userId, String token, RestPasswordRequest restPasswordRequest);
+    UserDto verifyToken(String token);
 }

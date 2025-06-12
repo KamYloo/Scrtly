@@ -11,14 +11,16 @@ import com.kamylo.Scrtly_backend.entity.UserEntity;
 import com.kamylo.Scrtly_backend.handler.CustomException;
 import com.kamylo.Scrtly_backend.mappers.Mapper;
 import com.kamylo.Scrtly_backend.service.*;
+import io.jsonwebtoken.lang.Collections;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -48,8 +50,8 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid LoginRequestDto loginRequest, HttpServletResponse response) throws MessagingException{
         Map<String, String> tokens  = authService.verify(loginRequest);
-        response.addCookie(cookieService.getNewCookie("jwt", tokens.get("jwt"), 24 * 60 * 60));
-        response.addCookie(cookieService.getNewCookie("refresh", tokens.get("refresh"), 7 * 24 * 60 * 60 * 1000));
+        response.addCookie(cookieService.getNewCookie("jwt", tokens.get("jwt"), 2 * 60 * 60));
+        response.addCookie(cookieService.getNewCookie("refresh", tokens.get("refresh"), 7 * 24 * 60 * 60));
         UserDto userDto = mapper.mapTo(userService.findUserByEmail(loginRequest.getEmail()));
         LoginResponseDto responseDto = LoginResponseDto.builder()
                 .user(userDto)
@@ -67,8 +69,8 @@ public class AuthController {
             UserEntity user = token.getUser();
             String jwtToken = jwtService.generateToken(user.getEmail());
             RefreshTokenResponse newRefreshToken  = refreshTokenService.createRefreshToken(user.getEmail());
-            response.addCookie(cookieService.getNewCookie("jwt", jwtToken, 24 * 60 * 60));
-            response.addCookie(cookieService.getNewCookie("refresh", newRefreshToken.getRefreshToken(), 7 * 24 * 60 * 60 * 1000));
+            response.addCookie(cookieService.getNewCookie("jwt", jwtToken, 2 * 60 * 60));
+            response.addCookie(cookieService.getNewCookie("refresh", newRefreshToken.getRefreshToken(), 7 * 24 * 60 * 60));
             return new ResponseEntity<>("Tokens refreshed successfully", HttpStatus.OK);
         } catch (CustomException e) {
             response.addCookie(cookieService.deleteCookie("jwt"));
@@ -86,6 +88,16 @@ public class AuthController {
         response.addCookie(cookieService.deleteCookie("refresh"));
         return new ResponseEntity<>("Logged out successfully", HttpStatus.OK);
     }
+
+    @GetMapping("/check")
+    public ResponseEntity<UserDto> checkAuth(@AuthenticationPrincipal UserDetails ud) {
+        if (ud == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        UserDto dto = mapper.mapTo(userService.findUserByEmail(ud.getUsername()));
+        return ResponseEntity.ok(dto);
+    }
+
 
     @GetMapping("/active/{userId}/{token}")
     public ResponseEntity<?> active_account(@PathVariable Long userId, @PathVariable String token, HttpServletResponse response)

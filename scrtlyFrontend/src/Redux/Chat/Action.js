@@ -1,4 +1,4 @@
-import {dispatchAction} from "../../config/api.js";
+import {dispatchAction} from "../api.js";
 import {
     CREATE_CHAT_ERROR,
     CREATE_CHAT_REQUEST, CREATE_CHAT_SUCCESS,

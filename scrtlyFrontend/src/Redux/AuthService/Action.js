@@ -64,8 +64,9 @@ export const forgotPasswordAction = (email) => async (dispatch) => {
 };
 
 export const currentUser = () => async (dispatch) => {
-    await dispatchAction(dispatch, REQUEST_USER, REQUEST_USER_SUCCESS, REQUEST_USER_ERROR, `/users/profile`, {
+    await dispatchAction(dispatch, REQUEST_USER, REQUEST_USER_SUCCESS, REQUEST_USER_ERROR, `/auth/check`, {
         method: 'GET',
+        credentials: 'include',
     });
 }
 

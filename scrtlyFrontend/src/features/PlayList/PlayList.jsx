@@ -7,7 +7,7 @@ import {getPlayList, getPlayListTracks} from "../../Redux/PlayList/Action.js";
 import {AddSongToPlayList} from "./AddSongToPlayList.jsx";
 import {PlayListForm} from "./PlayListForm.jsx";
 import Spinner from "../../Components/Spinner.jsx";
-import ErrorAlert from "../../Components/ErrorAlert.jsx";
+import ErrorOverlay from "../../Components/ErrorOverlay.jsx";
 
 // eslint-disable-next-line react/prop-types
 function PlayList({ volume, onTrackChange}) {
@@ -44,9 +44,9 @@ function PlayList({ volume, onTrackChange}) {
         return <Spinner />;
     }
     if (playList.error) {
-        return <ErrorAlert message={playList.error} />
+        return <ErrorOverlay message={playList.error} />
     } else if (song.loading) {
-        return <ErrorAlert message={song.error}/>
+        return <ErrorOverlay message={song.error}/>
     }
 
     return (

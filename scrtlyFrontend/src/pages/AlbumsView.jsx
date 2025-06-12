@@ -7,7 +7,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {getAllAlbums} from "../Redux/Album/Action.js";
 import {useNavigate} from "react-router-dom";
 import Spinner from "../Components/Spinner.jsx";
-import ErrorAlert from "../Components/ErrorAlert.jsx";
+import ErrorOverlay from "../Components/ErrorOverlay.jsx";
 
 function AlbumsView() {
     const dispatch = useDispatch()
@@ -27,7 +27,7 @@ function AlbumsView() {
         return <Spinner />;
     }
     if (album.error) {
-        return <ErrorAlert message={album.error} />;
+        return <ErrorOverlay message={album.error} />;
     }
 
     return (

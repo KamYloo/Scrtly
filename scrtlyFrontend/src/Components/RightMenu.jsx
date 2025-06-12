@@ -7,18 +7,12 @@ import { logoutAction } from "../Redux/AuthService/Action.js";
 import { NotificationsList } from "../features/Notification/NotificationsList.jsx";
 import toast from "react-hot-toast";
 import { getNotifications } from "../Redux/NotificationService/Action.js";
+import defaultAvatar from "../assets/user.jpg";
 
 function RightMenu() {
   const [openNotifications, setOpenNotifications] = useState(false);
-  const userData = (() => {
-    try {
-      return JSON.parse(localStorage.getItem("user")) || null;
-    } catch {
-      return null;
-    }
-  })();
   const dispatch = useDispatch();
-  const { logoutResponse, error } = useSelector((state) => state.auth);
+  const { logoutResponse, error, reqUser } = useSelector((state) => state.auth);
   const notifications = useSelector(
     (state) => state.notifications.notifications
   );
@@ -31,8 +25,8 @@ function RightMenu() {
   };
 
   const handleProfileClick = () => {
-    if (localStorage.getItem("user")) {
-      navigate(`/profile/${userData?.nickName}`);
+    if (reqUser) {
+      navigate(`/profile/${reqUser?.nickName}`);
     } else {
       navigate("/login");
     }
@@ -47,10 +41,9 @@ function RightMenu() {
   useEffect(() => {
     if (logoutResponse) {
       toast.success(logoutResponse);
-      localStorage.removeItem("user");
       navigate("/login");
     }
-  }, [logoutResponse, navigate]);
+  }, [dispatch, logoutResponse, navigate]);
 
   useEffect(() => {
     if (error) {
@@ -86,14 +79,20 @@ function RightMenu() {
           <FaCogs />
         </i>
         <div className="profileImg" onClick={handleProfileClick}>
-          <img src={userData?.profilePicture || ""} alt="" />
+          <img
+              src={reqUser?.profilePicture || defaultAvatar}
+              alt="Profilowe"
+              onError={e => {
+                e.currentTarget.src = defaultAvatar;
+              }}
+          />
         </div>
-        {localStorage.getItem("user") ? (
-          <p className="loginBtn" onClick={handleLogout}>
-            Logout
-          </p>
+        {reqUser ? (
+            <p className="loginBtn" onClick={handleLogout}>
+              Logout
+            </p>
         ) : (
-          <p className="loginBtn" onClick={() => navigate("/login")}>
+            <p className="loginBtn" onClick={() => navigate("/login")}>
             Login
           </p>
         )}

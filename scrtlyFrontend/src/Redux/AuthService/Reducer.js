@@ -31,7 +31,6 @@ import {
 const initialValue= {
     loading: false,
     error: null,
-    user: null,
     loginResponse:null,
     registerResponse:null,
     logoutResponse:null,
@@ -52,16 +51,16 @@ export const authReducer=(state=initialValue, {type,payload})=>{
             return { ...state, loading: false, error: payload };
 
         case LOGIN_REQUEST:
-            return { ...state, loading: true, error: null };
+            return { ...state, loading: true, error: null, loginResponse: null, reqUser: null};
         case LOGIN_SUCCESS:
-            return { ...state, loading: false, loginResponse: payload, user: payload.user, logoutResponse: null};
+            return { ...state, loading: false, loginResponse: payload, logoutResponse: null, reqUser: payload.user};
         case LOGIN_ERROR:
             return { ...state, loading: false, error: payload };
 
         case LOGOUT_REQUEST:
             return { ...state, loading: true, error: null };
         case LOGOUT_SUCCESS:
-            return { ...state, loading: false, logoutResponse: payload, loginResponse: null };
+            return { ...state, loading: false, logoutResponse: payload, loginResponse: null, reqUser: null };
         case LOGOUT_ERROR:
             return { ...state, loading: false, error: payload };
 
@@ -82,7 +81,7 @@ export const authReducer=(state=initialValue, {type,payload})=>{
         case UPDATE_USER_REQUEST:
             return { ...state, loading: true, error: null };
         case UPDATE_USER_SUCCESS:
-            return { ...state, loading: false, user: payload };
+            return { ...state, loading: false, reqUser: payload };
         case UPDATE_USER_ERROR:
             return { ...state, loading: false, error: payload };
 

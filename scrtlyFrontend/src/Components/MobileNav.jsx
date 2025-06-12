@@ -9,20 +9,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { logoutAction } from "../Redux/AuthService/Action.js";
 import { getNotifications } from "../Redux/NotificationService/Action.js";
 import toast from "react-hot-toast";
+import defaultAvatar from "../assets/user.jpg";
 
 function MobileNav() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  const userData = (() => {
-    try {
-      return JSON.parse(localStorage.getItem("user")) || null;
-    } catch {
-      return null;
-    }
-  })();
+  const { reqUser } = useSelector((store) => store.auth);
 
   const notifications =
     useSelector((state) => state.notifications.notifications) || [];
@@ -36,8 +30,8 @@ function MobileNav() {
 
   const handleProfileClick = () => {
     setShowUserDropdown(false);
-    if (userData) {
-      navigate(`/profile/${userData.nickName}`);
+    if (reqUser) {
+      navigate(`/profile/${reqUser.nickName}`);
     } else {
       navigate("/login");
     }
@@ -84,7 +78,7 @@ function MobileNav() {
           </div>
           <div className="mobileNav-icon" onClick={handleProfileClick}>
             <img
-              src={userData?.profilePicture || ""}
+              src={reqUser?.profilePicture || defaultAvatar}
               alt="Profile"
               className="mobileNav-profile"
             />

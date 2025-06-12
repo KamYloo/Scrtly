@@ -3,7 +3,7 @@ import {
     VERIFY_ARTIST_SUCCESS,
     VERIFY_ARTIST_ERROR
 } from "./ActionType"
-import {dispatchAction} from "../../config/api.js";
+import {dispatchAction} from "../api.js";
 
 
 export const verifyArtistAction = (artistName) => async (dispatch) => {
