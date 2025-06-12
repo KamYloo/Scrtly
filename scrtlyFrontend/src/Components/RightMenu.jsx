@@ -7,6 +7,7 @@ import { logoutAction } from "../Redux/AuthService/Action.js";
 import { NotificationsList } from "../features/Notification/NotificationsList.jsx";
 import toast from "react-hot-toast";
 import { getNotifications } from "../Redux/NotificationService/Action.js";
+import defaultAvatar from "../assets/user.jpg";
 
 function RightMenu() {
   const [openNotifications, setOpenNotifications] = useState(false);
@@ -78,14 +79,20 @@ function RightMenu() {
           <FaCogs />
         </i>
         <div className="profileImg" onClick={handleProfileClick}>
-          <img src={reqUser?.profilePicture || ""} alt="" />
+          <img
+              src={reqUser?.profilePicture || defaultAvatar}
+              alt="Profilowe"
+              onError={e => {
+                e.currentTarget.src = defaultAvatar;
+              }}
+          />
         </div>
         {reqUser ? (
-          <p className="loginBtn" onClick={handleLogout}>
-            Logout
-          </p>
+            <p className="loginBtn" onClick={handleLogout}>
+              Logout
+            </p>
         ) : (
-          <p className="loginBtn" onClick={() => navigate("/login")}>
+            <p className="loginBtn" onClick={() => navigate("/login")}>
             Login
           </p>
         )}

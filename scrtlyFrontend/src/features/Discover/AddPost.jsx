@@ -6,6 +6,8 @@ import {useDispatch, useSelector} from "react-redux";
 import {createPost} from "../../Redux/Post/Action.js";
 import {useNavigate} from "react-router-dom";
 import toast from "react-hot-toast";
+import defaultAvatar from "../../assets/user.jpg";
+
 
 
 function AddPost() {
@@ -47,7 +49,7 @@ function AddPost() {
   return (
     <div className='addPost'>
       <div className="context">
-        <img src={reqUser?.profilePicture} alt="" onClick={() => navigate(`/profile/${reqUser?.nickName}`)}/>
+        <img src={reqUser?.profilePicture || defaultAvatar} alt="" onClick={() => navigate(`/profile/${reqUser?.nickName}`)}/>
         <div className="middle">
           <textarea type="text" value={descriptionText}
                     onChange={(e) => setDescriptionText(e.target.value)} />

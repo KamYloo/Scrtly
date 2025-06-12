@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { searchUser } from "../../Redux/AuthService/Action.js";
 import { createChat } from "../../Redux/Chat/Action.js";
 import { MdCancel } from "react-icons/md";
+import defaultAvatar from "../../assets/user.jpg";
+
 
 function AddUser({ onClose }) {
     const [keyword, setKeyword] = useState('');
@@ -57,7 +59,7 @@ function AddUser({ onClose }) {
                             onClick={() => toggleUserSelection(user)}
                         >
                             <div className="detail">
-                                <img src={user?.profilePicture} alt={user.fullName} />
+                                <img src={user?.profilePicture || defaultAvatar} alt={user.fullName} />
                                 <span>{user.fullName}</span>
                             </div>
                         </div>

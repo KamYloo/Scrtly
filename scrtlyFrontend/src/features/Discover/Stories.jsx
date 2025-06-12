@@ -3,11 +3,11 @@ import { FaChevronRight, FaChevronLeft } from "react-icons/fa";
 import {useDispatch, useSelector} from "react-redux";
 import {AddStory} from "./AddStory.jsx";
 import {StoryViewer} from "./StoryViewer.jsx";
-
 import {getFollowedUsersStory} from "../../Redux/Story/Action.js";
+import defaultAvatar from "../../assets/user.jpg";
+
 
 function Stories() {
-
   const storyBoxRef = useRef(null)
   const [addStory, setAddStory] = useState(false)
   const [showViewer, setShowViewer] = useState(false);
@@ -23,7 +23,6 @@ function Stories() {
       behavior: 'smooth'
     })
   }
-
 
   const handleScrollRight = () => {
     storyBoxRef.current.scrollBy({
@@ -49,12 +48,12 @@ function Stories() {
         </button>
         <div className="box" ref={storyBoxRef}>
           <div className="story add-story" onClick={() => setAddStory(((prev) => !prev))}>
-            <img src={reqUser?.profilePicture } alt="Add story" />
+            <img src={reqUser?.profilePicture || defaultAvatar} alt="Add story" />
             <span>+ Story</span>
           </div>
             {Object.entries(story.stories).map(([user, stories], userIndex) => (
                 <div className="story" key={userIndex} onClick={() => handleStoryClick(userIndex, 0)}>
-                    <img src={stories[0]?.user?.profilePicture} alt={stories[0]?.user?.fullName || ''} />
+                    <img src={stories[0]?.user?.profilePicture || defaultAvatar} alt={stories[0]?.user?.fullName || ''} />
                     <span>{stories[0]?.user?.fullName || ''}</span>
                 </div>
             ))}

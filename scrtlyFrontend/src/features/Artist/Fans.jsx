@@ -1,8 +1,10 @@
 import React from 'react'
 import { FaUser } from "react-icons/fa";
-import {BASE_API_URL} from "../../config/api.js";
+import {BASE_API_URL} from "../../Redux/api.js";
 import Verification from "../../assets/check.png";
 import {useNavigate} from "react-router-dom";
+import defaultAvatar from "../../assets/user.jpg";
+
 
 // eslint-disable-next-line react/prop-types
 function Fans({fans}) {
@@ -14,7 +16,7 @@ function Fans({fans}) {
                     <div className="user" key={item.id} onClick={() => navigate(`/profile/${item.id}`)}>
                         <i className="push"><FaUser/></i>
                         <div className="imgPic">
-                            <img src={`${BASE_API_URL}/${item.profilePicture || ''}`} alt=""/>
+                            <img src={`${BASE_API_URL}/${item.profilePicture || defaultAvatar}`} alt=""/>
                             <img className='check' src={Verification} alt=""/>
                         </div>
                         <p>{item?.fullName}</p>

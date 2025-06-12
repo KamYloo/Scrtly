@@ -6,7 +6,7 @@ import {getPostsByUser} from "../../Redux/Post/Action.js";
 import {Post} from "../Discover/Post.jsx";
 import {useParams} from "react-router-dom";
 import Spinner from "../../Components/Spinner.jsx";
-import ErrorAlert from "../../Components/ErrorAlert.jsx";
+import ErrorOverlay from "../../Components/ErrorOverlay.jsx";
 
 function Profile() {
     const [selectedPost, setSelectedPost] = useState(false)
@@ -30,7 +30,7 @@ function Profile() {
         return <Spinner />;
     }
     if (post.error) {
-        return <ErrorAlert message={post.error} />;
+        return <ErrorOverlay message={post.error} />;
     }
 
     return (

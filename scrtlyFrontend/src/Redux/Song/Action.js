@@ -1,4 +1,4 @@
-import {dispatchAction} from "../../config/api.js";
+import {dispatchAction} from "../api.js";
 import {
     DELETE_SONG_FAILURE,
     DELETE_SONG_REQUEST, DELETE_SONG_SUCCESS, LIKE_SONG_ERROR,

@@ -1,4 +1,4 @@
-import {dispatchAction} from "../../config/api.js";
+import {dispatchAction} from "../api.js";
 import {
     FIND_ARTIST_BY_ID_ERROR,
     FIND_ARTIST_BY_ID_REQUEST,

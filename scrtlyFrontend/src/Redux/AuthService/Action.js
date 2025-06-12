@@ -1,4 +1,4 @@
-import {BASE_API_URL, dispatchAction} from "../../config/api"
+import {dispatchAction} from "../api.js"
 import {
     REQUEST_USER,
     FOLLOW_USER_REQUEST,

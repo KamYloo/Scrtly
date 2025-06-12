@@ -7,7 +7,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {deleteAlbum, getAlbum, getAlbumTracks} from "../../Redux/Album/Action.js";
 import {AddSong} from "../Song/addSong.jsx";
 import Spinner from "../../Components/Spinner.jsx";
-import ErrorAlert from "../../Components/ErrorAlert.jsx";
+import ErrorOverlay from "../../Components/ErrorOverlay.jsx";
 
 // eslint-disable-next-line react/prop-types
 function Album({ volume, onTrackChange}) {
@@ -55,7 +55,7 @@ function Album({ volume, onTrackChange}) {
         return <Spinner />;
     }
     if (album.error) {
-        return <ErrorAlert message={album.error} />;
+        return <ErrorOverlay message={album.error} />;
     }
 
     return (

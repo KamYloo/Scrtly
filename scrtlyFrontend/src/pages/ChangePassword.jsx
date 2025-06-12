@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import '../Styles/Login&Register.css';
-import {BASE_API_URL} from "../config/api.js";
+import {BASE_API_URL} from "../Redux/api.js";
 import logo from "../assets/logo.png"; // Upewnij się, że ścieżka do CSS jest prawidłowa
 
 function ChangePassword() {

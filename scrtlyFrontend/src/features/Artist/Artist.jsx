@@ -11,7 +11,7 @@ import { ArtistAlbums } from './ArtistAlbums.jsx'
 import { Fans } from './Fans.jsx'
 import { AboutArtist } from './AboutArtist.jsx'
 import Spinner from '../../Components/Spinner.jsx'
-import ErrorAlert from '../../Components/ErrorAlert.jsx'
+import ErrorOverlay from '../../Components/ErrorOverlay.jsx'
 
 function Artist({ volume, onTrackChange }) {
   const { artistId } = useParams()
@@ -30,9 +30,9 @@ function Artist({ volume, onTrackChange }) {
     return <Spinner />
   }
   if (artist.error) {
-    return <ErrorAlert message={artist.error} />
+    return <ErrorOverlay message={artist.error} />
   } else if (song.error) {
-    return <ErrorAlert message={song.error} />
+    return <ErrorOverlay message={song.error} />
   }
 
   return (

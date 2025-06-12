@@ -6,6 +6,8 @@ import { getAllPostComments, likeComment, deleteComment, getReplies } from "../.
 import { formatDistanceToNow } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../../Components/Spinner.jsx";
+import defaultAvatar from "../../assets/user.jpg";
+
 
 function Comments({ post }) {
     const { comment, auth } = useSelector(store => store)
@@ -106,7 +108,7 @@ function Comments({ post }) {
     return (
         <div className='commentsSection'>
             <div className="up">
-                <img src={post?.user.profilePicture} alt="" onClick={() => navigate(`/profile/${post?.user.nickName}`)} />
+                <img src={post?.user.profilePicture || defaultAvatar} alt="" onClick={() => navigate(`/profile/${post?.user.nickName}`)} />
                 <p>{post?.user.fullName}</p>
             </div>
             <hr className="line" />
@@ -120,7 +122,7 @@ function Comments({ post }) {
 
             <div className="comments">
                 <div className="comment Own">
-                    <img src={post?.user.profilePicture} alt="" onClick={() => navigate(`/profile/${post?.user.nickName}`)} />
+                    <img src={post?.user.profilePicture || defaultAvatar} alt="" onClick={() => navigate(`/profile/${post?.user.nickName}`)} />
                     <div className="context">
                         <p>{post.user.fullName}</p>
                         <span>{post.description}</span>
@@ -130,7 +132,7 @@ function Comments({ post }) {
                 {comment.comments.content.filter(c => !c.parentCommentId).map(item => (
                     <div key={item.id} className="commentContainer">
                         <div className="comment">
-                            <img src={item.user?.profilePicture} alt="" onClick={() => navigate(`/profile/${item.user.nickName}`)} />
+                            <img src={item.user?.profilePicture || defaultAvatar} alt="" onClick={() => navigate(`/profile/${item.user.nickName}`)} />
                             <div className="context">
                                 <p>{item.user.fullName}</p>
                                 <span>{item.comment}</span>
@@ -160,7 +162,7 @@ function Comments({ post }) {
                             <div className="repliesContainer" onScroll={handleRepliesScroll} ref={el => { repliesRefs.current[item.id] = el }} style={{ maxHeight: '300px', overflowY: 'auto', overflowAnchor: 'none' }}>
                                 {repliesData.map(reply => (
                                     <div key={reply.id} className="comment reply">
-                                        <img src={reply.user?.profilePicture} alt="" onClick={() => navigate(`/profile/${reply.user.nickName}`)} />
+                                        <img src={reply.user?.profilePicture || defaultAvatar} alt="" onClick={() => navigate(`/profile/${reply.user.nickName}`)} />
                                         <div className="context">
                                             <p>{reply.user.fullName}</p>
                                             <span>{reply.comment}</span>

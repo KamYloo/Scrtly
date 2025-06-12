@@ -1,4 +1,4 @@
-import { LOGIN_SUCCESS, LOGOUT_SUCCESS } from "../Redux/AuthService/ActionType.js";
+import { LOGIN_SUCCESS, LOGOUT_SUCCESS } from "./AuthService/ActionType.js";
 
 export const BASE_API_URL = "http://localhost:8080";
 

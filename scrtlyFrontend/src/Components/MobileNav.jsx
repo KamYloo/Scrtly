@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { logoutAction } from "../Redux/AuthService/Action.js";
 import { getNotifications } from "../Redux/NotificationService/Action.js";
 import toast from "react-hot-toast";
+import defaultAvatar from "../assets/user.jpg";
 
 function MobileNav() {
   const [showNotifications, setShowNotifications] = useState(false);
@@ -77,7 +78,7 @@ function MobileNav() {
           </div>
           <div className="mobileNav-icon" onClick={handleProfileClick}>
             <img
-              src={reqUser?.profilePicture || ""}
+              src={reqUser?.profilePicture || defaultAvatar}
               alt="Profile"
               className="mobileNav-profile"
             />

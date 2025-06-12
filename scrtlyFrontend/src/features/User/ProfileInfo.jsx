@@ -4,8 +4,10 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { findUser, followUser } from "../../Redux/AuthService/Action.js";
 import { useDispatch, useSelector } from "react-redux";
 import Spinner from "../../Components/Spinner.jsx";
-import ErrorAlert from "../../Components/ErrorAlert.jsx";
+import ErrorOverlay from "../../Components/ErrorOverlay.jsx";
 import ArtistVerificationModal from "./ArtistVerificationModal.jsx";
+import defaultAvatar from "../../assets/user.jpg";
+
 
 function ProfileInfo() {
     const navigate = useNavigate();
@@ -30,14 +32,14 @@ function ProfileInfo() {
         return <Spinner />;
     }
     if (auth.error) {
-        return <ErrorAlert message={auth.error} />;
+        return <ErrorOverlay message={auth.error} />;
     }
 
     return (
         <div className='profileInfo'>
             <div className="userData">
                 <img
-                    src={auth.findUser?.profilePicture || ''}
+                    src={auth.findUser?.profilePicture || defaultAvatar}
                     alt={auth.findUser?.fullName || 'Profile Picture'}
                 />
                 <div className="right">

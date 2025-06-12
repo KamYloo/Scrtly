@@ -1,4 +1,4 @@
-import {dispatchAction} from "../../config/api.js";
+import {dispatchAction} from "../api.js";
 import {
     GET_USERS_FOLLOWED_STORY_ERROR,
     GET_USERS_FOLLOWED_STORY_REQUEST, GET_USERS_FOLLOWED_STORY_SUCCESS,

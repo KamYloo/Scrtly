@@ -8,6 +8,8 @@ import {useDispatch, useSelector} from "react-redux";
 import { deleteChat } from "../../Redux/Chat/Action.js";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import defaultAvatar from "../../assets/user.jpg";
+
 
 function ChatUsersList({ chat, onChatSelect }) {
     const [addMode, setAddMode] = useState(false);
@@ -67,7 +69,7 @@ function ChatUsersList({ chat, onChatSelect }) {
                         return (
                             <div className="userItem" key={chatItem.id} onClick={() => onChatSelect(chatItem)}>
                                 <img
-                                    src={otherParticipants[0]?.profilePicture || "/default-avatar.png"}
+                                    src={otherParticipants[0]?.profilePicture || defaultAvatar}
                                     alt="User Avatar"
                                 />
                                 <div className="text">

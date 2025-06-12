@@ -1,4 +1,4 @@
-import {dispatchAction} from "../../config/api.js";
+import {dispatchAction} from "../api.js";
 import {
     SEND_NOTIFICATION,
     GET_NOTIFICATIONS_ERROR,
