@@ -1,66 +1,63 @@
-import {LOGIN_SUCCESS, LOGOUT_SUCCESS} from "../Redux/AuthService/ActionType.js";
+import { LOGIN_SUCCESS, LOGOUT_SUCCESS } from "../Redux/AuthService/ActionType.js";
 
-export const BASE_API_URL = "http://localhost:8080"
+export const BASE_API_URL = "http://localhost:8080";
 
 export const fetchWithAuth = async (url, options = {}, errorType) => {
-    let headers = {
-        ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
+    const headers = {
+        ...(options.body instanceof FormData ? {} : { "Content-Type": "application/json" }),
         ...options.headers,
     };
+    let response;
 
-    try {
-        let response = await fetch(`${BASE_API_URL}${url}`, {
-            ...options,
-            headers,
-            credentials: 'include'
-        });
-
-        if (url === '/api/authService/login' && response.status === 401) {
-            const errorData = await response.json();
-            const msg = errorData.error || errorData.businessErrornDescription;
-            return { error: true, message: msg };
-        }
-
-        if (response.status === 401) {
-            const refreshResponse = await fetch(`${BASE_API_URL}/api/auth/refresh`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include'
+    const doFetch = async () => {
+        try {
+            return await fetch(`${BASE_API_URL}${url}`, {
+                ...options,
+                headers,
+                credentials: "include",
             });
-
-            if (refreshResponse.ok) {
-                response = await fetch(`${BASE_API_URL}${url}`, {
-                    ...options,
-                    headers,
-                    credentials: 'include'
-                });
-            } else {
-                window.location.href = "/login";
-                return { error: true, message: 'Your session has expired. Please log in again' };
-            }
+        } catch (networkErr) {
+            console.error(`Network error in ${errorType}:`, networkErr);
+            throw new Error("Network error");
         }
+    };
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            const serverMessage =
-                errorData.message ||
-                errorData.businessErrornDescription ||
-                errorData.error ||
-                (errorData.validationErrors && errorData.validationErrors.join(', ')) ||
-                'Request failed';
-            return { error: true, message: serverMessage };
+    response = await doFetch();
+
+    if (response.status === 401) {
+        const refreshRes = await fetch(`${BASE_API_URL}/api/auth/refresh`, {
+            method: "POST",
+            credentials: "include",
+        });
+        if (refreshRes.ok) {
+            response = await doFetch();
+        } else {
+            localStorage.removeItem("isLoggedIn");
+            window.location.href = "/login";
+            return;
         }
-
-        const contentType = response.headers.get('content-type');
-        const isJson = contentType && contentType.includes('application/json');
-        return isJson ? await response.json() : await response.text();
-    } catch (error) {
-        console.error(`Error in ${errorType}:`, error);
-        throw new Error(error.message);
     }
+
+    const text = await response.text();
+    let data = null;
+    try {
+        data = text ? JSON.parse(text) : null;
+    } catch {
+        data = null;
+    }
+
+    if (!response.ok) {
+        const msg =
+            (data && (data.message || data.error || data.businessErrorDescription)) ||
+            text ||
+            `Request failed with status ${response.status}`;
+        return { error: true, message: msg, status: response.status };
+    }
+
+    const contentType = response.headers.get("Content-Type") || "";
+    const isJson = contentType.includes("application/json");
+    return isJson ? data : text;
 };
-
-
 
 export const dispatchAction = async (
     dispatch,
@@ -73,8 +70,8 @@ export const dispatchAction = async (
     dispatch({ type: actionTypeRequest });
     try {
         const result = await fetchWithAuth(url, options, actionTypeRequest);
-        // console.log(result);
-        if (result.error) {
+
+        if (result && result.error) {
             dispatch({ type: actionTypeError, payload: result.message });
             throw new Error(result.message);
         }
@@ -86,12 +83,10 @@ export const dispatchAction = async (
         } else if (actionTypeSuccess === LOGOUT_SUCCESS) {
             localStorage.removeItem("isLoggedIn");
         }
+
         return result;
-    } catch (error) {
-        dispatch({ type: actionTypeError, payload: error.message });
-        throw error;
+    } catch (err) {
+        dispatch({ type: actionTypeError, payload: err.message });
+        throw err;
     }
 };
-
-
-
