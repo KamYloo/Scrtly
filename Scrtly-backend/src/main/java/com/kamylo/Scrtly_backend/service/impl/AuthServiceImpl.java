@@ -98,8 +98,8 @@ public class AuthServiceImpl implements AuthService {
         if (authentication.isAuthenticated()) {
             String email = loginRequest.getEmail();
             Map<String, String> objects = new HashMap<>();
-            objects.put("jwt", jwtService.generateToken(email));
-            objects.put("refresh", refreshTokenService.createRefreshToken(email).getRefreshToken());
+            objects.put("jwt_zuvoria_v1", jwtService.generateToken(email));
+            objects.put("refresh_zuvoria_v1", refreshTokenService.createRefreshToken(email).getRefreshToken());
             return objects;
         }
         throw new CustomException(BusinessErrorCodes.BAD_CREDENTIALS);

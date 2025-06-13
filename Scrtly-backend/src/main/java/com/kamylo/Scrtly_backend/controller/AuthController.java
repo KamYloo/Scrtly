@@ -11,7 +11,6 @@ import com.kamylo.Scrtly_backend.entity.UserEntity;
 import com.kamylo.Scrtly_backend.handler.CustomException;
 import com.kamylo.Scrtly_backend.mappers.Mapper;
 import com.kamylo.Scrtly_backend.service.*;
-import io.jsonwebtoken.lang.Collections;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -50,8 +49,8 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid LoginRequestDto loginRequest, HttpServletResponse response) throws MessagingException{
         Map<String, String> tokens  = authService.verify(loginRequest);
-        response.addCookie(cookieService.getNewCookie("jwt", tokens.get("jwt"), 2 * 60 * 60));
-        response.addCookie(cookieService.getNewCookie("refresh", tokens.get("refresh"), 7 * 24 * 60 * 60));
+        response.addCookie(cookieService.getNewCookie("jwt_zuvoria_v1", tokens.get("jwt_zuvoria_v1"), 2 * 60 * 60));
+        response.addCookie(cookieService.getNewCookie("refresh_zuvoria_v1", tokens.get("refresh_zuvoria_v1"), 7 * 24 * 60 * 60));
         UserDto userDto = mapper.mapTo(userService.findUserByEmail(loginRequest.getEmail()));
         LoginResponseDto responseDto = LoginResponseDto.builder()
                 .user(userDto)
@@ -61,7 +60,7 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ResponseEntity<?> refresh(HttpServletRequest request, HttpServletResponse response) {
-        String rawRefreshToken = cookieService.getCookieValue(request, "refresh");
+        String rawRefreshToken = cookieService.getCookieValue(request, "refresh_zuvoria_v1");
         try {
             RefreshTokenEntity token = refreshTokenService.findByToken(rawRefreshToken);
             refreshTokenService.verifyExpiration(token);
@@ -69,23 +68,23 @@ public class AuthController {
             UserEntity user = token.getUser();
             String jwtToken = jwtService.generateToken(user.getEmail());
             RefreshTokenResponse newRefreshToken  = refreshTokenService.createRefreshToken(user.getEmail());
-            response.addCookie(cookieService.getNewCookie("jwt", jwtToken, 2 * 60 * 60));
-            response.addCookie(cookieService.getNewCookie("refresh", newRefreshToken.getRefreshToken(), 7 * 24 * 60 * 60));
+            response.addCookie(cookieService.getNewCookie("jwt_zuvoria_v1", jwtToken, 2 * 60 * 60));
+            response.addCookie(cookieService.getNewCookie("refresh_zuvoria_v1", newRefreshToken.getRefreshToken(), 7 * 24 * 60 * 60));
             return new ResponseEntity<>("Tokens refreshed successfully", HttpStatus.OK);
         } catch (CustomException e) {
-            response.addCookie(cookieService.deleteCookie("jwt"));
-            response.addCookie(cookieService.deleteCookie("refresh"));
+            response.addCookie(cookieService.deleteCookie("jwt_zuvoria_v1"));
+            response.addCookie(cookieService.deleteCookie("refresh_zuvoria_v1"));
             return new ResponseEntity<>("Refresh token expired", HttpStatus.BAD_REQUEST);
         }
     }
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
-        String jwt = cookieService.getCookieValue(request, "jwt");
+        String jwt = cookieService.getCookieValue(request, "jwt_zuvoria_v1");
         String username = jwtService.extractUserName(jwt);
         refreshTokenService.deleteByUserEmail(username);
-        response.addCookie(cookieService.deleteCookie("jwt"));
-        response.addCookie(cookieService.deleteCookie("refresh"));
+        response.addCookie(cookieService.deleteCookie("jwt_zuvoria_v1"));
+        response.addCookie(cookieService.deleteCookie("refresh_zuvoria_v1"));
         return new ResponseEntity<>("Logged out successfully", HttpStatus.OK);
     }
 
