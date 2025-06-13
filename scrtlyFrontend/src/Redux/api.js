@@ -1,6 +1,6 @@
 import { LOGIN_SUCCESS, LOGOUT_SUCCESS } from "./AuthService/ActionType.js";
 
-export const BASE_API_URL = "http://localhost:8080";
+export const BASE_API_URL = import.meta.env.VITE_APP_BACKEND_URL;
 
 export const fetchWithAuth = async (url, options = {}, errorType) => {
     const headers = {
@@ -25,7 +25,7 @@ export const fetchWithAuth = async (url, options = {}, errorType) => {
     response = await doFetch();
 
     if (response.status === 401) {
-        const refreshRes = await fetch(`${BASE_API_URL}/api/auth/refresh`, {
+        const refreshRes = await fetch(`${BASE_API_URL}/auth/refresh`, {
             method: "POST",
             credentials: "include",
         });
