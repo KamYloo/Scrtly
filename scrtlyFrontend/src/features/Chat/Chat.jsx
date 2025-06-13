@@ -1,4 +1,3 @@
-// Chat.jsx
 import React, { useEffect, useRef, useState } from 'react';
 import EmojiPicker from 'emoji-picker-react';
 import { FaPhoneAlt, FaInfoCircle, FaImage, FaCamera, FaMicrophone } from "react-icons/fa";
@@ -9,7 +8,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client/dist/sockjs";
 import { useNavigate } from "react-router-dom";
-import {BASE_API_URL} from "../../config/api.js";
+import {BASE_API_URL} from "../../Redux/api.js";
 import defaultAvatar from "../../assets/user.jpg";
 
 function Chat({ chat, onBack }) {

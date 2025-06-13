@@ -1,6 +1,6 @@
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client/dist/sockjs";
-import {BASE_API_URL} from "../config/api.js";
+import {BASE_API_URL} from "../Redux/api.js";
 
 const WEBSOCKET_URL = `${BASE_API_URL}/ws`;
 
