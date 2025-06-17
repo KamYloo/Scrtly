@@ -66,7 +66,7 @@ function Chat({ chat, onBack }) {
             onConnect: (frame) => {
                 console.log("Połączono STOMP:", frame);
                 if (chat?.id) {
-                    client.subscribe(`/topic/room/${chat.id}`, onMessageReceive);
+                    client.subscribe(`/exchange/chat.exchange/room.${chat.id}`, onMessageReceive);
                 }
             },
             onStompError: (frame) => {

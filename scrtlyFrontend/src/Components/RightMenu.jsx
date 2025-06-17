@@ -33,10 +33,8 @@ function RightMenu() {
   };
 
   useEffect(() => {
-    if (openNotifications) {
       dispatch(getNotifications());
-    }
-  }, [openNotifications, notifications.length]);
+  }, []);
 
   useEffect(() => {
     if (logoutResponse) {

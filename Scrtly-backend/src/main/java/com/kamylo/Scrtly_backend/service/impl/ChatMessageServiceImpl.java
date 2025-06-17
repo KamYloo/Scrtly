@@ -1,6 +1,6 @@
 package com.kamylo.Scrtly_backend.service.impl;
 
-import com.kamylo.Scrtly_backend.config.RabbitMQConfig;
+import com.kamylo.Scrtly_backend.config.rabbitmq.ChatRabbitConfig;
 import com.kamylo.Scrtly_backend.dto.ChatMessageDto;
 import com.kamylo.Scrtly_backend.dto.ChatRoomDto;
 import com.kamylo.Scrtly_backend.dto.request.ChatMessageEditRequest;
@@ -17,11 +17,14 @@ import com.kamylo.Scrtly_backend.service.ChatService;
 import com.kamylo.Scrtly_backend.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.LocalDateTime;
 import java.util.concurrent.CompletableFuture;
@@ -37,8 +40,14 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     private final Mapper<ChatMessageEntity, ChatMessageDto> chatMessageMapper;
     private final RabbitTemplate rabbitTemplate;
 
+    @Value("${chat.exchange}")
+    private String chatExchangeName;
+
+    @Value("${chat.routing-key-prefix}")
+    private String chatRoutingKeyPrefix;
+
     @Override
-    @Async
+    @Async("chatExecutor")
     @Transactional
     public CompletableFuture<ChatMessageDto> sendMessageAsync(SendMessageRequest request, String username) {
         UserEntity userEntity = userService.findUserByEmail(username);
@@ -54,13 +63,12 @@ public class ChatMessageServiceImpl implements ChatMessageService {
         ChatMessageDto dto = chatMessageMapper.mapTo(savedChatMessage);
         dto.setChatRoomId(chatRoom.getId());
         dto.setStatus("NEW");
-
-        rabbitTemplate.convertAndSend(RabbitMQConfig.CHAT_EXCHANGE, RabbitMQConfig.ROUTING_KEY, dto);
+        publishAfterCommit(dto);
         return CompletableFuture.completedFuture(dto);
     }
 
     @Override
-    @Async
+    @Async("chatExecutor")
     @Transactional
     public CompletableFuture<ChatMessageDto> editMessageAsync(ChatMessageEditRequest request, Integer chatId, String username) {
         ChatMessageEntity message = chatMessageRepository.findById(request.getId()).orElseThrow(
@@ -77,7 +85,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
             ChatMessageDto dto = chatMessageMapper.mapTo(updatedMessage);
             dto.setChatRoomId(message.getChatRoom().getId());
             dto.setStatus("EDITED");
-            rabbitTemplate.convertAndSend(RabbitMQConfig.CHAT_EXCHANGE, RabbitMQConfig.ROUTING_KEY, dto);
+            publishAfterCommit(dto);
             return CompletableFuture.completedFuture(dto);
         } else {
             throw new CustomException(BusinessErrorCodes.CHAT_MESSAGE_MISMATCH);
@@ -85,7 +93,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     }
 
     @Override
-    @Async
+    @Async("chatExecutor")
     @Transactional
     public CompletableFuture<ChatMessageDto> deleteMessageAsync(Long messageId, Integer chatId, String username) {
         ChatMessageEntity chatMessage = chatMessageRepository.findById(messageId).orElseThrow(
@@ -101,7 +109,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
                     .chatRoomId(chatMessage.getChatRoom().getId())
                     .status("DELETED")
                     .build();
-            rabbitTemplate.convertAndSend(RabbitMQConfig.CHAT_EXCHANGE, RabbitMQConfig.ROUTING_KEY, dto);
+            publishAfterCommit(dto);
             return CompletableFuture.completedFuture(dto);
         } else {
             throw new CustomException(BusinessErrorCodes.CHAT_MESSAGE_MISMATCH);
@@ -110,12 +118,29 @@ public class ChatMessageServiceImpl implements ChatMessageService {
 
     @Override
     public Page<ChatMessageDto> getChatMessages(Integer chatId, Pageable pageable) {
-        return chatMessageRepository.findByChatRoomIdOrderByCreateDateDesc(chatId, pageable).map(chatMessageMapper::mapTo);
+        return chatMessageRepository.findByChatRoomIdOrderByCreateDateDesc(chatId, pageable)
+                .map(chatMessageMapper::mapTo);
     }
-
 
     private boolean validateChatMessageOwnership(String username, ChatMessageEntity chatMessage) {
         UserEntity user = userService.findUserByEmail(username);
         return user.getId().equals(chatMessage.getUser().getId());
     }
+
+    private void publishAfterCommit(ChatMessageDto dto) {
+        TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        String routingKey = chatRoutingKeyPrefix + dto.getChatRoomId();
+                        rabbitTemplate.convertAndSend(
+                                chatExchangeName,
+                                routingKey,
+                                dto
+                        );
+                    }
+                }
+        );
+    }
+
 }

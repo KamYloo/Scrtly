@@ -31,4 +31,14 @@ public class AsyncConfig {
         return executor;
     }
 
+    @Bean(name = "chatExecutor")
+    public ThreadPoolTaskExecutor chatExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(10);
+        executor.setMaxPoolSize(20);
+        executor.setQueueCapacity(1000);
+        executor.setThreadNamePrefix("chat-exec-");
+        executor.initialize();
+        return executor;
+    }
 }

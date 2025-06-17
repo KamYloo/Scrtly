@@ -14,5 +14,4 @@ public class UserMinimalDto {
     private String fullName;
     private String nickName;
     private String profilePicture;
-    private String description;
 }

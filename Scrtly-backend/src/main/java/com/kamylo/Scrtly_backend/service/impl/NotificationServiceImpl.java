@@ -1,5 +1,6 @@
 package com.kamylo.Scrtly_backend.service.impl;
 
+import com.kamylo.Scrtly_backend.config.rabbitmq.NotificationRabbitConfig;
 import com.kamylo.Scrtly_backend.dto.NotificationDto;
 import com.kamylo.Scrtly_backend.entity.NotificationEntity;
 import com.kamylo.Scrtly_backend.entity.PostEntity;
@@ -13,9 +14,10 @@ import com.kamylo.Scrtly_backend.repository.PostRepository;
 import com.kamylo.Scrtly_backend.service.NotificationService;
 import com.kamylo.Scrtly_backend.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -26,9 +28,15 @@ import java.util.Optional;
 public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
     private final PostRepository postRepository;
-    private final SimpMessagingTemplate messagingTemplate;
+    private final RabbitTemplate rabbitTemplate;
     private final UserService userService;
     private final Mapper<NotificationEntity, NotificationDto> notificationMapper;
+
+    @Value("${notification.exchange}")
+    private String notifExchangeName;
+
+    @Value("${notification.routing-key-prefix}")
+    private String notifRoutingKey;
 
     @Override
     public void createOrUpdateNotification(Long userId, Long postId, NotificationType type, String triggeringUserName) {
@@ -116,9 +124,10 @@ public class NotificationServiceImpl implements NotificationService {
 
     private void sendNotification(NotificationEntity notification) {
         NotificationDto notificationDto = notificationMapper.mapTo(notification);
-        messagingTemplate.convertAndSendToUser(
-                notification.getRecipient().getUsername(),
-                "/queue/notifications",
+        String routingKey = notifRoutingKey + notification.getRecipient().getUsername();
+        rabbitTemplate.convertAndSend(
+                notifExchangeName,
+                routingKey,
                 notificationDto
         );
     }

@@ -1,5 +1,7 @@
 package com.kamylo.Scrtly_backend.config;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -8,7 +10,21 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 
 @Configuration
 @EnableWebSocketMessageBroker
+@RequiredArgsConstructor
 public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
+
+    @Value("${spring.rabbitmq.host}")
+    private String relayHost;
+
+    @Value("${spring.rabbitmq.stomp.port}")
+    private Integer stompPort;
+
+    @Value("${spring.rabbitmq.username}")
+    private String relayLogin;
+
+    @Value("${spring.rabbitmq.password}")
+    private String relayPasscode;
+
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
@@ -19,7 +35,15 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         config.setApplicationDestinationPrefixes("/app");
-        config.enableSimpleBroker("/queue", "/topic", "/user");
+        config.enableStompBrokerRelay(
+                        "/exchange", "/queue")
+                .setRelayHost(relayHost)
+                .setRelayPort(stompPort)
+                .setClientLogin(relayLogin)
+                .setClientPasscode(relayPasscode)
+                .setSystemLogin(relayLogin)
+                .setSystemPasscode(relayPasscode);
         config.setUserDestinationPrefix("/user");
+
     }
 }

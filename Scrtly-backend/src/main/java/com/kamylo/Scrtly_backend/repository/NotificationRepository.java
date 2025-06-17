@@ -6,6 +6,7 @@ import com.kamylo.Scrtly_backend.entity.UserEntity;
 import com.kamylo.Scrtly_backend.entity.enums.NotificationType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -16,6 +17,8 @@ import java.util.Optional;
 @Repository
 public interface NotificationRepository extends JpaRepository<NotificationEntity, Long> {
     Optional<NotificationEntity> findByRecipientAndTypeAndPost(UserEntity recipient, NotificationType type, PostEntity post);
+
+    @EntityGraph(attributePaths = {"recipient", "post"})
     Page<NotificationEntity> findByRecipientIdOrderByUpdatedDateDescCreatedDateDesc(Long recipientId, Pageable pageable);
 
     @Modifying
