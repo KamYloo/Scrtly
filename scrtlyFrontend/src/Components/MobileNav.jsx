@@ -3,17 +3,20 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { MenuList } from "./MenuList";
 import "../Styles/MobileNav.css";
 import logo from "../assets/logo.png";
-import { FaBell, FaAlignRight } from "react-icons/fa";
+import { FaBell, FaAlignRight, FaList } from "react-icons/fa";
+import { RiPlayListLine } from "react-icons/ri";
 import { NotificationsList } from "../features/Notification/NotificationsList.jsx";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutAction } from "../Redux/AuthService/Action.js";
 import { getNotifications } from "../Redux/NotificationService/Action.js";
 import toast from "react-hot-toast";
 import defaultAvatar from "../assets/user.jpg";
+import { MenuPlayList } from "../features/PlayList/MenuPlayList.jsx";
 
-function MobileNav() {
+function MobileNav({setCreatePlayList}) {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
+  const [showPlaylists, setShowPlaylists] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { reqUser } = useSelector((store) => store.auth);
@@ -71,6 +74,12 @@ function MobileNav() {
         <div className="mobileNav-top-right">
           <div
             className="mobileNav-icon"
+            onClick={() => setShowPlaylists((prev) => !prev)}
+          >
+            <RiPlayListLine className="mobileNav-bell" />
+          </div>
+          <div
+            className="mobileNav-icon"
             onClick={() => setShowNotifications(!showNotifications)}
           >
             <FaBell className="mobileNav-bell" />
@@ -85,7 +94,7 @@ function MobileNav() {
           </div>
           <div className="mobileNav-user-dropdown">
             <p className="mobileNav-userText" onClick={toggleUserDropdown}>
-              {localStorage.getItem("user") ? (
+              {reqUser ? (
                 <FaAlignRight className="mobileNav-menu" />
               ) : (
                 "Login"
@@ -93,7 +102,7 @@ function MobileNav() {
             </p>
             {showUserDropdown && (
               <div className="dropdown-menu">
-                {localStorage.getItem("user") ? (
+                {reqUser ? (
                   <>
                     <div className="dropdown-item" onClick={handleProfileClick}>
                       Profile
@@ -149,6 +158,26 @@ function MobileNav() {
             <NotificationsList notifications={notifications} />
           </div>
         </div>
+      )}
+
+      {showPlaylists && (
+          <div className="mobilePlaylistsModal">
+            <div className="modalHeader">
+              <h2>Playlists</h2>
+              <button
+                  className="closeBtn"
+                  onClick={() => setShowPlaylists(false)}
+              >
+                ×
+              </button>
+            </div>
+            <div className="modalContent">
+              <MenuPlayList
+                  setCreatePlayList={setCreatePlayList}
+                  closeModals={() => setShowPlaylists(false)}
+              />
+            </div>
+          </div>
       )}
     </>
   );

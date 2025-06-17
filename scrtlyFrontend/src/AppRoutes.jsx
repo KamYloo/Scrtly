@@ -58,7 +58,7 @@ function AppRoutes() {
                 {...props}
             />
             {!isMobile && <RightMenu />}
-            {isMobile && <MobileNav />}
+            {isMobile && <MobileNav setCreatePlayList={setCreatePlayList}/>}
             {createPlayList && (
                 <PlayListForm onClose={() => setCreatePlayList(prev => !prev)} />
             )}

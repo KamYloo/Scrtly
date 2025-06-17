@@ -53,12 +53,12 @@
         .buttons {
            display: flex;
            position: absolute;
-            bottom: 2vh;
+            top: 2vh;
             right: 2vh;
             gap: 2vh;
             align-items: flex-end;
 
-            .addSongBtn, .deleteAlbumBtn, .editPlayListBtn {
+            .addSongBtn, .deleteAlbumBtn, .deletePlayListBtn, .editPlayListBtn {
                 width: 10vh;
                 height: 4vh;
                 text-align: center;
@@ -122,7 +122,7 @@
             }
 
             .buttons {
-                .addSongBtn, .deleteAlbumBtn {
+                .addSongBtn, .deleteAlbumBtn, .deletePlayListBtn, .editPlayListBtn {
                     width: 8vh;
                     height: 3vh;
                     padding: 5px;
@@ -193,7 +193,7 @@
 
             .buttons {
 
-                .addSongBtn, .deleteAlbumBtn {
+                .addSongBtn, .deleteAlbumBtn, .deletePlayListBtn, .editPlayListBtn {
                     width: 10vh;
                     height: 5vh;
                 }
@@ -245,6 +245,20 @@
         .audioList .songsBox {
             height: calc(100% - 160px);
         }
+
+        .topSection {
+            .buttons {
+                .addSongBtn, .deleteAlbumBtn, .deletePlayListBtn, .editPlayListBtn {
+                    width: 8vh;
+                    height: 3.5vh;
+                    top: 6vh;
+                    right: 1vh;
+                    padding: 5px;
+                    font-size: 10px;
+                }
+            }
+
+        }
     }
 }
 
@@ -262,9 +276,11 @@
             }
 
             .buttons {
-                .addSongBtn, .deleteAlbumBtn, .deletePlayListBtn {
+                gap: 1vh;
+
+                .addSongBtn, .deleteAlbumBtn, .deletePlayListBtn, .editPlayListBtn {
                     width: 8vh;
-                    height: 4vh;
+                    height: 3vh;
                     top: 6vh;
                     right: 2vh;
                     padding: 5px;
