@@ -471,15 +471,17 @@ class PlayListServiceImplTest {
     @Test
     void updatePlayList_shouldNotUpdateTitle_whenTitleIsEmpty() {
         Integer playListId = 1;
-        String title = "New Title";
+        String title = "";
 
-        when(playListRepository.findById(1)).thenReturn(Optional.of(playList));
+        when(playListRepository.findById(playListId)).thenReturn(Optional.of(playList));
         when(userService.findUserByEmail("user@example.com")).thenReturn(user);
-        when(playListRepository.save(playList)).thenReturn(playList); // Stub save
+        when(playListRepository.save(playList)).thenReturn(playList);
 
         PlayListDto result = playListService.updatePlayList(playListId, title, "user@example.com", null);
 
+        assertNotNull(result);
         assertEquals("My Playlist", result.getTitle());
+        assertEquals("old/path", result.getCoverImage());
         verify(playListRepository).save(playList);
     }
 

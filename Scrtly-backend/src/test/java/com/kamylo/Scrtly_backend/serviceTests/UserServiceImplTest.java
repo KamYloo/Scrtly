@@ -10,6 +10,7 @@ import com.kamylo.Scrtly_backend.entity.UserEntity;
 import com.kamylo.Scrtly_backend.handler.CustomException;
 import com.kamylo.Scrtly_backend.mappers.Mapper;
 import com.kamylo.Scrtly_backend.repository.UserRepository;
+import com.kamylo.Scrtly_backend.service.ArtistVerificationTokenService;
 import com.kamylo.Scrtly_backend.service.EmailService;
 import com.kamylo.Scrtly_backend.service.FileService;
 import com.kamylo.Scrtly_backend.service.impl.UserServiceImpl;
@@ -38,7 +39,7 @@ class UserServiceImplTest {
     @Mock private Mapper<UserEntity, UserDto> mapper;
     @Mock private UserLikeChecker userLikeChecker;
     @Mock private MultipartFile multipartFile;
-    @Mock private com.kamylo.Scrtly_backend.service.ArtistVerificationTokenService artistVerificationTokenService;
+    @Mock private ArtistVerificationTokenService artistVerificationTokenService;
     @Mock private EmailService emailService;
 
     @InjectMocks private UserServiceImpl userService;
