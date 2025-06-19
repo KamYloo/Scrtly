@@ -10,7 +10,8 @@ import com.kamylo.Scrtly_backend.entity.enums.NotificationType;
 import com.kamylo.Scrtly_backend.events.NotificationEvent;
 import com.kamylo.Scrtly_backend.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.handler.CustomException;
-import com.kamylo.Scrtly_backend.mappers.Mapper;
+import com.kamylo.Scrtly_backend.mappers.CommentLikeMapperImpl;
+import com.kamylo.Scrtly_backend.mappers.PostLikeMapperImpl;
 import com.kamylo.Scrtly_backend.repository.CommentRepository;
 import com.kamylo.Scrtly_backend.repository.LikeRepository;
 import com.kamylo.Scrtly_backend.repository.PostRepository;
@@ -31,35 +32,16 @@ import static org.mockito.Mockito.*;
 
 public class LikeServiceImplTest {
 
-    @Mock
-    private UserService userService;
-
-    @Mock
-    private LikeRepository likeRepository;
-
-    @Mock
-    private PostRepository postRepository;
-
-    @Mock
-    private CommentRepository commentRepository;
-
-    @Mock
-    private Mapper<LikeEntity, PostStatsDto> postMapper;
-
-    @Mock
-    private Mapper<LikeEntity, CommentStatsDto> commentMapper;
-
-    @Mock
-    private ApplicationEventPublisher eventPublisher;
-
-    @Mock
-    private NotificationService notificationService;
-
-    @Mock
-    private UserLikeChecker userLikeChecker;
-
-    @InjectMocks
-    private LikeServiceImpl likeService;
+    @Mock private UserService userService;
+    @Mock private LikeRepository likeRepository;
+    @Mock private PostRepository postRepository;
+    @Mock private CommentRepository commentRepository;
+    @Mock private PostLikeMapperImpl postLikeMapper;
+    @Mock private CommentLikeMapperImpl commentLikeMapper;
+    @Mock private ApplicationEventPublisher eventPublisher;
+    @Mock private NotificationService notificationService;
+    @Mock private UserLikeChecker userLikeChecker;
+    @InjectMocks private LikeServiceImpl likeService;
 
     private UserEntity user;
     private PostEntity post;
@@ -102,8 +84,8 @@ public class LikeServiceImplTest {
     void likePost_shouldUnlike_whenAlreadyLiked() {
         when(userService.findUserByEmail("test@example.com")).thenReturn(user);
         when(likeRepository.isLikeExistPost(user.getId(), post.getId())).thenReturn(likeEntity);
-        when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
-        when(postMapper.mapTo(likeEntity)).thenReturn(postDto);
+        when(postRepository.findById(post.getId())).thenReturn(Optional.of(post));
+        when(postLikeMapper.mapTo(likeEntity)).thenReturn(postDto);
 
         PostStatsDto result = likeService.likePost(post.getId(), "test@example.com");
 
@@ -122,7 +104,7 @@ public class LikeServiceImplTest {
             saved.setId(501L);
             return saved;
         });
-        when(postMapper.mapTo(any(LikeEntity.class))).thenReturn(postDto);
+        when(postLikeMapper.mapTo(any(LikeEntity.class))).thenReturn(postDto);
 
         PostStatsDto result = likeService.likePost(post.getId(), "test@example.com");
 
@@ -152,7 +134,7 @@ public class LikeServiceImplTest {
         when(userService.findUserByEmail("test@example.com")).thenReturn(user);
         when(likeRepository.isLikeExistComment(user.getId(), comment.getId())).thenReturn(likeEntity);
         when(commentRepository.findById(comment.getId())).thenReturn(Optional.of(comment));
-        when(commentMapper.mapTo(likeEntity)).thenReturn(commentDto);
+        when(commentLikeMapper.mapTo(likeEntity)).thenReturn(commentDto);
 
         CommentStatsDto result = likeService.likeComment(comment.getId(), "test@example.com");
 
@@ -170,7 +152,7 @@ public class LikeServiceImplTest {
             saved.setId(502L);
             return saved;
         });
-        when(commentMapper.mapTo(any(LikeEntity.class))).thenReturn(commentDto);
+        when(commentLikeMapper.mapTo(any(LikeEntity.class))).thenReturn(commentDto);
 
         CommentStatsDto result = likeService.likeComment(comment.getId(), "test@example.com");
 
