@@ -1,9 +1,9 @@
 package com.kamylo.Scrtly_backend.serviceTests;
 
-import com.kamylo.Scrtly_backend.entity.ArtistVerificationToken;
-import com.kamylo.Scrtly_backend.entity.UserEntity;
-import com.kamylo.Scrtly_backend.repository.ArtistVerificationTokenRepository;
-import com.kamylo.Scrtly_backend.service.impl.ArtistVerificationTokenServiceImpl;
+import com.kamylo.Scrtly_backend.artist.domain.ArtistVerificationToken;
+import com.kamylo.Scrtly_backend.user.domain.UserEntity;
+import com.kamylo.Scrtly_backend.artist.repository.ArtistVerificationTokenRepository;
+import com.kamylo.Scrtly_backend.artist.service.impl.ArtistVerificationTokenServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

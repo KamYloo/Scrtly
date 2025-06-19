@@ -1,8 +1,8 @@
 package com.kamylo.Scrtly_backend.serviceTests;
 
 import com.kamylo.Scrtly_backend.email.EmailTemplateName;
-import com.kamylo.Scrtly_backend.entity.UserEntity;
-import com.kamylo.Scrtly_backend.service.impl.EmailServiceImpl;
+import com.kamylo.Scrtly_backend.user.domain.UserEntity;
+import com.kamylo.Scrtly_backend.email.service.EmailServiceImpl;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.Test;

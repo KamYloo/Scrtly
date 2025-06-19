@@ -1,9 +1,9 @@
 package com.kamylo.Scrtly_backend.serviceTests;
 
-import com.kamylo.Scrtly_backend.entity.ActivationToken;
-import com.kamylo.Scrtly_backend.entity.UserEntity;
-import com.kamylo.Scrtly_backend.repository.ActivationTokenRepository;
-import com.kamylo.Scrtly_backend.service.impl.ActivationTokenServiceImpl;
+import com.kamylo.Scrtly_backend.auth.domain.ActivationToken;
+import com.kamylo.Scrtly_backend.user.domain.UserEntity;
+import com.kamylo.Scrtly_backend.auth.repository.ActivationTokenRepository;
+import com.kamylo.Scrtly_backend.auth.service.impl.ActivationTokenServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

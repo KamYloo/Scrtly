@@ -1,8 +1,8 @@
 package com.kamylo.Scrtly_backend.repositoryTests;
 
-import com.kamylo.Scrtly_backend.entity.ActivationToken;
-import com.kamylo.Scrtly_backend.entity.UserEntity;
-import com.kamylo.Scrtly_backend.repository.ActivationTokenRepository;
+import com.kamylo.Scrtly_backend.auth.domain.ActivationToken;
+import com.kamylo.Scrtly_backend.user.domain.UserEntity;
+import com.kamylo.Scrtly_backend.auth.repository.ActivationTokenRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +10,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.time.Instant;
 import java.util.Optional;
 import java.time.LocalDateTime;
 import java.time.ZoneId;

@@ -1,8 +1,8 @@
 package com.kamylo.Scrtly_backend.repositoryTests;
 
-import com.kamylo.Scrtly_backend.entity.RefreshTokenEntity;
-import com.kamylo.Scrtly_backend.entity.UserEntity;
-import com.kamylo.Scrtly_backend.repository.RefreshTokenRepository;
+import com.kamylo.Scrtly_backend.auth.domain.RefreshTokenEntity;
+import com.kamylo.Scrtly_backend.user.domain.UserEntity;
+import com.kamylo.Scrtly_backend.auth.repository.RefreshTokenRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,8 +1,8 @@
 package com.kamylo.Scrtly_backend.serviceTests;
 
-import com.kamylo.Scrtly_backend.handler.BusinessErrorCodes;
-import com.kamylo.Scrtly_backend.handler.CustomException;
-import com.kamylo.Scrtly_backend.service.impl.FileServiceImpl;
+import com.kamylo.Scrtly_backend.common.handler.BusinessErrorCodes;
+import com.kamylo.Scrtly_backend.common.handler.CustomException;
+import com.kamylo.Scrtly_backend.common.service.impl.FileServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;

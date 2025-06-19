@@ -1,7 +1,6 @@
 
 package com.kamylo.Scrtly_backend.serviceTests;
-import com.kamylo.Scrtly_backend.service.impl.JwtServiceImpl;
-import io.jsonwebtoken.Claims;
+import com.kamylo.Scrtly_backend.auth.service.impl.JwtServiceImpl;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.JwtParserBuilder;

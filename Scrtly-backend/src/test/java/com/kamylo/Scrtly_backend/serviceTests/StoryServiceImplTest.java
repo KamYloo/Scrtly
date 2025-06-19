@@ -1,16 +1,16 @@
 package com.kamylo.Scrtly_backend.serviceTests;
 
-import com.kamylo.Scrtly_backend.dto.Minimal.UserMinimalDto;
-import com.kamylo.Scrtly_backend.dto.StoryDto;
-import com.kamylo.Scrtly_backend.entity.StoryEntity;
-import com.kamylo.Scrtly_backend.entity.UserEntity;
-import com.kamylo.Scrtly_backend.handler.BusinessErrorCodes;
-import com.kamylo.Scrtly_backend.handler.CustomException;
-import com.kamylo.Scrtly_backend.mappers.Mapper;
-import com.kamylo.Scrtly_backend.repository.StoryRepository;
-import com.kamylo.Scrtly_backend.service.UserService;
-import com.kamylo.Scrtly_backend.service.impl.FileServiceImpl;
-import com.kamylo.Scrtly_backend.service.impl.StoryServiceImpl;
+import com.kamylo.Scrtly_backend.user.web.dto.UserMinimalDto;
+import com.kamylo.Scrtly_backend.story.web.dto.StoryDto;
+import com.kamylo.Scrtly_backend.story.domain.StoryEntity;
+import com.kamylo.Scrtly_backend.user.domain.UserEntity;
+import com.kamylo.Scrtly_backend.common.handler.BusinessErrorCodes;
+import com.kamylo.Scrtly_backend.common.handler.CustomException;
+import com.kamylo.Scrtly_backend.common.mapper.Mapper;
+import com.kamylo.Scrtly_backend.story.repository.StoryRepository;
+import com.kamylo.Scrtly_backend.user.service.UserService;
+import com.kamylo.Scrtly_backend.common.service.impl.FileServiceImpl;
+import com.kamylo.Scrtly_backend.story.service.StoryServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

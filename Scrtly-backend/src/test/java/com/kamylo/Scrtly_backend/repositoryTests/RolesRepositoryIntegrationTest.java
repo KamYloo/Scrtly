@@ -1,7 +1,7 @@
 package com.kamylo.Scrtly_backend.repositoryTests;
 
-import com.kamylo.Scrtly_backend.entity.RoleEntity;
-import com.kamylo.Scrtly_backend.repository.RolesRepository;
+import com.kamylo.Scrtly_backend.user.domain.RoleEntity;
+import com.kamylo.Scrtly_backend.user.repository.RolesRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;

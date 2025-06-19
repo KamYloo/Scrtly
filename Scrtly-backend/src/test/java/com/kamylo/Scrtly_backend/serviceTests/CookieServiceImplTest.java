@@ -1,7 +1,7 @@
 package com.kamylo.Scrtly_backend.serviceTests;
 
-import com.kamylo.Scrtly_backend.handler.CustomException;
-import com.kamylo.Scrtly_backend.service.impl.CookieServiceImpl;
+import com.kamylo.Scrtly_backend.common.handler.CustomException;
+import com.kamylo.Scrtly_backend.auth.service.impl.CookieServiceImpl;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;

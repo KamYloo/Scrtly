@@ -1,13 +1,15 @@
 package com.kamylo.Scrtly_backend.serviceTests;
 
-import com.kamylo.Scrtly_backend.entity.*;
-import com.kamylo.Scrtly_backend.handler.BusinessErrorCodes;
-import com.kamylo.Scrtly_backend.handler.CustomException;
-import com.kamylo.Scrtly_backend.repository.RolesRepository;
-import com.kamylo.Scrtly_backend.repository.UserRepository;
-import com.kamylo.Scrtly_backend.service.ArtistVerificationTokenService;
-import com.kamylo.Scrtly_backend.service.UserService;
-import com.kamylo.Scrtly_backend.service.impl.AdminServiceImpl;
+import com.kamylo.Scrtly_backend.artist.domain.ArtistVerificationToken;
+import com.kamylo.Scrtly_backend.common.handler.BusinessErrorCodes;
+import com.kamylo.Scrtly_backend.common.handler.CustomException;
+import com.kamylo.Scrtly_backend.user.repository.RolesRepository;
+import com.kamylo.Scrtly_backend.user.repository.UserRepository;
+import com.kamylo.Scrtly_backend.artist.service.ArtistVerificationTokenService;
+import com.kamylo.Scrtly_backend.user.service.UserService;
+import com.kamylo.Scrtly_backend.user.service.AdminServiceImpl;
+import com.kamylo.Scrtly_backend.user.domain.RoleEntity;
+import com.kamylo.Scrtly_backend.user.domain.UserEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
