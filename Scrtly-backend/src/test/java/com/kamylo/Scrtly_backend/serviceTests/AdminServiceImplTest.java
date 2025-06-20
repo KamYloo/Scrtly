@@ -7,7 +7,7 @@ import com.kamylo.Scrtly_backend.user.repository.RolesRepository;
 import com.kamylo.Scrtly_backend.user.repository.UserRepository;
 import com.kamylo.Scrtly_backend.artist.service.ArtistVerificationTokenService;
 import com.kamylo.Scrtly_backend.user.service.UserService;
-import com.kamylo.Scrtly_backend.user.service.AdminServiceImpl;
+import com.kamylo.Scrtly_backend.user.service.impl.AdminServiceImpl;
 import com.kamylo.Scrtly_backend.user.domain.RoleEntity;
 import com.kamylo.Scrtly_backend.user.domain.UserEntity;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,4 +1,4 @@
-package com.kamylo.Scrtly_backend.user.service;
+package com.kamylo.Scrtly_backend.user.service.impl;
 
 import com.kamylo.Scrtly_backend.user.repository.UserRepository;
 import lombok.AllArgsConstructor;

@@ -23,6 +23,7 @@ import { Login } from './pages/Login.jsx';
 import { Register } from './pages/Register.jsx';
 import { ForgotPassword } from './pages/ForgotPassword.jsx';
 import { ChangePassword } from './pages/ChangePassword.jsx';
+import {OAuth2RedirectHandler} from "./utils/OAuth2RedirectHandler.jsx";
 
 function AppRoutes() {
     const [createPlayList, setCreatePlayList] = useState(false);
@@ -106,6 +107,7 @@ function AppRoutes() {
                         </div>
                     }
                 />
+                <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
 
                 <Route path="/home" element={renderLayout(Home)} />
                 <Route path="/chat" element={renderLayout(ChatView)} />

@@ -1,4 +1,5 @@
-package com.kamylo.Scrtly_backend.user.service;
+package com.kamylo.Scrtly_backend.user.service.impl;
+import com.kamylo.Scrtly_backend.user.service.UserService;
 import com.kamylo.Scrtly_backend.user.web.dto.UserDto;
 import com.kamylo.Scrtly_backend.artist.web.dto.ArtistVerificationRequest;
 import com.kamylo.Scrtly_backend.email.EmailTemplateName;

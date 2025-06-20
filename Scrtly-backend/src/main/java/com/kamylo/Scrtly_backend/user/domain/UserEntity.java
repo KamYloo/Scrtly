@@ -61,7 +61,6 @@ public class UserEntity implements UserDetails, Principal {
     private String description;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @NotBlank
     @Size(min = 6, max = 100)
     private String password;
 

@@ -1,4 +1,4 @@
-package com.kamylo.Scrtly_backend.user.service;
+package com.kamylo.Scrtly_backend.user.service.impl;
 
 import com.kamylo.Scrtly_backend.artist.domain.ArtistEntity;
 import com.kamylo.Scrtly_backend.artist.domain.ArtistVerificationToken;
@@ -9,6 +9,8 @@ import com.kamylo.Scrtly_backend.user.repository.UserRepository;
 import com.kamylo.Scrtly_backend.artist.service.ArtistVerificationTokenService;
 import com.kamylo.Scrtly_backend.user.domain.RoleEntity;
 import com.kamylo.Scrtly_backend.user.domain.UserEntity;
+import com.kamylo.Scrtly_backend.user.service.AdminService;
+import com.kamylo.Scrtly_backend.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

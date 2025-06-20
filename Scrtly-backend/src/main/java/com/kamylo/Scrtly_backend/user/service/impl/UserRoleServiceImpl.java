@@ -1,6 +1,8 @@
-package com.kamylo.Scrtly_backend.user.service;
+package com.kamylo.Scrtly_backend.user.service.impl;
 
 import com.kamylo.Scrtly_backend.user.domain.UserEntity;
+import com.kamylo.Scrtly_backend.user.service.UserRoleService;
+import com.kamylo.Scrtly_backend.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

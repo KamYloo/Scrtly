@@ -7,6 +7,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { loginAction } from "../Redux/AuthService/Action.js";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import {FcGoogle} from "react-icons/fc";
+import {BASE_API_URL} from "../Redux/api.js";
 
 function Login() {
     const [inputData, setInputData] = useState({ email: "", password: "" });
@@ -58,36 +60,48 @@ function Login() {
                 <i className='cancel'><Link to="/"><MdCancel /></Link></i>
                 <form onSubmit={handleLogin}>
                     <div className="title">
-                        <img src={logo} alt="Logo" />
+                        <img src={logo} alt="Logo"/>
                         <h1>Login</h1>
                     </div>
                     <div className="inputBox">
-                        <input 
-                            type="email" 
-                            name="email" 
-                            value={inputData.email} 
+                        <input
+                            type="email"
+                            name="email"
+                            value={inputData.email}
                             onChange={handleChange}
-                            placeholder='Email address' 
+                            placeholder='Email address'
                             required
                         />
-                        <FaUser className='icon' />
+                        <FaUser className='icon'/>
                         {errors.email && <p className="error">{errors.email}</p>}
                     </div>
                     <div className="inputBox">
-                        <input 
-                            type="password" 
-                            name="password" 
+                        <input
+                            type="password"
+                            name="password"
                             value={inputData.password}
-                            onChange={handleChange} 
-                            placeholder='Password' 
+                            onChange={handleChange}
+                            placeholder='Password'
                             required
                         />
-                        <FaLock className='icon' />
+                        <FaLock className='icon'/>
                         {errors.password && <p className="error">{errors.password}</p>}
                     </div>
-                    <button type='submit' disabled={loading}>
-                        {loading ? 'Logging in…' : 'Login'}
-                    </button>
+                    <div className="button-group">
+                        <button type='submit' disabled={loading} className="login-btn">
+                            {loading ? 'Logging in…' : 'Login'}
+                        </button>
+                        <button
+                            type="button"
+                            className="google-btn"
+                            onClick={() => {
+                                window.location.href = `${BASE_API_URL}/api/oauth2/authorize/google`;
+                            }}
+                        >
+                            <FcGoogle size={20} style={{marginRight: '8px'}}/>
+                            Sign in with Google
+                        </button>
+                    </div>
                     <div className="forgotLink">
                         <p>Don't remember the password? <Link to="/forgot-password">Change Password</Link></p>
                     </div>
@@ -100,4 +114,4 @@ function Login() {
     );
 }
 
-export { Login };
+export {Login};

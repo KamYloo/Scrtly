@@ -1,5 +1,7 @@
 package com.kamylo.Scrtly_backend.common.config;
 
+import com.kamylo.Scrtly_backend.auth.service.impl.CustomOAuth2UserServiceImpl;
+import com.kamylo.Scrtly_backend.auth.service.impl.OAuth2AuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -33,6 +35,8 @@ public class SecurityConfig implements WebMvcConfigurer {
     private final JwtFilter jwtFilter;
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
+    private final CustomOAuth2UserServiceImpl customOAuth2UserService;
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 
     @Value("${application.file.image-dir}")
     private String uploadDir;
@@ -59,6 +63,9 @@ public class SecurityConfig implements WebMvcConfigurer {
                                     "/swagger-ui.html",
 
                                     "/auth/**",
+                                    "/oauth2/authorize/**",
+                                    "/oauth2/redirect/**",
+                                    "/api/oauth2/**",
                                     "/admin/artist/verify/**"
                             ).permitAll();
 
@@ -83,6 +90,12 @@ public class SecurityConfig implements WebMvcConfigurer {
                         }
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .oauth2Login(oauth2 -> oauth2
+                        .authorizationEndpoint( authz -> authz.baseUri("/oauth2/authorize") )
+                        .redirectionEndpoint( redir -> redir.baseUri("/oauth2/redirect") )
+                        .userInfoEndpoint(ui -> ui.oidcUserService(customOAuth2UserService))
+                        .successHandler(oAuth2AuthenticationSuccessHandler)
+                )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

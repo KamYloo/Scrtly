@@ -13,7 +13,7 @@ import com.kamylo.Scrtly_backend.user.repository.UserRepository;
 import com.kamylo.Scrtly_backend.artist.service.ArtistVerificationTokenService;
 import com.kamylo.Scrtly_backend.email.service.EmailService;
 import com.kamylo.Scrtly_backend.common.service.FileService;
-import com.kamylo.Scrtly_backend.user.service.UserServiceImpl;
+import com.kamylo.Scrtly_backend.user.service.impl.UserServiceImpl;
 import com.kamylo.Scrtly_backend.common.utils.UserLikeChecker;
 import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.BeforeEach;
