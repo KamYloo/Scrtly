@@ -6,15 +6,14 @@ import { Provider } from "react-redux"
 import { store } from './Redux/store.js'
 import {registerSW} from "virtual:pwa-register";
 
-const updateSW = registerSW({
+registerSW({
     onRegistered(r) {
-        console.log('Service Worker zarejestrowany pod:', r?.scope)
+        console.log('Service Worker registered under:', r?.scope)
     },
     onRegisterError(err) {
-        console.error('Błąd rejestracji SW:', err)
+        console.error('SW registration error:', err)
     }
-})
-
+});
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
         <Provider store={store}>

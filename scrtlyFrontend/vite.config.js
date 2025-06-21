@@ -13,8 +13,8 @@ export default defineConfig({
         name: 'Zuvoria',
         short_name: 'Zuvoria',
         description: 'Music Platform',
-        theme_color: '#ffffff',
-        background_color: 'rgba(0,5,12,0.93)',
+        theme_color: '#1b1b1b',
+        background_color: '#1b1b1b',
         display: 'standalone',
         start_url: '/',
         icons: [
@@ -25,12 +25,10 @@ export default defineConfig({
       workbox: {
         runtimeCaching: [
           {
-            // dokumenty: fallback do sieci
             urlPattern: ({ request }) => request.destination === 'document',
             handler: 'NetworkFirst'
           },
           {
-            // skrypty, style, obrazy: cache
             urlPattern: ({ request }) =>
                 ['script','style','image'].includes(request.destination),
             handler: 'CacheFirst',
