@@ -25,6 +25,7 @@ services:
       - "61613:61613"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+      - ./rabbitmq-plugins.conf:/etc/rabbitmq/plugins.conf:ro
     networks:
       - scrtly-net
       
