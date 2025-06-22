@@ -21,6 +21,10 @@ services:
       RABBITMQ_DEFAULT_PASS: "${RABBIT_PASS}"
     ports:
       - "15672:15672"
+      - "5672:5672"
+      - "61613:61613"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
     networks:
       - scrtly-net
       
@@ -89,6 +93,7 @@ services:
 
 volumes:
   pgdata:
+  rabbitmq_data:
   certbot-ssl:
   certbot-challenge:
   uploads:
