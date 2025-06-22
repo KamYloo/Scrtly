@@ -1,21 +1,20 @@
 package com.kamylo.Scrtly_backend.serviceTests;
 
-import com.kamylo.Scrtly_backend.dto.PlayListDto;
-import com.kamylo.Scrtly_backend.dto.SongDto;
-import com.kamylo.Scrtly_backend.entity.PlayListEntity;
-import com.kamylo.Scrtly_backend.entity.SongEntity;
-import com.kamylo.Scrtly_backend.entity.UserEntity;
-import com.kamylo.Scrtly_backend.handler.BusinessErrorCodes;
-import com.kamylo.Scrtly_backend.handler.CustomException;
-import com.kamylo.Scrtly_backend.mappers.Mapper;
-import com.kamylo.Scrtly_backend.mappers.PlayListMapperImpl;
-import com.kamylo.Scrtly_backend.repository.PlayListRepository;
-import com.kamylo.Scrtly_backend.repository.SongLikeRepository;
-import com.kamylo.Scrtly_backend.repository.SongRepository;
-import com.kamylo.Scrtly_backend.dto.request.PlayListRequest;
-import com.kamylo.Scrtly_backend.service.UserService;
-import com.kamylo.Scrtly_backend.service.impl.FileServiceImpl;
-import com.kamylo.Scrtly_backend.service.impl.PlayListServiceImpl;
+import com.kamylo.Scrtly_backend.playList.web.dto.PlayListDto;
+import com.kamylo.Scrtly_backend.song.web.dto.SongDto;
+import com.kamylo.Scrtly_backend.playList.domain.PlayListEntity;
+import com.kamylo.Scrtly_backend.song.domain.SongEntity;
+import com.kamylo.Scrtly_backend.user.domain.UserEntity;
+import com.kamylo.Scrtly_backend.common.handler.BusinessErrorCodes;
+import com.kamylo.Scrtly_backend.common.handler.CustomException;
+import com.kamylo.Scrtly_backend.common.mapper.Mapper;
+import com.kamylo.Scrtly_backend.playList.mapper.PlayListMapperImpl;
+import com.kamylo.Scrtly_backend.playList.repository.PlayListRepository;
+import com.kamylo.Scrtly_backend.like.repository.SongLikeRepository;
+import com.kamylo.Scrtly_backend.song.repository.SongRepository;
+import com.kamylo.Scrtly_backend.user.service.UserService;
+import com.kamylo.Scrtly_backend.common.service.impl.FileServiceImpl;
+import com.kamylo.Scrtly_backend.playList.service.PlayListServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -471,15 +470,17 @@ class PlayListServiceImplTest {
     @Test
     void updatePlayList_shouldNotUpdateTitle_whenTitleIsEmpty() {
         Integer playListId = 1;
-        String title = "New Title";
+        String title = "";
 
-        when(playListRepository.findById(1)).thenReturn(Optional.of(playList));
+        when(playListRepository.findById(playListId)).thenReturn(Optional.of(playList));
         when(userService.findUserByEmail("user@example.com")).thenReturn(user);
-        when(playListRepository.save(playList)).thenReturn(playList); // Stub save
+        when(playListRepository.save(playList)).thenReturn(playList);
 
         PlayListDto result = playListService.updatePlayList(playListId, title, "user@example.com", null);
 
+        assertNotNull(result);
         assertEquals("My Playlist", result.getTitle());
+        assertEquals("old/path", result.getCoverImage());
         verify(playListRepository).save(playList);
     }
 

@@ -315,3 +315,57 @@
     color: rgba(255, 255, 255, 0.5);
     font-size: 0.9em;
 }
+
+.mobilePlaylistsModal {
+    height: calc(100dvh - 120px);
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(27, 27, 27, 0.95);
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+}
+
+.mobilePlaylistsModal .modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background: #1b1b1b;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mobilePlaylistsModal .modalHeader h2 {
+    color: white;
+    margin: 0;
+    font-size: 18px;
+}
+
+.mobilePlaylistsModal .closeBtn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.mobilePlaylistsModal .modalContent {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    background: #2c2c2c;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+@media screen and (max-height: 500px) {
+    .mobilePlaylistsModal .modalHeader,
+    .mobilePlaylistsModal .modalContent {
+        padding: 5px;
+        font-size: 14px;
+    }
+}

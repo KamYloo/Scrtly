@@ -1,13 +1,13 @@
 package com.kamylo.Scrtly_backend.serviceTests;
 
-import com.kamylo.Scrtly_backend.dto.response.RefreshTokenResponse;
-import com.kamylo.Scrtly_backend.entity.RefreshTokenEntity;
-import com.kamylo.Scrtly_backend.entity.UserEntity;
-import com.kamylo.Scrtly_backend.handler.BusinessErrorCodes;
-import com.kamylo.Scrtly_backend.handler.CustomException;
-import com.kamylo.Scrtly_backend.repository.RefreshTokenRepository;
-import com.kamylo.Scrtly_backend.repository.UserRepository;
-import com.kamylo.Scrtly_backend.service.impl.RefreshTokenServiceImpl;
+import com.kamylo.Scrtly_backend.auth.web.dto.response.RefreshTokenResponse;
+import com.kamylo.Scrtly_backend.auth.domain.RefreshTokenEntity;
+import com.kamylo.Scrtly_backend.user.domain.UserEntity;
+import com.kamylo.Scrtly_backend.common.handler.BusinessErrorCodes;
+import com.kamylo.Scrtly_backend.common.handler.CustomException;
+import com.kamylo.Scrtly_backend.auth.repository.RefreshTokenRepository;
+import com.kamylo.Scrtly_backend.user.repository.UserRepository;
+import com.kamylo.Scrtly_backend.auth.service.impl.RefreshTokenServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

@@ -1,15 +1,14 @@
 package com.kamylo.Scrtly_backend.serviceTests;
 
-import com.kamylo.Scrtly_backend.entity.PasswordResetToken;
-import com.kamylo.Scrtly_backend.entity.UserEntity;
-import com.kamylo.Scrtly_backend.repository.PasswordResetTokenRepository;
-import com.kamylo.Scrtly_backend.service.impl.PasswordResetTokenServiceImpl;
+import com.kamylo.Scrtly_backend.auth.domain.PasswordResetToken;
+import com.kamylo.Scrtly_backend.user.domain.UserEntity;
+import com.kamylo.Scrtly_backend.auth.repository.PasswordResetTokenRepository;
+import com.kamylo.Scrtly_backend.auth.service.impl.PasswordResetTokenServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;

@@ -1,21 +1,21 @@
 package com.kamylo.Scrtly_backend.serviceTests;
 
-import com.kamylo.Scrtly_backend.dto.ChatMessageDto;
-import com.kamylo.Scrtly_backend.dto.ChatRoomDto;
-import com.kamylo.Scrtly_backend.dto.request.ChatMessageEditRequest;
-import com.kamylo.Scrtly_backend.entity.ChatMessageEntity;
-import com.kamylo.Scrtly_backend.entity.ChatRoomEntity;
-import com.kamylo.Scrtly_backend.entity.UserEntity;
-import com.kamylo.Scrtly_backend.handler.BusinessErrorCodes;
-import com.kamylo.Scrtly_backend.handler.CustomException;
-import com.kamylo.Scrtly_backend.mappers.ChatMessageMapperImpl;
-import com.kamylo.Scrtly_backend.mappers.ChatRoomMapperImpl;
-import com.kamylo.Scrtly_backend.mappers.Mapper;
-import com.kamylo.Scrtly_backend.repository.ChatMessageRepository;
-import com.kamylo.Scrtly_backend.dto.request.SendMessageRequest;
-import com.kamylo.Scrtly_backend.service.ChatService;
-import com.kamylo.Scrtly_backend.service.UserService;
-import com.kamylo.Scrtly_backend.service.impl.ChatMessageServiceImpl;
+import com.kamylo.Scrtly_backend.chat.web.dto.ChatMessageDto;
+import com.kamylo.Scrtly_backend.chat.web.dto.ChatRoomDto;
+import com.kamylo.Scrtly_backend.chat.web.dto.request.ChatMessageEditRequest;
+import com.kamylo.Scrtly_backend.chat.domain.ChatMessageEntity;
+import com.kamylo.Scrtly_backend.chat.domain.ChatRoomEntity;
+import com.kamylo.Scrtly_backend.user.domain.UserEntity;
+import com.kamylo.Scrtly_backend.common.handler.BusinessErrorCodes;
+import com.kamylo.Scrtly_backend.common.handler.CustomException;
+import com.kamylo.Scrtly_backend.chat.mapper.ChatMessageMapperImpl;
+import com.kamylo.Scrtly_backend.chat.mapper.ChatRoomMapperImpl;
+import com.kamylo.Scrtly_backend.common.mapper.Mapper;
+import com.kamylo.Scrtly_backend.chat.repository.ChatMessageRepository;
+import com.kamylo.Scrtly_backend.chat.web.dto.request.SendMessageRequest;
+import com.kamylo.Scrtly_backend.chat.service.ChatService;
+import com.kamylo.Scrtly_backend.user.service.UserService;
+import com.kamylo.Scrtly_backend.chat.service.impl.ChatMessageServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
@@ -57,7 +57,7 @@ public class ChatMessageServiceImplTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         Mapper<ChatRoomEntity, ChatRoomDto> chatRoomMapper = new ChatRoomMapperImpl(new ModelMapper());
-        Mapper<com.kamylo.Scrtly_backend.entity.ChatMessageEntity, ChatMessageDto> chatMessageMapper = new ChatMessageMapperImpl(new ModelMapper());
+        Mapper<ChatMessageEntity, ChatMessageDto> chatMessageMapper = new ChatMessageMapperImpl(new ModelMapper());
         chatMessageService = new ChatMessageServiceImpl(
                 chatMessageRepository,
                 userService,

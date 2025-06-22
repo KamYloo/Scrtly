@@ -9,11 +9,11 @@ export const connectWebSocket = (username, onMessageReceived) => {
         webSocketFactory: () => new SockJS(WEBSOCKET_URL),
         reconnectDelay: 5000,
         onConnect: () => {
-            client.subscribe(`/user/${username}/queue/notifications`, (message) => {
+            client.subscribe(`/exchange/notification.exchange/notification.user.${username}`, (message) => {
                 const notification = JSON.parse(message.body);
                 onMessageReceived(notification);
             });
-            console.log(`Subscribed to channel: /user/${username}/queue/notifications`);
+            // console.log(`Subscribed to channel: /user/${username}/queue/notifications`);
         },
         onStompError: (frame) => {
             console.error("STOMP Error: ", frame);

@@ -1,8 +1,8 @@
 package com.kamylo.Scrtly_backend.serviceTests;
 
-import com.kamylo.Scrtly_backend.entity.UserEntity;
-import com.kamylo.Scrtly_backend.repository.UserRepository;
-import com.kamylo.Scrtly_backend.service.impl.CustomUserDetailService;
+import com.kamylo.Scrtly_backend.user.domain.UserEntity;
+import com.kamylo.Scrtly_backend.user.repository.UserRepository;
+import com.kamylo.Scrtly_backend.user.service.impl.CustomUserDetailService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

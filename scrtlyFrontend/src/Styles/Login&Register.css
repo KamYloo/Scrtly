@@ -8,8 +8,8 @@
 .login {
     position: relative;
     width: 420px;
-    max-height: 480px;
-    min-height: 480px;
+    max-height: 550px;
+    min-height: 550px;
     border-radius: 10px;
     color: white;
     background: transparent;
@@ -134,24 +134,60 @@
     max-height: 750px;
 }
 
-@media screen and (max-height: 800px) {
-    .login.r {
-        min-height: 600px;
-        max-height: 680px;
-        .formBox {
-            padding: 20px 40px;
+.button-group {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
 
-            .title {
-                padding: 5px;
-            }
+.button-group button {
+    flex: 1 1 180px;
+    min-width: 160px;
+    max-width: 100%;
+    height: 45px;
+    font-size: 16px;
+    border-radius: 40px;
+    font-weight: 700;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
-            .inputBox {
-                margin: 15px 0;
-            }
+.button-group .login-btn {
+    background: white;
+    color: #222;
+    box-shadow: 0 0 10px rgba(0,0,0,0.08);
+}
 
-            .registerLink {
-                margin: 20px 0 5px;
-            }
-        }
+.button-group .login-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.button-group .google-btn {
+    background: #fff;
+    color: #444;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border: 1px solid #eee;
+}
+
+.button-group .google-btn:hover {
+    background: #f5f5f5;
+}
+
+@media (max-width: 500px) {
+    .button-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .button-group button {
+        min-width: 0;
+        width: 100%;
     }
 }

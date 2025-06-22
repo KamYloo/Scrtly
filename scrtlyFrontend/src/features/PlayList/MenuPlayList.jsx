@@ -7,7 +7,7 @@ import {deletePlayList, getUserPlayLists} from "../../Redux/PlayList/Action.js";
 import toast from "react-hot-toast";
 import Spinner from "../../Components/Spinner.jsx";
 
-function MenuPlayList({setCreatePlayList}) {
+function MenuPlayList({setCreatePlayList, closeModals}) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { playList, auth } = useSelector(state => state);
@@ -54,11 +54,16 @@ function MenuPlayList({setCreatePlayList}) {
             <div className="scrollBox">
                 {
                     playList?.playLists.content.map((playList)=> (
-                    <div className="playList" key={playList.id}>
-                        <i className='iconP'><BsMusicNoteList /></i>
-                        <p onClick={() => navigate(`/playList/${playList.id}`)}>{playList?.title}</p>
-                        <i className='trash' onClick={() => deletePlayListHandler(playList.id)}><BsTrash /></i>
-                    </div>
+                        <div className="playList" key={playList.id}>
+                            <i className='iconP'><BsMusicNoteList/></i>
+                            <p onClick={() => {
+                                closeModals()
+                                navigate(`/playList/${playList.id}`);
+                            }}>
+                                {playList?.title}
+                            </p>
+                            <i className='trash' onClick={() => deletePlayListHandler(playList.id)}><BsTrash/></i>
+                        </div>
                     ))
                 }
             </div>
@@ -66,4 +71,4 @@ function MenuPlayList({setCreatePlayList}) {
     )
 }
 
-export { MenuPlayList }
+export {MenuPlayList}
