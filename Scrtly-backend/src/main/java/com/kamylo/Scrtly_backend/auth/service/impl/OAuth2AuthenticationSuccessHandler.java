@@ -32,8 +32,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         OidcUser user = (OidcUser) authentication.getPrincipal();
         String token = jwtService.generateToken(user.getEmail());
         RefreshTokenResponse refreshResp = refreshTokenService.createRefreshToken(user.getEmail());
-        response.addCookie(cookieService.getNewCookie("jwt", token, 2 * 60 * 60));
-        response.addCookie(cookieService.getNewCookie("refresh", refreshResp.getRefreshToken(), 7 * 24 * 60 * 60));
+        response.addCookie(cookieService.getNewCookie("jwt_zuvoria_v1", token, 2 * 60 * 60));
+        response.addCookie(cookieService.getNewCookie("refresh_zuvoria_v1", refreshResp.getRefreshToken(), 7 * 24 * 60 * 60));
         getRedirectStrategy().sendRedirect(request, response, redirectUrl+"/oauth2/redirect");
     }
 
