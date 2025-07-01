@@ -19,7 +19,7 @@ function MenuPlayList({setCreatePlayList, closeModals}) {
                 toast.success('Playlist deleted successfully.');
                 navigate('/home')
             }).catch(() => {
-                toast.error('Failed to delete playlist. Please try again.');
+                toast.error(playList.error);
             });
         }
     }

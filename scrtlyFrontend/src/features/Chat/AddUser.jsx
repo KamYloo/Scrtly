@@ -31,7 +31,7 @@ function AddUser({ onClose }) {
     const handleCreateChat = () => {
         if (selectedUsers.length === 0) return;
         if (selectedUsers.length > 1 && groupName.trim() === '') {
-            alert('Proszę podać nazwę grupy.');
+            alert('Please enter a group name.');
             return;
         }
         const userIds = selectedUsers.map(user => user.id);

@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 
 function ProfileEdit() {
   const dispatch = useDispatch()
-  const { loading, reqUser } = useSelector(state => state.auth);
+  const { loading, reqUser, error } = useSelector(state => state.auth);
   const [fullName, setFullName] = useState(reqUser?.fullName || "")
   const [description, setDescription] = useState(reqUser?.description || "")
   const [profilePicture, setProfilePicture] = useState(null)
@@ -35,7 +35,7 @@ function ProfileEdit() {
           navigate(`/profile/${reqUser?.nickName}?reload=true`);
         })
         .catch(() => {
-          toast.error('Failed to update user. Please try again.');
+          toast.error(error);
         });
   };
 

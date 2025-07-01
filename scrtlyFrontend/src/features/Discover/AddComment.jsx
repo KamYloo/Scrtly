@@ -3,12 +3,13 @@ import EmojiPicker from 'emoji-picker-react'
 import { BsEmojiSmileFill } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
 import { createComment } from "../../Redux/Comment/Action.js";
+import toast from "react-hot-toast";
 
 function AddComment({ post, parentCommentId }) {
     const dispatch = useDispatch()
     const [commentText, setCommentText] = useState('')
     const [openEmoji, setOpenEmoji] = useState(false)
-    const { loading } = useSelector(state => state.comment);
+    const { createLoading, error } = useSelector(state => state.comment);
 
     const handleEmoji = (e) => {
         setCommentText(prev => prev + e.emoji)
@@ -16,9 +17,17 @@ function AddComment({ post, parentCommentId }) {
     }
 
     const handleCommentCreation = () => {
-        // Include parentCommentId only if replying to a comment
         dispatch(createComment({ postId: post.id, comment: commentText, parentCommentId }))
-        setCommentText('')
+            .then(() => {
+                toast.success('Comment created successfully.');
+            })
+            .catch(() => {
+                toast.error(error);
+            })
+            .finally(() => {
+                setCommentText('')
+            });
+
     }
 
     return (
@@ -34,8 +43,8 @@ function AddComment({ post, parentCommentId }) {
                 onChange={e => setCommentText(e.target.value)} 
                 placeholder={parentCommentId ? 'Odpowiedz na komentarz...' : 'Dodaj komentarz...'}
             ></textarea>
-            <button onClick={handleCommentCreation} disabled={loading}>
-                {loading ? "Sending..." : "Send"}
+            <button onClick={handleCommentCreation} disabled={createLoading}>
+                {createLoading ? "Sending..." : "Send"}
             </button>
         </div>
     )

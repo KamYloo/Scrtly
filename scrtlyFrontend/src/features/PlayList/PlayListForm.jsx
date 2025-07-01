@@ -9,7 +9,7 @@ function PlayListForm({onClose, isEdit}) {
     const [playListImg, setPlayListImg] = useState(null)
     const [preview, setPreview] = useState(isEdit?.playListImage ? `${isEdit.playListImage}` : '');
     const dispatch = useDispatch()
-    const { loading } = useSelector(state => state.playList);
+    const { loading, error } = useSelector(state => state.playList);
 
     const handleFileChange = (e) => {
         setPlayListImg(e.target.files[0])
@@ -26,7 +26,7 @@ function PlayListForm({onClose, isEdit}) {
                     toast.success('Playlist updated successfully.');
                 })
                 .catch(() => {
-                    toast.error('Failed to update playlist. Please try again.');
+                    toast.error(error);
                 });
         } else {
             dispatch(createPlayList(formData))

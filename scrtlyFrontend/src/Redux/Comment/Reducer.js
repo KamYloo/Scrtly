@@ -19,6 +19,8 @@ import {
 
 const initialValue = {
     loading: false,
+    likeLoading: false,
+    createLoading: false,
     error: null,
     createdComment:null,
     comments: {
@@ -42,11 +44,11 @@ const initialValue = {
 export const commentReducer = (state = initialValue, { type, payload }) => {
     switch (type) {
         case CREATE_COMMENT_REQUEST:
-            return { ...state, loading: true, error: null };
+            return { ...state, createLoading: true, error: null };
         case CREATE_COMMENT_SUCCESS:
             return {
                 ...state,
-                loading: false,
+                createLoading: false,
                 createdComment: payload,
                 comments: {
                     ...state.comments,
@@ -60,7 +62,7 @@ export const commentReducer = (state = initialValue, { type, payload }) => {
                 }
             };
         case CREATE_COMMENT_FAIL:
-            return { ...state, loading: false, error: payload };
+            return { ...state, createLoading: false, error: payload };
 
         case GET_POST_COMMENT_REQUEST:
             return { ...state, loading: true, error: null };
@@ -91,11 +93,11 @@ export const commentReducer = (state = initialValue, { type, payload }) => {
             return { ...state, loading: false, error: payload };
 
         case Like_COMMENT_REQUEST:
-            return { ...state, loading: true, error: null };
+            return { ...state, likeLoading: true, error: null };
         case Like_COMMENT_SUCCESS:
             return {
                 ...state,
-                loading: false,
+                likeLoading: false,
                 likeComment: payload,
                 comments: {
                     ...state.comments,
@@ -115,7 +117,7 @@ export const commentReducer = (state = initialValue, { type, payload }) => {
                 }
             };
         case Like_COMMENT_FAIL:
-            return { ...state, loading: false, error: payload };
+            return { ...state, likeLoading: false, error: payload };
 
         case GET_REPLIES_REQUEST:
             return { ...state, loading: true, error: null };

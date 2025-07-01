@@ -9,7 +9,7 @@ function EditArtist({onClose}) {
     const [bannerImg, setBannerImg] = useState(null)
     const [preview, setPreview] = useState('');
     const dispatch = useDispatch()
-    const { loading } = useSelector(state => state.artist);
+    const { loading, error } = useSelector(state => state.artist);
 
     const handleFileChange = (e) => {
         setBannerImg(e.target.files[0])
@@ -26,7 +26,7 @@ function EditArtist({onClose}) {
                 toast.success('Artist profile updated successfully.');
             })
             .catch(() => {
-                toast.error('Failed to update artist profile. Please try again.');
+                toast.error(error);
             })
             .finally(() => {
                 setBannerImg(null)

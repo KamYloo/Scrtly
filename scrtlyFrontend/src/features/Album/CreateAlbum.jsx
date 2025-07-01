@@ -9,7 +9,7 @@ function CreateAlbum({onClose}) {
     const [albumImg, setAlbumImg] = useState(null)
     const [preview, setPreview] = useState('');
     const dispatch = useDispatch()
-    const { loading } = useSelector(state => state.album);
+    const { loading, error } = useSelector(state => state.album);
 
     const handleFileChange = (e) => {
         setAlbumImg(e.target.files[0])
@@ -26,7 +26,7 @@ function CreateAlbum({onClose}) {
                 toast.success('Album created successfully.');
             })
             .catch(() => {
-                toast.error('Failed to create album. Please try again.');
+                toast.error(error);
             })
             .finally(() => {
                 setAlbumImg(null);

@@ -24,7 +24,7 @@ function Feed() {
   const [sortOrder, setSortOrder] = useState('date-desc');
 
   const dispatch = useDispatch();
-  const { post } = useSelector(store => store);
+  const { post, auth } = useSelector(store => store);
   const navigate = useNavigate();
 
   const handleProfileClick = (nickName) => {
@@ -54,12 +54,12 @@ function Feed() {
     const confirmDelete = window.confirm('Are you sure you want to delete this post?');
     if (confirmDelete) {
       dispatch(deletePost(postId))
-      .then(() => {
-        toast.success('Post deleted successfully.');
-      })
-      .catch(() => {
-        toast.error('Failed to delete post. Please try again.');
-      });
+        .then(() => {
+          toast.success('Post deleted successfully.');
+        })
+        .catch(() => {
+          toast.error(post.error);
+        });
     }
   };
 
@@ -84,7 +84,7 @@ function Feed() {
 
   if (post.loading) {
     return (
-        <Spinner />
+      <Spinner />
     );
   }
 
@@ -99,7 +99,7 @@ function Feed() {
   return (
     <div className='feed'>
       <div className="posts">
-        <i className="postsSettings" onClick={() => setPostsSettings(prev => !prev)}><MdOutlineMenuOpen/></i>
+        <i className="postsSettings" onClick={() => setPostsSettings(prev => !prev)}><MdOutlineMenuOpen /></i>
         {postsSettings && (
           <ul className="filtredMenu">
             <li className="filter">
@@ -143,30 +143,32 @@ function Feed() {
           <div className="post" key={item.id}>
             <div className="up">
               <img src={item.user?.profilePicture || defaultAvatar} alt=""
-                   onClick={() => handleProfileClick(item.user.nickName)}/>
+                onClick={() => handleProfileClick(item.user.nickName)} />
               <div className="userData">
                 <p>{item.user.fullName}</p>
                 <span>{formatTimeAgo(item.creationDate)}</span>
               </div>
-              <>
-                <i onClick={() => handleMenuToggle(item.id)}><FaEllipsisH/></i>
-                {menuPost === item.id && (
-                  <ul className="list">
-                    <li className="option" onClick={() => toggleEditPost(item)}>
-                      <span>Edit</span>
-                    </li>
-                    <li className="option" onClick={() => {
-                      handleDeletePost(item.id);
-                      setMenuPost(false);
-                    }}>
-                      <span>Delete</span>
-                    </li>
-                  </ul>
-                )}
-              </>
+              {auth.reqUser && auth.reqUser?.id === item.user.id && (
+                <>
+                  <i onClick={() => handleMenuToggle(item.id)}><FaEllipsisH /></i>
+                  {menuPost === item.id && (
+                    <ul className="list">
+                      <li className="option" onClick={() => toggleEditPost(item)}>
+                        <span>Edit</span>
+                      </li>
+                      <li className="option" onClick={() => {
+                        handleDeletePost(item.id);
+                        setMenuPost(false);
+                      }}>
+                        <span>Delete</span>
+                      </li>
+                    </ul>
+                  )}
+                </>
+              )}
             </div>
             <div className="middle">
-              <img src={item?.image} alt=""/>
+              <img src={item?.image} alt="" />
             </div>
             <div className="description">
               <p>{item.description}</p>
@@ -174,20 +176,20 @@ function Feed() {
             <div className="bottom">
               <div className="likes">
                 <i onClick={() => likePostHandler(item.id)}>
-                  {item.likedByUser ? <AiFillLike/> : <AiOutlineLike/>}
+                  {item.likedByUser ? <AiFillLike /> : <AiOutlineLike />}
                 </i>
                 <span>{item.likeCount || 0}</span>
               </div>
               <div className="comments" onClick={() => togglePost(item)}>
-                <i><TfiCommentAlt/></i>
+                <i><TfiCommentAlt /></i>
                 <span>{item.commentCount || 0} comments</span>
               </div>
             </div>
           </div>
         ))}
       </div>
-      {editPost && <EditPost post={postDetail} onClose={() => setEditPost(prev => !prev)}/>}
-      {selectedPost && <Post post={postDetail} onClose={togglePost}/>}
+      {editPost && <EditPost post={postDetail} onClose={() => setEditPost(prev => !prev)} />}
+      {selectedPost && <Post post={postDetail} onClose={togglePost} />}
     </div>
   );
 }

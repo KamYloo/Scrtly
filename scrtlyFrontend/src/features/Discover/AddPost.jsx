@@ -17,7 +17,7 @@ function AddPost() {
   const [openEmoji, setOpenEmoji] = useState(false)
   const { reqUser } = useSelector(state => state.auth);
   const navigate = useNavigate();
-  const { loading } = useSelector(state => state.post);
+  const { loading, error } = useSelector(state => state.post);
 
   const handleFileChange = (e) => {
     setFilePic(e.target.files[0])
@@ -38,7 +38,7 @@ function AddPost() {
           toast.success('Post created successfully.');
         })
         .catch(() => {
-          toast.error('Failed to create post. Please try again.');
+          toast.error(error);
         })
         .finally(() => {
           setDescriptionText('')

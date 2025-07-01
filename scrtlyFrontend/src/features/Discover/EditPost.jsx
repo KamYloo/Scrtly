@@ -11,7 +11,7 @@ function EditPost({ post, onClose }) {
     const [preview, setPreview] = useState(post?.image ? `${post.image}` : '');
     const fileInputRef = useRef(null);
     const dispatch = useDispatch();
-    const { loading } = useSelector(state => state.post);
+    const { loading, error } = useSelector(state => state.post);
 
     const handleFileChange = (e) => {
         const selectedFile = e.target.files[0];
@@ -32,7 +32,7 @@ function EditPost({ post, onClose }) {
                 toast.success('Post updated successfully.');
             })
             .catch(() => {
-                toast.error('Failed to update post. Please try again.');
+                toast.error(error);
             })
             .finally(() => {
                 setDescription('')

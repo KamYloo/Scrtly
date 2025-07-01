@@ -20,6 +20,7 @@ const initialValue = {
         totalPages: 0,
     },
     likedPost: null,
+    likeLoading: false,
 }
 
 export const postReducer = (state = initialValue, { type, payload }) => {
@@ -85,11 +86,11 @@ export const postReducer = (state = initialValue, { type, payload }) => {
             return { ...state, loading: false, error: payload };
 
         case LIKE_POST_REQUEST:
-            return { ...state, loading: true, error: null };
+            return { ...state, likeLoading: true, error: null };
         case LIKE_POST_SUCCESS:
             return {
                 ...state,
-                loading: false,
+                likeLoading: false,
                 likedPost: payload,
                 posts: {
                     ...state.posts,
@@ -103,7 +104,7 @@ export const postReducer = (state = initialValue, { type, payload }) => {
 
 
         case LIKE_POST_ERROR:
-            return { ...state, loading: false, error: payload };
+            return { ...state, likeLoading: false, error: payload };
 
         case GET_POSTS_BY_USERID_REQUEST:
             return { ...state, loading: true, error: null };

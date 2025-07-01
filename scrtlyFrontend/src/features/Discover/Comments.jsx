@@ -7,6 +7,7 @@ import { formatDistanceToNow } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../../Components/Spinner.jsx";
 import defaultAvatar from "../../assets/user.jpg";
+import toast from "react-hot-toast";
 
 
 function Comments({ post }) {
@@ -29,7 +30,13 @@ function Comments({ post }) {
 
     const handleDeleteComment = (commentId) => {
         if (window.confirm("Are you sure you want to delete this comment?")) {
-            dispatch(deleteComment(commentId));
+            dispatch(deleteComment(commentId))
+                .then(() => {
+                    toast.success('Comment deleted successfully.');
+                })
+                .catch(() => {
+                    toast.error(comment.error);
+                })
         }
     };
 

@@ -2,12 +2,13 @@ import React, {useState} from 'react'
 import {useDispatch, useSelector} from "react-redux";
 import {searchSong} from "../../Redux/Song/Action.js";
 import {addSongToPlayList} from "../../Redux/PlayList/Action.js";
+import toast from "react-hot-toast";
 
 function AddSongToPlayList({playListId}) {
     const [keyword, setKeyword] = useState('');
     const dispatch = useDispatch();
     const { song } = useSelector(state => state);
-    const { loading } = useSelector(state => state.playList);
+    const { loading, error } = useSelector(state => state.playList);
 
     const handleSearch = async (e) => {
         e.preventDefault();
@@ -17,7 +18,13 @@ function AddSongToPlayList({playListId}) {
     }
 
     const handleAddSong = (songId) => {
-        dispatch(addSongToPlayList({playListId, songId}));
+        dispatch(addSongToPlayList({playListId, songId}))
+            .then(() => {
+                toast.success('Song added to playList successfully.');
+            })
+            .catch(() => {
+                toast.error(error);
+            })
     }
 
     return (

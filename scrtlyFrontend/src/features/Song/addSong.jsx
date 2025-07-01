@@ -11,7 +11,7 @@ function AddSong({onClose, albumId}) {
     const [songImg, setSongImg] = useState(null)
     const [audio, setAudio] = useState(null)
     const [preview, setPreview] = useState('');
-    const { loading } = useSelector(state => state.album);
+    const { loading, error } = useSelector(state => state.album);
 
     const dispatch = useDispatch()
 
@@ -27,7 +27,7 @@ function AddSong({onClose, albumId}) {
                 toast.success('Song upload successfully.');
             })
             .catch(() => {
-                toast.error('Failed to upload song. Please try again.');
+                toast.error(error);
             })
             .finally(() => {
                 setSongImg(null);

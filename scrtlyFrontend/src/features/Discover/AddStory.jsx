@@ -8,7 +8,7 @@ import toast from "react-hot-toast";
 function AddStory({onClose}) {
     const [image, setImage] = useState(null)
     const dispatch = useDispatch()
-    const { loading } = useSelector(state => state.story);
+    const { loading, error } = useSelector(state => state.story);
 
 
     const handleFileChange = (e) => {
@@ -25,7 +25,7 @@ function AddStory({onClose}) {
                 toast.success('Story created successfully.');
             })
             .catch(() => {
-                toast.error('Failed to create story. Please try again.');
+                toast.error(error);
             })
             .finally(() => {
                 setImage(null);
