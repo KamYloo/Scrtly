@@ -11,8 +11,8 @@ import com.kamylo.Scrtly_backend.common.mapper.Mapper;
 import com.kamylo.Scrtly_backend.notification.repository.NotificationRepository;
 import com.kamylo.Scrtly_backend.post.repository.PostRepository;
 import com.kamylo.Scrtly_backend.user.service.UserService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,7 +22,6 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
     private final PostRepository postRepository;
@@ -35,6 +34,19 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Value("${notification.routing-key-prefix}")
     private String notifRoutingKey;
+
+    public NotificationServiceImpl(
+            NotificationRepository notificationRepository,
+            PostRepository postRepository,
+            @Qualifier("notificationRabbitTemplate") RabbitTemplate rabbitTemplate,
+            UserService userService,
+            Mapper<NotificationEntity, NotificationDto> notificationMapper) {
+        this.notificationRepository = notificationRepository;
+        this.postRepository = postRepository;
+        this.rabbitTemplate = rabbitTemplate;
+        this.userService = userService;
+        this.notificationMapper = notificationMapper;
+    }
 
     @Override
     public void createOrUpdateNotification(Long userId, Long postId, NotificationType type, String triggeringUserName) {

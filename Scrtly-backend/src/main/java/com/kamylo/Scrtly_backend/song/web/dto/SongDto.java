@@ -18,6 +18,7 @@ public class SongDto {
     private String hlsManifestUrl;
     private String contentType;
     private int duration;
+    private Long playCount;
     private boolean favorite;
     private String imageSong;
     private ArtistDto artist;

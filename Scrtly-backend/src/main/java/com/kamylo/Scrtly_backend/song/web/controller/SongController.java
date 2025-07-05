@@ -1,5 +1,6 @@
 package com.kamylo.Scrtly_backend.song.web.controller;
 
+import com.kamylo.Scrtly_backend.metrics.service.MetricsPublisher;
 import com.kamylo.Scrtly_backend.song.web.dto.SongDto;
 import com.kamylo.Scrtly_backend.song.web.dto.SongRequest;
 import com.kamylo.Scrtly_backend.song.service.SongService;
@@ -26,8 +27,8 @@ import java.util.Set;
 @RestController
 @RequestMapping("/song")
 public class SongController {
-
     private final SongService songService;
+    private final MetricsPublisher metricsPublisher;
 
     @Value("${application.hls.directory}")
     private String hlsBasePath;
@@ -48,6 +49,11 @@ public class SongController {
         return new ResponseEntity<>(songs, HttpStatus.OK);
     }
 
+    @PostMapping("/{id}/play")
+    public void recordPlay(@PathVariable Long id) {
+        metricsPublisher.publishSongPlay(id);
+    }
+
     @GetMapping("/{id}/hls/master")
     public ResponseEntity<Resource> getMasterManifest(@PathVariable Long id) throws MalformedURLException {
         Path master = Paths.get(hlsBasePath, id.toString(), "master.m3u8");
@@ -65,7 +71,6 @@ public class SongController {
             @PathVariable Long id,
             @PathVariable String rate,
             @PathVariable String segment) throws MalformedURLException {
-
         Path seg = Paths.get(hlsBasePath, id.toString(), rate, segment);
 
         if (!Files.exists(seg)) {

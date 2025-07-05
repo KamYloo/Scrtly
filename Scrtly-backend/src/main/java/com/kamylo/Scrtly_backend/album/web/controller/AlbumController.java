@@ -1,6 +1,7 @@
 package com.kamylo.Scrtly_backend.album.web.controller;
 
 import com.kamylo.Scrtly_backend.album.web.dto.AlbumDto;
+import com.kamylo.Scrtly_backend.metrics.service.MetricsPublisher;
 import com.kamylo.Scrtly_backend.song.web.dto.SongDto;
 import com.kamylo.Scrtly_backend.common.response.PagedResponse;
 import com.kamylo.Scrtly_backend.album.service.AlbumService;
@@ -21,8 +22,8 @@ import java.util.List;
 @AllArgsConstructor
 @RequestMapping("/album")
 public class AlbumController {
-
     private final AlbumService albumService;
+    private final MetricsPublisher metricsPublisher;
 
     @PostMapping("/create")
     public ResponseEntity<AlbumDto> createAlbum(@RequestParam(value = "file", required = false) MultipartFile file,
@@ -47,6 +48,7 @@ public class AlbumController {
 
     @GetMapping("/{albumId}")
     public ResponseEntity<AlbumDto> getAlbum(@PathVariable Integer albumId) {
+        metricsPublisher.publishAlbumView(albumId);
         AlbumDto album = albumService.getAlbum(albumId);
         return new ResponseEntity<>(album, HttpStatus.OK);
     }

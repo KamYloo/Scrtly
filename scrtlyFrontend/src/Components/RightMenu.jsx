@@ -33,6 +33,7 @@ function RightMenu() {
   };
 
   useEffect(() => {
+    if (reqUser)
       dispatch(getNotifications());
   }, []);
 

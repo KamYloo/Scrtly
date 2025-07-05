@@ -41,7 +41,7 @@ public class NotificationRabbitConfig {
                 .with(notifRoutingKey);
     }
 
-    @Bean
+    @Bean("notificationRabbitTemplate")
     public RabbitTemplate rabbitTemplate(ConnectionFactory cf, MessageConverter converter) {
         RabbitTemplate template = new RabbitTemplate(cf);
         template.setMessageConverter(converter);

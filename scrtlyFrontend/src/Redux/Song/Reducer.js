@@ -2,7 +2,7 @@ import {
     DELETE_SONG_FAILURE,
     DELETE_SONG_REQUEST,
     DELETE_SONG_SUCCESS, LIKE_SONG_ERROR,
-    LIKE_SONG_REQUEST, LIKE_SONG_SUCCESS,
+    LIKE_SONG_REQUEST, LIKE_SONG_SUCCESS, RECORD_PLAY_ERROR, RECORD_PLAY_REQUEST, RECORD_PLAY_SUCCESS,
     SEARCH_SONG_ERROR,
     SEARCH_SONG_REQUEST,
     SEARCH_SONG_SUCCESS
@@ -14,6 +14,7 @@ const initialValue= {
     deletedSong:null,
     searchResults: null,
     likedSong: null,
+    isPlaying: true,
 }
 
 export const songReducer=(state=initialValue, {type,payload})=>{
@@ -38,6 +39,13 @@ export const songReducer=(state=initialValue, {type,payload})=>{
             return { ...state, loading: false, likedSong: payload };
         case LIKE_SONG_ERROR:
             return { ...state, loading: false, error: payload };
+
+        case RECORD_PLAY_REQUEST:
+            return { ...state, error: null };
+        case RECORD_PLAY_SUCCESS:
+            return { ...state, isPlaying: payload };
+        case RECORD_PLAY_ERROR:
+            return { ...state, error: payload };
 
         default:
             return state;

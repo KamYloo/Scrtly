@@ -2,7 +2,7 @@ import {dispatchAction} from "../api.js";
 import {
     DELETE_SONG_FAILURE,
     DELETE_SONG_REQUEST, DELETE_SONG_SUCCESS, LIKE_SONG_ERROR,
-    LIKE_SONG_REQUEST, LIKE_SONG_SUCCESS,
+    LIKE_SONG_REQUEST, LIKE_SONG_SUCCESS, RECORD_PLAY_ERROR, RECORD_PLAY_REQUEST, RECORD_PLAY_SUCCESS,
     SEARCH_SONG_ERROR,
     SEARCH_SONG_REQUEST, SEARCH_SONG_SUCCESS
 } from "./ActionType.js";
@@ -29,3 +29,10 @@ export const likeSong = (songId) => async (dispatch) => {
         credentials: 'include',
     });
 }
+
+export const recordPlay = (songId) => async (dispatch) => {
+    await dispatchAction(dispatch, RECORD_PLAY_REQUEST, RECORD_PLAY_SUCCESS, RECORD_PLAY_ERROR, `/api/song/${songId}/play`, {
+        method: 'POST',
+        credentials: 'include',
+    });
+};

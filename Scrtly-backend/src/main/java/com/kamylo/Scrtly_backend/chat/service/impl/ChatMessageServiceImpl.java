@@ -16,6 +16,7 @@ import com.kamylo.Scrtly_backend.chat.service.ChatService;
 import com.kamylo.Scrtly_backend.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +30,6 @@ import java.time.LocalDateTime;
 import java.util.concurrent.CompletableFuture;
 
 @Service
-@RequiredArgsConstructor
 public class ChatMessageServiceImpl implements ChatMessageService {
 
     private final ChatMessageRepository chatMessageRepository;
@@ -44,6 +44,22 @@ public class ChatMessageServiceImpl implements ChatMessageService {
 
     @Value("${chat.routing-key-prefix}")
     private String chatRoutingKeyPrefix;
+
+    public ChatMessageServiceImpl(
+            ChatMessageRepository chatMessageRepository,
+            UserService userService,
+            ChatService chatService,
+            Mapper<ChatRoomEntity, ChatRoomDto> chatRoomMapper,
+            Mapper<ChatMessageEntity, ChatMessageDto> chatMessageMapper,
+            @Qualifier("chatRabbitTemplate") RabbitTemplate rabbitTemplate
+    ) {
+        this.chatMessageRepository = chatMessageRepository;
+        this.userService            = userService;
+        this.chatService            = chatService;
+        this.chatRoomMapper         = chatRoomMapper;
+        this.chatMessageMapper      = chatMessageMapper;
+        this.rabbitTemplate         = rabbitTemplate;
+    }
 
     @Override
     @Async("chatExecutor")

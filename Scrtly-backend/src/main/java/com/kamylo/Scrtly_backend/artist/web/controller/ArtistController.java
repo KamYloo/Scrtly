@@ -1,6 +1,7 @@
 package com.kamylo.Scrtly_backend.artist.web.controller;
 
 import com.kamylo.Scrtly_backend.artist.web.dto.ArtistDto;
+import com.kamylo.Scrtly_backend.metrics.service.MetricsPublisher;
 import com.kamylo.Scrtly_backend.song.web.dto.SongDto;
 import com.kamylo.Scrtly_backend.common.response.PagedResponse;
 import com.kamylo.Scrtly_backend.artist.service.ArtistService;
@@ -19,9 +20,11 @@ import java.security.Principal;
 @RequestMapping("/artist")
 public class ArtistController {
     private final ArtistService artistService;
+    private final MetricsPublisher metricsPublisher;
 
     @GetMapping("/{artistId}")
     public ResponseEntity<ArtistDto> getArtist(@PathVariable Long artistId, Principal principal) {
+        metricsPublisher.publishArtistView(artistId);
         String username = (principal != null ? principal.getName() : null);
         ArtistDto artist = artistService.getArtistProfile(artistId, username);
         return new ResponseEntity<>(artist, HttpStatus.OK);

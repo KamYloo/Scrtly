@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import { FaHeadphones, FaHeart, FaRegClock, FaRegHeart } from 'react-icons/fa'
 import { FaRegSquarePlus } from 'react-icons/fa6'
 import { MusicPlayer } from './MusicPlayer.jsx'
@@ -9,15 +9,25 @@ import { addSongToPlayList, deleteSongFromPlayList } from '../../Redux/PlayList/
 import toast from 'react-hot-toast'
 
 // eslint-disable-next-line react/prop-types
-function AudioList({ volume, onTrackChange, initialSongs, req_artist, isplayListSongs, playListId }) {
+function AudioList({ volume, onTrackChange, initialSongs, req_artist, isplayListSongs, playListId, initialSongId }) {
     const [currentIndex, setCurrentIndex] = useState(0)
     const [auto, setAuto] = useState(false)
     const [addToPlayList, setAddToPlayList] = useState(null)
-
     const dispatch = useDispatch()
     const { playList } = useSelector((store) => store)
 
     const currentSong = initialSongs[currentIndex] || {}
+
+    useEffect(() => {
+        if (initialSongId && initialSongs && initialSongs.length > 0) {
+            // eslint-disable-next-line react/prop-types
+            const idx = initialSongs.findIndex(song => song.id === initialSongId)
+            if (idx !== -1) {
+                setCurrentIndex(idx)
+                setAuto(true)
+            }
+        }
+    }, [initialSongId, initialSongs])
 
     const setMainSong = (index) => {
         setCurrentIndex(index)
@@ -94,7 +104,7 @@ function AudioList({ volume, onTrackChange, initialSongs, req_artist, isplayList
                                 </p>
                                 <div className='hits'>
                                     <p className='hit'>
-                                        <FaHeadphones /> 95,490,102
+                                        <FaHeadphones /> {songItem?.playCount}
                                     </p>
                                     <p className='duration'>
                                         <span className="clock-icon">
@@ -141,6 +151,7 @@ function AudioList({ volume, onTrackChange, initialSongs, req_artist, isplayList
                 ))}
             </div>
             <MusicPlayer
+                songId={currentSong?.id}
                 trackSrc={currentSong?.track}
                 hlsManifestUrl={currentSong?.hlsManifestUrl}
                 imgSrc={encodeURI(currentSong?.imageSong || '')}

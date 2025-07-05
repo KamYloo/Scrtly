@@ -28,6 +28,16 @@ services:
     networks:
       - scrtly-network
 
+  redis:
+    image: redis:latest
+    container_name: scrtly_redis
+    ports:
+      - '6379:6379'
+    networks:
+      - scrtly-network
+    volumes:
+      - redis-data:/data
+
 #  app:
 #    image: scrtly_backend:latest
 #    build: .
@@ -45,3 +55,6 @@ services:
 networks:
   scrtly-network:
     driver: bridge
+
+volumes:
+  redis-data:

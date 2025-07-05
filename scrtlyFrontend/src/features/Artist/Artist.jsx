@@ -5,7 +5,7 @@ import { Banner } from './Banner.jsx'
 import { FaUsers } from 'react-icons/fa'
 import { AudioList } from '../Song/AudioList.jsx'
 import { useDispatch, useSelector } from 'react-redux'
-import { NavLink, Route, Routes, useParams } from 'react-router-dom'
+import {NavLink, Route, Routes, useLocation, useParams} from 'react-router-dom'
 import { findArtistById, getArtistTracks } from '../../Redux/Artist/Action.js'
 import { ArtistAlbums } from './ArtistAlbums.jsx'
 import { Fans } from './Fans.jsx'
@@ -15,6 +15,8 @@ import ErrorOverlay from '../../Components/ErrorOverlay.jsx'
 
 function Artist({ volume, onTrackChange }) {
   const { artistId } = useParams()
+  const location = useLocation()
+  const playSongId = location.state?.playSongId;
   const dispatch = useDispatch()
   const { artist, song, auth } = useSelector(state => state)
 
@@ -77,7 +79,7 @@ function Artist({ volume, onTrackChange }) {
         </div>
 
         <Routes>
-          <Route path="popular" element={<AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={artist?.songs.content} req_artist={artist.findArtist?.id === auth.reqUser?.id}/>}/>
+          <Route path="popular" element={<AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={artist?.songs.content} req_artist={artist.findArtist?.id === auth.reqUser?.id} initialSongId={playSongId}/>}/>
           <Route path="albums" element={<ArtistAlbums artistId={artistId} />} />
           <Route path="songs" element={<AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={artist?.songs.content} req_artist={artist.findArtist?.id === auth.reqUser?.id}/>}/>
           <Route path="fans" element={<Fans artistId={artistId} fans={artist.findArtist?.fans} />}/>

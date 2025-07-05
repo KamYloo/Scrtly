@@ -5,17 +5,24 @@ import com.kamylo.Scrtly_backend.common.mapper.Mapper;
 import com.kamylo.Scrtly_backend.song.domain.SongEntity;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
 @AllArgsConstructor
 public class SongMapperImpl implements Mapper<SongEntity, SongDto> {
 
-    private ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
+    private final StringRedisTemplate redis;
 
     @Override
     public SongDto mapTo(SongEntity songEntity) {
-        return modelMapper.map(songEntity, SongDto.class);
+        SongDto dto = modelMapper.map(songEntity, SongDto.class);
+        Double score = redis.opsForZSet()
+                .score("song:plays:all", songEntity.getId().toString());
+        dto.setPlayCount(score != null ? score.longValue() : 0L);
+
+        return dto;
     }
 
     @Override
