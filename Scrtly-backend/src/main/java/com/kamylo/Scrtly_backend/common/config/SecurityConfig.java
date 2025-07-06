@@ -86,6 +86,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                             auth.requestMatchers(HttpMethod.GET,"/comments/**").permitAll();
                             auth.requestMatchers(HttpMethod.GET,"/user/profile/**").permitAll();
                             auth.requestMatchers(HttpMethod.GET,"recommendations/**").permitAll();
+                            auth.requestMatchers(HttpMethod.POST,"song/{id}/play").permitAll();
 
                             auth.anyRequest().authenticated();
                         }

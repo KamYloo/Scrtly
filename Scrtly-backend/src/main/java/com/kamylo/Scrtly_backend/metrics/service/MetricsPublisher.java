@@ -31,7 +31,7 @@ public class MetricsPublisher {
     public void publishArtistView(Long artistId) {
         rabbit.convertAndSend(
                 exchange,
-                MetricType.ARTIST_VIEW.eventName(),
+                routingView,
                 new MetricEvent(MetricType.ARTIST_VIEW.eventName(), artistId, Instant.now())
         );
     }
@@ -39,7 +39,7 @@ public class MetricsPublisher {
     public void publishSongPlay(Long songId) {
         rabbit.convertAndSend(
                 exchange,
-                MetricType.SONG_PLAY.eventName(),
+                routingPlay,
                 new MetricEvent(MetricType.SONG_PLAY.eventName(), songId, Instant.now())
         );
     }
@@ -47,7 +47,7 @@ public class MetricsPublisher {
     public void publishAlbumView(Integer albumId) {
         rabbit.convertAndSend(
                 exchange,
-                MetricType.ALBUM_VIEW.eventName(),
+                routingAlbum,
                 new MetricEvent(MetricType.ALBUM_VIEW.eventName(), albumId.longValue(), Instant.now())
         );
     }

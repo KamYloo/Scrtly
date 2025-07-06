@@ -1,13 +1,10 @@
 import React, { useEffect } from 'react'
 import "../Styles/home.css"
-import { FaRegHeart, FaPlay, FaHeart } from "react-icons/fa";
-import { FaCirclePlay } from "react-icons/fa6";
-import { FaRegSquarePlus } from "react-icons/fa6";
 import { useDispatch, useSelector } from "react-redux";
 import Spinner from "../Components/Spinner.jsx";
 import ErrorOverlay from "../Components/ErrorOverlay.jsx";
 import { getTopAlbumsAction, getTopArtistsAction, getTopSongsAction } from "../Redux/RecommendationService/Action.js";
-import { Link, useNavigate } from "react-router-dom";
+import {useNavigate } from "react-router-dom";
 import { likeSong } from "../Redux/Song/Action.js";
 import TrendingSong from "../features/Home/TrendingSong.jsx";
 import AlbumsList from "../features/Home/AlbumsList.jsx";

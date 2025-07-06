@@ -36,45 +36,60 @@ public class MetricsServiceImpl implements MetricsService {
 
     @Override
     public List<ArtistDto> getTopArtists(String window, int n) {
-        String base = switch (window.toLowerCase()) {
-            case "day" -> LocalDate.now().toString();
-            case "month" -> LocalDate.now().toString().substring(0, 7);
-            default -> "all";
-        };
-        String key = "artist:views:" + base;
-        return fetchLong(key, n, artistRepo, artistMapper, ArtistEntity::getId);
+        return fetchWithFallback("artist:views", window, n, artistRepo, artistMapper, ArtistEntity::getId);
     }
 
     @Override
     public List<SongDto> getTopSongs(String window, int n) {
-        String base = switch (window.toLowerCase()) {
-            case "day" -> LocalDate.now().toString();
-            case "month" -> LocalDate.now().toString().substring(0, 7);
-            default -> "all";
-        };
-        String key = "song:plays:" + base;
-        return fetchLong(key, n, songRepo, songMapper, SongEntity::getId);
+        return fetchWithFallback("song:plays", window, n, songRepo, songMapper, SongEntity::getId);
     }
 
     @Override
     public List<AlbumDto> getTopAlbums(String window, int n) {
+        return fetchWithFallbackInt("album:views", window, n, albumRepo, albumMapper, AlbumEntity::getId);
+    }
+
+    private String buildKey(String prefix, String window) {
         String base = switch (window.toLowerCase()) {
             case "day"   -> LocalDate.now().toString();
             case "month" -> LocalDate.now().toString().substring(0, 7);
-            default      -> "all";
+            default       -> "all";
         };
-        String key = "album:views:" + base;
-        return fetchInt(key, n, albumRepo, albumMapper, AlbumEntity::getId);
+        return prefix + ":" + base;
     }
 
-    private <E,D> List<D> fetchLong(
+    private <E, D> List<D> fetchWithFallback(
+            String prefix,
+            String requestedWindow,
+            int n,
+            JpaRepository<E, Long> repo,
+            Mapper<E, D> mapper,
+            Function<E, Long> idExtractor) {
+
+        String[] windows = switch (requestedWindow.toLowerCase()) {
+            case "day"   -> new String[]{"day", "month", "all"};
+            case "month" -> new String[]{"month", "all"};
+            default       -> new String[]{"all"};
+        };
+
+        for (String w : windows) {
+            String key = buildKey(prefix, w);
+            List<D> result = fetchByKey(key, n, repo, mapper, idExtractor);
+            if (result.size() >= n || "all".equals(w)) {
+                return result;
+            }
+        }
+        return List.of();
+    }
+
+    private <E, D> List<D> fetchByKey(
             String key,
             int n,
-            JpaRepository<E,Long> repo,
-            Mapper<E,D> mapper,
-            Function<E,Long> idExtractor) {
+            JpaRepository<E, Long> repo,
+            Mapper<E, D> mapper,
+            Function<E, Long> idExtractor) {
 
-        Set<String> ids = redis.opsForZSet().reverseRange(key, 0, n-1);
+        Set<String> ids = redis.opsForZSet().reverseRange(key, 0, n - 1);
         if (ids == null || ids.isEmpty()) return List.of();
 
         List<Long> longIds = ids.stream()
@@ -82,8 +97,8 @@ public class MetricsServiceImpl implements MetricsService {
                 .toList();
 
         List<E> entities = repo.findAllById(longIds);
-        Map<Long,E> map = entities.stream()
-                .collect(Collectors.toMap(idExtractor, e->e));
+        Map<Long, E> map = entities.stream()
+                .collect(Collectors.toMap(idExtractor, e -> e));
 
         return longIds.stream()
                 .map(map::get)
@@ -92,14 +107,38 @@ public class MetricsServiceImpl implements MetricsService {
                 .toList();
     }
 
-    private <E,D> List<D> fetchInt(
+    private <E, D> List<D> fetchWithFallbackInt(
+            String prefix,
+            String requestedWindow,
+            int n,
+            JpaRepository<E, Integer> repo,
+            Mapper<E, D> mapper,
+            Function<E, Integer> idExtractor) {
+
+        String[] windows = switch (requestedWindow.toLowerCase()) {
+            case "day"   -> new String[]{"day", "month", "all"};
+            case "month" -> new String[]{"month", "all"};
+            default       -> new String[]{"all"};
+        };
+
+        for (String w : windows) {
+            String key = buildKey(prefix, w);
+            List<D> result = fetchByKeyInt(key, n, repo, mapper, idExtractor);
+            if (result.size() >= n || "all".equals(w)) {
+                return result;
+            }
+        }
+        return List.of();
+    }
+
+    private <E, D> List<D> fetchByKeyInt(
             String key,
             int n,
-            JpaRepository<E,Integer> repo,
-            Mapper<E,D> mapper,
-            Function<E,Integer> idExtractor) {
+            JpaRepository<E, Integer> repo,
+            Mapper<E, D> mapper,
+            Function<E, Integer> idExtractor) {
 
-        Set<String> ids = redis.opsForZSet().reverseRange(key, 0, n-1);
+        Set<String> ids = redis.opsForZSet().reverseRange(key, 0, n - 1);
         if (ids == null || ids.isEmpty()) return List.of();
 
         List<Integer> intIds = ids.stream()
@@ -107,8 +146,8 @@ public class MetricsServiceImpl implements MetricsService {
                 .toList();
 
         List<E> entities = repo.findAllById(intIds);
-        Map<Integer,E> map = entities.stream()
-                .collect(Collectors.toMap(idExtractor, e->e));
+        Map<Integer, E> map = entities.stream()
+                .collect(Collectors.toMap(idExtractor, e -> e));
 
         return intIds.stream()
                 .map(map::get)
