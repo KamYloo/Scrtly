@@ -67,26 +67,24 @@ public class SecurityConfig implements WebMvcConfigurer {
                                     "/oauth2/redirect/**",
                                     "/api/oauth2/**",
                                     "/admin/artist/verify/**"
-                            ).permitAll();
+                            ).permitAll()
 
-                            auth.requestMatchers(
-                                    "/admin/**"
-                            ).hasAuthority("ADMIN");
+                            .requestMatchers(HttpMethod.POST, "/webhook/**").permitAll()
+                            .requestMatchers("/admin/**").hasAuthority("ADMIN")
+                            .requestMatchers(HttpMethod.GET,"/artist/**").permitAll()
+                            .requestMatchers("/artist/update").hasAnyAuthority("ARTIST", "ADMIN")
 
-                            auth.requestMatchers(HttpMethod.GET,"/artist/**").permitAll();
-                            auth.requestMatchers("/artist/update").hasAnyAuthority("ARTIST", "ADMIN");
+                            .requestMatchers(HttpMethod.GET,"/album/**").permitAll()
+                            .requestMatchers("/album/create", "/album/delete/**").hasAnyAuthority("ARTIST", "ADMIN")
 
-                            auth.requestMatchers(HttpMethod.GET,"/album/**").permitAll();
-                            auth.requestMatchers("/album/create", "/album/delete/**").hasAnyAuthority("ARTIST", "ADMIN");
+                            .requestMatchers(HttpMethod.GET,"/song/**").permitAll()
+                            .requestMatchers("/song/upload", "/song/delete/**").hasAnyAuthority("ARTIST", "ADMIN")
 
-                            auth.requestMatchers(HttpMethod.GET,"/song/**").permitAll();
-                            auth.requestMatchers("/song/upload", "/song/delete/**").hasAnyAuthority("ARTIST", "ADMIN");
-
-                            auth.requestMatchers(HttpMethod.GET,"/posts/**").permitAll();
-                            auth.requestMatchers(HttpMethod.GET,"/comments/**").permitAll();
-                            auth.requestMatchers(HttpMethod.GET,"/user/profile/**").permitAll();
-                            auth.requestMatchers(HttpMethod.GET,"recommendations/**").permitAll();
-                            auth.requestMatchers(HttpMethod.POST,"song/{id}/play").permitAll();
+                            .requestMatchers(HttpMethod.GET,"/posts/**").permitAll()
+                            .requestMatchers(HttpMethod.GET,"/comments/**").permitAll()
+                            .requestMatchers(HttpMethod.GET,"/user/profile/**").permitAll()
+                            .requestMatchers(HttpMethod.GET,"/recommendations/**").permitAll()
+                            .requestMatchers(HttpMethod.POST,"/song/*/play").permitAll();
 
                             auth.anyRequest().authenticated();
                         }

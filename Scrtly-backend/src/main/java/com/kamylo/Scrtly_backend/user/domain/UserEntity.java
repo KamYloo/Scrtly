@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.kamylo.Scrtly_backend.artist.domain.ArtistEntity;
 import com.kamylo.Scrtly_backend.auth.domain.RefreshTokenEntity;
+import com.kamylo.Scrtly_backend.payment.domain.entity.SubscriptionEntity;
 import com.kamylo.Scrtly_backend.playList.domain.PlayListEntity;
 import com.kamylo.Scrtly_backend.post.domain.PostEntity;
 import com.kamylo.Scrtly_backend.story.domain.StoryEntity;
@@ -67,6 +68,9 @@ public class UserEntity implements UserDetails, Principal {
     private boolean accountLocked;
     private boolean enable;
 
+    @Column(name = "stripe_customer_id", unique = true)
+    private String stripeCustomerId;
+
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime createDate;
@@ -104,6 +108,13 @@ public class UserEntity implements UserDetails, Principal {
     @ManyToMany(mappedBy = "followers", fetch = FetchType.LAZY)
     @ToString.Exclude
     private Set<UserEntity> followings = new HashSet<>();
+
+    @OneToMany(mappedBy = "user",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    @JsonIgnore
+    private List<SubscriptionEntity> subscriptions = new ArrayList<>();
 
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)

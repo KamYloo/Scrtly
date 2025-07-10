@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@stomp/stompjs": "^7.1.0",
+    "@stripe/stripe-js": "^7.4.0",
     "axios": "^1.7.4",
     "date-fns": "^3.6.0",
     "emoji-picker-react": "^4.11.1",
