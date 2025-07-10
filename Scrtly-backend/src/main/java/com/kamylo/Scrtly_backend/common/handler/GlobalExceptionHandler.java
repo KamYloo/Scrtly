@@ -1,5 +1,7 @@
 package com.kamylo.Scrtly_backend.common.handler;
 
+import com.stripe.exception.SignatureVerificationException;
+import com.stripe.exception.StripeException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -109,4 +111,27 @@ public class GlobalExceptionHandler {
                                 .build()
                 );
     }
+
+    @ExceptionHandler(StripeException.class)
+    public ResponseEntity<ExceptionResponse> handleStripeError(StripeException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_GATEWAY)
+                .body(ExceptionResponse.builder()
+                        .businessErrorCode(null)
+                        .businessErrornDescription("Stripe API error")
+                        .error(ex.getMessage())
+                        .build());
+    }
+
+    @ExceptionHandler(SignatureVerificationException.class)
+    public ResponseEntity<ExceptionResponse> handleWebhookSignature(SignatureVerificationException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ExceptionResponse.builder()
+                        .businessErrorCode(null)
+                        .businessErrornDescription("Invalid Stripe webhook signature")
+                        .error(ex.getMessage())
+                        .build());
+    }
+
 }
