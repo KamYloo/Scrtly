@@ -49,6 +49,7 @@ public enum BusinessErrorCodes {
     USER_ALREADY_ARTIST(340,"User already artist", HttpStatus.BAD_REQUEST),
     VERIFICATION_ALREADY_REQUESTED(341,"verification has already been sent", HttpStatus.FORBIDDEN),
     HLS_GENERATION_FAILED(342, "HLS generation failed", HttpStatus.INTERNAL_SERVER_ERROR),
+    USER_ALREADY_SUBSCRIBED(343, "Premium account is active", HttpStatus.CONFLICT),
     ;
     private final int code;
     private final String description;

@@ -1,6 +1,11 @@
 package com.kamylo.Scrtly_backend.payment.service.impl;
 
+import com.kamylo.Scrtly_backend.common.handler.BusinessErrorCodes;
+import com.kamylo.Scrtly_backend.common.handler.CustomException;
 import com.kamylo.Scrtly_backend.payment.config.StripeConfig;
+import com.kamylo.Scrtly_backend.payment.domain.entity.SubscriptionEntity;
+import com.kamylo.Scrtly_backend.payment.domain.enums.SubscriptionStatus;
+import com.kamylo.Scrtly_backend.payment.repository.SubscriptionRepository;
 import com.kamylo.Scrtly_backend.payment.service.StripeCustomerService;
 import com.kamylo.Scrtly_backend.payment.service.StripeService;
 import com.kamylo.Scrtly_backend.user.domain.UserEntity;
@@ -16,16 +21,26 @@ import com.stripe.model.checkout.Session;
 import com.stripe.net.Webhook;
 import com.stripe.param.checkout.SessionCreateParams;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class StripeServiceImpl implements StripeService {
     private final StripeConfig cfg;
     private final UserService userService;
     private final StripeCustomerService customerService;
+    private final SubscriptionRepository subscriptionRepository;
 
     @Override
     public Session createCheckoutSession(String username, String successUrl, String cancelUrl) throws StripeException {
         UserEntity user = userService.findUserByEmail(username);
+        List<SubscriptionEntity> activeSubs = subscriptionRepository.findAllByUserAndStatusIn(
+                user, List.of(SubscriptionStatus.ACTIVE, SubscriptionStatus.PENDING)
+        );
+        if (!activeSubs.isEmpty()) {
+            throw new CustomException(BusinessErrorCodes.USER_ALREADY_SUBSCRIBED);
+        }
+
         customerService.ensureCustomer(user);
         SessionCreateParams params = SessionCreateParams.builder()
                 .setMode(SessionCreateParams.Mode.SUBSCRIPTION)
