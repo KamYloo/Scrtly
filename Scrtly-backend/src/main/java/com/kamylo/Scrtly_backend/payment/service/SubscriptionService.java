@@ -6,7 +6,7 @@ import com.stripe.model.Subscription;
 import com.stripe.model.checkout.Session;
 
 public interface SubscriptionService {
-    void handleCheckoutSession(Session session, UserEntity user);
+    void handleCheckoutSession(Session session, Long userId);
     void handleInvoicePaymentSucceeded(Invoice invoice);
     void handleSubscriptionDeleted(Subscription subscription);
     void handleInvoicePaymentFailed(Invoice invoice);

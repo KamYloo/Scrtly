@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 public class WebhookController {
     private final StripeService stripe;
     private final SubscriptionService subscriptionService;
-    private final UserRepository userRepo;
 
     @PostMapping
     public ResponseEntity<Void> handle(@RequestBody String payload,
@@ -31,8 +30,7 @@ public class WebhookController {
                 Session session = (Session) event.getDataObjectDeserializer()
                         .getObject().orElseThrow();
                 Long userId = Long.valueOf(session.getClientReferenceId());
-                UserEntity user = userRepo.findById(userId).orElseThrow();
-                subscriptionService.handleCheckoutSession(session, user);
+                subscriptionService.handleCheckoutSession(session, userId);
                 break;
             case "invoice.payment_succeeded":
                 Invoice invoice = (Invoice) event.getDataObjectDeserializer()

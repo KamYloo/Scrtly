@@ -8,10 +8,12 @@ import { NotificationsList } from "../features/Notification/NotificationsList.js
 import toast from "react-hot-toast";
 import { getNotifications } from "../Redux/NotificationService/Action.js";
 import defaultAvatar from "../assets/user.jpg";
+import {SubscribeButton} from "../features/Payment/SubscribeButton.jsx";
 
 function RightMenu() {
   const [openNotifications, setOpenNotifications] = useState(false);
   const dispatch = useDispatch();
+  const base = window.location.origin;
   const { logoutResponse, error, reqUser } = useSelector((state) => state.auth);
   const notifications = useSelector(
     (state) => state.notifications.notifications
@@ -54,12 +56,10 @@ function RightMenu() {
     <div className="rightMenu">
       {openNotifications && <NotificationsList notifications={notifications} />}
       <div className="top">
-        <i>
-          <FaCrown />
-          <p>
-            Go <span>Premium</span>
-          </p>
-        </i>
+        <SubscribeButton
+            successUrl={`${base}/success`}
+            cancelUrl={`${base}/cancel`}
+        />
         <i
           className={unseenCount > 0 ? "has-unseen" : ""}
           onClick={() => setOpenNotifications((prev) => !prev)}

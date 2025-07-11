@@ -5,6 +5,7 @@ import com.kamylo.Scrtly_backend.payment.repository.SubscriptionRepository;
 import com.kamylo.Scrtly_backend.payment.domain.enums.SubscriptionStatus;
 import com.kamylo.Scrtly_backend.payment.service.SubscriptionService;
 import com.kamylo.Scrtly_backend.user.domain.UserEntity;
+import com.kamylo.Scrtly_backend.user.service.UserService;
 import com.stripe.model.Invoice;
 import com.stripe.model.Subscription;
 import com.stripe.model.checkout.Session;
@@ -20,10 +21,13 @@ import java.time.ZoneOffset;
 @RequiredArgsConstructor
 public class SubscriptionServiceImpl implements SubscriptionService {
     private final SubscriptionRepository repo;
+    private final UserService userService;
 
     @Override
     @Transactional
-    public void handleCheckoutSession(Session session, UserEntity user) {
+    public void handleCheckoutSession(Session session, Long userId) {
+        UserEntity user = userService.findUserById(userId);
+
         String stripeSubId = session.getSubscription();
         if (repo.findByStripeSubscriptionId(stripeSubId).isPresent()) {
             return;
