@@ -10,6 +10,7 @@ import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client/dist/sockjs";
 import { useNavigate } from "react-router-dom";
 import defaultAvatar from "../../assets/user.jpg";
+import {BASE_API_URL} from "../../Redux/api.js";
 
 function Chat({ chat, onBack }) {
     const [open, setOpen] = useState(false);
@@ -61,7 +62,7 @@ function Chat({ chat, onBack }) {
 
     useEffect(() => {
         const client = new Client({
-            webSocketFactory: () => new SockJS("http://localhost:8080/api/ws"),
+            webSocketFactory: () => new SockJS(`${BASE_API_URL}/ws`),
             reconnectDelay: 5000,
             onConnect: (frame) => {
                 console.log("Połączono STOMP:", frame);

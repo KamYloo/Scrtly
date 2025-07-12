@@ -12,7 +12,7 @@ export const verifyArtistAction = (artistName) => async (dispatch) => {
         VERIFY_ARTIST_REQUEST,
         VERIFY_ARTIST_SUCCESS,
         VERIFY_ARTIST_ERROR,
-        `/api/user/verify-request`,
+        `/user/verify-request`,
         {
             method: 'POST',
             body: JSON.stringify({ requestedArtistName: artistName }),

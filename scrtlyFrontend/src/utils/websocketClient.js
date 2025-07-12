@@ -1,7 +1,8 @@
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client/dist/sockjs";
+import {BASE_API_URL} from "../Redux/api.js";
 
-const WEBSOCKET_URL = "http://localhost:8080/api/ws";
+const WEBSOCKET_URL = `${BASE_API_URL}/ws`;
 
 export const connectWebSocket = (username, onMessageReceived) => {
     const client = new Client({
