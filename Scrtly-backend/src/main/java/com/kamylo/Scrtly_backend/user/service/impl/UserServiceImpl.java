@@ -1,4 +1,6 @@
 package com.kamylo.Scrtly_backend.user.service.impl;
+import com.kamylo.Scrtly_backend.payment.domain.enums.SubscriptionStatus;
+import com.kamylo.Scrtly_backend.payment.repository.SubscriptionRepository;
 import com.kamylo.Scrtly_backend.user.service.UserService;
 import com.kamylo.Scrtly_backend.user.web.dto.UserDto;
 import com.kamylo.Scrtly_backend.artist.web.dto.ArtistVerificationRequest;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -37,6 +40,7 @@ public class UserServiceImpl implements UserService {
     private final UserLikeChecker userLikeChecker;
     private final ArtistVerificationTokenService artistVerificationTokenService;
     private final EmailService emailService;
+    private final SubscriptionRepository subscriptionRepo;
 
     @Value("${mailing.backend.artistVerification-url}")
     private String artistVerificationUrl;
@@ -152,6 +156,16 @@ public class UserServiceImpl implements UserService {
                 e.printStackTrace();
             }
         });
+    }
+
+    @Override
+    public boolean isPremium(String email) {
+        UserEntity user = findUserByEmail(email);
+        return subscriptionRepo.existsByUserIdAndStatusAndCurrentPeriodEndAfter(
+                user.getId(),
+                SubscriptionStatus.ACTIVE,
+                LocalDateTime.now()
+        );
     }
 
     private void sendArtistVerificationEmail(UserEntity user, UserEntity admin, ArtistVerificationToken artistVerificationToken) throws MessagingException {
