@@ -15,6 +15,7 @@ import { BsDownload } from 'react-icons/bs'
 import Hls from 'hls.js'
 import {recordPlay} from "../../Redux/Song/Action.js";
 import {useDispatch} from "react-redux";
+import {BASE_API_URL} from "../../Redux/api.js";
 
 export function MusicPlayer({
                                 songId,
@@ -54,10 +55,10 @@ export function MusicPlayer({
         initialBufferedRef.current = false
 
         if (Hls.isSupported()) {
-            const hls = new Hls({ maxBufferLength: maxBufferSeconds, autoStartLoad: false })
+            const hls = new Hls({ maxBufferLength: maxBufferSeconds, autoStartLoad: false,  xhrSetup: (xhr) => {xhr.withCredentials = true}})
             hlsRef.current = hls
             hls.attachMedia(audio)
-            hls.loadSource(hlsManifestUrl)
+            hls.loadSource(`${BASE_API_URL}${hlsManifestUrl}`)
 
             const onMeta = () => {
                 setDuration(audio.duration)

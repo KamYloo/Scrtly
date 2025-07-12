@@ -4,6 +4,7 @@ import com.kamylo.Scrtly_backend.metrics.service.MetricsPublisher;
 import com.kamylo.Scrtly_backend.song.web.dto.SongDto;
 import com.kamylo.Scrtly_backend.song.web.dto.SongRequest;
 import com.kamylo.Scrtly_backend.song.service.SongService;
+import com.kamylo.Scrtly_backend.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -29,6 +30,7 @@ import java.util.Set;
 public class SongController {
     private final SongService songService;
     private final MetricsPublisher metricsPublisher;
+    private final UserService userService;
 
     @Value("${application.hls.directory}")
     private String hlsBasePath;
@@ -55,12 +57,15 @@ public class SongController {
     }
 
     @GetMapping("/{id}/hls/master")
-    public ResponseEntity<Resource> getMasterManifest(@PathVariable Long id) throws MalformedURLException {
-        Path master = Paths.get(hlsBasePath, id.toString(), "master.m3u8");
-        if (!Files.exists(master)) {
+    public ResponseEntity<Resource> getMasterManifest(@PathVariable Long id, Principal principal) throws MalformedURLException {
+        boolean isPremium = principal != null && userService.isPremium(principal.getName());
+        String fileName = isPremium ? "premium.m3u8" : "master.m3u8";
+
+        Path manifest = Paths.get(hlsBasePath, id.toString(), fileName);
+        if (!Files.exists(manifest)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        Resource resource = new UrlResource(master.toUri());
+        Resource resource = new UrlResource(manifest.toUri());
         return ResponseEntity.ok()
                 .contentType(MediaType.valueOf("application/vnd.apple.mpegurl"))
                 .body(resource);

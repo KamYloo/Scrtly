@@ -14,10 +14,10 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-
 
 @Service
 @RequiredArgsConstructor
@@ -26,17 +26,17 @@ public class HlsServiceImpl implements HlsService {
     @Value("${application.hls.directory}")
     private String hlsBasePath;
 
-    @Value("${application.file.cdn}")
-    private String cdnBaseUrl;
-
     @Value("${application.file.image-dir}")
     private String storageBasePath;
 
-    private static final Map<String, Integer> AUDIO_RATES = Map.of(
-            "64k", 64_000,
-            "128k", 128_000,
-            "256k", 256_000
-    );
+    private static final LinkedHashMap<String, Integer> AUDIO_RATES;
+    static {
+        AUDIO_RATES = new LinkedHashMap<>();
+        AUDIO_RATES.put("320k", 320_000);
+        AUDIO_RATES.put("256k", 256_000);
+        AUDIO_RATES.put("128k", 128_000);
+        AUDIO_RATES.put("64k",  64_000);
+    }
 
     @Async("hlsExecutor")
     @Override
@@ -74,11 +74,15 @@ public class HlsServiceImpl implements HlsService {
                 }
             }
 
-            Path master = baseDir.resolve("master.m3u8");
-            String masterContent = createMasterManifest();
-            Files.writeString(master, masterContent);
+            String fullManifest = createMasterManifest(AUDIO_RATES);
+            Files.writeString(baseDir.resolve("premium.m3u8"), fullManifest);
 
-            String manifestUrl = cdnBaseUrl + "hls/" + songId + "/master.m3u8";
+            LinkedHashMap<String,Integer> freeRates = new LinkedHashMap<>(AUDIO_RATES);
+            freeRates.remove("320k");
+            String freeManifest = createMasterManifest(freeRates);
+            Files.writeString(baseDir.resolve("master.m3u8"), freeManifest);
+
+            String manifestUrl = "/song/" + songId + "/hls/master";
             return CompletableFuture.completedFuture(manifestUrl);
 
         } catch (IOException | InterruptedException e) {
@@ -96,14 +100,17 @@ public class HlsServiceImpl implements HlsService {
         }
     }
 
-    private String createMasterManifest() {
+    private String createMasterManifest(Map<String,Integer> rates) {
         StringBuilder sb = new StringBuilder();
         sb.append("#EXTM3U\n");
         sb.append("#EXT-X-VERSION:3\n");
-        for (Map.Entry<String, Integer> entry : AUDIO_RATES.entrySet()) {
+        for (var entry : rates.entrySet()) {
             String rate = entry.getKey();
-            int bw = entry.getValue();
-            sb.append(String.format("#EXT-X-STREAM-INF:BANDWIDTH=%d,NAME=\"%s\"\n", bw, rate));
+            int bandwidth = entry.getValue();
+            sb.append(String.format(
+                    "#EXT-X-STREAM-INF:BANDWIDTH=%d,NAME=\"%s\"\n",
+                    bandwidth, rate
+            ));
             sb.append(rate).append("/prog.m3u8\n");
         }
         return sb.toString();
