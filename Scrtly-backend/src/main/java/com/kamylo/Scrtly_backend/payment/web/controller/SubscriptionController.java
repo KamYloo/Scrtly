@@ -27,7 +27,7 @@ public class SubscriptionController {
     @PostMapping("/create")
     public ResponseEntity<Map<String, String>> create(
             Principal principal,
-            @Valid @RequestBody CreateSubscriptionRequest req) throws StripeException {
+            @Valid @RequestBody CreateSubscriptionRequest req) {
 
         Session session = stripe.createCheckoutSession(principal.getName(), req.getSuccessUrl(), req.getCancelUrl());
         return ResponseEntity.ok(Map.of("sessionId", session.getId()));
@@ -36,7 +36,7 @@ public class SubscriptionController {
     @PostMapping("/{subscriptionId}/cancel")
     public ResponseEntity<Void> cancelSubscription(
             Principal principal,
-            @PathVariable String subscriptionId) throws StripeException {
+            @PathVariable String subscriptionId) {
 
         UserEntity user = userRepo.findByEmail(principal.getName())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));

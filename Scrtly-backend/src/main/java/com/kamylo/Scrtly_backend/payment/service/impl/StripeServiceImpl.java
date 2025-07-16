@@ -32,7 +32,7 @@ public class StripeServiceImpl implements StripeService {
     private final SubscriptionRepository subscriptionRepository;
 
     @Override
-    public Session createCheckoutSession(String username, String successUrl, String cancelUrl) throws StripeException {
+    public Session createCheckoutSession(String username, String successUrl, String cancelUrl) {
         UserEntity user = userService.findUserByEmail(username);
         List<SubscriptionEntity> activeSubs = subscriptionRepository.findAllByUserAndStatusIn(
                 user, List.of(SubscriptionStatus.ACTIVE, SubscriptionStatus.PENDING)
@@ -58,17 +58,29 @@ public class StripeServiceImpl implements StripeService {
                 .setIdempotencyKey(idempotencyKey)
                 .build();
 
-        return Session.create(params, requestOptions);
+        try {
+            return Session.create(params, requestOptions);
+        } catch (StripeException e) {
+            throw new CustomException(BusinessErrorCodes.STRIPE_API_ERROR, e);
+        }
     }
 
     @Override
-    public Event constructEvent(String payload, String sigHeader) throws SignatureVerificationException {
-        return Webhook.constructEvent(payload, sigHeader, cfg.getWebhookSecret());
+    public Event constructEvent(String payload, String sigHeader) {
+        try {
+            return Webhook.constructEvent(payload, sigHeader, cfg.getWebhookSecret());
+        } catch (SignatureVerificationException ex) {
+            throw new CustomException(BusinessErrorCodes.STRIPE_WEBHOOK_SIGNATURE_INVALID, ex);
+        }
     }
 
     @Override
-    public Subscription cancelSubscription(String subscriptionId) throws StripeException {
-        Subscription subscription = Subscription.retrieve(subscriptionId);
-        return subscription.cancel();
+    public Subscription cancelSubscription(String subscriptionId) {
+        try {
+            Subscription subscription = Subscription.retrieve(subscriptionId);
+            return subscription.cancel();
+        } catch (StripeException e) {
+            throw new CustomException(BusinessErrorCodes.STRIPE_API_ERROR, e);
+        }
     }
 }

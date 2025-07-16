@@ -111,27 +111,4 @@ public class GlobalExceptionHandler {
                                 .build()
                 );
     }
-
-    @ExceptionHandler(StripeException.class)
-    public ResponseEntity<ExceptionResponse> handleStripeError(StripeException ex) {
-        return ResponseEntity
-                .status(HttpStatus.BAD_GATEWAY)
-                .body(ExceptionResponse.builder()
-                        .businessErrorCode(null)
-                        .businessErrornDescription("Stripe API error")
-                        .error(ex.getMessage())
-                        .build());
-    }
-
-    @ExceptionHandler(SignatureVerificationException.class)
-    public ResponseEntity<ExceptionResponse> handleWebhookSignature(SignatureVerificationException ex) {
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(ExceptionResponse.builder()
-                        .businessErrorCode(null)
-                        .businessErrornDescription("Invalid Stripe webhook signature")
-                        .error(ex.getMessage())
-                        .build());
-    }
-
 }

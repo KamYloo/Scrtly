@@ -22,7 +22,7 @@ public class WebhookController {
 
     @PostMapping
     public ResponseEntity<Void> handle(@RequestBody String payload,
-                                       @RequestHeader("Stripe-Signature") String sigHeader) throws SignatureVerificationException {
+                                       @RequestHeader("Stripe-Signature") String sigHeader) {
 
         Event event = stripe.constructEvent(payload, sigHeader);
         switch (event.getType()) {
