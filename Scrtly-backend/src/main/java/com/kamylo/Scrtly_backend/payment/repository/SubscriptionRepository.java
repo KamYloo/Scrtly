@@ -15,4 +15,5 @@ public interface SubscriptionRepository extends JpaRepository<SubscriptionEntity
     Optional<SubscriptionEntity> findByStripeSubscriptionId(String stripeId);
     List<SubscriptionEntity> findAllByUserAndStatusIn(UserEntity user, List<SubscriptionStatus> statuses);
     boolean existsByUserIdAndStatusAndCurrentPeriodEndAfter(Long userId, SubscriptionStatus status, LocalDateTime now);
+    Optional<SubscriptionEntity> findFirstByUserAndStatusOrderByCurrentPeriodEndDesc(UserEntity user, SubscriptionStatus status);
 }

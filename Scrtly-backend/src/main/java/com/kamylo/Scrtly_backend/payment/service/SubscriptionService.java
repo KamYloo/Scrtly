@@ -1,5 +1,6 @@
 package com.kamylo.Scrtly_backend.payment.service;
 
+import com.kamylo.Scrtly_backend.payment.web.dto.SubscriptionDto;
 import com.kamylo.Scrtly_backend.user.domain.UserEntity;
 import com.stripe.model.Invoice;
 import com.stripe.model.Subscription;
@@ -11,4 +12,5 @@ public interface SubscriptionService {
     void handleSubscriptionDeleted(Subscription subscription);
     void handleInvoicePaymentFailed(Invoice invoice);
     void cancelLocalSubscription(String subscriptionId);
+    SubscriptionDto getMySubscription(String username);
 }

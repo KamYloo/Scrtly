@@ -1,4 +1,4 @@
-package com.kamylo.Scrtly_backend.payment.web.dto;
+package com.kamylo.Scrtly_backend.payment.web.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;

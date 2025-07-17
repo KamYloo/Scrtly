@@ -4,6 +4,7 @@ import com.kamylo.Scrtly_backend.payment.domain.entity.SubscriptionEntity;
 import com.kamylo.Scrtly_backend.payment.repository.SubscriptionRepository;
 import com.kamylo.Scrtly_backend.payment.domain.enums.SubscriptionStatus;
 import com.kamylo.Scrtly_backend.payment.service.SubscriptionService;
+import com.kamylo.Scrtly_backend.payment.web.dto.SubscriptionDto;
 import com.kamylo.Scrtly_backend.user.domain.UserEntity;
 import com.kamylo.Scrtly_backend.user.service.UserService;
 import com.stripe.model.Invoice;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -103,6 +105,25 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                     e.setStatus(SubscriptionStatus.CANCELED);
                     repo.save(e);
                 });
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public SubscriptionDto getMySubscription(String username) {
+        UserEntity user = userService.findUserByEmail(username);
+
+        return repo
+                .findFirstByUserAndStatusOrderByCurrentPeriodEndDesc(
+                        user,
+                       SubscriptionStatus.ACTIVE
+                )
+                .map(e -> SubscriptionDto.builder()
+                        .status(e.getStatus().name())
+                        .startDate(e.getStartDate())
+                        .currentPeriodEnd(e.getCurrentPeriodEnd())
+                        .build()
+                )
+                .orElse(null);
     }
 
     private String extractSubscriptionId(Invoice invoice) {

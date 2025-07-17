@@ -26,6 +26,8 @@ import { ChangePassword } from './pages/ChangePassword.jsx';
 import {OAuth2RedirectHandler} from "./utils/OAuth2RedirectHandler.jsx";
 import SuccessPage from "./features/Payment/SuccessPage.jsx";
 import CancelPage from "./features/Payment/CancelPage.jsx";
+import {BillingPage} from "./pages/BillingPage.jsx";
+
 
 function AppRoutes() {
     const [createPlayList, setCreatePlayList] = useState(false);
@@ -146,6 +148,7 @@ function AppRoutes() {
                     path="/profile/edit"
                     element={renderLayout(ProfileEdit)}
                 />
+                <Route path="/account/billing" element={renderLayout(BillingPage)} />
 
                 <Route path="/" element={<Navigate to="/home" replace />} />
             </Routes>

@@ -15,6 +15,7 @@ public class StripeConfig {
     private String apiKey;
     private String webhookSecret;
     private String priceIdMonthly;
+    private String portalReturnUrl;
 
     @PostConstruct
     public void init() {

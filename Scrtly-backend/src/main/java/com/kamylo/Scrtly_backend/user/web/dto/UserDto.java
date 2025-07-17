@@ -18,6 +18,7 @@ public class UserDto {
     private String description;
 
     private boolean observed;
+    private boolean isPremium;
     private int observersCount;
     private int observationsCount;
 

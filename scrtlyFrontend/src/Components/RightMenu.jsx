@@ -56,26 +56,35 @@ function RightMenu() {
     <div className="rightMenu">
       {openNotifications && <NotificationsList notifications={notifications} />}
       <div className="top">
-        <SubscribeButton
-            successUrl={`${base}/success`}
-            cancelUrl={`${base}/cancel`}
-        />
+        {!reqUser?.premium ? (
+                <SubscribeButton
+                    successUrl={`${base}/success`}
+                    cancelUrl={`${base}/cancel`}
+                />
+            ) :
+            <i onClick={() => navigate('/account/billing')} title="My subscribe">
+              <FaCrown/>
+              <p>
+                My <span>Premium</span>
+              </p>
+            </i>}
         <i
-          className={unseenCount > 0 ? "has-unseen" : ""}
-          onClick={() => setOpenNotifications((prev) => !prev)}
+            className={unseenCount > 0 ? "has-unseen" : ""}
+            onClick={() => setOpenNotifications((prev) => !prev)}
         >
-          <FaBell />
+          <FaBell/>
         </i>
+
         <i>
-          <FaRegHeart />
+          <FaRegHeart/>
         </i>
       </div>
       <div className="profile">
         <i>
-          <FaSun />
+          <FaSun/>
         </i>
         <i>
-          <FaCogs />
+          <FaCogs/>
         </i>
         <div className="profileImg" onClick={handleProfileClick}>
           <img

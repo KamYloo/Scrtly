@@ -56,6 +56,7 @@ public class AuthController {
         response.addCookie(cookieService.getNewCookie("jwt", tokens.get("jwt"), 2 * 60 * 60));
         response.addCookie(cookieService.getNewCookie("refresh", tokens.get("refresh"), 7 * 24 * 60 * 60));
         UserDto userDto = mapper.mapTo(userService.findUserByEmail(loginRequest.getEmail()));
+        userDto.setPremium(userService.isPremium(loginRequest.getEmail()));
         LoginResponseDto responseDto = LoginResponseDto.builder()
                 .user(userDto)
                 .build();
@@ -97,7 +98,10 @@ public class AuthController {
         if (ud == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        UserDto dto = mapper.mapTo(userService.findUserByEmail(ud.getUsername()));
+        var email = ud.getUsername();
+        var user = userService.findUserByEmail(email);
+        var dto = mapper.mapTo(user);
+        dto.setPremium(userService.isPremium(email));
         return ResponseEntity.ok(dto);
     }
 

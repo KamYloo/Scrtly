@@ -95,7 +95,7 @@ function Login() {
                             type="button"
                             className="google-btn"
                             onClick={() => {
-                                window.location.href = `${BASE_API_URL}/api/oauth2/authorize/google`;
+                                window.location.href = `${BASE_API_URL}/oauth2/authorize/google`;
                             }}
                         >
                             <FcGoogle size={20} style={{marginRight: '8px'}}/>

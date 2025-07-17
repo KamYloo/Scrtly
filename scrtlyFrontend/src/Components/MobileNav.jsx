@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { MenuList } from "./MenuList";
 import "../Styles/MobileNav.css";
 import logo from "../assets/logo.png";
-import { FaBell, FaAlignRight, FaList } from "react-icons/fa";
+import {FaBell, FaAlignRight, FaList, FaCrown} from "react-icons/fa";
 import { RiPlayListLine } from "react-icons/ri";
 import { NotificationsList } from "../features/Notification/NotificationsList.jsx";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,6 +12,7 @@ import { getNotifications } from "../Redux/NotificationService/Action.js";
 import toast from "react-hot-toast";
 import defaultAvatar from "../assets/user.jpg";
 import { MenuPlayList } from "../features/PlayList/MenuPlayList.jsx";
+import {SubscribeButton} from "../features/Payment/SubscribeButton.jsx";
 
 function MobileNav({setCreatePlayList}) {
   const [showNotifications, setShowNotifications] = useState(false);
@@ -20,6 +21,7 @@ function MobileNav({setCreatePlayList}) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { reqUser } = useSelector((store) => store.auth);
+  const base = window.location.origin;
 
   const notifications =
     useSelector((state) => state.notifications.notifications) || [];
@@ -110,6 +112,20 @@ function MobileNav({setCreatePlayList}) {
                     <div className="dropdown-item" onClick={handleLogout}>
                       Logout
                     </div>
+                    {!reqUser.premium ? (
+                        <div className="dropdown-item">
+                          <SubscribeButton
+                              successUrl={`${base}/success`}
+                              cancelUrl={`${base}/cancel`}
+                          />
+                        </div>
+                    ):
+                        <div className="dropdown-item">
+                          <i onClick={() => navigate('/account/billing')} title="My subscribe">
+                          <FaCrown/>
+                          <p>My <span>Premium</span></p>
+                          </i>
+                        </div>}
                   </>
                 ) : (
                   <div

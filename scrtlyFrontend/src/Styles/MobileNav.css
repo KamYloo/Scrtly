@@ -227,6 +227,11 @@
     color: #b1b1b1;
     font-size: 14px;
     white-space: nowrap;
+
+    i {
+        display: flex;
+        gap: 5px;
+    }
 }
 
 .dropdown-item:hover {

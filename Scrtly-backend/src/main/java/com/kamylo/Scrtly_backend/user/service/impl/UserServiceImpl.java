@@ -19,6 +19,7 @@ import com.kamylo.Scrtly_backend.common.utils.UserLikeChecker;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -159,6 +160,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Cacheable(
+            value = "premiumStatus",
+            key = "#email",
+            unless = "#result == false"
+    )
     public boolean isPremium(String email) {
         UserEntity user = findUserByEmail(email);
         return subscriptionRepo.existsByUserIdAndStatusAndCurrentPeriodEndAfter(
