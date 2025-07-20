@@ -1,6 +1,7 @@
 package com.kamylo.Scrtly_backend.user.service.impl;
 import com.kamylo.Scrtly_backend.payment.domain.enums.SubscriptionStatus;
 import com.kamylo.Scrtly_backend.payment.repository.SubscriptionRepository;
+import com.kamylo.Scrtly_backend.user.mapper.UserMapper;
 import com.kamylo.Scrtly_backend.user.service.UserService;
 import com.kamylo.Scrtly_backend.user.web.dto.UserDto;
 import com.kamylo.Scrtly_backend.artist.web.dto.ArtistVerificationRequest;
@@ -9,7 +10,6 @@ import com.kamylo.Scrtly_backend.artist.domain.ArtistVerificationToken;
 import com.kamylo.Scrtly_backend.user.domain.UserEntity;
 import com.kamylo.Scrtly_backend.common.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.common.handler.CustomException;
-import com.kamylo.Scrtly_backend.common.mapper.Mapper;
 import com.kamylo.Scrtly_backend.user.repository.UserRepository;
 import com.kamylo.Scrtly_backend.user.web.dto.request.UserRequestDto;
 import com.kamylo.Scrtly_backend.artist.service.ArtistVerificationTokenService;
@@ -37,7 +37,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final FileService fileService;
-    private final Mapper<UserEntity, UserDto> mapper;
+    private final UserMapper userMapper;
     private final UserLikeChecker userLikeChecker;
     private final ArtistVerificationTokenService artistVerificationTokenService;
     private final EmailService emailService;
@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto findUserByNickname(String nickname) {
-        return  mapper.mapTo(userRepository.findByNickName(nickname).orElseThrow(
+        return  userMapper.toDto(userRepository.findByNickName(nickname).orElseThrow(
                 ()->new UsernameNotFoundException("User not found")));
     }
 
@@ -70,7 +70,7 @@ public class UserServiceImpl implements UserService {
                 ()->new UsernameNotFoundException("User not found"));
         UserEntity reqUser = (reqUsername != null) ? findUserByEmail(reqUsername) : null;
 
-        UserDto userDto = mapper.mapTo(user);
+        UserDto userDto = userMapper.toDto(user);
         if (reqUser != null)
             userDto.setObserved(userLikeChecker.isUserFollowed(user,reqUser.getId()));
         return userDto;
@@ -97,7 +97,7 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(followToUser);
         userRepository.save(reqUser);
-        UserDto userDto = mapper.mapTo(followToUser);
+        UserDto userDto = userMapper.toDto(followToUser);
         userDto.setObserved(userLikeChecker.isUserFollowed(followToUser,reqUser.getId()));
         return userDto;
     }
@@ -119,13 +119,13 @@ public class UserServiceImpl implements UserService {
             user.setProfilePicture(imagePath);
         }
 
-        return mapper.mapTo(userRepository.save(user));
+        return userMapper.toDto(userRepository.save(user));
     }
 
     @Override
     public Set<UserDto> searchUser(String query) {
         return userRepository.searchUser(query).stream()
-                .map(mapper::mapTo)
+                .map(userMapper::toDto)
                 .collect(Collectors.toCollection(HashSet::new));
     }
 

@@ -1,5 +1,7 @@
 package com.kamylo.Scrtly_backend.chat.service.impl;
 
+import com.kamylo.Scrtly_backend.chat.mapper.ChatMessageMapper;
+import com.kamylo.Scrtly_backend.chat.mapper.ChatRoomMapper;
 import com.kamylo.Scrtly_backend.chat.web.dto.ChatMessageDto;
 import com.kamylo.Scrtly_backend.chat.web.dto.ChatRoomDto;
 import com.kamylo.Scrtly_backend.chat.web.dto.request.ChatMessageEditRequest;
@@ -8,13 +10,11 @@ import com.kamylo.Scrtly_backend.chat.domain.ChatMessageEntity;
 import com.kamylo.Scrtly_backend.chat.domain.ChatRoomEntity;
 import com.kamylo.Scrtly_backend.common.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.common.handler.CustomException;
-import com.kamylo.Scrtly_backend.common.mapper.Mapper;
 import com.kamylo.Scrtly_backend.chat.repository.ChatMessageRepository;
 import com.kamylo.Scrtly_backend.chat.web.dto.request.SendMessageRequest;
 import com.kamylo.Scrtly_backend.chat.service.ChatMessageService;
 import com.kamylo.Scrtly_backend.chat.service.ChatService;
 import com.kamylo.Scrtly_backend.user.service.UserService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,8 +35,8 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     private final ChatMessageRepository chatMessageRepository;
     private final UserService userService;
     private final ChatService chatService;
-    private final Mapper<ChatRoomEntity, ChatRoomDto> chatRoomMapper;
-    private final Mapper<ChatMessageEntity, ChatMessageDto> chatMessageMapper;
+    private final ChatRoomMapper chatRoomMapper;
+    private final ChatMessageMapper chatMessageMapper;
     private final RabbitTemplate rabbitTemplate;
 
     @Value("${chat.exchange}")
@@ -49,8 +49,8 @@ public class ChatMessageServiceImpl implements ChatMessageService {
             ChatMessageRepository chatMessageRepository,
             UserService userService,
             ChatService chatService,
-            Mapper<ChatRoomEntity, ChatRoomDto> chatRoomMapper,
-            Mapper<ChatMessageEntity, ChatMessageDto> chatMessageMapper,
+            ChatRoomMapper chatRoomMapper,
+            ChatMessageMapper chatMessageMapper,
             @Qualifier("chatRabbitTemplate") RabbitTemplate rabbitTemplate
     ) {
         this.chatMessageRepository = chatMessageRepository;
@@ -67,7 +67,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     public CompletableFuture<ChatMessageDto> sendMessageAsync(SendMessageRequest request, String username) {
         UserEntity userEntity = userService.findUserByEmail(username);
         ChatRoomDto chatRoomDto = chatService.getChatById(request.getChatId(), username);
-        ChatRoomEntity chatRoom = chatRoomMapper.mapFrom(chatRoomDto);
+        ChatRoomEntity chatRoom = chatRoomMapper.toEntity(chatRoomDto);
         ChatMessageEntity chatMessage = ChatMessageEntity.builder()
                 .chatRoom(chatRoom)
                 .user(userEntity)
@@ -75,7 +75,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
                 .build();
 
         ChatMessageEntity savedChatMessage = chatMessageRepository.save(chatMessage);
-        ChatMessageDto dto = chatMessageMapper.mapTo(savedChatMessage);
+        ChatMessageDto dto = chatMessageMapper.toDto(savedChatMessage);
         dto.setChatRoomId(chatRoom.getId());
         dto.setStatus("NEW");
         publishAfterCommit(dto);
@@ -97,7 +97,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
             message.setMessageText(request.getMessage());
             message.setLastModifiedDate(LocalDateTime.now());
             ChatMessageEntity updatedMessage = chatMessageRepository.save(message);
-            ChatMessageDto dto = chatMessageMapper.mapTo(updatedMessage);
+            ChatMessageDto dto = chatMessageMapper.toDto(updatedMessage);
             dto.setChatRoomId(message.getChatRoom().getId());
             dto.setStatus("EDITED");
             publishAfterCommit(dto);
@@ -134,7 +134,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     @Override
     public Page<ChatMessageDto> getChatMessages(Integer chatId, Pageable pageable) {
         return chatMessageRepository.findByChatRoomIdOrderByCreateDateDesc(chatId, pageable)
-                .map(chatMessageMapper::mapTo);
+                .map(chatMessageMapper::toDto);
     }
 
     private boolean validateChatMessageOwnership(String username, ChatMessageEntity chatMessage) {

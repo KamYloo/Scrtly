@@ -1,12 +1,12 @@
 package com.kamylo.Scrtly_backend.like.service;
 
+import com.kamylo.Scrtly_backend.like.mapper.SongLikeMapper;
 import com.kamylo.Scrtly_backend.like.web.dto.SongLikeDto;
 import com.kamylo.Scrtly_backend.song.domain.SongEntity;
 import com.kamylo.Scrtly_backend.like.domain.SongLikeEntity;
 import com.kamylo.Scrtly_backend.user.domain.UserEntity;
 import com.kamylo.Scrtly_backend.common.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.common.handler.CustomException;
-import com.kamylo.Scrtly_backend.common.mapper.Mapper;
 import com.kamylo.Scrtly_backend.like.repository.SongLikeRepository;
 import com.kamylo.Scrtly_backend.song.repository.SongRepository;
 import com.kamylo.Scrtly_backend.playList.service.PlayListService;
@@ -23,7 +23,7 @@ public class SongLikeServiceImpl implements SongLikeService {
     private final SongLikeRepository songLikeRepository;
     private final PlayListService playListService;
     private final SongRepository songRepository;
-    private final Mapper<SongLikeEntity, SongLikeDto> songLikeMapper;
+    private final SongLikeMapper songLikeMapper;
 
     @Override
     @Transactional
@@ -37,7 +37,7 @@ public class SongLikeServiceImpl implements SongLikeService {
             song.setFavorite(false);
             songLikeRepository.delete(existingLike);
             playListService.removeFromFavourites(user, song);
-            return songLikeMapper.mapTo(existingLike);
+            return songLikeMapper.toDto(existingLike);
         } else {
             song.setFavorite(true);
             playListService.addToFavourites(user, song);
@@ -46,7 +46,7 @@ public class SongLikeServiceImpl implements SongLikeService {
                     .user(user)
                     .build();
             songLikeRepository.save(newLike);
-            return songLikeMapper.mapTo(newLike);
+            return songLikeMapper.toDto(newLike);
         }
     }
 }

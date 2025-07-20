@@ -1,12 +1,12 @@
 package com.kamylo.Scrtly_backend.chat.service.impl;
 
+import com.kamylo.Scrtly_backend.chat.mapper.ChatRoomMapper;
 import com.kamylo.Scrtly_backend.chat.web.dto.ChatRoomDto;
 import com.kamylo.Scrtly_backend.chat.web.dto.request.ChatRoomRequest;
 import com.kamylo.Scrtly_backend.user.domain.UserEntity;
 import com.kamylo.Scrtly_backend.chat.domain.ChatRoomEntity;
 import com.kamylo.Scrtly_backend.common.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.common.handler.CustomException;
-import com.kamylo.Scrtly_backend.common.mapper.Mapper;
 import com.kamylo.Scrtly_backend.chat.repository.ChatRepository;
 import com.kamylo.Scrtly_backend.chat.service.ChatService;
 import com.kamylo.Scrtly_backend.user.service.UserService;
@@ -23,7 +23,7 @@ public class ChatServiceImpl implements ChatService {
 
     private final ChatRepository chatRepository;
     private final UserService userService;
-    private final Mapper<ChatRoomEntity, ChatRoomDto> chatRoomMapper;
+    private final ChatRoomMapper chatRoomMapper;
 
     @Override
     public ChatRoomDto createChat(String username, ChatRoomRequest chatRoomRequest) {
@@ -39,7 +39,7 @@ public class ChatServiceImpl implements ChatService {
                 .build();
 
         ChatRoomEntity createdChatRoom = chatRepository.save(chatRoom);
-        return chatRoomMapper.mapTo(createdChatRoom);
+        return chatRoomMapper.toDto(createdChatRoom);
     }
 
     @Override
@@ -47,7 +47,7 @@ public class ChatServiceImpl implements ChatService {
         ChatRoomEntity chatRoom = chatRepository.findById(chatId).orElseThrow(
                 () -> new CustomException(BusinessErrorCodes.CHATROOM_NOT_FOUND));
         if (validateChatRoomOwnership(username, chatRoom)) {
-            return chatRoomMapper.mapTo(chatRoom);
+            return chatRoomMapper.toDto(chatRoom);
         } else {
             throw new CustomException(BusinessErrorCodes.CHATROOM_MISMATCH);
         }
@@ -56,12 +56,12 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public List<ChatRoomDto> findChatsByUser(String username) {
         UserEntity reqUser = userService.findUserByEmail(username);
-        return chatRepository.findChatRoomsByUserId(reqUser.getId()).stream().map(chatRoomMapper::mapTo).toList();
+        return chatRepository.findChatRoomsByUserId(reqUser.getId()).stream().map(chatRoomMapper::toDto).toList();
     }
 
     @Override
     public void deleteChat(Integer chatId, String username) {
-        ChatRoomEntity chatRoom = chatRoomMapper.mapFrom(getChatById(chatId, username));
+        ChatRoomEntity chatRoom = chatRoomMapper.toEntity(getChatById(chatId, username));
         chatRepository.delete(chatRoom);
     }
 

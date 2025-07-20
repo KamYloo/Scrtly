@@ -1,5 +1,7 @@
 package com.kamylo.Scrtly_backend.like.service;
 
+import com.kamylo.Scrtly_backend.like.mapper.CommentLikeMapper;
+import com.kamylo.Scrtly_backend.like.mapper.PostLikeMapper;
 import com.kamylo.Scrtly_backend.like.web.dto.PostStatsDto;
 import com.kamylo.Scrtly_backend.like.web.dto.CommentStatsDto;
 import com.kamylo.Scrtly_backend.comment.domain.CommentEntity;
@@ -10,8 +12,6 @@ import com.kamylo.Scrtly_backend.notification.domain.enums.NotificationType;
 import com.kamylo.Scrtly_backend.notification.events.NotificationEvent;
 import com.kamylo.Scrtly_backend.common.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.common.handler.CustomException;
-import com.kamylo.Scrtly_backend.like.mapper.CommentLikeMapperImpl;
-import com.kamylo.Scrtly_backend.like.mapper.PostLikeMapperImpl;
 import com.kamylo.Scrtly_backend.comment.repository.CommentRepository;
 import com.kamylo.Scrtly_backend.like.repository.LikeRepository;
 import com.kamylo.Scrtly_backend.post.repository.PostRepository;
@@ -31,8 +31,8 @@ public class LikeServiceImpl implements LikeService {
     private final LikeRepository likeRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
-    private final PostLikeMapperImpl postLikeMapper;
-    private final CommentLikeMapperImpl commentLikeMapper;
+    private final PostLikeMapper postLikeMapper;
+    private final CommentLikeMapper commentLikeMapper;
     private final ApplicationEventPublisher eventPublisher;
     private final NotificationService notificationService;
     private final UserLikeChecker userLikeChecker;
@@ -67,7 +67,7 @@ public class LikeServiceImpl implements LikeService {
                     () -> new CustomException(BusinessErrorCodes.POST_NOT_FOUND));
             post.getLikes().remove(checkLikeExistPost);
             notificationService.decrementNotification(post.getUser().getId(), postId, NotificationType.LIKE);
-            PostStatsDto postStatsDto = postLikeMapper.mapTo(checkLikeExistPost);
+            PostStatsDto postStatsDto = postLikeMapper.toDto(checkLikeExistPost);
             postStatsDto.setLikedByUser(userLikeChecker.isPostLikedByUser(post, user.getId()));
             return postStatsDto;
         }
@@ -92,7 +92,7 @@ public class LikeServiceImpl implements LikeService {
                 username
         ));
 
-        PostStatsDto postStatsDto = postLikeMapper.mapTo(like);
+        PostStatsDto postStatsDto = postLikeMapper.toDto(like);
         postStatsDto.setLikedByUser(userLikeChecker.isPostLikedByUser(post, user.getId()));
         return postStatsDto;
     }
@@ -108,7 +108,7 @@ public class LikeServiceImpl implements LikeService {
             CommentEntity comment = commentRepository.findById(commentId).orElseThrow(
                     () -> new CustomException(BusinessErrorCodes.COMMENT_NOT_FOUND));
             comment.getLikes().remove(checkLikeExistComment);
-            CommentStatsDto commentStatsDto = commentLikeMapper.mapTo(checkLikeExistComment);
+            CommentStatsDto commentStatsDto = commentLikeMapper.toDto(checkLikeExistComment);
             commentStatsDto.setLikedByUser(userLikeChecker.isCommentLikedByUser(comment, user.getId()));
             return commentStatsDto;
         }
@@ -125,7 +125,7 @@ public class LikeServiceImpl implements LikeService {
         comment.getLikes().add(savedLikeEntity);
         commentRepository.save(comment);
 
-        CommentStatsDto commentStatsDto = commentLikeMapper.mapTo(like);
+        CommentStatsDto commentStatsDto = commentLikeMapper.toDto(like);
         commentStatsDto.setLikedByUser(userLikeChecker.isCommentLikedByUser(comment, user.getId()));
         return commentStatsDto;
     }

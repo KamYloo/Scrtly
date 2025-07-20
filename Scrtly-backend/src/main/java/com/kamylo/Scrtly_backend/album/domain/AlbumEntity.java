@@ -1,5 +1,6 @@
 package com.kamylo.Scrtly_backend.album.domain;
 
+import com.kamylo.Scrtly_backend.artist.domain.ArtistEntity;
 import com.kamylo.Scrtly_backend.song.domain.SongEntity;
 import com.kamylo.Scrtly_backend.user.domain.UserEntity;
 import jakarta.persistence.*;
@@ -42,7 +43,7 @@ public class AlbumEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "artist_id", nullable = false)
-    private UserEntity artist;
+    private ArtistEntity artist;
 
     @OneToMany(mappedBy = "album", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SongEntity> songs = new ArrayList<>();

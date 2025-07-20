@@ -51,7 +51,6 @@ public class ChatRabbitConfig {
         template.setMessageConverter(conv);
         template.setExchange(chatExchangeName);
         template.setRoutingKey(chatRoutingKey);
-        template.setChannelTransacted(true);
         return template;
     }
 

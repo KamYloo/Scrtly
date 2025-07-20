@@ -100,7 +100,7 @@ function AudioList({ volume, onTrackChange, initialSongs, req_artist, isplayList
                             <div className='section'>
                                 <p className='songName'>
                                     {songItem?.title}
-                                    <span className='spanArtist'>{songItem.artist?.artistName}</span>
+                                    <span className='spanArtist'>{songItem.artist?.pseudonym}</span>
                                 </p>
                                 <div className='hits'>
                                     <p className='hit'>

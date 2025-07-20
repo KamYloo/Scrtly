@@ -1,8 +1,10 @@
 package com.kamylo.Scrtly_backend.song.service.impl;
 
+import com.kamylo.Scrtly_backend.album.mapper.AlbumMapper;
 import com.kamylo.Scrtly_backend.album.service.AlbumService;
-import com.kamylo.Scrtly_backend.album.web.dto.AlbumDto;
+import com.kamylo.Scrtly_backend.artist.domain.ArtistEntity;
 import com.kamylo.Scrtly_backend.common.service.FileService;
+import com.kamylo.Scrtly_backend.song.mapper.SongMapper;
 import com.kamylo.Scrtly_backend.song.service.HlsService;
 import com.kamylo.Scrtly_backend.song.service.SongService;
 import com.kamylo.Scrtly_backend.song.web.dto.SongDto;
@@ -12,7 +14,6 @@ import com.kamylo.Scrtly_backend.song.domain.SongEntity;
 import com.kamylo.Scrtly_backend.user.domain.UserEntity;
 import com.kamylo.Scrtly_backend.common.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.common.handler.CustomException;
-import com.kamylo.Scrtly_backend.common.mapper.Mapper;
 import com.kamylo.Scrtly_backend.song.repository.SongRepository;
 import com.kamylo.Scrtly_backend.user.service.UserRoleService;
 import com.kamylo.Scrtly_backend.user.service.UserService;
@@ -44,8 +45,8 @@ public class SongServiceImpl implements SongService {
     private final UserService userService;
     private final UserRoleService userRoleService;
     private final AlbumService albumService;
-    private final Mapper<AlbumEntity, AlbumDto> albumMapper;
-    private final Mapper<SongEntity, SongDto> songMapper;
+    private final AlbumMapper albumMapper;
+    private final SongMapper songMapper;
     private final HlsService hlsService;
 
     @Value("${application.file.image-dir}")
@@ -59,8 +60,8 @@ public class SongServiceImpl implements SongService {
     public SongDto createSong(SongRequest songRequest, String username, MultipartFile imageSong, MultipartFile audioFile) throws IOException, UnsupportedAudioFileException {
         validateArtistOrAdmin(username);
 
-        UserEntity artist = userService.findUserByEmail(username);
-        AlbumEntity album = albumMapper.mapFrom(albumService.getAlbum(songRequest.getAlbumId()));
+        ArtistEntity artist = userService.findUserByEmail(username).getArtistEntity();
+        AlbumEntity album = albumMapper.toEntity(albumService.getAlbum(songRequest.getAlbumId()));
 
         String imagePath = null;
         if (!imageSong.isEmpty()) {
@@ -99,14 +100,14 @@ public class SongServiceImpl implements SongService {
                     songRepository.save(savedSong);
                 });
 
-        return songMapper.mapTo(savedSong);
+        return songMapper.toDto(savedSong);
     }
 
     @Override
     public Set<SongDto> searchSongByTitle(String title) {
         return songRepository.findByTitle(title)
                 .stream()
-                .map(songMapper::mapTo)
+                .map(songMapper::toDto)
                 .collect(Collectors.toSet());
     }
 

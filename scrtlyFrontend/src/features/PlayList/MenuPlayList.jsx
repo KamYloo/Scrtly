@@ -7,7 +7,7 @@ import {deletePlayList, getUserPlayLists} from "../../Redux/PlayList/Action.js";
 import toast from "react-hot-toast";
 import Spinner from "../../Components/Spinner.jsx";
 
-function MenuPlayList({setCreatePlayList, closeModals}) {
+function MenuPlayList({setCreatePlayList, closeModals = () => {}}) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { playList, auth } = useSelector(state => state);

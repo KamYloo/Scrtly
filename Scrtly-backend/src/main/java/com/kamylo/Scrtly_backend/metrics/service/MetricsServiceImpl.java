@@ -1,13 +1,15 @@
 package com.kamylo.Scrtly_backend.metrics.service;
 
 import com.kamylo.Scrtly_backend.album.domain.AlbumEntity;
+import com.kamylo.Scrtly_backend.album.mapper.AlbumMapper;
 import com.kamylo.Scrtly_backend.album.repository.AlbumRepository;
 import com.kamylo.Scrtly_backend.album.web.dto.AlbumDto;
 import com.kamylo.Scrtly_backend.artist.domain.ArtistEntity;
+import com.kamylo.Scrtly_backend.artist.mapper.ArtistMapper;
 import com.kamylo.Scrtly_backend.artist.repository.ArtistRepository;
 import com.kamylo.Scrtly_backend.artist.web.dto.ArtistDto;
-import com.kamylo.Scrtly_backend.common.mapper.Mapper;
 import com.kamylo.Scrtly_backend.song.domain.SongEntity;
+import com.kamylo.Scrtly_backend.song.mapper.SongMapper;
 import com.kamylo.Scrtly_backend.song.repository.SongRepository;
 import com.kamylo.Scrtly_backend.song.web.dto.SongDto;
 import lombok.RequiredArgsConstructor;
@@ -30,23 +32,23 @@ public class MetricsServiceImpl implements MetricsService {
     private final ArtistRepository artistRepo;
     private final SongRepository songRepo;
     private final AlbumRepository albumRepo;
-    private final Mapper<ArtistEntity, ArtistDto> artistMapper;
-    private final Mapper<SongEntity, SongDto> songMapper;
-    private final Mapper<AlbumEntity, AlbumDto> albumMapper;
+    private final ArtistMapper artistMapper;
+    private final SongMapper songMapper;
+    private final AlbumMapper albumMapper;
 
     @Override
     public List<ArtistDto> getTopArtists(String window, int n) {
-        return fetchWithFallback("artist:views", window, n, artistRepo, artistMapper, ArtistEntity::getId);
+        return fetchWithFallback("artist:views", window, n, artistRepo, artistMapper::toDto, ArtistEntity::getId);
     }
 
     @Override
     public List<SongDto> getTopSongs(String window, int n) {
-        return fetchWithFallback("song:plays", window, n, songRepo, songMapper, SongEntity::getId);
+        return fetchWithFallback("song:plays", window, n, songRepo, songMapper::toDto, SongEntity::getId);
     }
 
     @Override
     public List<AlbumDto> getTopAlbums(String window, int n) {
-        return fetchWithFallbackInt("album:views", window, n, albumRepo, albumMapper, AlbumEntity::getId);
+        return fetchWithFallbackInt("album:views", window, n, albumRepo, albumMapper::toDto, AlbumEntity::getId);
     }
 
     private String buildKey(String prefix, String window) {
@@ -63,7 +65,7 @@ public class MetricsServiceImpl implements MetricsService {
             String requestedWindow,
             int n,
             JpaRepository<E, Long> repo,
-            Mapper<E, D> mapper,
+            Function<E, D> mapper,
             Function<E, Long> idExtractor) {
 
         String[] windows = switch (requestedWindow.toLowerCase()) {
@@ -86,7 +88,7 @@ public class MetricsServiceImpl implements MetricsService {
             String key,
             int n,
             JpaRepository<E, Long> repo,
-            Mapper<E, D> mapper,
+            Function<E, D> mapper,
             Function<E, Long> idExtractor) {
 
         Set<String> ids = redis.opsForZSet().reverseRange(key, 0, n - 1);
@@ -103,7 +105,7 @@ public class MetricsServiceImpl implements MetricsService {
         return longIds.stream()
                 .map(map::get)
                 .filter(Objects::nonNull)
-                .map(mapper::mapTo)
+                .map(mapper)
                 .toList();
     }
 
@@ -112,7 +114,7 @@ public class MetricsServiceImpl implements MetricsService {
             String requestedWindow,
             int n,
             JpaRepository<E, Integer> repo,
-            Mapper<E, D> mapper,
+            Function<E, D> mapper,
             Function<E, Integer> idExtractor) {
 
         String[] windows = switch (requestedWindow.toLowerCase()) {
@@ -135,7 +137,7 @@ public class MetricsServiceImpl implements MetricsService {
             String key,
             int n,
             JpaRepository<E, Integer> repo,
-            Mapper<E, D> mapper,
+            Function<E, D> mapper,
             Function<E, Integer> idExtractor) {
 
         Set<String> ids = redis.opsForZSet().reverseRange(key, 0, n - 1);
@@ -152,7 +154,7 @@ public class MetricsServiceImpl implements MetricsService {
         return intIds.stream()
                 .map(map::get)
                 .filter(Objects::nonNull)
-                .map(mapper::mapTo)
+                .map(mapper)
                 .toList();
     }
 }

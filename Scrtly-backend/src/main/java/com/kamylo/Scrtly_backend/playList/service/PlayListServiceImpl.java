@@ -1,6 +1,8 @@
 package com.kamylo.Scrtly_backend.playList.service;
 
+import com.kamylo.Scrtly_backend.playList.mapper.PlayListMapper;
 import com.kamylo.Scrtly_backend.playList.web.dto.PlayListDto;
+import com.kamylo.Scrtly_backend.song.mapper.SongMapper;
 import com.kamylo.Scrtly_backend.song.web.dto.SongDto;
 import com.kamylo.Scrtly_backend.playList.domain.PlayListEntity;
 import com.kamylo.Scrtly_backend.common.service.impl.FileServiceImpl;
@@ -8,7 +10,6 @@ import com.kamylo.Scrtly_backend.song.domain.SongEntity;
 import com.kamylo.Scrtly_backend.user.domain.UserEntity;
 import com.kamylo.Scrtly_backend.common.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.common.handler.CustomException;
-import com.kamylo.Scrtly_backend.common.mapper.Mapper;
 import com.kamylo.Scrtly_backend.playList.repository.PlayListRepository;
 import com.kamylo.Scrtly_backend.like.repository.SongLikeRepository;
 import com.kamylo.Scrtly_backend.song.repository.SongRepository;
@@ -31,8 +32,8 @@ public class PlayListServiceImpl implements PlayListService {
     private final PlayListRepository playListRepository;
     private final SongRepository songRepository;
     private final SongLikeRepository songLikeRepository;
-    private final Mapper<PlayListEntity, PlayListDto> playListMapper;
-    private final Mapper<SongEntity, SongDto> songMapper;
+    private final PlayListMapper playListMapper;
+    private final SongMapper songMapper;
 
     @Override
     @Transactional
@@ -50,25 +51,25 @@ public class PlayListServiceImpl implements PlayListService {
                 .build();
 
         PlayListEntity savedPlayListEntity = playListRepository.save(playListEntity);
-        return playListMapper.mapTo(savedPlayListEntity);
+        return playListMapper.toDto(savedPlayListEntity);
     }
 
     @Override
     public PlayListDto getPlayList(Integer playListId) {
         PlayListEntity playList = playListRepository.findById(playListId).orElseThrow(
                 () -> new CustomException(BusinessErrorCodes.PLAYLIST_NOT_FOUND));
-        return playListMapper.mapTo(playList);
+        return playListMapper.toDto(playList);
     }
 
     @Override
     public Page<PlayListDto> getPlayLists(Pageable pageable) {
-        return playListRepository.findAll(pageable).map(playListMapper::mapTo);
+        return playListRepository.findAll(pageable).map(playListMapper::toDto);
     }
 
     @Override
     public Page<PlayListDto> getPlayListsByUser(String username, Pageable pageable) {
         UserEntity user = userService.findUserByEmail(username);
-        return playListRepository.getPlayListsByUserId(user.getId(), pageable).map(playListMapper::mapTo);
+        return playListRepository.getPlayListsByUserId(user.getId(), pageable).map(playListMapper::toDto);
     }
 
     @Override
@@ -82,7 +83,7 @@ public class PlayListServiceImpl implements PlayListService {
                 throw new CustomException(BusinessErrorCodes.SONG_EXISTS);
             } else {
                 playList.getSongs().add(songEntity);
-                return playListMapper.mapTo(playListRepository.save(playList));
+                return playListMapper.toDto(playListRepository.save(playList));
             }
         } else {
             throw new CustomException(BusinessErrorCodes.PLAYLIST_MISMATCH);
@@ -126,7 +127,7 @@ public class PlayListServiceImpl implements PlayListService {
 
     @Override
     public Page<SongDto> getPlayListTracks(Integer playListId, Pageable pageable) {
-        return songRepository.findByPlaylistId(playListId, pageable).map(songMapper::mapTo);
+        return songRepository.findByPlaylistId(playListId, pageable).map(songMapper::toDto);
     }
 
     @Override
@@ -142,7 +143,7 @@ public class PlayListServiceImpl implements PlayListService {
                 String imagePath = fileService.updateFile(playListImage, playListEntity.getCoverImage(), "playListImages/");
                 playListEntity.setCoverImage(imagePath);
             }
-            return playListMapper.mapTo(playListRepository.save(playListEntity));
+            return playListMapper.toDto(playListRepository.save(playListEntity));
         } else {
             throw new CustomException(BusinessErrorCodes.PLAYLIST_MISMATCH);
         }
