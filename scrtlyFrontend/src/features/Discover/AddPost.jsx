@@ -7,6 +7,7 @@ import {createPost} from "../../Redux/Post/Action.js";
 import {useNavigate} from "react-router-dom";
 import toast from "react-hot-toast";
 import defaultAvatar from "../../assets/user.jpg";
+import {useGetCurrentUserQuery} from "../../Redux/services/authApi.js";
 
 
 
@@ -15,7 +16,9 @@ function AddPost() {
   const [descriptionText, setDescriptionText] = useState('')
   const [filePic, setFilePic] = useState(null)
   const [openEmoji, setOpenEmoji] = useState(false)
-  const { reqUser } = useSelector(state => state.auth);
+  const { data: reqUser } = useGetCurrentUserQuery(null, {
+    skip: !localStorage.getItem('isLoggedIn'),
+  });
   const navigate = useNavigate();
   const { loading, error } = useSelector(state => state.post);
 

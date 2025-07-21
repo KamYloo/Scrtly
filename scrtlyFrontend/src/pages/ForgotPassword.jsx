@@ -3,17 +3,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import logo from '../assets/logo.png';
 import { MdCancel } from 'react-icons/md';
 import '../Styles/Login&Register.css';
-import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
-import { forgotPasswordAction } from '../Redux/AuthService/Action.js';
+import {useForgotPasswordMutation} from "../Redux/services/authApi.js";
 
 function ForgotPassword() {
     const [email, setEmail] = useState('');
     const [errors, setErrors] = useState({});
-    const dispatch = useDispatch();
     const navigate = useNavigate();
-
-    const { loading } = useSelector(state => state.auth);
+    const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
 
     const handleChange = (e) => {
         setEmail(e.target.value);
@@ -38,11 +35,12 @@ function ForgotPassword() {
         }
 
         try {
-            await dispatch(forgotPasswordAction(email));
+            await forgotPassword(email).unwrap();
             toast.success("A password reset email has been sent.");
             navigate("/login");
-        } catch (error) {
-            toast.error("Failed to send reset email. Please try again.");
+        } catch (err) {
+            const msg = err?.data?.message || err?.error || 'Failed to send reset email. Please try again.';
+            toast.error(msg);
         }
     };
 
@@ -68,8 +66,8 @@ function ForgotPassword() {
                         />
                         {errors.email && <p className="error">{errors.email}</p>}
                     </div>
-                    <button type='submit' disabled={loading}>
-                        {loading ? "Sending..." : "Send Reset Email"}
+                    <button type='submit' disabled={isLoading}>
+                        {isLoading ? "Sending..." : "Send Reset Email"}
                     </button>
                     <div className="registerLink">
                         <p>

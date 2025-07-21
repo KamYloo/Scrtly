@@ -6,11 +6,15 @@ import {useNavigate} from "react-router-dom";
 import {deletePlayList, getUserPlayLists} from "../../Redux/PlayList/Action.js";
 import toast from "react-hot-toast";
 import Spinner from "../../Components/Spinner.jsx";
+import {useGetCurrentUserQuery} from "../../Redux/services/authApi.js";
 
 function MenuPlayList({setCreatePlayList, closeModals = () => {}}) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { playList, auth } = useSelector(state => state);
+    const { data: reqUser } = useGetCurrentUserQuery(null, {
+        skip: !localStorage.getItem('isLoggedIn'),
+    });
+    const { playList } = useSelector(state => state);
 
     const deletePlayListHandler = (playListId) => {
         const confirmDelete = window.confirm('Are you sure you want to delete this playList?');
@@ -25,10 +29,10 @@ function MenuPlayList({setCreatePlayList, closeModals = () => {}}) {
     }
 
     useEffect(() => {
-        if (auth?.reqUser) {
+        if (reqUser) {
             dispatch(getUserPlayLists());
         }
-    }, [dispatch, auth.reqUser]);
+    }, [dispatch, reqUser]);
 
     if (playList.loading) {
         return (

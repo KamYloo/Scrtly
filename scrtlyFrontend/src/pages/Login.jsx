@@ -1,64 +1,62 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import logo from '../assets/logo.png'
 import { FaUser, FaLock } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
 import '../Styles/Login&Register.css'
 import { Link, useNavigate } from 'react-router-dom'
-import { loginAction } from "../Redux/AuthService/Action.js";
-import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import {FcGoogle} from "react-icons/fc";
 import {BASE_API_URL} from "../Redux/api.js";
+import {useLoginMutation} from "../Redux/services/authApi.js";
 
 function Login() {
-    const [inputData, setInputData] = useState({ email: "", password: "" });
-    const [errors, setErrors] = useState({});
-    const dispatch = useDispatch();
+    const [formData, setFormData] = useState({ email: '', password: '' })
+    const [errors, setErrors] = useState({})
     const navigate = useNavigate();
 
-    const { loading, error, loginResponse } = useSelector(state => state.auth);
+    const [login, { isLoading }] =
+        useLoginMutation()
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setInputData(values => ({ ...values, [name]: value }));
-    };
+        const { name, value } = e.target
+        setFormData((f) => ({ ...f, [name]: value }))
+    }
 
     const validate = () => {
-        const newErrors = {};
-        if (!inputData.email) newErrors.email = "Email is required.";
-        else if (!/^\S+@\S+\.\S+$/.test(inputData.email)) newErrors.email = "Invalid email format.";
-        if (!inputData.password) newErrors.password = "Password is required.";
-        return newErrors;
-    };
+        const errs = {}
+        if (!formData.email) errs.email = 'Email is required.'
+        else if (!/^\S+@\S+\.\S+$/.test(formData.email))
+            errs.email = 'Invalid email format.'
+        if (!formData.password) errs.password = 'Password is required.'
+        return errs
+    }
 
-    const handleLogin = (e) => {
-        e.preventDefault();
-        const formErrors = validate();
-        if (Object.keys(formErrors).length === 0) {
-            dispatch(loginAction(inputData));
-        } else {
-            setErrors(formErrors);
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+        const v = validate()
+        if (Object.keys(v).length) {
+            setErrors(v)
+            return
         }
-    };
-
-    useEffect(() => {
-        if (error) {
-            toast.error(error);
+        try {
+            await login(formData).unwrap()
+            toast.success('You have logged in successfully.')
+            localStorage.setItem('isLoggedIn', '1')
+            navigate('/home')
+        } catch (err) {
+            const msg =
+                (err.data && (err.data.message || err.data.error)) ||
+                err.error ||
+                'Login failed';
+            toast.error(msg);
         }
-    }, [error]);
-
-    useEffect(() => {
-        if (loginResponse) {
-            toast.success("You have logged in successfully.");
-            navigate("/home");
-        }
-    }, [dispatch, loginResponse, navigate]);
+    }
 
     return (
         <div className='login'>
             <div className="formBox login">
                 <i className='cancel'><Link to="/"><MdCancel /></Link></i>
-                <form onSubmit={handleLogin}>
+                <form onSubmit={handleSubmit}>
                     <div className="title">
                         <img src={logo} alt="Logo"/>
                         <h1>Login</h1>
@@ -67,7 +65,7 @@ function Login() {
                         <input
                             type="email"
                             name="email"
-                            value={inputData.email}
+                            value={formData.email}
                             onChange={handleChange}
                             placeholder='Email address'
                             required
@@ -79,7 +77,7 @@ function Login() {
                         <input
                             type="password"
                             name="password"
-                            value={inputData.password}
+                            value={formData.password}
                             onChange={handleChange}
                             placeholder='Password'
                             required
@@ -88,8 +86,8 @@ function Login() {
                         {errors.password && <p className="error">{errors.password}</p>}
                     </div>
                     <div className="button-group">
-                        <button type='submit' disabled={loading} className="login-btn">
-                            {loading ? 'Logging in…' : 'Login'}
+                        <button type='submit' disabled={isLoading } className="login-btn">
+                            {isLoading  ? 'Logging in…' : 'Login'}
                         </button>
                         <button
                             type="button"

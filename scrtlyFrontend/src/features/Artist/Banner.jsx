@@ -4,16 +4,24 @@ import Verification from '../../assets/check.png'
 import { FaEllipsisH, FaHeadphones, FaCheck } from 'react-icons/fa'
 import {EditArtist} from "./EditArtist.jsx";
 import {CreateAlbum} from "../Album/CreateAlbum.jsx";
-import {useDispatch, useSelector} from "react-redux";
-import {followUser} from "../../Redux/AuthService/Action.js";
+import {useGetCurrentUserQuery} from "../../Redux/services/authApi.js";
+import {useFollowUserMutation} from "../../Redux/services/userApi.js";
 
 // eslint-disable-next-line react/prop-types
 function Banner({artist}) {
     const [menu, setMenu] = useState(false)
     const [editArtist, setEditArtist] = useState(false)
     const [createAlbum, setCreateAlbum] = useState(false)
-    const dispatch = useDispatch()
-    const { reqUser } = useSelector(state => state.auth);
+    const { data: reqUser } = useGetCurrentUserQuery(null, {
+        skip: !localStorage.getItem('isLoggedIn'),
+    });
+    const [followUser, { isLoading: isFollowing }] = useFollowUserMutation();
+
+    const handleFollow = async () => {
+        await followUser(artist.findArtist.id).unwrap();
+    };
+
+    const isOwner = artist.findArtist?.id === reqUser?.id;
 
     return (
         <div className='banner'>
@@ -21,7 +29,7 @@ function Banner({artist}) {
             <div className="content">
                 <div className="top">
                     <p>Home <span>/Popular Artist</span></p>
-                    {artist.findArtist?.id === reqUser?.id && <i onClick={() => setMenu(((prev) => !prev))}><FaEllipsisH/></i>}
+                    {isOwner && <i onClick={() => setMenu(((prev) => !prev))}><FaEllipsisH/></i>}
                     {menu && <ul className="list">
                         <li onClick={() => {
                         setEditArtist(((prev) => !prev))
@@ -47,8 +55,8 @@ function Banner({artist}) {
                         <p><i><FaHeadphones/></i> 12,132,5478 <span>Monthly listeners</span></p>
                     </div>
                     <div className="right">
-                        {!artist.findArtist?.id === reqUser?.id && <button className={artist.findArtist?.followed ? 'following' : 'follow'}
-                        onClick={() => dispatch(followUser(artist.findArtist?.id))}><i><FaCheck/></i>{artist.findArtist?.observed ? 'Following': 'Follow'}</button>}
+                        {!isOwner && <button className={artist.findArtist?.followed ? 'following' : 'follow'}
+                        onClick={handleFollow} disabled={isFollowing}><i><FaCheck/></i>{artist.findArtist?.observed ? 'Following': 'Follow'}</button>}
                     </div>
                 </div>
             </div>

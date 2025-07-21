@@ -1,21 +1,22 @@
 import React, {useEffect, useState} from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import {verifyArtistAction} from "../../Redux/UserService/Action.js";
 import toast from "react-hot-toast";
+import {useVerifyArtistMutation} from "../../Redux/services/userApi.js";
 
 
 function ArtistVerificationModal({ onClose }) {
     const [artistName, setArtistName] = useState('');
-    const dispatch = useDispatch();
-    const {error } = useSelector(state => state.userService);
+    const [verifyArtist, { isLoading, error }] = useVerifyArtistMutation();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        dispatch(verifyArtistAction(artistName))
-            .then(() => {
-                toast.success('Verification has been sent for review');
-                onClose();
-            })
+        try {
+            await verifyArtist(artistName).unwrap();
+            toast.success('Verification has been sent for review');
+            onClose();
+        } catch (err) {
+            const msg = err?.data?.message || err?.error || 'Verification request failed';
+            toast.error(msg);
+        }
     };
 
     useEffect(() => {
@@ -40,8 +41,10 @@ function ArtistVerificationModal({ onClose }) {
                         required
                     />
                 </div>
-                <button type="submit" className="submit">Send application</button>
-                <button type="button" className="submit" onClick={onClose} style={{ marginTop: '10px' }}>
+                <button type="submit" className="submit" disabled={isLoading}>
+                    {isLoading ? 'Sending…' : 'Send application'}
+                </button>
+                <button type="button" className="submit" onClick={onClose} style={{marginTop: '10px'}}>
                     Cancel
                 </button>
             </form>

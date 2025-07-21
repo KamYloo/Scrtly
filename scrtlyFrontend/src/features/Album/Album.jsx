@@ -8,12 +8,16 @@ import {deleteAlbum, getAlbum, getAlbumTracks} from "../../Redux/Album/Action.js
 import {AddSong} from "../Song/addSong.jsx";
 import Spinner from "../../Components/Spinner.jsx";
 import ErrorOverlay from "../../Components/ErrorOverlay.jsx";
+import {useGetCurrentUserQuery} from "../../Redux/services/authApi.js";
 
 // eslint-disable-next-line react/prop-types
 function Album({ volume, onTrackChange}) {
     const {albumId} = useParams()
+    const { data: reqUser } = useGetCurrentUserQuery(null, {
+        skip: !localStorage.getItem('isLoggedIn'),
+    });
     const dispatch = useDispatch()
-    const {album, auth} = useSelector(state => state)
+    const {album} = useSelector(state => state)
     const [addSong, setAddSong] = useState(false)
     const navigate = useNavigate()
 
@@ -67,7 +71,7 @@ function Album({ volume, onTrackChange}) {
                     <h1 className='albumName'>{album.findAlbum?.title}</h1>
                     <p className='stats'>{album.findAlbum?.artist.pseudonym} • {album.findAlbum?.tracksCount} Songs <span>• {album.findAlbum?.releaseDate} • {formatTime(album.findAlbum?.totalDuration)}</span> </p>
                 </div>
-                {album.findAlbum?.artist.id === auth.reqUser?.id && (
+                {album.findAlbum?.artist.id === reqUser?.id && (
                 <div className="buttons">
                     <button className="addSongBtn" onClick={() =>
                         setAddSong(((prev) => !prev))}>Add Song</button>
@@ -76,7 +80,7 @@ function Album({ volume, onTrackChange}) {
                 </div>)}
 
             </div>
-            <AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={album?.songs} req_artist={album.findAlbum?.artist.id === auth.reqUser?.id}  isplayListSongs={false}/>
+            <AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={album?.songs} req_artist={album.findAlbum?.artist.id === reqUser?.id}  isplayListSongs={false}/>
             {addSong && <AddSong onClose={() => setAddSong(((prev) => !prev))} albumId={albumId} />}
         </div>
     )

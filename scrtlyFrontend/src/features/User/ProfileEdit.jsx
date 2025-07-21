@@ -1,43 +1,28 @@
 import React, {useEffect, useState} from 'react'
 import "../../Styles/Profile.css"
-import {useDispatch, useSelector} from "react-redux";
-import {updateUser} from "../../Redux/AuthService/Action.js";
 import {useNavigate} from "react-router-dom";
 import toast from "react-hot-toast";
+import {useGetCurrentUserQuery} from "../../Redux/services/authApi.js";
+import {useUpdateUserMutation} from "../../Redux/services/userApi.js";
 
 function ProfileEdit() {
-  const dispatch = useDispatch()
-  const { loading, reqUser, error } = useSelector(state => state.auth);
+  const { data: reqUser } = useGetCurrentUserQuery(null, {
+    skip: !localStorage.getItem('isLoggedIn'),
+  });
+  const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
   const [fullName, setFullName] = useState(reqUser?.fullName || "")
   const [description, setDescription] = useState(reqUser?.description || "")
   const [profilePicture, setProfilePicture] = useState(null)
   const [preview, setPreview] = useState(reqUser?.profilePicture ? reqUser.profilePicture : '');
   const navigate = useNavigate()
 
-  const handleFileChange = (e) => {
-    setProfilePicture(e.target.files[0])
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const formData = new FormData();
-    const jsonBlob = new Blob([JSON.stringify({ fullName, description })], {
-      type: 'application/json',
-    });
-    formData.append('userDetails', jsonBlob);
-    if (profilePicture) {
-      formData.append("profilePicture", profilePicture);
+  useEffect(() => {
+    if (reqUser) {
+      setFullName(reqUser.fullName);
+      setDescription(reqUser.description || '');
+      setPreview(reqUser.profilePicture || '');
     }
-
-    dispatch(updateUser(formData))
-        .then(() => {
-          toast.success('User updated successfully.');
-          navigate(`/profile/${reqUser?.nickName}?reload=true`);
-        })
-        .catch(() => {
-          toast.error(error);
-        });
-  };
+  }, [reqUser]);
 
   useEffect(() => {
     if (profilePicture) {
@@ -48,6 +33,32 @@ function ProfileEdit() {
       }
     }
   }, [profilePicture])
+
+  const handleFileChange = (e) => {
+    setProfilePicture(e.target.files[0])
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData();
+    const jsonBlob = new Blob([JSON.stringify({ fullName, description })], {
+      type: 'application/json',
+    });
+    formData.append('userDetails', jsonBlob);
+    if (profilePicture) {
+      formData.append("profilePicture", profilePicture);
+    }
+
+    try {
+      const result = await updateUser(formData).unwrap();
+      toast.success('Profile updated successfully.');
+      navigate(`/profile/${result.nickName}`);
+    } catch (err) {
+      toast.error(
+          err?.data?.message || err?.error || 'Failed to update profile.'
+      );
+    }
+  };
 
   return (
     <div className='profileEdit'>
@@ -77,8 +88,8 @@ function ProfileEdit() {
               <h4>Description</h4>
               <textarea value={description} onChange={(e) => setDescription(e.target.value)}></textarea>
             </div>
-            <button type="submit" className='submit' disabled={loading}>
-              {loading ? "Editing..." : "Send"}
+            <button type="submit" className='submit' disabled={isUpdating}>
+              {isUpdating ? "Editing..." : "Send"}
             </button>
           </form>
 

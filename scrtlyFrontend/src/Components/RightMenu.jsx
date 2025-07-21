@@ -3,18 +3,19 @@ import { useNavigate } from "react-router-dom";
 import "../Styles/RightMenu.css";
 import { FaBell, FaCogs, FaCrown, FaRegHeart, FaSun } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { logoutAction } from "../Redux/AuthService/Action.js";
 import { NotificationsList } from "../features/Notification/NotificationsList.jsx";
 import toast from "react-hot-toast";
 import { getNotifications } from "../Redux/NotificationService/Action.js";
 import defaultAvatar from "../assets/user.jpg";
 import {SubscribeButton} from "../features/Payment/SubscribeButton.jsx";
+import {useGetCurrentUserQuery, useLogoutMutation} from "../Redux/services/authApi.js";
 
 function RightMenu() {
   const [openNotifications, setOpenNotifications] = useState(false);
   const dispatch = useDispatch();
   const base = window.location.origin;
-  const { logoutResponse, error, reqUser } = useSelector((state) => state.auth);
+  const [logout] = useLogoutMutation();
+  const { data: currentUser } = useGetCurrentUserQuery(null, { skip: !localStorage.getItem('isLoggedIn') });
   const notifications = useSelector(
     (state) => state.notifications.notifications
   );
@@ -22,41 +23,35 @@ function RightMenu() {
 
   const unseenCount = notifications.filter((notif) => !notif.seen).length;
 
-  const handleLogout = () => {
-    dispatch(logoutAction());
+  const handleLogout = async () => {
+    try {
+      await logout().unwrap();
+      toast.success("Logged out successfully");
+      navigate("/login");
+    } catch (err) {
+      toast.error(err?.data?.message || "Logout failed");
+    }
   };
 
+
   const handleProfileClick = () => {
-    if (reqUser) {
-      navigate(`/profile/${reqUser?.nickName}`);
+    if (currentUser) {
+      navigate(`/profile/${currentUser?.nickName}`);
     } else {
       navigate("/login");
     }
   };
 
   useEffect(() => {
-    if (reqUser)
+    if (currentUser)
       dispatch(getNotifications());
   }, []);
-
-  useEffect(() => {
-    if (logoutResponse) {
-      toast.success(logoutResponse);
-      navigate("/login");
-    }
-  }, [dispatch, logoutResponse, navigate]);
-
-  useEffect(() => {
-    if (error) {
-      toast.error(error);
-    }
-  }, [error]);
 
   return (
     <div className="rightMenu">
       {openNotifications && <NotificationsList notifications={notifications} />}
       <div className="top">
-        {!reqUser?.premium ? (
+        {!currentUser?.premium ? (
                 <SubscribeButton
                     successUrl={`${base}/success`}
                     cancelUrl={`${base}/cancel`}
@@ -88,14 +83,14 @@ function RightMenu() {
         </i>
         <div className="profileImg" onClick={handleProfileClick}>
           <img
-              src={reqUser?.profilePicture || defaultAvatar}
+              src={currentUser?.profilePicture || defaultAvatar}
               alt="Profilowe"
               onError={e => {
                 e.currentTarget.src = defaultAvatar;
               }}
           />
         </div>
-        {reqUser ? (
+        {currentUser ? (
             <p className="loginBtn" onClick={handleLogout}>
               Logout
             </p>

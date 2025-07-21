@@ -8,10 +8,14 @@ import { useNavigate } from "react-router-dom";
 import Spinner from "../../Components/Spinner.jsx";
 import defaultAvatar from "../../assets/user.jpg";
 import toast from "react-hot-toast";
+import {useGetCurrentUserQuery} from "../../Redux/services/authApi.js";
 
 
 function Comments({ post }) {
-    const { comment, auth } = useSelector(store => store)
+    const { data: reqUser } = useGetCurrentUserQuery(null, {
+        skip: !localStorage.getItem('isLoggedIn'),
+    });
+    const { comment } = useSelector(store => store)
     const dispatch = useDispatch()
     const navigate = useNavigate();
 
@@ -152,7 +156,7 @@ function Comments({ post }) {
                                 <i onClick={() => likeCommentHandler(item.id)}>
                                     {item.likedByUser ? <AiFillLike /> : <AiOutlineLike />}
                                 </i>
-                                {item.user?.nickName === auth.reqUser?.nickName && (
+                                {item.user?.nickName === reqUser?.nickName && (
                                     <i onClick={() => handleDeleteComment(item.id)} style={{ marginLeft: '10px' }}>
                                         <AiOutlineDelete />
                                     </i>
@@ -182,7 +186,7 @@ function Comments({ post }) {
                                             <i onClick={() => likeCommentHandler(reply.id)}>
                                                 {reply.likedByUser ? <AiFillLike /> : <AiOutlineLike />}
                                             </i>
-                                            {reply.user?.nickName === auth.reqUser?.nickName && (
+                                            {reply.user?.nickName === reqUser?.nickName && (
                                                 <i onClick={() => handleDeleteComment(reply.id)} style={{ marginLeft: '10px' }}>
                                                     <AiOutlineDelete />
                                                 </i>

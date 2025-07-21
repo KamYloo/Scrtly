@@ -12,13 +12,17 @@ import { Fans } from './Fans.jsx'
 import { AboutArtist } from './AboutArtist.jsx'
 import Spinner from '../../Components/Spinner.jsx'
 import ErrorOverlay from '../../Components/ErrorOverlay.jsx'
+import {useGetCurrentUserQuery} from "../../Redux/services/authApi.js";
 
 function Artist({ volume, onTrackChange }) {
   const { artistId } = useParams()
   const location = useLocation()
   const playSongId = location.state?.playSongId;
+  const { data: reqUser } = useGetCurrentUserQuery(null, {
+    skip: !localStorage.getItem('isLoggedIn'),
+  });
   const dispatch = useDispatch()
-  const { artist, song, auth } = useSelector(state => state)
+  const { artist, song } = useSelector(state => state)
 
   useEffect(() => {
     dispatch(findArtistById(artistId))
@@ -79,9 +83,9 @@ function Artist({ volume, onTrackChange }) {
         </div>
 
         <Routes>
-          <Route path="popular" element={<AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={artist?.songs.content} req_artist={artist.findArtist?.id === auth.reqUser?.id} initialSongId={playSongId}/>}/>
+          <Route path="popular" element={<AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={artist?.songs.content} req_artist={artist.findArtist?.id === reqUser?.id} initialSongId={playSongId}/>}/>
           <Route path="albums" element={<ArtistAlbums artistId={artistId} />} />
-          <Route path="songs" element={<AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={artist?.songs.content} req_artist={artist.findArtist?.id === auth.reqUser?.id}/>}/>
+          <Route path="songs" element={<AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={artist?.songs.content} req_artist={artist.findArtist?.id === reqUser?.id}/>}/>
           <Route path="fans" element={<Fans artistId={artistId} fans={artist.findArtist?.fans} />}/>
           <Route path="about" element={<AboutArtist artist={artist} artistBio={artist.findArtist?.artistBio} />}/>
         </Routes>

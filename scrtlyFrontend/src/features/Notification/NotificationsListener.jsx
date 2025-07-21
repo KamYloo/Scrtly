@@ -1,13 +1,16 @@
 import { useEffect } from "react";
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch} from "react-redux";
 
 import {sendNotification} from "../../Redux/NotificationService/Action.js";
 import {connectWebSocket} from "../../utils/websocketClient.js";
+import {useGetCurrentUserQuery} from "../../Redux/services/authApi.js";
 
 
 const NotificationsListener = () => {
     const dispatch = useDispatch();
-    const { reqUser } = useSelector(state => state.auth);
+    const { data: reqUser } = useGetCurrentUserQuery(null, {
+        skip: !localStorage.getItem('isLoggedIn'),
+    });
 
     useEffect(() => {
         if (reqUser) {

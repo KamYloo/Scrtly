@@ -120,7 +120,7 @@ public class AuthController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/reset-password/{userId}/{token}")
+    @PostMapping("/change-password/{userId}/{token}")
     public ResponseEntity<?> reset_password(
             @PathVariable Long userId,
             @PathVariable String token,

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from "react-redux";
-import { searchUser } from "../../Redux/AuthService/Action.js";
+import { useDispatch } from "react-redux";
 import { createChat } from "../../Redux/Chat/Action.js";
 import { MdCancel } from "react-icons/md";
 import defaultAvatar from "../../assets/user.jpg";
+import {useSearchUserQuery} from "../../Redux/services/userApi.js";
 
 
 function AddUser({ onClose }) {
@@ -11,22 +11,10 @@ function AddUser({ onClose }) {
     const [selectedUsers, setSelectedUsers] = useState([]);
     const [groupName, setGroupName] = useState('');
     const dispatch = useDispatch();
-    const { auth } = useSelector(store => store);
-
-    const handleSearch = (e) => {
-        e.preventDefault();
-        if (keyword.trim() !== '') {
-            dispatch(searchUser({ keyword }));
-        }
-    };
-
-    const toggleUserSelection = (user) => {
-        if (selectedUsers.find(u => u.id === user.id)) {
-            setSelectedUsers(selectedUsers.filter(u => u.id !== user.id));
-        } else {
-            setSelectedUsers([...selectedUsers, user]);
-        }
-    };
+    const { data: searchResults = [], isFetching, isError } = useSearchUserQuery(
+        { keyword },
+        { skip: keyword.trim() === '' }
+    );
 
     const handleCreateChat = () => {
         if (selectedUsers.length === 0) return;
@@ -39,35 +27,45 @@ function AddUser({ onClose }) {
         onClose();
     };
 
+    const toggleUserSelection = (user) => {
+        if (selectedUsers.find(u => u.id === user.id)) {
+            setSelectedUsers(selectedUsers.filter(u => u.id !== user.id));
+        } else {
+            setSelectedUsers([...selectedUsers, user]);
+        }
+    };
+
     return (
         <div className='addUser'>
-            <i className='cancel' onClick={onClose}><MdCancel /></i>
-            <form onSubmit={handleSearch}>
+            <i className='cancel' onClick={onClose}><MdCancel/></i>
+            <form onSubmit={e => e.preventDefault()}>
                 <input
                     type="text"
                     placeholder='Username...'
+                    value={keyword}
                     onChange={(e) => setKeyword(e.target.value)}
                 />
-                <button type="submit" className="styledButton">Search</button>
+                <button type="submit" className="styledButton" disabled={isFetching}>Search</button>
             </form>
-            {auth.searchResults && auth.searchResults.length > 0 ? (
-                <div className="userList">
-                    {auth.searchResults.map((user) => (
-                        <div
-                            key={user.id}
-                            className={`user ${selectedUsers.find(u => u.id === user.id) ? 'selected' : ''}`}
-                            onClick={() => toggleUserSelection(user)}
-                        >
-                            <div className="detail">
-                                <img src={user?.profilePicture || defaultAvatar} alt={user.fullName} />
-                                <span>{user.fullName}</span>
-                            </div>
+
+            {isError && <p>Error fetching users.</p>}
+            {!isFetching && searchResults.length === 0 && keyword.trim() !== '' && <p>No users found</p>}
+
+            <div className='userList'>
+                {searchResults.map(user => (
+                    <div
+                        key={user.id}
+                        className={`user ${selectedUsers.find(u => u.id === user.id) ? 'selected' : ''}`}
+                        onClick={() => toggleUserSelection(user)}
+                    >
+                        <div className='detail'>
+                            <img src={user.profilePicture || defaultAvatar} alt={user.fullName}/>
+                            <span>{user.fullName}</span>
                         </div>
-                    ))}
-                </div>
-            ) : (
-                <p>No users found</p>
-            )}
+                    </div>
+                ))}
+            </div>
+
             {selectedUsers.length > 1 && (
                 <div className="groupNameInput">
                     <input
@@ -81,7 +79,12 @@ function AddUser({ onClose }) {
             <button
                 onClick={handleCreateChat}
                 className="styledButton"
-                style={{ marginTop: selectedUsers.length === 1 ? '40px' : '20px', display: 'block', marginLeft: 'auto', marginRight: 'auto' }}
+                style={{
+                    marginTop: selectedUsers.length === 1 ? '40px' : '20px',
+                    display: 'block',
+                    marginLeft: 'auto',
+                    marginRight: 'auto'
+                }}
             >
                 Create Chat
             </button>
@@ -89,4 +92,4 @@ function AddUser({ onClose }) {
     );
 }
 
-export { AddUser };
+export {AddUser};

@@ -5,6 +5,7 @@ import {AddStory} from "./AddStory.jsx";
 import {StoryViewer} from "./StoryViewer.jsx";
 import {getFollowedUsersStory} from "../../Redux/Story/Action.js";
 import defaultAvatar from "../../assets/user.jpg";
+import {useGetCurrentUserQuery} from "../../Redux/services/authApi.js";
 
 
 function Stories() {
@@ -13,8 +14,10 @@ function Stories() {
   const [showViewer, setShowViewer] = useState(false);
   const [currentUserIndex, setCurrentUserIndex] = useState(0);
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
+    const { data: reqUser } = useGetCurrentUserQuery(null, {
+        skip: !localStorage.getItem('isLoggedIn'),
+    });
   const dispatch = useDispatch()
-  const { reqUser } = useSelector(state => state.auth);
   const {story} = useSelector(store => store);
 
     const handleScrollLeft = () => {

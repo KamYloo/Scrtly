@@ -4,17 +4,20 @@ import { MdDeleteSweep } from "react-icons/md";
 import { BsPlus } from "react-icons/bs";
 import { FaMinus } from "react-icons/fa";
 import { AddUser } from './AddUser.jsx';
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch} from "react-redux";
 import { deleteChat } from "../../Redux/Chat/Action.js";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import defaultAvatar from "../../assets/user.jpg";
+import {useGetCurrentUserQuery} from "../../Redux/services/authApi.js";
 
 
 function ChatUsersList({ chat, onChatSelect }) {
     const [addMode, setAddMode] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const { reqUser } = useSelector(state => state.auth);
+    const { data: reqUser } = useGetCurrentUserQuery(null, {
+        skip: !localStorage.getItem('isLoggedIn'),
+    });
     const dispatch = useDispatch();
     const navigate = useNavigate();
 

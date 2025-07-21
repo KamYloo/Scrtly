@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { EditPost } from "./EditPost.jsx";
 import Spinner from "../../Components/Spinner.jsx";
 import defaultAvatar from "../../assets/user.jpg";
+import {useGetCurrentUserQuery} from "../../Redux/services/authApi.js";
 
 function Feed() {
   const [selectedPost, setSelectedPost] = useState(false);
@@ -22,9 +23,11 @@ function Feed() {
   const [minLikesFilter, setMinLikesFilter] = useState('');
   const [maxLikesFilter, setMaxLikesFilter] = useState('');
   const [sortOrder, setSortOrder] = useState('date-desc');
-
+  const { data: reqUser } = useGetCurrentUserQuery(null, {
+    skip: !localStorage.getItem('isLoggedIn'),
+  });
   const dispatch = useDispatch();
-  const { post, auth } = useSelector(store => store);
+  const { post } = useSelector(store => store);
   const navigate = useNavigate();
 
   const handleProfileClick = (nickName) => {
@@ -148,7 +151,7 @@ function Feed() {
                 <p>{item.user.fullName}</p>
                 <span>{formatTimeAgo(item.creationDate)}</span>
               </div>
-              {auth.reqUser && auth.reqUser?.id === item.user.id && (
+              {reqUser && reqUser?.id === item.user.id && (
                 <>
                   <i onClick={() => handleMenuToggle(item.id)}><FaEllipsisH /></i>
                   {menuPost === item.id && (

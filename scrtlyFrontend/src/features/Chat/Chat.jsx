@@ -1,4 +1,3 @@
-// Chat.jsx
 import React, { useEffect, useRef, useState } from 'react';
 import EmojiPicker from 'emoji-picker-react';
 import { FaPhoneAlt, FaInfoCircle, FaImage, FaCamera, FaMicrophone } from "react-icons/fa";
@@ -11,6 +10,7 @@ import SockJS from "sockjs-client/dist/sockjs";
 import { useNavigate } from "react-router-dom";
 import defaultAvatar from "../../assets/user.jpg";
 import {BASE_API_URL} from "../../Redux/api.js";
+import {useGetCurrentUserQuery} from "../../Redux/services/authApi.js";
 
 function Chat({ chat, onBack }) {
     const [open, setOpen] = useState(false);
@@ -18,7 +18,10 @@ function Chat({ chat, onBack }) {
     const [stompClient, setStompClient] = useState(null);
     const [editingMessageId, setEditingMessageId] = useState(null);
     const [editingMessageText, setEditingMessageText] = useState("");
-    const { chatMessage, auth } = useSelector(store => store);
+    const { data: reqUser } = useGetCurrentUserQuery(null, {
+        skip: !localStorage.getItem('isLoggedIn'),
+    });
+    const { chatMessage } = useSelector(store => store);
     const messagesEndRef = useRef(null);
     const messagesContainerRef = useRef(null);
     const prevScrollHeightRef = useRef(0);
@@ -135,7 +138,7 @@ function Chat({ chat, onBack }) {
         }
     };
 
-    const otherPerson = chat.participants.find(user => user.id !== auth.reqUser?.id);
+    const otherPerson = chat.participants.find(user => user.id !== reqUser?.id);
     return (
         <div className='chat'>
             <div className="top">
@@ -171,7 +174,7 @@ function Chat({ chat, onBack }) {
             <div className="center" ref={messagesContainerRef} onScroll={handleScroll}>
                 {chatMessage.messages?.map((item, index) => (
                     <div
-                        className={item.user.id === auth.reqUser?.id ? "messageOwn" : "message"}
+                        className={item.user.id === reqUser?.id ? "messageOwn" : "message"}
                         key={`${item.id}-${index}`}
                     >
                         <img
@@ -196,7 +199,7 @@ function Chat({ chat, onBack }) {
                             </p>
                             <div className="info">
                                 <span>{item.lastModifiedDate ? formatTimeAgo(item.lastModifiedDate) : formatTimeAgo(item.createDate)}</span>
-                                {item.user.id === auth.reqUser?.id && (
+                                {item.user.id === reqUser?.id && (
                                     <>
                                         {editingMessageId === item.id ? (
                                             <>
