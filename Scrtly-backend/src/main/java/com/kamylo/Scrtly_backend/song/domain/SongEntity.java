@@ -2,6 +2,7 @@ package com.kamylo.Scrtly_backend.song.domain;
 
 import com.kamylo.Scrtly_backend.album.domain.AlbumEntity;
 import com.kamylo.Scrtly_backend.artist.domain.ArtistEntity;
+import com.kamylo.Scrtly_backend.like.domain.SongLikeEntity;
 import com.kamylo.Scrtly_backend.playList.domain.PlayListEntity;
 import com.kamylo.Scrtly_backend.user.domain.UserEntity;
 import jakarta.persistence.*;
@@ -60,6 +61,13 @@ public class SongEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "artist_id", nullable = false)
     private ArtistEntity artist;
+
+    @OneToMany(
+            mappedBy = "song",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true
+    )
+    private Set<SongLikeEntity> likes = new HashSet<>();
 
     @ManyToMany(mappedBy = "songs", fetch = FetchType.LAZY)
     private Set<PlayListEntity> playlists = new HashSet<>();

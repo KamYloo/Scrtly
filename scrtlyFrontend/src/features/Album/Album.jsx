@@ -1,14 +1,13 @@
-import React, {useEffect, useState} from 'react'
+import React, {useState} from 'react'
 import toast from 'react-hot-toast';
 import "../../Styles/Album&&PlayList.css"
 import { AudioList } from '../Song/AudioList.jsx'
 import {useNavigate, useParams} from "react-router-dom";
-import {useDispatch, useSelector} from "react-redux";
-import {deleteAlbum, getAlbum, getAlbumTracks} from "../../Redux/Album/Action.js";
 import {AddSong} from "../Song/addSong.jsx";
 import Spinner from "../../Components/Spinner.jsx";
 import ErrorOverlay from "../../Components/ErrorOverlay.jsx";
 import {useGetCurrentUserQuery} from "../../Redux/services/authApi.js";
+import {useDeleteAlbumMutation, useGetAlbumQuery, useGetAlbumTracksQuery} from "../../Redux/services/albumApi.js";
 
 // eslint-disable-next-line react/prop-types
 function Album({ volume, onTrackChange}) {
@@ -16,20 +15,35 @@ function Album({ volume, onTrackChange}) {
     const { data: reqUser } = useGetCurrentUserQuery(null, {
         skip: !localStorage.getItem('isLoggedIn'),
     });
-    const dispatch = useDispatch()
-    const {album} = useSelector(state => state)
     const [addSong, setAddSong] = useState(false)
     const navigate = useNavigate()
+    const {
+        data: albumData,
+        isLoading: isAlbumLoading,
+        isError: isAlbumError,
+        error: albumError,
+    } = useGetAlbumQuery(albumId)
 
-    const albumDeleteHandler = () => {
-        const confirmDelete = window.confirm('Are you sure you want to delete this album?');
-        if (confirmDelete) {
-            dispatch(deleteAlbum(albumId)).then(() => {
-                toast.success('Album deleted successfully.');
-                navigate("/albums");
-            }).catch(() => {
-                toast.error('Failed to delete album. Please try again.');
-            });
+    const {
+        data: tracks = [],
+        isLoading: isTracksLoading,
+        isError: isTracksError,
+        error: tracksError,
+    } = useGetAlbumTracksQuery(albumId)
+    const [deleteAlbum, { isLoading: isDeleting }] = useDeleteAlbumMutation()
+
+    const handleDelete = async () => {
+        if (!window.confirm('Are you sure you want to delete this album?')) return
+        try {
+            await deleteAlbum(albumId).unwrap()
+            toast.success('Album deleted successfully.')
+            navigate('/albums')
+        } catch (err) {
+            const msg =
+                (err.data && (err.data.message || err.data.error)) ||
+                err.error ||
+                'Failed to delete album. Please try again.';
+            toast.error(msg);
         }
     };
 
@@ -46,44 +60,38 @@ function Album({ volume, onTrackChange}) {
     }
 
 
-    useEffect(() => {
-        dispatch(getAlbum(albumId))
-    }, [albumId, dispatch, album.uploadSong, album.deletedSong]);
-
-    useEffect(() => {
-        dispatch(getAlbumTracks(albumId))
-    }, [albumId, dispatch]);
-
-
-    if (album.loading) {
+    if (isAlbumLoading || isTracksLoading) {
         return <Spinner />;
     }
-    if (album.error) {
-        return <ErrorOverlay message={album.error} />;
+    if (isAlbumError || isTracksError) {
+        const message = albumError?.status
+            ? `Error ${albumError.status}: ${albumError.error}`
+            : tracksError?.status
+                ? `Error ${tracksError.status}: ${tracksError.error}`
+                : 'Unknown error'
+        return <ErrorOverlay error={message} />
     }
-
+    const { title, albumImage, artist, tracksCount, releaseDate, totalDuration } = albumData
     return (
         <div className='albumDetail'>
             <div className="topSection">
-                <img src={album.findAlbum?.albumImage || ''} alt="" />
+                <img src={albumImage || ''} alt="" />
                 <div className="albumData">
                     <p>Album</p>
-                    <h1 className='albumName'>{album.findAlbum?.title}</h1>
-                    <p className='stats'>{album.findAlbum?.artist.pseudonym} • {album.findAlbum?.tracksCount} Songs <span>• {album.findAlbum?.releaseDate} • {formatTime(album.findAlbum?.totalDuration)}</span> </p>
+                    <h1 className='albumName'>{title}</h1>
+                    <p className='stats'>{artist.pseudonym} • {tracksCount} Songs <span>• {releaseDate} • {formatTime(totalDuration)}</span> </p>
                 </div>
-                {album.findAlbum?.artist.id === reqUser?.id && (
+                {artist.id === reqUser?.id && (
                 <div className="buttons">
                     <button className="addSongBtn" onClick={() =>
                         setAddSong(((prev) => !prev))}>Add Song</button>
-                    <button className="deleteAlbumBtn" onClick={() => albumDeleteHandler()
-                    }>Delete Album</button>
+                    <button className="deleteAlbumBtn" onClick={handleDelete}  disabled={isDeleting} > {isDeleting ? 'Deleting…' : 'Delete Album'}</button>
                 </div>)}
 
             </div>
-            <AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={album?.songs} req_artist={album.findAlbum?.artist.id === reqUser?.id}  isplayListSongs={false}/>
+            <AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={tracks} req_artist={artist.id === reqUser?.id}  isplayListSongs={false}/>
             {addSong && <AddSong onClose={() => setAddSong(((prev) => !prev))} albumId={albumId} />}
         </div>
     )
 }
-
 export { Album }

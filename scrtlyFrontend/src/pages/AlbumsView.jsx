@@ -1,33 +1,28 @@
-import React, {useEffect, useState} from 'react'
+import React, {useState} from 'react'
 import "../Styles/AlbumsView&&ArtistsView.css"
 import AlbumBanner from '../assets/albumBanner.png'
 import { BiSearchAlt } from "react-icons/bi";
 import { FaCirclePlay } from "react-icons/fa6";
-import {useDispatch, useSelector} from "react-redux";
-import {getAllAlbums} from "../Redux/Album/Action.js";
 import {useNavigate} from "react-router-dom";
 import Spinner from "../Components/Spinner.jsx";
 import ErrorOverlay from "../Components/ErrorOverlay.jsx";
+import {useGetAllAlbumsQuery} from "../Redux/services/albumApi.js";
 
 function AlbumsView() {
-    const dispatch = useDispatch()
-    const {album} = useSelector(state => state);
+    const { data, error, isLoading } = useGetAllAlbumsQuery()
+    const albums = data?.content ?? []
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
 
-    const filteredAlbums = album?.albums.content.filter(albumItem =>
+    const filteredAlbums = albums.filter(albumItem =>
         albumItem.title.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    useEffect(() => {
-        dispatch(getAllAlbums())
-    }, [dispatch])
-
-    if (album.loading) {
+    if (isLoading) {
         return <Spinner />;
     }
-    if (album.error) {
-        return <ErrorOverlay message={album.error} />;
+    if (error) {
+        return <ErrorOverlay error={error} />
     }
 
     return (

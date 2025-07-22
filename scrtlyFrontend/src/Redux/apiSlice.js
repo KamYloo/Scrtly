@@ -10,7 +10,7 @@ const baseQueryWithReauth = async (args, api, options) => {
 
     if (result.error?.status === 401) {
         const refreshResult = await baseQuery(
-            { url: '/auth/refresh', method: 'POST' },
+            { url: '/auth/refresh', method: 'POST', responseHandler: 'text' },
             api,
             options
         );
@@ -29,7 +29,7 @@ const baseQueryWithReauth = async (args, api, options) => {
 export const apiSlice  = createApi({
     reducerPath: 'api',
     baseQuery: baseQueryWithReauth,
-    tagTypes: ['Album','Artist','Song', 'User', 'Auth'],
+    tagTypes: ['Album', 'Track', 'Artist', 'Song', 'User', 'Auth'],
     endpoints: () => ({}),
 });
 

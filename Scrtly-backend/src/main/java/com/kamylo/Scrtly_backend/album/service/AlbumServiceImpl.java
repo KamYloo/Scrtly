@@ -4,6 +4,7 @@ import com.kamylo.Scrtly_backend.album.mapper.AlbumMapper;
 import com.kamylo.Scrtly_backend.album.web.dto.AlbumDto;
 import com.kamylo.Scrtly_backend.common.service.FileService;
 import com.kamylo.Scrtly_backend.song.mapper.SongMapper;
+import com.kamylo.Scrtly_backend.song.service.HlsService;
 import com.kamylo.Scrtly_backend.song.web.dto.SongDto;
 import com.kamylo.Scrtly_backend.album.domain.AlbumEntity;
 import com.kamylo.Scrtly_backend.artist.domain.ArtistEntity;
@@ -38,6 +39,7 @@ public class AlbumServiceImpl implements AlbumService {
     private final AlbumMapper albumMapper;
     private final SongMapper songMapper;
     private final SongRepository songRepository;
+    private final HlsService hlsService;
 
     @Override
     @Transactional
@@ -117,6 +119,7 @@ public class AlbumServiceImpl implements AlbumService {
         albumEntity.getSongs().forEach(song -> {
             fileService.deleteFile(song.getTrack());
             fileService.deleteFile(song.getImageSong());
+            hlsService.deleteHlsFolder(song.getId());
         });
         fileService.deleteFile(albumEntity.getCoverImage());
         albumRepository.deleteById(albumId);
