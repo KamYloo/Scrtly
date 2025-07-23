@@ -389,6 +389,15 @@
     transition: box-shadow 0.3s;
 }
 
+.songs.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.songs.disabled .songName {
+    color: #999;
+}
+
 @media screen and (max-width : 748px) {
     .mainBox {
         min-width: 380px;

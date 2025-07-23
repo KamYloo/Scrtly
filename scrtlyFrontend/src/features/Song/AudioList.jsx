@@ -88,9 +88,15 @@ function AudioList({ volume, onTrackChange, initialSongs, req_artist, isplayList
             <div className='songsBox'>
                 {initialSongs?.map((songItem, index) => (
                     <div
-                        className={`songs ${index === currentIndex ? 'playing' : ''}`}
+                        className={
+                            `songs ${index === currentIndex ? 'playing' : ''}` +
+                            ( !songItem.hlsManifestUrl ? ' disabled' : '' )
+                        }
                         key={songItem?.id}
-                        onClick={() => setMainSong(index)}
+                        onClick={() => {
+                            if (!songItem.hlsManifestUrl) return;
+                            setMainSong(index);
+                        }}
                     >
                         <div className='count'>#{index + 1}</div>
                         <div className='song'>

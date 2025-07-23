@@ -5,7 +5,6 @@ import com.kamylo.Scrtly_backend.common.handler.CustomException;
 import com.kamylo.Scrtly_backend.song.service.HlsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 
@@ -17,7 +16,6 @@ import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
@@ -38,56 +36,60 @@ public class HlsServiceImpl implements HlsService {
         AUDIO_RATES.put("64k",  64_000);
     }
 
-    @Async("hlsExecutor")
     @Override
-    public CompletableFuture<String> generateHls(String inputFilePath, Long songId) {
-        Path baseDir = Paths.get(hlsBasePath, songId.toString());
+    public String generateHls(String inputFilePath, Long songId) {
         try {
-            if (!Files.exists(Paths.get(inputFilePath))) {
-                throw new CustomException(BusinessErrorCodes.HLS_GENERATION_FAILED);
-            }
-            Files.createDirectories(baseDir);
-
-            for (String rate : AUDIO_RATES.keySet()) {
-                Path rateDir = baseDir.resolve(rate);
-                Files.createDirectories(rateDir);
-
-                List<String> cmd = List.of(
-                        "ffmpeg",
-                        "-i", inputFilePath,
-                        "-vn",
-                        "-c:a", "aac",
-                        "-b:a", rate,
-                        "-f", "hls",
-                        "-hls_time", "10",
-                        "-hls_list_size", "0",
-                        "-hls_segment_filename", rateDir.resolve("seg_%03d.ts").toString(),
-                        rateDir.resolve("prog.m3u8").toString()
-                );
-
-                ProcessBuilder pb = new ProcessBuilder(cmd);
-                pb.inheritIO();
-                Process p = pb.start();
-                int exit = p.waitFor();
-                if (exit != 0) {
-                    throw new CustomException(BusinessErrorCodes.HLS_GENERATION_FAILED);
-                }
-            }
-
-            String fullManifest = createMasterManifest(AUDIO_RATES);
-            Files.writeString(baseDir.resolve("premium.m3u8"), fullManifest);
-
-            LinkedHashMap<String,Integer> freeRates = new LinkedHashMap<>(AUDIO_RATES);
-            freeRates.remove("320k");
-            String freeManifest = createMasterManifest(freeRates);
-            Files.writeString(baseDir.resolve("master.m3u8"), freeManifest);
-
-            String manifestUrl = "/song/" + songId + "/hls/master";
-            return CompletableFuture.completedFuture(manifestUrl);
-
-        } catch (IOException | InterruptedException e) {
+            return generateHlsInternal(inputFilePath, songId);
+        } catch (Exception e) {
             throw new CustomException(BusinessErrorCodes.HLS_GENERATION_FAILED, e);
         }
+    }
+
+    private String generateHlsInternal(String inputFilePath, Long songId) throws IOException, InterruptedException {
+        Path baseDir = Paths.get(hlsBasePath, songId.toString());
+        if (!Files.exists(Paths.get(inputFilePath))) {
+            throw new CustomException(BusinessErrorCodes.HLS_GENERATION_FAILED);
+        }
+        Files.createDirectories(baseDir);
+
+        for (Map.Entry<String, Integer> entry : AUDIO_RATES.entrySet()) {
+            String rate = entry.getKey();
+            Path rateDir = baseDir.resolve(rate);
+            Files.createDirectories(rateDir);
+
+            List<String> cmd = List.of(
+                    "ffmpeg", "-i", inputFilePath,
+                    "-vn", "-c:a", "aac", "-b:a", rate,
+                    "-f", "hls", "-hls_time", "10",
+                    "-hls_list_size", "0",
+                    "-hls_segment_filename", rateDir.resolve("seg_%03d.ts").toString(),
+                    rateDir.resolve("prog.m3u8").toString()
+            );
+
+            Process p = new ProcessBuilder(cmd).inheritIO().start();
+            if (p.waitFor() != 0) {
+                throw new CustomException(BusinessErrorCodes.HLS_GENERATION_FAILED);
+            }
+        }
+
+        // write manifests
+        String master = buildMasterManifest(AUDIO_RATES);
+        Files.writeString(baseDir.resolve("master.m3u8"), master);
+
+        String premium = buildMasterManifest(AUDIO_RATES);
+        Files.writeString(baseDir.resolve("premium.m3u8"), premium);
+
+        return "/song/" + songId + "/hls/master";
+    }
+
+    private String buildMasterManifest(Map<String,Integer> rates) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("#EXTM3U\n#EXT-X-VERSION:3\n");
+        rates.forEach((rate, bw) -> {
+            sb.append(String.format("#EXT-X-STREAM-INF:BANDWIDTH=%d,NAME=\"%s\"\n", bw, rate));
+            sb.append(rate).append("/prog.m3u8\n");
+        });
+        return sb.toString();
     }
 
     @Override
@@ -98,22 +100,6 @@ public class HlsServiceImpl implements HlsService {
         } catch (IOException ex) {
             throw new UncheckedIOException("Failed to delete HLS folder for song " + songId, ex);
         }
-    }
-
-    private String createMasterManifest(Map<String,Integer> rates) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("#EXTM3U\n");
-        sb.append("#EXT-X-VERSION:3\n");
-        for (var entry : rates.entrySet()) {
-            String rate = entry.getKey();
-            int bandwidth = entry.getValue();
-            sb.append(String.format(
-                    "#EXT-X-STREAM-INF:BANDWIDTH=%d,NAME=\"%s\"\n",
-                    bandwidth, rate
-            ));
-            sb.append(rate).append("/prog.m3u8\n");
-        }
-        return sb.toString();
     }
 }
 

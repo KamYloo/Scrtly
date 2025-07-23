@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import toast from 'react-hot-toast';
 import "../../Styles/Album&&PlayList.css"
 import { AudioList } from '../Song/AudioList.jsx'
@@ -17,6 +17,7 @@ function Album({ volume, onTrackChange}) {
     });
     const [addSong, setAddSong] = useState(false)
     const navigate = useNavigate()
+    const [pollInterval, setPollInterval] = useState(4000);
     const {
         data: albumData,
         isLoading: isAlbumLoading,
@@ -29,7 +30,9 @@ function Album({ volume, onTrackChange}) {
         isLoading: isTracksLoading,
         isError: isTracksError,
         error: tracksError,
-    } = useGetAlbumTracksQuery(albumId)
+    } = useGetAlbumTracksQuery(albumId, {
+        pollingInterval: pollInterval,
+    })
     const [deleteAlbum, { isLoading: isDeleting }] = useDeleteAlbumMutation()
 
     const handleDelete = async () => {
@@ -59,6 +62,11 @@ function Album({ volume, onTrackChange}) {
         return `${hoursDisplay}${minutesDisplay}${secondsDisplay}`.trim();
     }
 
+    useEffect(() => {
+        if (!tracks) return;
+        const missing = tracks.some(t => !t.hlsManifestUrl);
+        setPollInterval(missing ? 4000 : 0);
+    }, [tracks]);
 
     if (isAlbumLoading || isTracksLoading) {
         return <Spinner />;

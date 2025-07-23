@@ -4,6 +4,7 @@ import com.kamylo.Scrtly_backend.album.mapper.AlbumMapper;
 import com.kamylo.Scrtly_backend.album.service.AlbumService;
 import com.kamylo.Scrtly_backend.artist.domain.ArtistEntity;
 import com.kamylo.Scrtly_backend.common.service.FileService;
+import com.kamylo.Scrtly_backend.song.event.SongCreatedEvent;
 import com.kamylo.Scrtly_backend.song.mapper.SongMapper;
 import com.kamylo.Scrtly_backend.song.service.HlsService;
 import com.kamylo.Scrtly_backend.song.service.SongService;
@@ -22,8 +23,11 @@ import javazoom.jl.decoder.BitstreamException;
 import javazoom.jl.decoder.Header;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.sound.sampled.AudioFormat;
@@ -48,6 +52,7 @@ public class SongServiceImpl implements SongService {
     private final AlbumMapper albumMapper;
     private final SongMapper songMapper;
     private final HlsService hlsService;
+    private final ApplicationEventPublisher publisher;
 
     @Value("${application.file.image-dir}")
     private String storageBasePath;
@@ -79,6 +84,7 @@ public class SongServiceImpl implements SongService {
             duration = getAudioDuration(new File("/uploads/audio/" + srcAudio));
         }
 
+
         SongEntity songEntity = SongEntity.builder()
                 .title(songRequest.getTitle())
                 .album(album)
@@ -94,11 +100,7 @@ public class SongServiceImpl implements SongService {
         String localAudioPath = savedSong.getTrack()
                 .replace(cdnBaseUrl + "audio/", storageBasePath + "audio/");
 
-        hlsService.generateHls(localAudioPath, savedSong.getId())
-                .thenAccept(manifestUrl -> {
-                    savedSong.setHlsManifestUrl(manifestUrl);
-                    songRepository.save(savedSong);
-                });
+        publisher.publishEvent(new SongCreatedEvent(this, savedSong.getId(), localAudioPath));
 
         return songMapper.toDto(savedSong);
     }

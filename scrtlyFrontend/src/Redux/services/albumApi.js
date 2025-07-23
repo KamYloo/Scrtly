@@ -1,5 +1,4 @@
 import {apiSlice} from "../apiSlice.js";
-import axios from "axios";
 
 export const albumApi = apiSlice.injectEndpoints({
     endpoints: builder => ({
@@ -51,41 +50,18 @@ export const albumApi = apiSlice.injectEndpoints({
         }),
 
         uploadSong: builder.mutation({
-            async queryFn(
-                { formData, onUploadProgress },
-                _queryApi,
-                _extraOptions,
-                baseQuery
-            ) {
-                try {
-                    const response = await axios.post(
-                        `${import.meta.env.VITE_APP_BACKEND_URL}/song/upload`,
-                        formData,
-                        {
-                            headers: { "Content-Type": "multipart/form-data" },
-                            withCredentials: true,
-                            onUploadProgress,
-                        }
-                    )
-                    return { data: response.data }
-                } catch (axiosError) {
-                    const err = axiosError.response ?? axiosError
-                    return {
-                        error: {
-                            status: err.status,
-                            data: err.data || err.message,
-                        }
-                    }
-                }
-            },
-
+            query: ({ formData }) => ({
+                url: "/song/upload",
+                method: "POST",
+                body: formData,
+            }),
             invalidatesTags: (result) => {
-                if (!result) return []
-                const albumId = result.album.id
+                if (!result) return [];
+                const albumId = result.album.id;
                 return [
                     { type: "Track", id: `ALBUM_${albumId}` },
                     { type: "Album", id: albumId },
-                ]
+                ];
             },
         }),
 

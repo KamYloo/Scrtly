@@ -1,9 +1,8 @@
 import React, {useEffect, useState} from 'react'
 import {MdCancel} from "react-icons/md";
-import {useDispatch, useSelector} from "react-redux";
-import {uploadSong} from "../../Redux/Album/Action.js";
 import "../../Styles/form.css"
 import toast from "react-hot-toast";
+import {useUploadSongMutation} from "../../Redux/services/albumApi.js";
 
 // eslint-disable-next-line react/prop-types
 function AddSong({onClose, albumId}) {
@@ -11,30 +10,30 @@ function AddSong({onClose, albumId}) {
     const [songImg, setSongImg] = useState(null)
     const [audio, setAudio] = useState(null)
     const [preview, setPreview] = useState('');
-    const { loading, error } = useSelector(state => state.album);
+    const [uploadSong, { isLoading }] = useUploadSongMutation()
 
-    const dispatch = useDispatch()
-
-    const createSongHandler = (e) => {
+    const handleSubmit  = async (e) => {
         e.preventDefault();
         const formData = new FormData()
         formData.append("songDetails", new Blob([JSON.stringify({ title, albumId })], { type: "application/json" }));
         formData.append("imageSong", songImg);
         formData.append("audioFile", audio);
 
-        dispatch(uploadSong(formData))
-            .then(() => {
-                toast.success('Song upload successfully.');
-            })
-            .catch(() => {
-                toast.error(error);
-            })
-            .finally(() => {
-                setSongImg(null);
-                setAudio(null);
-                setTitle('');
-                onClose();
-            });
+        try {
+            await uploadSong({ formData }).unwrap()
+            toast.success('Song uploaded successfully.')
+            onClose()
+        } catch (err) {
+            const message =
+                err?.status
+                    ? `Error ${err.status}: ${err.data || err.error}`
+                    : 'Failed to upload song.'
+            toast.error(message)
+        } finally {
+            setTitle('')
+            setSongImg(null)
+            setAudio(null)
+        }
     }
 
     useEffect(() => {
@@ -53,7 +52,8 @@ function AddSong({onClose, albumId}) {
             <div className="title">
                 <h2>Create Song</h2>
             </div>
-            <form onSubmit={createSongHandler}>
+
+            <form onSubmit={handleSubmit}>
                 <div className="editPic">
                     <div className="left">
                         <img className="trackImg" src={preview} alt=""/>
@@ -83,8 +83,8 @@ function AddSong({onClose, albumId}) {
                     <h4>Title</h4>
                     <input type="text" value={title} onChange={(e) => setTitle(e.target.value)}></input>
                 </div>
-                <button type="submit" className='submit' disabled={loading}>
-                    {loading ? "Sending..." : "Send"}
+                <button type="submit" className='submit' disabled={isLoading}>
+                    {isLoading ? "Uploading...": "Send"}
                 </button>
             </form>
         </div>
