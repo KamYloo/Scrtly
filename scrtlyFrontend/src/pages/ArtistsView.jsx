@@ -1,35 +1,35 @@
-import React, {useEffect, useState} from 'react'
+import React, {useState} from 'react'
 import "../Styles/AlbumsView&&ArtistsView.css"
 import ArtistBanner from '../assets/ArtistsBanner.png'
 import Verification from '../assets/check.png'
 import defaultAvatar from "../assets/user.jpg";
 import { BiSearchAlt } from "react-icons/bi";
 import { FaHeadphones } from "react-icons/fa";
-import {useDispatch, useSelector} from "react-redux";
 import {useNavigate} from "react-router-dom";
-import {getAllArtists} from "../Redux/Artist/Action.js";
 import Spinner from "../Components/Spinner.jsx";
 import ErrorOverlay from "../Components/ErrorOverlay.jsx";
+import {useGetAllArtistsQuery} from "../Redux/services/artistApi.js";
 
 function ArtistsView() {
-    const dispatch = useDispatch()
-    const {artist} = useSelector(state => state);
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
 
-    const filteredArtists = artist?.artists.content.filter(artistItem =>
+    const {
+        data: { content: artists = [] } = { content: [] },
+        isLoading,
+        isError,
+        error,
+    } = useGetAllArtistsQuery();
+
+    const filteredArtists = artists.filter(artistItem =>
         artistItem.pseudonym.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    useEffect(() => {
-        dispatch(getAllArtists())
-    }, [dispatch])
-
-    if (artist.loading) {
+    if (isLoading) {
         return <Spinner />;
     }
-    if (artist.error) {
-        return <ErrorOverlay message={artist.error} />;
+    if (isError) {
+        return <ErrorOverlay error={error} />;
     }
 
     return (

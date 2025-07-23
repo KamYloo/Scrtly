@@ -1,37 +1,34 @@
 import React, {useEffect, useState} from 'react'
 import {MdCancel} from "react-icons/md";
-import {updateArtist} from "../../Redux/Artist/Action.js";
-import {useDispatch, useSelector} from "react-redux";
 import toast from "react-hot-toast";
+import {useUpdateArtistMutation} from "../../Redux/services/artistApi.js";
 
-function EditArtist({onClose}) {
-    const [artistBio, setArtistBio] = useState()
+function EditArtist({artist, onClose}) {
+    const [artistBio, setArtistBio] = useState(artist?.artistBio)
     const [bannerImg, setBannerImg] = useState(null)
-    const [preview, setPreview] = useState('');
-    const dispatch = useDispatch()
-    const { loading, error } = useSelector(state => state.artist);
+    const [preview, setPreview] = useState(artist?.bannerImg);
+    const [updateArtist, { isLoading }] = useUpdateArtistMutation();
 
     const handleFileChange = (e) => {
         setBannerImg(e.target.files[0])
     };
 
-    const updateArtistHandler = (e) => {
+    const handleSubmit  = async (e) => {
         e.preventDefault()
         const formData = new FormData()
         formData.append('bannerImg', bannerImg)
         formData.append('artistBio', artistBio)
 
-        dispatch(updateArtist(formData))
-            .then(() => {
-                toast.success('Artist profile updated successfully.');
-            })
-            .catch(() => {
-                toast.error(error);
-            })
-            .finally(() => {
-                setBannerImg(null)
-                onClose();
-            });
+        try {
+            await updateArtist(formData).unwrap();
+            toast.success('Artist profile updated successfully.');
+            onClose();
+        } catch (err) {
+            const msg = err?.data?.message || err?.error || 'Update failed';
+            toast.error(msg);
+        } finally {
+            setBannerImg(null)
+        }
     }
 
     useEffect(() => {
@@ -50,7 +47,7 @@ function EditArtist({onClose}) {
             <div className="title">
                 <h2>Edit Artist</h2>
             </div>
-            <form onSubmit={updateArtistHandler}>
+            <form onSubmit={handleSubmit}>
                 <div className="editPic">
                     <div className="left">
                         <img src={preview} alt=""/>
@@ -68,8 +65,8 @@ function EditArtist({onClose}) {
                     <h4>Artist Bio</h4>
                     <textarea value={artistBio} onChange={(e) => setArtistBio(e.target.value)}></textarea>
                 </div>
-                <button type="submit" className='submit' disabled={loading}>
-                    {loading ? "Editing..." : "Send"}
+                <button type="submit" className='submit' disabled={isLoading }>
+                    {isLoading  ? "Editing..." : "Send"}
                 </button>
             </form>
         </div>

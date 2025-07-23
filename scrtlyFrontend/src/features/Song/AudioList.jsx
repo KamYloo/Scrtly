@@ -34,7 +34,7 @@ function AudioList({ volume, onTrackChange, initialSongs, req_artist, isplayList
         setAuto(true)
         onTrackChange(
             initialSongs[index]?.title,
-            initialSongs[index]?.artist?.artistName
+            initialSongs[index]?.artist?.pseudonym
         )
     }
 

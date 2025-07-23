@@ -146,6 +146,12 @@
     color: black;
 }
 
+.banner .content .artist .right .following {
+    background: transparent;
+    color: aqua;
+    border: 1px solid aqua;
+}
+
 .mainBox .menuList {
     display: flex;
     justify-content: space-between;

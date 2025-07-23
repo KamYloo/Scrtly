@@ -18,14 +18,14 @@ function Banner({artist}) {
     const [followUser, { isLoading: isFollowing }] = useFollowUserMutation();
 
     const handleFollow = async () => {
-        await followUser(artist.findArtist.id).unwrap();
+        await followUser(artist.id).unwrap();
     };
 
-    const isOwner = artist.findArtist?.id === reqUser?.id;
+    const isOwner = artist?.id === reqUser?.id;
 
     return (
         <div className='banner'>
-            <img src={artist.findArtist?.bannerImg} alt="" className='bannerImg' />
+            <img src={artist?.bannerImg} alt="" className='bannerImg' />
             <div className="content">
                 <div className="top">
                     <p>Home <span>/Popular Artist</span></p>
@@ -49,20 +49,20 @@ function Banner({artist}) {
                 <div className="artist">
                     <div className="left">
                         <div className="name">
-                            <h2>{artist.findArtist?.pseudonym}</h2>
+                            <h2>{artist?.pseudonym}</h2>
                             <img src={Verification} alt=""/>
                         </div>
                         <p><i><FaHeadphones/></i> 12,132,5478 <span>Monthly listeners</span></p>
                     </div>
                     <div className="right">
-                        {!isOwner && <button className={artist.findArtist?.followed ? 'following' : 'follow'}
-                        onClick={handleFollow} disabled={isFollowing}><i><FaCheck/></i>{artist.findArtist?.observed ? 'Following': 'Follow'}</button>}
+                        {!isOwner && <button className={artist?.observed ? 'following' : 'follow'}
+                        onClick={handleFollow} disabled={isFollowing}><i><FaCheck/></i>{artist?.observed ? 'Following': 'Follow'}</button>}
                     </div>
                 </div>
             </div>
             <div className="bottom">
             </div>
-            {editArtist && <EditArtist onClose={() => setEditArtist(((prev) => !prev))}/>}
+            {editArtist && <EditArtist artist={artist} onClose={() => setEditArtist(((prev) => !prev))}/>}
             {createAlbum && <CreateAlbum onClose={() => setCreateAlbum(((prev) => !prev))} />}
         </div>
     )

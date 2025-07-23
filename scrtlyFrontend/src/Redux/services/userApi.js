@@ -20,6 +20,7 @@ export const userApi = apiSlice.injectEndpoints({
                     ? [
                         { type: 'User', id: result.nickName },
                         { type: 'User', id: 'CURRENT' },
+                        { type: 'Artist', id: result.id },
                     ]
                     : [],
         }),

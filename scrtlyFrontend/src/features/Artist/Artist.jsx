@@ -1,18 +1,17 @@
-import React, { useEffect } from 'react'
+import React, { } from 'react'
 import '../../Styles/Middle.css'
 import '../../Styles/form.css'
 import { Banner } from './Banner.jsx'
 import { FaUsers } from 'react-icons/fa'
 import { AudioList } from '../Song/AudioList.jsx'
-import { useDispatch, useSelector } from 'react-redux'
 import {NavLink, Route, Routes, useLocation, useParams} from 'react-router-dom'
-import { findArtistById, getArtistTracks } from '../../Redux/Artist/Action.js'
 import { ArtistAlbums } from './ArtistAlbums.jsx'
 import { Fans } from './Fans.jsx'
 import { AboutArtist } from './AboutArtist.jsx'
 import Spinner from '../../Components/Spinner.jsx'
 import ErrorOverlay from '../../Components/ErrorOverlay.jsx'
 import {useGetCurrentUserQuery} from "../../Redux/services/authApi.js";
+import {useFindArtistByIdQuery, useGetArtistTracksQuery} from "../../Redux/services/artistApi.js";
 
 function Artist({ volume, onTrackChange }) {
   const { artistId } = useParams()
@@ -21,29 +20,34 @@ function Artist({ volume, onTrackChange }) {
   const { data: reqUser } = useGetCurrentUserQuery(null, {
     skip: !localStorage.getItem('isLoggedIn'),
   });
-  const dispatch = useDispatch()
-  const { artist, song } = useSelector(state => state)
+  const {
+    data: artistData,
+    isLoading: artistLoading,
+    isError: artistError,
+    error: artistErrorData,
+  } = useFindArtistByIdQuery(artistId);
 
-  useEffect(() => {
-    dispatch(findArtistById(artistId))
-  }, [artistId, artist.follow])
+  const {
+    data: { content: tracks = [] } = { content: [] },
+    isLoading: tracksLoading,
+    isError: tracksError,
+    error: tracksErrorData,
+  } = useGetArtistTracksQuery(artistId);
 
-  useEffect(() => {
-    dispatch(getArtistTracks(artistId))
-  }, [artistId])
-
-  if (artist.loading || song.loading) {
+  if (artistLoading || tracksLoading) {
     return <Spinner />
   }
-  if (artist.error) {
-    return <ErrorOverlay message={artist.error} />
-  } else if (song.error) {
-    return <ErrorOverlay message={song.error} />
+  if (artistError) {
+    return <ErrorOverlay error={artistErrorData} />;
+  }
+  if (tracksError) {
+    return <ErrorOverlay error={tracksErrorData} />;
   }
 
+  console.log(tracks)
   return (
       <div className="mainBox">
-        <Banner artist={artist} />
+        <Banner artist={artistData} />
 
         <div className="menuList">
           <ul>
@@ -77,17 +81,17 @@ function Artist({ volume, onTrackChange }) {
             <i>
               <FaUsers />
             </i>
-            {artist.findArtist?.totalFans}
+            {artistData?.totalFans}
             <span>Followers</span>
           </p>
         </div>
 
         <Routes>
-          <Route path="popular" element={<AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={artist?.songs.content} req_artist={artist.findArtist?.id === reqUser?.id} initialSongId={playSongId}/>}/>
+          <Route path="popular" element={<AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={tracks} req_artist={artistData?.id === reqUser?.id} initialSongId={playSongId}/>}/>
           <Route path="albums" element={<ArtistAlbums artistId={artistId} />} />
-          <Route path="songs" element={<AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={artist?.songs.content} req_artist={artist.findArtist?.id === reqUser?.id}/>}/>
-          <Route path="fans" element={<Fans artistId={artistId} fans={artist.findArtist?.fans} />}/>
-          <Route path="about" element={<AboutArtist artist={artist} artistBio={artist.findArtist?.artistBio} />}/>
+          <Route path="songs" element={<AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={tracks} req_artist={artistData?.id === reqUser?.id}/>}/>
+          <Route path="fans" element={<Fans artistId={artistId} fans={artistData?.fans} />}/>
+          <Route path="about" element={<AboutArtist artist={artistData} artistBio={artistData?.artistBio} />}/>
         </Routes>
       </div>
   )
