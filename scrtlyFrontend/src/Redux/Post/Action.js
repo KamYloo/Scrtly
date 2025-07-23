@@ -28,7 +28,7 @@ export const updatePost = (formData) => async (dispatch) => {
     });
 }
 
-export const getAllPosts = ({ minLikes, maxLikes, sortDir, page, size } = {}) => async (dispatch) => {
+/*export const getAllPosts = ({ minLikes, maxLikes, sortDir, page, size } = {}) => async (dispatch) => {
     let query = [];
     if (minLikes != null) query.push(`minLikes=${minLikes}`);
     if (maxLikes != null) query.push(`maxLikes=${maxLikes}`);
@@ -45,7 +45,7 @@ export const getAllPosts = ({ minLikes, maxLikes, sortDir, page, size } = {}) =>
         '/posts/all' + queryString,
         { method: 'GET', credentials: 'include' }
     );
-};
+};*/
 
 export const getPostsByUser = (nickName) => async (dispatch) => {
     await dispatchAction(dispatch, GET_POSTS_BY_USERID_REQUEST, GET_POSTS_BY_USERID_SUCCESS, GET_POSTS_BY_USERID_ERROR, `/posts/${nickName}/all`, {

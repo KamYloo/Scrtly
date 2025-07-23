@@ -1,17 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { MdCancel } from "react-icons/md";
-import {useDispatch, useSelector} from "react-redux";
 import "../../Styles/form.css";
-import {updatePost} from "../../Redux/Post/Action.js";
 import toast from "react-hot-toast";
+import {useUpdatePostMutation} from "../../Redux/services/postApi.js";
 
 function EditPost({ post, onClose }) {
     const [description, setDescription] = useState(post?.description || "");
     const [postImg, setPostImg] = useState(null);
     const [preview, setPreview] = useState(post?.image ? `${post.image}` : '');
     const fileInputRef = useRef(null);
-    const dispatch = useDispatch();
-    const { loading, error } = useSelector(state => state.post);
+    const [updatePost, { isLoading }] = useUpdatePostMutation();
 
     const handleFileChange = (e) => {
         const selectedFile = e.target.files[0];
@@ -20,25 +18,24 @@ function EditPost({ post, onClose }) {
         }
     };
 
-    const editPostHandler = (e) => {
-        e.preventDefault(); // Prevents form default behavior
+    const editPostHandler = async (e) => {
+        e.preventDefault();
         const formData = new FormData();
         formData.append('postId', post?.id);
         formData.append('file', postImg);
         formData.append('description', description);
 
-        dispatch(updatePost(formData))
-            .then(() => {
-                toast.success('Post updated successfully.');
-            })
-            .catch(() => {
-                toast.error(error);
-            })
-            .finally(() => {
-                setDescription('')
-                setPostImg(null);
-                onClose();
-            });
+        try {
+            await updatePost(formData).unwrap();
+            toast.success('Post updated successfully.');
+        } catch (err) {
+            const msg = (err.data && (err.data.message || err.data.error)) || err.error;
+            toast.error(msg);
+        } finally {
+            setDescription('')
+            setPostImg(null);
+            onClose();
+        }
     };
 
     useEffect(() => {
@@ -81,8 +78,8 @@ function EditPost({ post, onClose }) {
                         onChange={(e) => setDescription(e.target.value)}
                     />
                 </div>
-                <button type="submit" className='submit' disabled={loading}>
-                    {loading ? "Sending..." : "Send"}
+                <button type="submit" className='submit' disabled={isLoading}>
+                    {isLoading ? "Sending..." : "Send"}
                 </button>
             </form>
         </div>

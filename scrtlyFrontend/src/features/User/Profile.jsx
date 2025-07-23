@@ -1,44 +1,44 @@
 import React, {useEffect, useState} from 'react'
 import "../../Styles/Profile.css"
 import { ProfileInfo } from './ProfileInfo.jsx'
-import {useDispatch, useSelector} from "react-redux";
-import {getPostsByUser} from "../../Redux/Post/Action.js";
 import {Post} from "../Discover/Post.jsx";
 import {useParams} from "react-router-dom";
 import Spinner from "../../Components/Spinner.jsx";
 import ErrorOverlay from "../../Components/ErrorOverlay.jsx";
+import {useGetPostsByUserQuery} from "../../Redux/services/postApi.js";
 
 function Profile() {
     const [selectedPost, setSelectedPost] = useState(false)
     const [postDetail, setPostDetail] = useState(null)
-    const dispatch = useDispatch()
     const {nickName} = useParams();
-
-    const {post} = useSelector(state => state);
+    const {
+        data: postsPage,
+        isLoading,
+        isError,
+        error,
+    } = useGetPostsByUserQuery(nickName, {
+    });
 
     const togglePost = (post = null) => {
         setPostDetail(post)
         setSelectedPost((prev) => !prev);
     };
 
-    useEffect(() => {
-        dispatch(getPostsByUser(nickName))
-    }, [dispatch,nickName, post.likedPost, post.createdPost, post.deletedPost])
-
-
-    if (post.loading) {
+    if (isLoading) {
         return <Spinner />;
     }
-    if (post.error) {
-        return <ErrorOverlay message={post.error} />;
+    if (isError) {
+        return <ErrorOverlay error={error} />;
     }
+
+    const posts = postsPage?.content || [];
 
     return (
         <div className='profileSite'>
             <ProfileInfo  />
             <hr className="lineP"/>
             <div className="posts">
-                {post.posts.content.map((item) => (
+                {posts.map((item) => (
                     <div className="post" key={item.id} onClick={() => togglePost(item)}>
                         <img src={item.image} alt=""/>
                     </div>

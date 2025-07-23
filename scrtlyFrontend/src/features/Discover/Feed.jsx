@@ -1,18 +1,17 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import toast from 'react-hot-toast';
 import { AiFillLike, AiOutlineLike } from "react-icons/ai";
 import { TfiCommentAlt } from "react-icons/tfi";
 import { FaEllipsisH } from "react-icons/fa";
 import { MdOutlineMenuOpen } from "react-icons/md";
 import { Post } from './Post.jsx';
-import { useDispatch, useSelector } from "react-redux";
-import { deletePost, getAllPosts, likePost } from "../../Redux/Post/Action.js";
 import { formatDistanceToNow } from 'date-fns'
 import { useNavigate } from "react-router-dom";
 import { EditPost } from "./EditPost.jsx";
 import Spinner from "../../Components/Spinner.jsx";
 import defaultAvatar from "../../assets/user.jpg";
 import {useGetCurrentUserQuery} from "../../Redux/services/authApi.js";
+import {useDeletePostMutation, useGetAllPostsQuery, useLikePostMutation} from "../../Redux/services/postApi.js";
 
 function Feed() {
   const [selectedPost, setSelectedPost] = useState(false);
@@ -26,8 +25,17 @@ function Feed() {
   const { data: reqUser } = useGetCurrentUserQuery(null, {
     skip: !localStorage.getItem('isLoggedIn'),
   });
-  const dispatch = useDispatch();
-  const { post } = useSelector(store => store);
+  const sortDir = sortOrder === 'date-asc' ? 'ASC' : 'DESC';
+  const { data: postsPage, isLoading, isError, error } = useGetAllPostsQuery({
+    minLikes: minLikesFilter ? Number(minLikesFilter) : null,
+    maxLikes: maxLikesFilter ? Number(maxLikesFilter) : null,
+    sortDir,
+    page: 0,
+    size: 10,
+  });
+  const posts = postsPage?.content || [];
+  const [likePost] = useLikePostMutation();
+  const [deletePost] = useDeletePostMutation();
   const navigate = useNavigate();
 
   const handleProfileClick = (nickName) => {
@@ -53,48 +61,36 @@ function Feed() {
     return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
   };
 
-  const handleDeletePost = (postId) => {
-    const confirmDelete = window.confirm('Are you sure you want to delete this post?');
-    if (confirmDelete) {
-      dispatch(deletePost(postId))
-        .then(() => {
-          toast.success('Post deleted successfully.');
-        })
-        .catch(() => {
-          toast.error(post.error);
-        });
+  const handleDeletePost = async (postId) => {
+    if (!window.confirm('Are you sure you want to delete this post?')) return;
+    try {
+      await deletePost(postId).unwrap();
+      toast.success('Post deleted');
+    } catch (err) {
+      const msg = (err.data && (err.data.message || err.data.error)) || err.error;
+      toast.error(msg);
     }
   };
 
-  const likePostHandler = (postId) => {
-    dispatch(likePost(postId))
+  const likePostHandler = async (postId) => {
+    try {
+      await likePost(postId).unwrap();
+    } catch (err) {
+      const msg = (err.data && (err.data.message || err.data.error)) || err.error;
+      toast.error(msg);
+    }
   };
 
-  const loadPosts = () => {
-    const sortDir = sortOrder === 'date-asc' ? 'ASC' : 'DESC';
-    dispatch(getAllPosts({
-      sortDir,
-      minLikes: minLikesFilter !== '' ? Number(minLikesFilter) : null,
-      maxLikes: maxLikesFilter !== '' ? Number(maxLikesFilter) : null,
-      page: 0,
-      size: 10,
-    }));
-  };
-
-  useEffect(() => {
-    loadPosts();
-  }, [dispatch, minLikesFilter, maxLikesFilter, sortOrder]);
-
-  if (post.loading) {
+  if (isLoading) {
     return (
       <Spinner />
     );
   }
 
-  if (post.error) {
+  if (isError) {
     return (
       <div className="feed">
-        <p>Błąd: {post.error}</p>
+        <p>Error: {error?.data || error.error}</p>
       </div>
     );
   }
@@ -108,7 +104,7 @@ function Feed() {
             <li className="filter">
               <input
                 type="number"
-                placeholder="Filter by minimum likes..."
+                placeholder="Filter by min likes..."
                 value={minLikesFilter}
                 onChange={(e) => setMinLikesFilter(e.target.value)}
                 onKeyDown={(e) => {
@@ -121,7 +117,7 @@ function Feed() {
             <li className="filter">
               <input
                 type="number"
-                placeholder="Filter by maximum likes..."
+                placeholder="Filter by max likes..."
                 value={maxLikesFilter}
                 onChange={(e) => setMaxLikesFilter(e.target.value)}
                 onKeyDown={(e) => {
@@ -136,13 +132,13 @@ function Feed() {
                 setSortOrder(e.target.value);
                 setPostsSettings(false);
               }}>
-                <option value="date-desc">Sort by date (descending)</option>
-                <option value="date-asc">Sort by date (ascending)</option>
+                <option value="date-desc">Data ↓</option>
+                <option value="date-asc">Data ↑</option>
               </select>
             </li>
           </ul>
         )}
-        {post.posts.content.map((item) => (
+        {posts.map((item) => (
           <div className="post" key={item.id}>
             <div className="up">
               <img src={item.user?.profilePicture || defaultAvatar} alt=""
