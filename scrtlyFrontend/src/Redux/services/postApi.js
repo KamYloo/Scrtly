@@ -4,7 +4,7 @@ export const postApi = apiSlice.injectEndpoints({
     endpoints: builder => ({
         createPost: builder.mutation({
             query: formData => ({
-                url: '/posts',
+                url: '/posts/create',
                 method: 'POST',
                 body: formData,
             }),

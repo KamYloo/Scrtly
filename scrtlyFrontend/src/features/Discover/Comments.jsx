@@ -1,120 +1,139 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { AiOutlineLike, AiFillLike, AiOutlineDelete } from "react-icons/ai";
 import { AddComment } from './AddComment.jsx';
-import { useDispatch, useSelector } from "react-redux";
-import { getAllPostComments, likeComment, deleteComment, getReplies } from "../../Redux/Comment/Action.js";
 import { formatDistanceToNow } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../../Components/Spinner.jsx";
 import defaultAvatar from "../../assets/user.jpg";
 import toast from "react-hot-toast";
 import {useGetCurrentUserQuery} from "../../Redux/services/authApi.js";
+import {
+    useDeleteCommentMutation, useGetCommentsByPostQuery, useGetRepliesQuery
+    , useLikeCommentMutation
+} from "../../Redux/services/commentApi.js";
 
 
 function Comments({ post }) {
     const { data: reqUser } = useGetCurrentUserQuery(null, {
         skip: !localStorage.getItem('isLoggedIn'),
     });
-    const { comment } = useSelector(store => store)
-    const dispatch = useDispatch()
+
     const navigate = useNavigate();
+    const [currentPage, setCurrentPage] = useState(0);
+    const commentsContainerRef = useRef(null);
+
+    const {
+        data: commentsResult,
+        isFetching: fetchingComments,
+        error: commentsError,
+    } = useGetCommentsByPostQuery(
+        { postId: post.id, page: currentPage, size: 20 },
+        { refetchOnMountOrArgChange: true }
+    );
+
+    const allComments = commentsResult?.content || [];
+    const totalPages = commentsResult?.totalPages ?? 0;
 
     const [activeReplyInputId, setActiveReplyInputId] = useState(null);
     const [activeRepliesId, setActiveRepliesId] = useState(null);
-    const [repliesData, setRepliesData] = useState([]);
     const [currentReplyPage, setCurrentReplyPage] = useState(0);
-    const [replyTotalPages, setReplyTotalPages] = useState(0);
-    const [isLoadingReplies, setIsLoadingReplies] = useState(false);
+    const repliesContainerRef = useRef({});
 
-    const repliesRefs = useRef({});
+    const {
+        data: repliesResult,
+        isFetching: fetchingReplies,
+    } = useGetRepliesQuery(
+        { parentCommentId: activeRepliesId, page: currentReplyPage, size: 20 },
+        { skip: activeRepliesId == null, refetchOnMountOrArgChange: true }
+    );
+    const allReplies = repliesResult?.content || [];
+    const totalReplyPages = repliesResult?.totalPages ?? 0;
+
+    const [likeComment] = useLikeCommentMutation();
+    const [deleteComment] = useDeleteCommentMutation();
+
+    const commentRefs = useRef({});
+
+    const onScroll = () => {
+        const el = commentsContainerRef.current;
+        const { scrollTop, clientHeight, scrollHeight } = el;
+
+        let firstVisibleIdx = allComments.findIndex((c, i) => {
+            const node = commentRefs.current[c.id];
+            if (!node) return false;
+            const offset = node.offsetTop;
+            return offset + node.clientHeight > scrollTop;
+        });
+
+        if (firstVisibleIdx >= 0) {
+            const pageOfFirst = Math.floor(firstVisibleIdx / 20);
+            if (pageOfFirst !== currentPage) {
+                setCurrentPage(pageOfFirst);
+            }
+        }
+
+        if (
+            !fetchingComments &&
+            scrollTop + clientHeight >= scrollHeight - 10 &&
+            currentPage < totalPages - 1
+        ) {
+            setCurrentPage(p => p + 1);
+        }
+    };
+
+    const handleRepliesScroll = (e) => {
+        const el = e.currentTarget;
+        const { scrollTop, clientHeight, scrollHeight } = el;
+
+        let firstVisibleIdx = allReplies.findIndex((r, i) => {
+            const node = repliesContainerRef.current[r.id];
+            if (!node) return false;
+            return node.offsetTop + node.clientHeight > scrollTop;
+        });
+
+        if (firstVisibleIdx >= 0) {
+            const pageOfFirst = Math.floor(firstVisibleIdx / 20);
+            if (pageOfFirst !== currentReplyPage) setCurrentReplyPage(pageOfFirst);
+        }
+
+        if (!fetchingReplies && scrollTop + clientHeight >= scrollHeight - 10 && currentReplyPage < totalReplyPages - 1) {
+            setCurrentReplyPage(p => p + 1);
+        }
+    };
+
+    const toggleReplies = (id) => {
+        if (activeRepliesId === id) {
+            setActiveRepliesId(null);
+            setCurrentReplyPage(0);
+        } else {
+            setActiveRepliesId(id);
+            setCurrentReplyPage(0);
+        }
+    };
 
     const formatTimeAgo = (timestamp) => formatDistanceToNow(new Date(timestamp), { addSuffix: true });
 
-    const likeCommentHandler = (commentId) => dispatch(likeComment(commentId));
-
-    const handleDeleteComment = (commentId) => {
-        if (window.confirm("Are you sure you want to delete this comment?")) {
-            dispatch(deleteComment(commentId))
-                .then(() => {
-                    toast.success('Comment deleted successfully.');
-                })
-                .catch(() => {
-                    toast.error(comment.error);
-                })
+    const handleLike = async (commentId, parentCommentId = null) => {
+        try {
+            await likeComment({ commentId, postId: post.id, parentCommentId }).unwrap();
+        } catch (err) {
+            const msg = (err.data && (err.data.message || err.data.error)) || err.error;
+            toast.error(msg);
         }
     };
 
-    const loadReplies = async (commentId, page = 0) => {
-        setIsLoadingReplies(true);
-        const container = repliesRefs.current[commentId];
-        const prevScrollHeight = container?.scrollHeight || 0;
-        const prevScrollTop = container?.scrollTop || 0;
-        const bottomOffset = prevScrollHeight - prevScrollTop;
-
-        const result = await dispatch(getReplies(commentId, page, 10));
-        if (result) {
-            setRepliesData(prev => page === 0 ? result.content : [...prev, ...result.content]);
-            setCurrentReplyPage(result.pageNumber);
-            setReplyTotalPages(result.totalPages);
-            if (container && page !== 0) {
-                setTimeout(() => {
-                    const newScrollHeight = container.scrollHeight;
-                    container.scrollTop = newScrollHeight - bottomOffset;
-                }, 0);
-            }
+    const handleDelete = async (commentId, parentCommentId = null) => {
+        if (!window.confirm('Are you sure you want to delete this comment?')) return;
+        try {
+            await deleteComment({ commentId, postId: post.id, parentCommentId }).unwrap();
+            toast.success('Comment deleted successfully.');
+        } catch (err) {
+            const msg = (err.data && (err.data.message || err.data.error)) || err.error;
+            toast.error(msg);
         }
-        setIsLoadingReplies(false);
-    }
-
-    const toggleReplies = (parentId) => {
-        if (activeRepliesId === parentId) {
-            setActiveRepliesId(null);
-            setRepliesData([]);
-            setCurrentReplyPage(0);
-            setReplyTotalPages(0);
-        } else {
-            setActiveRepliesId(parentId);
-            loadReplies(parentId, 0);
-        }
-    }
+    };
 
     const toggleReplyInput = (parentId) => setActiveReplyInputId(prev => prev === parentId ? null : parentId);
-
-    const handleRepliesScroll = (e) => {
-        const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
-        if (!isLoadingReplies && currentReplyPage < replyTotalPages - 1 && scrollTop + clientHeight >= scrollHeight - 10) {
-            loadReplies(activeRepliesId, currentReplyPage + 1);
-        }
-    };
-
-    useEffect(() => { dispatch(getAllPostComments(post.id)); }, [dispatch, post.id]);
-
-    useEffect(() => {
-        if (activeRepliesId && comment.likeComment) {
-            const container = repliesRefs.current[activeRepliesId];
-            const prevScrollTop = container?.scrollTop || 0;
-            setRepliesData(prev =>
-                prev.map(reply => reply.id === comment.likeComment.commentId
-                    ? { ...reply, likedByUser: comment.likeComment.likedByUser, likeCount: comment.likeComment.likeCount }
-                    : reply
-                )
-            );
-            setTimeout(() => { if (container) container.scrollTop = prevScrollTop; }, 0);
-        }
-    }, [comment.likeComment, activeRepliesId]);
-
-    useEffect(() => {
-        if (comment.createdComment && comment.createdComment.parentCommentId === activeRepliesId) {
-            setRepliesData(prev => [comment.createdComment, ...prev]);
-        }
-    }, [comment.createdComment, activeRepliesId]);
-
-    useEffect(() => {
-        if (comment.deletedComment && activeRepliesId) {
-            // Filter out the deleted reply from the repliesData list
-            setRepliesData(prev => prev.filter(reply => reply.id !== comment.deletedComment));
-        }
-    }, [comment.deletedComment, activeRepliesId]);
 
     return (
         <div className='commentsSection'>
@@ -124,14 +143,12 @@ function Comments({ post }) {
             </div>
             <hr className="line" />
 
-            {comment.loading && (
-                <Spinner />
-            )}
-            {comment.error && (
-                <p>Błąd: {comment.error}</p>
-            )}
+            {fetchingComments && <Spinner />}
+            {commentsError && <p>Error: {commentsError.toString()}</p>}
 
-            <div className="comments">
+            <div className="comments"
+                 ref={commentsContainerRef}
+                 onScroll={onScroll}>
                 <div className="comment Own">
                     <img src={post?.user.profilePicture || defaultAvatar} alt="" onClick={() => navigate(`/profile/${post?.user.nickName}`)} />
                     <div className="context">
@@ -140,8 +157,10 @@ function Comments({ post }) {
                         <div className="info"><span>{formatTimeAgo(post.creationDate)}</span></div>
                     </div>
                 </div>
-                {comment.comments.content.filter(c => !c.parentCommentId).map(item => (
-                    <div key={item.id} className="commentContainer">
+                {allComments.map((item) => (
+                    <div key={item.id} className="commentContainer"  ref={node => {
+                        if (node) commentRefs.current[item.id] = node;
+                    }}>
                         <div className="comment">
                             <img src={item.user?.profilePicture || defaultAvatar} alt="" onClick={() => navigate(`/profile/${item.user.nickName}`)} />
                             <div className="context">
@@ -153,11 +172,11 @@ function Comments({ post }) {
                                 </div>
                             </div>
                             <div className="commentIcons">
-                                <i onClick={() => likeCommentHandler(item.id)}>
+                                <i onClick={() => handleLike(item.id, null)}>
                                     {item.likedByUser ? <AiFillLike /> : <AiOutlineLike />}
                                 </i>
                                 {item.user?.nickName === reqUser?.nickName && (
-                                    <i onClick={() => handleDeleteComment(item.id)} style={{ marginLeft: '10px' }}>
+                                    <i onClick={() => handleDelete(item.id, null)} style={{ marginLeft: '10px' }}>
                                         <AiOutlineDelete />
                                     </i>
                                 )}
@@ -170,8 +189,9 @@ function Comments({ post }) {
                             <button className="replyBtn" onClick={() => toggleReplyInput(item.id)}>Reply</button>
                         </div>
                         {activeRepliesId === item.id && (
-                            <div className="repliesContainer" onScroll={handleRepliesScroll} ref={el => { repliesRefs.current[item.id] = el }} style={{ maxHeight: '300px', overflowY: 'auto', overflowAnchor: 'none' }}>
-                                {repliesData.map(reply => (
+                            <div className="repliesContainer"  onScroll={handleRepliesScroll}
+                                 ref={el => (repliesContainerRef.current[item.id] = el)} style={{ maxHeight: '300px', overflowY: 'auto', overflowAnchor: 'none' }}>
+                                {allReplies.map(reply => (
                                     <div key={reply.id} className="comment reply">
                                         <img src={reply.user?.profilePicture || defaultAvatar} alt="" onClick={() => navigate(`/profile/${reply.user.nickName}`)} />
                                         <div className="context">
@@ -183,18 +203,18 @@ function Comments({ post }) {
                                             </div>
                                         </div>
                                         <div className="commentIcons">
-                                            <i onClick={() => likeCommentHandler(reply.id)}>
+                                            <i onClick={() => handleLike(reply.id, reply.parentCommentId)}>
                                                 {reply.likedByUser ? <AiFillLike /> : <AiOutlineLike />}
                                             </i>
                                             {reply.user?.nickName === reqUser?.nickName && (
-                                                <i onClick={() => handleDeleteComment(reply.id)} style={{ marginLeft: '10px' }}>
+                                                <i onClick={() => handleDelete(reply.id, reply.parentCommentId)} style={{ marginLeft: '10px' }}>
                                                     <AiOutlineDelete />
                                                 </i>
                                             )}
                                         </div>
                                     </div>
                                 ))}
-                                {isLoadingReplies && <Spinner />}
+                                {fetchingReplies  && <Spinner />}
                             </div>
                         )}
                     </div>

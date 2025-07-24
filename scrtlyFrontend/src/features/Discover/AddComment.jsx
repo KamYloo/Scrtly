@@ -1,32 +1,28 @@
 import React, { useState } from 'react'
 import EmojiPicker from 'emoji-picker-react'
 import { BsEmojiSmileFill } from "react-icons/bs";
-import { useDispatch, useSelector } from "react-redux";
-import { createComment } from "../../Redux/Comment/Action.js";
 import toast from "react-hot-toast";
+import {useCreateCommentMutation} from "../../Redux/services/commentApi.js";
 
 function AddComment({ post, parentCommentId }) {
-    const dispatch = useDispatch()
     const [commentText, setCommentText] = useState('')
     const [openEmoji, setOpenEmoji] = useState(false)
-    const { createLoading, error } = useSelector(state => state.comment);
+    const [createComment, { isLoading }] = useCreateCommentMutation();
 
     const handleEmoji = (e) => {
         setCommentText(prev => prev + e.emoji)
         setOpenEmoji(false)
     }
 
-    const handleCommentCreation = () => {
-        dispatch(createComment({ postId: post.id, comment: commentText, parentCommentId }))
-            .then(() => {
-                toast.success('Comment created successfully.');
-            })
-            .catch(() => {
-                toast.error(error);
-            })
-            .finally(() => {
-                setCommentText('')
-            });
+    const handleSend = async () => {
+        try {
+            await createComment({ postId: post.id, parentCommentId, comment: commentText }).unwrap();
+            toast.success('Comment created successfully.');
+            setCommentText('');
+        } catch (err) {
+            const msg = (err.data && (err.data.message || err.data.error)) || err.error;
+            toast.error(msg);
+        }
 
     }
 
@@ -41,10 +37,10 @@ function AddComment({ post, parentCommentId }) {
             <textarea 
                 value={commentText}
                 onChange={e => setCommentText(e.target.value)} 
-                placeholder={parentCommentId ? 'Odpowiedz na komentarz...' : 'Dodaj komentarz...'}
+                placeholder={parentCommentId ? 'Reply to comment...' : 'Add a comment...'}
             ></textarea>
-            <button onClick={handleCommentCreation} disabled={createLoading}>
-                {createLoading ? "Sending..." : "Send"}
+            <button onClick={handleSend} disabled={isLoading}>
+                {isLoading ? "Sending..." : "Send"}
             </button>
         </div>
     )

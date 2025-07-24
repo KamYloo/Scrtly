@@ -589,6 +589,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
+  z-index: 6;
 
   .imgPost {
     flex: 5;
