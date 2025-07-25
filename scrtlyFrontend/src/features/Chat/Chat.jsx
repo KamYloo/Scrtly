@@ -1,152 +1,191 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import throttle from 'lodash/throttle';
 import EmojiPicker from 'emoji-picker-react';
 import { FaPhoneAlt, FaInfoCircle, FaImage, FaCamera, FaMicrophone } from "react-icons/fa";
 import { BsCameraVideoFill, BsEmojiSmileFill } from "react-icons/bs";
-import { useDispatch, useSelector } from "react-redux";
-import { getAllMessages } from "../../Redux/ChatMessage/Action.js";
+import { useDispatch } from "react-redux";
 import { formatDistanceToNow } from 'date-fns';
-import { Client } from "@stomp/stompjs";
-import SockJS from "sockjs-client/dist/sockjs";
-import { useNavigate } from "react-router-dom";
-import defaultAvatar from "../../assets/user.jpg";
-import {BASE_API_URL} from "../../Redux/api.js";
-import {useGetCurrentUserQuery} from "../../Redux/services/authApi.js";
+import { Client } from '@stomp/stompjs';
+import SockJS from 'sockjs-client/dist/sockjs';
+import { useNavigate } from 'react-router-dom';
+import defaultAvatar from '../../assets/user.jpg';
+import { BASE_API_URL } from '../../Redux/api.js';
+import { useGetCurrentUserQuery } from '../../Redux/services/authApi.js';
+import { chatMessageApi, useGetMessagesByChatQuery } from '../../Redux/services/chatMessageApi.js';
 
 function Chat({ chat, onBack }) {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
     const [open, setOpen] = useState(false);
     const [text, setText] = useState("");
     const [stompClient, setStompClient] = useState(null);
     const [editingMessageId, setEditingMessageId] = useState(null);
     const [editingMessageText, setEditingMessageText] = useState("");
+
+    const [page, setPage] = useState(0);
+    const [allMessages, setAllMessages] = useState([]);
+
     const { data: reqUser } = useGetCurrentUserQuery(null, {
         skip: !localStorage.getItem('isLoggedIn'),
     });
-    const { chatMessage } = useSelector(store => store);
-    const messagesEndRef = useRef(null);
-    const messagesContainerRef = useRef(null);
-    const prevScrollHeightRef = useRef(0);
 
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
+    const { data: pageData, isFetching } = useGetMessagesByChatQuery(
+        { chatId: chat.id, page },
+        { skip: !chat?.id }
+    );
+
+    const containerRef = useRef(null);
+    const endRef = useRef(null);
+    const prevScrollRef = useRef(0);
 
     useEffect(() => {
-        const container = messagesContainerRef.current;
-        if (!container) return;
-        if (chatMessage.page === 0) {
-            messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        if (!pageData) return;
+        const msgs = pageData.content.slice().reverse();
+        setAllMessages(prev => {
+            const newMsgs = msgs.filter(m => !prev.some(pm => pm.id === m.id));
+            return page === 0 ? [...newMsgs] : [...newMsgs, ...prev];
+        });
+    }, [pageData, page]);
+
+    useEffect(() => {
+        setPage(0);
+        setAllMessages([]);
+    }, [chat.id]);
+
+    useEffect(() => {
+        const c = containerRef.current;
+        if (!c) return;
+        if (page === 0) {
+            endRef.current?.scrollIntoView({ behavior: 'smooth' });
         } else {
-            const newScrollHeight = container.scrollHeight;
-            container.scrollTop = newScrollHeight - prevScrollHeightRef.current;
+            const newHeight = c.scrollHeight;
+            c.scrollTop = newHeight - prevScrollRef.current;
         }
-    }, [chatMessage.messages, chatMessage.page]);
+    }, [allMessages, page]);
 
-    const formatTimeAgo = (timestamp) => {
-        return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
-    };
-
-    const onMessageReceive = (message) => {
-        try {
-            const receivedMessage = JSON.parse(message.body);
-            if (receivedMessage.status === "EDITED") {
-                dispatch({ type: 'EDIT_MESSAGE', payload: receivedMessage });
-            } else if (receivedMessage.status === "DELETED") {
-                dispatch({ type: 'DELETE_MESSAGE', payload: receivedMessage });
-            } else {
-                dispatch({ type: 'ADD_NEW_MESSAGE', payload: receivedMessage });
+    const handleScroll = useCallback(
+        throttle(e => {
+            const { scrollTop, scrollHeight } = e.target;
+            if (
+                scrollTop < 100 &&
+                pageData &&
+                !pageData.last &&
+                !isFetching
+            ) {
+                prevScrollRef.current = scrollHeight;
+                setPage(p => p + 1);
             }
+        }, 300),
+        [pageData, isFetching]
+    );
 
-            setTimeout(() => {
-                messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-            }, 100);
-        } catch (error) {
-            console.error("Błąd parsowania odebranej wiadomości:", error);
+    // Format time ago
+    const formatTimeAgo = timestamp =>
+        formatDistanceToNow(new Date(timestamp), { addSuffix: true });
+
+    // Handle incoming STOMP messages
+    const onMessageReceive = ({ body }) => {
+        let msg;
+        try { msg = JSON.parse(body); } catch { return; }
+
+        dispatch(
+            chatMessageApi.util.updateQueryData(
+                'getMessagesByChat',
+                { chatId: chat.id, page: 0 },
+                draft => {
+                    switch (msg.status) {
+                        case 'EDITED': {
+                            const idx = draft.content.findIndex(m => m.id === msg.id);
+                            if (idx !== -1) draft.content[idx] = msg;
+                            break;
+                        }
+                        case 'DELETED': {
+                            draft.content = draft.content.filter(m => m.id !== msg.id);
+                            draft.totalElements -= 1;
+                            break;
+                        }
+                        default: {
+                            draft.content.unshift(msg);
+                            draft.totalElements += 1;
+                        }
+                    }
+                }
+            )
+        );
+
+        setAllMessages(prev => {
+            const idx = prev.findIndex(m => m.id === msg.id);
+            if (msg.status === 'DELETED') return prev.filter(m => m.id !== msg.id);
+            if (idx !== -1) {
+                const copy = [...prev];
+                copy[idx] = msg;
+                return copy;
+            }
+            return [...prev, msg].sort((a, b) => new Date(a.createDate) - new Date(b.createDate));
+        });
+
+        const c = containerRef.current;
+        if (c && c.scrollHeight - c.scrollTop - c.clientHeight < 50) {
+            setTimeout(() => endRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
         }
     };
 
     useEffect(() => {
+        if (!chat?.id) return;
         const client = new Client({
             webSocketFactory: () => new SockJS(`${BASE_API_URL}/ws`),
             reconnectDelay: 5000,
-            onConnect: (frame) => {
-                console.log("Połączono STOMP:", frame);
-                if (chat?.id) {
-                    client.subscribe(`/exchange/chat.exchange/room.${chat.id}`, onMessageReceive);
-                }
-            },
-            onStompError: (frame) => {
-                console.error("Błąd STOMP:", frame.headers['message'], frame.body);
-            }
+            onConnect: () => client.subscribe(
+                `/exchange/chat.exchange/room.${chat.id}`,
+                onMessageReceive
+            ),
+            onStompError: frame => console.error('STOMP error:', frame.headers['message'], frame.body),
         });
-
         client.activate();
         setStompClient(client);
+        return () => client.deactivate();
+    }, [chat.id, dispatch]);
 
-        if (chat?.id) {
-            dispatch(getAllMessages(chat.id, 0));
-        }
-
-        return () => {
-            client.deactivate();
-            setStompClient(null);
-        };
-    }, [chat?.id, dispatch]);
-
-    const handleScroll = () => {
-        const container = messagesContainerRef.current;
-        if (container.scrollTop === 0 && !chatMessage.last && !chatMessage.loading) {
-            prevScrollHeightRef.current = container.scrollHeight;
-            dispatch(getAllMessages(chat.id, chatMessage.page + 1));
-        }
-    };
-
-    const handleCreateNewMessage = () => {
-        if (text.trim() === "" || !stompClient || !stompClient.connected) return;
-        const newMessage = { message: text };
+    const handleSend = () => {
+        if (!text.trim() || !stompClient?.connected) return;
         stompClient.publish({
             destination: `/app/chat/sendMessage/${chat.id}`,
-            body: JSON.stringify(newMessage)
+            body: JSON.stringify({ message: text }),
         });
-        setText("");
-
-        setTimeout(() => {
-            messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-        }, 100);
+        setText('');
     };
 
-    const startEditing = (message) => {
-        setEditingMessageId(message.id);
-        setEditingMessageText(message.messageText);
+    const startEditing = msg => {
+        setEditingMessageId(msg.id);
+        setEditingMessageText(msg.messageText);
     };
-
-    const handleEditMessage = () => {
-        if (editingMessageText.trim() === "" || !stompClient || !stompClient.connected) return;
-        const payload = { id: editingMessageId, message: editingMessageText };
+    const handleEdit = () => {
+        if (!editingMessageText.trim() || !stompClient?.connected) return;
         stompClient.publish({
             destination: `/app/chat/editMessage/${chat.id}`,
-            body: JSON.stringify(payload)
+            body: JSON.stringify({ id: editingMessageId, message: editingMessageText }),
         });
         setEditingMessageId(null);
-        setEditingMessageText("");
+        setEditingMessageText('');
     };
 
-    const handleDeleteMessage = (messageId) => {
-        if (window.confirm('Czy na pewno chcesz usunąć tę wiadomość?')) {
-            stompClient.publish({
-                destination: `/app/chat/deleteMessage/${chat.id}`,
-                body: JSON.stringify({ messageId })
-            });
-        }
+    const handleDelete = id => {
+        if (!window.confirm('Are you sure you want to delete this message?')) return;
+        stompClient.publish({
+            destination: `/app/chat/deleteMessage/${chat.id}`,
+            body: JSON.stringify({ messageId: id }),
+        });
     };
 
-    const otherPerson = chat.participants.find(user => user.id !== reqUser?.id);
+    const otherPerson = chat.participants?.find(u => u.id !== reqUser?.id);
+
     return (
-        <div className='chat'>
+        <div className="chat">
             <div className="top">
                 <div className="user">
-                    {onBack && (
-                        <button className="backBtn" onClick={onBack}>Back</button>
-                    )}
-                    {chat?.participants && chat.participants.length === 2 ? (
+                    {onBack && <button className="backBtn" onClick={onBack}>Back</button>}
+                    {chat?.participants?.length === 2 ? (
                         <>
                             <img
                                 src={otherPerson?.profilePicture || defaultAvatar}
@@ -164,35 +203,31 @@ function Chat({ chat, onBack }) {
                         </div>
                     )}
                 </div>
-
                 <div className="icons">
                     <i><FaPhoneAlt /></i>
                     <i><BsCameraVideoFill /></i>
                     <i><FaInfoCircle /></i>
                 </div>
             </div>
-            <div className="center" ref={messagesContainerRef} onScroll={handleScroll}>
-                {chatMessage.messages?.map((item, index) => (
+
+            <div className="center" ref={containerRef} onScroll={handleScroll}>
+                {allMessages.map((item, idx) => (
                     <div
-                        className={item.user.id === reqUser?.id ? "messageOwn" : "message"}
-                        key={`${item.id}-${index}`}
+                        key={`${item.id}-${idx}`}
+                        className={item.user.id === reqUser?.id ? 'messageOwn' : 'message'}
                     >
                         <img
-                            src={otherPerson?.profilePicture || defaultAvatar}
-                            alt={otherPerson?.fullName}
-                            onClick={() => navigate(`/profile/${otherPerson?.nickName}`)}
+                            src={item.user.profilePicture || defaultAvatar}
+                            alt={item.user.fullName}
+                            onClick={() => navigate(`/profile/${item.user.nickName}`)}
                         />
                         <div className="text">
-                            <p>
-                                <strong>{item.user.nickName}:</strong>
+                            <p><strong>{item.user.nickName}:</strong>
                                 {editingMessageId === item.id ? (
-                                    <input
-                                        type="text"
-                                        className="editMessageInput"
-                                        value={editingMessageText}
-                                        onChange={(e) => setEditingMessageText(e.target.value)}
-                                        onKeyPress={(e) => e.key === "Enter" && handleEditMessage()}
-                                    />
+                                    <input type="text" className="editMessageInput"
+                                           value={editingMessageText}
+                                           onChange={e => setEditingMessageText(e.target.value)}
+                                           onKeyPress={e => e.key === 'Enter' && handleEdit()}/>
                                 ) : (
                                     <> {item.messageText}</>
                                 )}
@@ -203,13 +238,13 @@ function Chat({ chat, onBack }) {
                                     <>
                                         {editingMessageId === item.id ? (
                                             <>
-                                                <button onClick={handleEditMessage}>Zapisz</button>
+                                                <button onClick={handleEdit}>Zapisz</button>
                                                 <button onClick={() => setEditingMessageId(null)}>Anuluj</button>
                                             </>
                                         ) : (
                                             <>
                                                 <button onClick={() => startEditing(item)}>Edytuj</button>
-                                                <button onClick={() => handleDeleteMessage(item.id)}>Usuń</button>
+                                                <button onClick={() => handleDelete(item.id)}>Usuń</button>
                                             </>
                                         )}
                                     </>
@@ -218,35 +253,29 @@ function Chat({ chat, onBack }) {
                         </div>
                     </div>
                 ))}
-                <div ref={messagesEndRef}></div>
+                <div ref={endRef}/>
             </div>
+
             <div className="bottom">
                 <div className="icons">
                     <i><FaImage/></i>
                     <i><FaCamera/></i>
-                    <i><FaMicrophone /></i>
+                    <i><FaMicrophone/></i>
                 </div>
                 <input
-                    type="text"
-                    placeholder='Write message...'
-                    value={text}
-                    onChange={(e) => setText(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleCreateNewMessage()}
+                    type="text" placeholder="Write message..."
+                    value={text} onChange={e => setText(e.target.value)}
+                    onKeyPress={e => e.key === 'Enter' && handleSend()}
                 />
                 <div className="emoji">
-                    <i onClick={() => setOpen(prev => !prev)}><BsEmojiSmileFill /></i>
+                    <i onClick={() => setOpen(o => !o)}><BsEmojiSmileFill /></i>
                     {open && (
                         <div className="emojiPickerWrapper">
-                            <EmojiPicker
-                                onEmojiClick={(e) => {
-                                    setText(prev => prev + e.emoji);
-                                    setOpen(false);
-                                }}
-                            />
+                            <EmojiPicker onEmojiClick={(_, em) => { setText(t => t + em.emoji); setOpen(false); }} />
                         </div>
                     )}
                 </div>
-                <button className='sendButton' onClick={handleCreateNewMessage}>Send</button>
+                <button className="sendButton" onClick={handleSend}>Send</button>
             </div>
         </div>
     );
