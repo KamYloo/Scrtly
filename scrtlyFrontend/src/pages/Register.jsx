@@ -52,11 +52,7 @@ function Register() {
             toast.success('You have registered successfully.')
             navigate('/login')
         } catch (err) {
-            const msg =
-                (err.data && (err.data.message || err.data.error)) ||
-                err.error ||
-                'Registration failed'
-            toast.error(msg)
+            toast.error(err.data.businessErrornDescription)
         }
     }
 

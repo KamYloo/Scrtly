@@ -117,8 +117,7 @@ function Comments({ post }) {
         try {
             await likeComment({ commentId, postId: post.id, parentCommentId }).unwrap();
         } catch (err) {
-            const msg = (err.data && (err.data.message || err.data.error)) || err.error;
-            toast.error(msg);
+            toast.error(err.data.businessErrornDescription);
         }
     };
 
@@ -128,8 +127,7 @@ function Comments({ post }) {
             await deleteComment({ commentId, postId: post.id, parentCommentId }).unwrap();
             toast.success('Comment deleted successfully.');
         } catch (err) {
-            const msg = (err.data && (err.data.message || err.data.error)) || err.error;
-            toast.error(msg);
+            toast.error(err.data.businessErrornDescription);
         }
     };
 

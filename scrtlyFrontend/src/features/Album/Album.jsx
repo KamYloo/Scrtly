@@ -42,11 +42,7 @@ function Album({ volume, onTrackChange}) {
             toast.success('Album deleted successfully.')
             navigate('/albums')
         } catch (err) {
-            const msg =
-                (err.data && (err.data.message || err.data.error)) ||
-                err.error ||
-                'Failed to delete album. Please try again.';
-            toast.error(msg);
+            toast.error(err.data.businessErrornDescription);
         }
     };
 

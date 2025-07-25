@@ -20,8 +20,7 @@ function AddComment({ post, parentCommentId }) {
             toast.success('Comment created successfully.');
             setCommentText('');
         } catch (err) {
-            const msg = (err.data && (err.data.message || err.data.error)) || err.error;
-            toast.error(msg);
+            toast.error(err.data.businessErrornDescription);
         }
 
     }

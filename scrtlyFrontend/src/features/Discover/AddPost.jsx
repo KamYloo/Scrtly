@@ -37,8 +37,7 @@ function AddPost() {
       await createPost(formData).unwrap();
       toast.success('Post created successfully.');
     } catch (err) {
-      const msg = (err.data && (err.data.message || err.data.error)) || err.error;
-      toast.error(msg);
+      toast.error(err.data.businessErrornDescription);
     } finally {
       setDescriptionText('')
       setFilePic(null)

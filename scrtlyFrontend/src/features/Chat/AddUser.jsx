@@ -1,30 +1,42 @@
 import React, { useState } from 'react';
-import { useDispatch } from "react-redux";
-import { createChat } from "../../Redux/Chat/Action.js";
 import { MdCancel } from "react-icons/md";
 import defaultAvatar from "../../assets/user.jpg";
 import {useSearchUserQuery} from "../../Redux/services/userApi.js";
+import {useCreateChatMutation} from "../../Redux/services/chatApi.js";
+import toast from "react-hot-toast";
 
 
 function AddUser({ onClose }) {
     const [keyword, setKeyword] = useState('');
     const [selectedUsers, setSelectedUsers] = useState([]);
     const [groupName, setGroupName] = useState('');
-    const dispatch = useDispatch();
     const { data: searchResults = [], isFetching, isError } = useSearchUserQuery(
         { keyword },
         { skip: keyword.trim() === '' }
     );
 
-    const handleCreateChat = () => {
+    const [
+        createChat,
+        { isLoading: isCreating }
+    ] = useCreateChatMutation();
+
+    const handleCreateChat = async () => {
         if (selectedUsers.length === 0) return;
         if (selectedUsers.length > 1 && groupName.trim() === '') {
             alert('Please enter a group name.');
             return;
         }
         const userIds = selectedUsers.map(user => user.id);
-        dispatch(createChat(userIds, selectedUsers.length > 1 ? groupName : ""));
-        onClose();
+        try {
+            await createChat({
+                userIds,
+                chatRoomName: selectedUsers.length > 1 ? groupName : ""
+            }).unwrap();
+            toast.success('ChatRoom created successfully.');
+            onClose();
+        } catch (err) {
+            toast.error(err.data.businessErrornDescription);
+        }
     };
 
     const toggleUserSelection = (user) => {
@@ -79,6 +91,7 @@ function AddUser({ onClose }) {
             <button
                 onClick={handleCreateChat}
                 className="styledButton"
+                disabled={isCreating}
                 style={{
                     marginTop: selectedUsers.length === 1 ? '40px' : '20px',
                     display: 'block',
@@ -86,7 +99,7 @@ function AddUser({ onClose }) {
                     marginRight: 'auto'
                 }}
             >
-                Create Chat
+                {isCreating ? 'Creating…' : 'Create Chat'}
             </button>
         </div>
     );

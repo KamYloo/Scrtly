@@ -4,24 +4,23 @@ import { MdDeleteSweep } from "react-icons/md";
 import { BsPlus } from "react-icons/bs";
 import { FaMinus } from "react-icons/fa";
 import { AddUser } from './AddUser.jsx';
-import {useDispatch} from "react-redux";
-import { deleteChat } from "../../Redux/Chat/Action.js";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import defaultAvatar from "../../assets/user.jpg";
 import {useGetCurrentUserQuery} from "../../Redux/services/authApi.js";
+import {useDeleteChatMutation} from "../../Redux/services/chatApi.js";
 
 
-function ChatUsersList({ chat, onChatSelect }) {
+function ChatUsersList({ chats, onChatSelect }) {
     const [addMode, setAddMode] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const { data: reqUser } = useGetCurrentUserQuery(null, {
         skip: !localStorage.getItem('isLoggedIn'),
     });
-    const dispatch = useDispatch();
     const navigate = useNavigate();
+    const [deleteChat, { isLoading: isDeleting }] = useDeleteChatMutation();
 
-    const filteredChats = chat?.chats?.filter(chatItem => {
+    const filteredChats = chats?.filter(chatItem => {
         if (!chatItem.participants || chatItem.participants.length === 0) return false;
         const otherParticipants = chatItem.participants.filter(user => user.id !== reqUser?.id);
         const displayName = chatItem.chatRoomName || (otherParticipants[0]?.fullName || '');
@@ -32,17 +31,15 @@ function ChatUsersList({ chat, onChatSelect }) {
         setAddMode(prev => !prev);
     };
 
-    const deleteChatRoomHandler = (chatRoomId) => {
-        const confirmDelete = window.confirm('Are you sure you want to delete this ChatRoom?');
-        if (confirmDelete) {
-            dispatch(deleteChat(chatRoomId))
-                .then(() => {
-                    toast.success('ChatRoom deleted successfully.');
-                    navigate('/chat');
-                })
-                .catch(() => {
-                    toast.error('Failed to delete chatRoom. Please try again.');
-                });
+    const handleDelete = async (chatRoomId) => {
+        if (!window.confirm('Are you sure you want to delete this chat?')) return;
+        try {
+            await deleteChat(chatRoomId).unwrap();
+            toast.success('Chat deleted successfully.');
+            onChatSelect(null);
+            navigate('/chat');
+        } catch (err) {
+            toast.error(toast.error(err.data.businessErrornDescription));
         }
     };
 
@@ -81,10 +78,9 @@ function ChatUsersList({ chat, onChatSelect }) {
                                 </div>
                                 <i onClick={(e) => {
                                     e.stopPropagation();
-                                    deleteChatRoomHandler(chatItem.id);
-                                    onChatSelect(null);
+                                    handleDelete(chatItem.id);
                                 }}>
-                                    <MdDeleteSweep />
+                                    {isDeleting ? <span>…</span> : <MdDeleteSweep />}
                                 </i>
                             </div>
                         );

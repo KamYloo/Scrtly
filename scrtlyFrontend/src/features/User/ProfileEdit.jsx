@@ -54,9 +54,7 @@ function ProfileEdit() {
       toast.success('Profile updated successfully.');
       navigate(`/profile/${result.nickName}`);
     } catch (err) {
-      toast.error(
-          err?.data?.message || err?.error || 'Failed to update profile.'
-      );
+      toast.error(err.data.businessErrornDescription);
     }
   };
 

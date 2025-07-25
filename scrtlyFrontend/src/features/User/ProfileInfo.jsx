@@ -36,7 +36,7 @@ function ProfileInfo() {
         return <Spinner />;
     }
     if (viewingError) {
-        return <ErrorOverlay message={viewingErrorData?.data} />;
+        return <ErrorOverlay error={viewingErrorData?.data} />;
     }
 
     return (

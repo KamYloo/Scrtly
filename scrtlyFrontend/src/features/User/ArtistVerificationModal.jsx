@@ -1,11 +1,11 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import toast from "react-hot-toast";
 import {useVerifyArtistMutation} from "../../Redux/services/userApi.js";
 
 
 function ArtistVerificationModal({ onClose }) {
     const [artistName, setArtistName] = useState('');
-    const [verifyArtist, { isLoading, error }] = useVerifyArtistMutation();
+    const [verifyArtist, { isLoading }] = useVerifyArtistMutation();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -14,16 +14,9 @@ function ArtistVerificationModal({ onClose }) {
             toast.success('Verification has been sent for review');
             onClose();
         } catch (err) {
-            const msg = err?.data?.message || err?.error || 'Verification request failed';
-            toast.error(msg);
+            toast.error(err.data.businessErrornDescription);
         }
     };
-
-    useEffect(() => {
-        if (error) {
-            toast.error(error);
-        }
-    }, [error]);
 
     return (
         <div className="verifyArtist">

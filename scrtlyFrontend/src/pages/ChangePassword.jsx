@@ -48,8 +48,7 @@ function ChangePassword() {
             toast.success('Password has been reset successfully.');
             navigate('/login');
         } catch (err) {
-            const msg = err?.data || err?.error || 'Failed to reset password.';
-            toast.error(msg);
+            toast.error(err.data.businessErrornDescription);
         }
     };
 

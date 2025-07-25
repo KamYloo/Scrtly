@@ -24,8 +24,7 @@ function EditArtist({artist, onClose}) {
             toast.success('Artist profile updated successfully.');
             onClose();
         } catch (err) {
-            const msg = err?.data?.message || err?.error || 'Update failed';
-            toast.error(msg);
+            toast.error(err.data.businessErrornDescription);
         } finally {
             setBannerImg(null)
         }

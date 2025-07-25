@@ -67,8 +67,7 @@ function Feed() {
       await deletePost(postId).unwrap();
       toast.success('Post deleted');
     } catch (err) {
-      const msg = (err.data && (err.data.message || err.data.error)) || err.error;
-      toast.error(msg);
+      toast.error(err.data.businessErrornDescription);
     }
   };
 
@@ -76,8 +75,7 @@ function Feed() {
     try {
       await likePost(postId).unwrap();
     } catch (err) {
-      const msg = (err.data && (err.data.message || err.data.error)) || err.error;
-      toast.error(msg);
+      toast.error(err.data.businessErrornDescription);
     }
   };
 

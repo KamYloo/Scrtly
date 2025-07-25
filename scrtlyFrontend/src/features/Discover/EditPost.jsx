@@ -29,8 +29,7 @@ function EditPost({ post, onClose }) {
             await updatePost(formData).unwrap();
             toast.success('Post updated successfully.');
         } catch (err) {
-            const msg = (err.data && (err.data.message || err.data.error)) || err.error;
-            toast.error(msg);
+            toast.error(err.data.businessErrornDescription);
         } finally {
             setDescription('')
             setPostImg(null);

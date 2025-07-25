@@ -39,8 +39,7 @@ function ForgotPassword() {
             toast.success("A password reset email has been sent.");
             navigate("/login");
         } catch (err) {
-            const msg = err?.data?.message || err?.error || 'Failed to send reset email. Please try again.';
-            toast.error(msg);
+            toast.error(err.data.businessErrornDescription);
         }
     };
 

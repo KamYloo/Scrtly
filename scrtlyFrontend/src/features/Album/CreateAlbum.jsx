@@ -24,9 +24,7 @@ function CreateAlbum({onClose}) {
             toast.success('Album created successfully.')
             onClose()
         } catch (err) {
-            const message =
-                err?.status ? `Error ${err.status}: ${err.data || err.error}` : 'Failed to create album.'
-            toast.error(message)
+            toast.error(err.data.businessErrornDescription)
         } finally {
             setAlbumImg(null);
             setTitle(null);

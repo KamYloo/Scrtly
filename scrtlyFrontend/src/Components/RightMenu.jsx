@@ -29,7 +29,7 @@ function RightMenu() {
       toast.success("Logged out successfully");
       navigate("/login");
     } catch (err) {
-      toast.error(err?.data?.message || "Logout failed");
+      toast.error(err.data.businessErrornDescription);
     }
   };
 

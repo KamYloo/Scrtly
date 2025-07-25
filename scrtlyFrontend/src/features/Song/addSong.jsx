@@ -24,11 +24,7 @@ function AddSong({onClose, albumId}) {
             toast.success('Song uploaded successfully.')
             onClose()
         } catch (err) {
-            const message =
-                err?.status
-                    ? `Error ${err.status}: ${err.data || err.error}`
-                    : 'Failed to upload song.'
-            toast.error(message)
+            toast.error(err.data.businessErrornDescription)
         } finally {
             setTitle('')
             setSongImg(null)

@@ -4,7 +4,7 @@ import { ChatUsersList } from './ChatUsersList.jsx'
 
 
 // eslint-disable-next-line react/prop-types
-function ChatList({chat, onChatSelect }) {
+function ChatList({chats, onChatSelect }) {
     const [chatListViewVisible, setChatListViewVisible] = useState(true);
     const toggleChatListView = () => {
         setChatListViewVisible(!chatListViewVisible);
@@ -12,7 +12,7 @@ function ChatList({chat, onChatSelect }) {
     return (
         <div className={`chatList ${chatListViewVisible ? 'visible' : 'hidden'}`}>
             <UserInfo toggleChatListView={toggleChatListView} />
-            <ChatUsersList chat = {chat} onChatSelect = {onChatSelect}/>
+            <ChatUsersList chats = {chats} onChatSelect = {onChatSelect}/>
         </div>
     )
 }

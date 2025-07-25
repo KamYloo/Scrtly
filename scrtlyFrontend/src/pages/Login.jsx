@@ -44,11 +44,7 @@ function Login() {
             localStorage.setItem('isLoggedIn', '1')
             navigate('/home')
         } catch (err) {
-            const msg =
-                (err.data && (err.data.message || err.data.error)) ||
-                err.error ||
-                'Login failed';
-            toast.error(msg);
+            toast.error(err.data.businessErrornDescription);
         }
     }
 
