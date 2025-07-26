@@ -6,7 +6,6 @@ export const notificationApi = apiSlice.injectEndpoints({
             query: ({ page = 0, size = 10 } = {}) => ({
                 url: `/notifications/own?page=${page}&size=${size}`,
                 method: "GET",
-                credentials: "include",
             }),
             transformResponse: (response, meta, arg) => ({
                 notifications: response.content,
@@ -27,7 +26,6 @@ export const notificationApi = apiSlice.injectEndpoints({
             query: (id) => ({
                 url: `/notifications/delete/${id}`,
                 method: 'DELETE',
-                credentials: 'include',
             }),
             async onQueryStarted(id, { dispatch, queryFulfilled }) {
                 const allQueries = dispatch(

@@ -1,17 +1,36 @@
-import React, { useEffect } from 'react'
+import React, { } from 'react'
 import "../Styles/home.css"
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import Spinner from "../Components/Spinner.jsx";
 import ErrorOverlay from "../Components/ErrorOverlay.jsx";
-import { getTopAlbumsAction, getTopArtistsAction, getTopSongsAction } from "../Redux/RecommendationService/Action.js";
 import {useNavigate } from "react-router-dom";
 import { likeSong } from "../Redux/Song/Action.js";
 import TrendingSong from "../features/Home/TrendingSong.jsx";
 import AlbumsList from "../features/Home/AlbumsList.jsx";
 import TopSongsList from "../features/Home/TopSongsList.jsx";
 import FavouriteArtistsList from "../features/Home/FavouriteArtistsList.jsx";
+import {useGetTopAlbumsQuery, useGetTopArtistsQuery, useGetTopSongsQuery} from "../Redux/services/recommendationApi.js";
 function Home() {
-    const { loading, error, albums, artists, songs } = useSelector(state => state.recommendationService);
+    const {
+        data: artists = [],
+        isLoading: loadingArtists,
+        isError: errorArtists,
+    } = useGetTopArtistsQuery({ window: "day", n: 8 });
+
+    const {
+        data: albums = [],
+        isLoading: loadingAlbums,
+        isError: errorAlbums,
+    } = useGetTopAlbumsQuery({ window: "day", n: 6 });
+
+    const {
+        data: songs = [],
+        isLoading: loadingSongs,
+        isError: errorSongs,
+    } = useGetTopSongsQuery({ timeWindow  : "day", n: 6 });
+    const isLoading = loadingArtists || loadingAlbums || loadingSongs;
+    const isError = errorArtists || errorAlbums || errorSongs;
+
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const trending = songs[0];
@@ -23,14 +42,8 @@ function Home() {
         return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
     }
 
-    useEffect(() => {
-        dispatch(getTopArtistsAction('day', 8))
-        dispatch(getTopAlbumsAction('day', 6))
-        dispatch(getTopSongsAction('day', 6))
-    }, [dispatch])
-
-    if (loading) return <Spinner />
-    if (error) return <ErrorOverlay message={error} />
+    if (isLoading) return <Spinner />
+    if (isError) return <ErrorOverlay error={error} />
 
     return (
         <div className='homeBox'>
