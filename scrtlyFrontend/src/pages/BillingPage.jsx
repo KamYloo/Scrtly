@@ -1,30 +1,45 @@
 import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
-import { billingPortalAction, fetchSubscriptionAction } from "../Redux/PaymentService/Action.js";
 import '../Styles/BillingPage.css';
 import logo from '../assets/subscriptionLogo.png';
+import {useBillingPortalMutation, useFetchSubscriptionQuery} from "../Redux/services/paymentApi.js";
 
 function BillingPage() {
-    const dispatch = useDispatch();
-    const { subscription, billingPortalUrl, loading, error, loadingButton } = useSelector(state => state.paymentService);
+
+    const {
+        data: subscription,
+        error: fetchError,
+        isLoading,
+    } = useFetchSubscriptionQuery();
+
+    const [
+        openBillingPortal,
+        {
+            data: billingPortalData,
+            error: billingError,
+            isLoading: isPortalLoading,
+            isSuccess: isPortalSuccess,
+        }
+    ] = useBillingPortalMutation();
 
     useEffect(() => {
-        dispatch(fetchSubscriptionAction());
-    }, [dispatch]);
+        if (isPortalSuccess && billingPortalData?.url) {
+            window.location.href = billingPortalData.url;
+        }
+    }, [isPortalSuccess, billingPortalData]);
 
     useEffect(() => {
-        if (billingPortalUrl) window.location.href = billingPortalUrl;
-    }, [billingPortalUrl]);
+        if (fetchError) toast.error(fetchError);
+    }, [fetchError]);
 
     useEffect(() => {
-        if (error) toast.error(error);
-    }, [error]);
+        if (billingError) toast.error(billingError);
+    }, [billingError]);
 
     return (
         <div className="billing-page">
             <h1>Subscription Plan</h1>
-            {loading ? (
+            {isLoading  ? (
                 <p className="bp--loading">Loading data…</p>
             ) : (
                 <div className="bp__card">
@@ -61,8 +76,8 @@ function BillingPage() {
                     )}
                     <button
                         className="bp__btn"
-                        onClick={() => dispatch(billingPortalAction())}
-                        disabled={loadingButton}
+                        onClick={() => openBillingPortal()}
+                        disabled={isPortalLoading}
                     >
                         Manage in Stripe
                     </button>

@@ -1,37 +1,34 @@
 import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import {stripePromise} from "../../utils/stripe.js";
-import {subscribeAction} from "../../Redux/PaymentService/Action.js";
 import {FaCrown} from "react-icons/fa";
 import toast from "react-hot-toast";
-
+import {useSubscribeMutation} from "../../Redux/services/paymentApi.js";
 
 export function SubscribeButton({ successUrl, cancelUrl }) {
-    const dispatch = useDispatch();
-    const { error, session } = useSelector(state => state.paymentService);
+    const [subscribe, { data, error, isError }] = useSubscribeMutation();
 
     useEffect(() => {
-        if (error) {
+        if (isError) {
             toast.error(error);
         }
-    }, [error]);
+    }, [error, isError]);
 
     useEffect(() => {
-        if (!session) return;
+        if (!data?.sessionId) return;
 
         async function redirect() {
             const stripe = await stripePromise;
-            const { error } = await stripe.redirectToCheckout({ sessionId: session });
+            const { error } = await stripe.redirectToCheckout({ sessionId: data.sessionId, });
             if (error) {
                 toast.error(error.message || "Stripe redirect error");
             }
         }
 
         redirect();
-    }, [session]);
+    }, [data]);
 
     const handleSubscribe = () => {
-        dispatch(subscribeAction({successUrl, cancelUrl}));
+        subscribe({ successUrl, cancelUrl });
     };
 
     return (
