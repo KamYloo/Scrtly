@@ -31,7 +31,8 @@ export const apiSlice  = createApi({
     baseQuery: baseQueryWithReauth,
     tagTypes: [
         'Album', 'Track', 'Artist', 'Song', 'User', 'Auth',
-        "Post", "Comment", "Chat", "ChatMessages", "Subscription"],
+        "Post", "Comment", "Chat", "ChatMessages", "Subscription",
+        "Notifications"],
     endpoints: () => ({}),
 });
 

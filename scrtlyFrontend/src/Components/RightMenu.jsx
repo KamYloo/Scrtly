@@ -1,27 +1,30 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../Styles/RightMenu.css";
 import { FaBell, FaCogs, FaCrown, FaRegHeart, FaSun } from "react-icons/fa";
-import { useDispatch, useSelector } from "react-redux";
 import { NotificationsList } from "../features/Notification/NotificationsList.jsx";
 import toast from "react-hot-toast";
-import { getNotifications } from "../Redux/NotificationService/Action.js";
 import defaultAvatar from "../assets/user.jpg";
 import {SubscribeButton} from "../features/Payment/SubscribeButton.jsx";
 import {useGetCurrentUserQuery, useLogoutMutation} from "../Redux/services/authApi.js";
+import {useGetNotificationsQuery} from "../Redux/services/notificationApi.js";
 
 function RightMenu() {
   const [openNotifications, setOpenNotifications] = useState(false);
-  const dispatch = useDispatch();
   const base = window.location.origin;
   const [logout] = useLogoutMutation();
   const { data: currentUser } = useGetCurrentUserQuery(null, { skip: !localStorage.getItem('isLoggedIn') });
-  const notifications = useSelector(
-    (state) => state.notifications.notifications
-  );
   const navigate = useNavigate();
 
-  const unseenCount = notifications.filter((notif) => !notif.seen).length;
+  const { unseenCount } = useGetNotificationsQuery(
+      { page: 0, size: 10 },
+      {
+        selectFromResult: ({ data }) => ({
+          unseenCount:
+              data?.notifications.filter((n) => !n.seen).length ?? 0,
+        }),
+      }
+  );
 
   const handleLogout = async () => {
     try {
@@ -42,14 +45,9 @@ function RightMenu() {
     }
   };
 
-  useEffect(() => {
-    if (currentUser)
-      dispatch(getNotifications());
-  }, []);
-
   return (
     <div className="rightMenu">
-      {openNotifications && <NotificationsList notifications={notifications} />}
+      {openNotifications && <NotificationsList />}
       <div className="top">
         {!currentUser?.premium ? (
                 <SubscribeButton
