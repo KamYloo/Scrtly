@@ -4,9 +4,9 @@ import { FaRegSquarePlus } from 'react-icons/fa6'
 import { MusicPlayer } from './MusicPlayer.jsx'
 import { BsTrash } from 'react-icons/bs'
 import { useDispatch, useSelector } from 'react-redux'
-import { deleteSong, likeSong } from '../../Redux/Song/Action.js'
 import { addSongToPlayList, deleteSongFromPlayList } from '../../Redux/PlayList/Action.js'
 import toast from 'react-hot-toast'
+import {useDeleteSongMutation, useLikeSongMutation} from "../../Redux/services/songApi.js";
 
 // eslint-disable-next-line react/prop-types
 function AudioList({ volume, onTrackChange, initialSongs, req_artist, isplayListSongs, playListId, initialSongId }) {
@@ -14,13 +14,26 @@ function AudioList({ volume, onTrackChange, initialSongs, req_artist, isplayList
     const [auto, setAuto] = useState(false)
     const [addToPlayList, setAddToPlayList] = useState(null)
     const dispatch = useDispatch()
+    const [deleteSong] = useDeleteSongMutation()
+    const [likeSong]   = useLikeSongMutation()
     const { playList } = useSelector((store) => store)
 
     const currentSong = initialSongs[currentIndex] || {}
 
+    const [favorites, setFavorites] = useState(new Set())
+
+    useEffect(() => {
+        setFavorites(new Set(
+            initialSongs
+                .filter(s => s.favorite)
+                .map(s => s.id)
+        ))
+    }, [initialSongs])
+
+
+
     useEffect(() => {
         if (initialSongId && initialSongs && initialSongs.length > 0) {
-            // eslint-disable-next-line react/prop-types
             const idx = initialSongs.findIndex(song => song.id === initialSongId)
             if (idx !== -1) {
                 setCurrentIndex(idx)
@@ -48,19 +61,23 @@ function AudioList({ volume, onTrackChange, initialSongs, req_artist, isplayList
         setAddToPlayList((prev) => (prev === songId ? null : songId))
     }
 
-    const songDeleteFromAlbumHandler = (songId) => {
-        if (window.confirm('Are you sure you want to delete this song?')) {
-            dispatch(deleteSong(songId))
-                .then(() => toast.success('Song deleted successfully.'))
-                .catch(() => toast.error('Failed to delete song. Please try again.'))
+    const songDeleteFromAlbumHandler = async (songId) => {
+        if (!window.confirm('Are you sure you want to delete this song?')) return;
+        try {
+            await deleteSong(songId).unwrap()
+            toast.success('Song deleted successfully.')
+        } catch (err) {
+            toast.error(err.data.businessErrornDescription);
         }
     }
 
-    const songDeleteFromPlayListHandler = (songId) => {
-        if (window.confirm('Are you sure you want to delete this song from playlist?')) {
-            dispatch(deleteSongFromPlayList({ playListId, songId }))
-                .then(() => toast.success('Song removed from playlist.'))
-                .catch(() => toast.error('Failed to remove song. Please try again.'))
+    const songDeleteFromPlayListHandler = async (songId) => {
+        if (!window.confirm('Are you sure you want to delete this song from playlist?')) return;
+        try {
+            await deleteSong(songId).unwrap()
+            toast.success('Song removed from playlist.')
+        } catch (err) {
+            toast.error(err.data.businessErrornDescription);
         }
     }
 
@@ -68,9 +85,22 @@ function AudioList({ volume, onTrackChange, initialSongs, req_artist, isplayList
         dispatch(addSongToPlayList({ playListId, songId }))
     }
 
-    const likeSongHandler = (songId) => {
-        dispatch(likeSong(songId))
-    }
+    const likeSongHandler = async (songId) => {
+        const newFavorites = new Set(favorites);
+        if (favorites.has(songId)) {
+            newFavorites.delete(songId);
+        } else {
+            newFavorites.add(songId);
+        }
+        setFavorites(newFavorites);
+
+        try {
+            await likeSong(songId).unwrap();
+        } catch {
+            setFavorites(favorites);
+        }
+    };
+
 
     const handleNextSong = useCallback(() => {
         const nextIndex = (currentIndex + 1) % initialSongs.length
@@ -120,15 +150,19 @@ function AudioList({ volume, onTrackChange, initialSongs, req_artist, isplayList
                                             {formatTime(songItem?.duration)}
                                         </span>
                                     </p>
-                                    <div className='favourite' onClick={() => likeSongHandler(songItem.id)}>
-                                        {songItem?.favorite ? (
+                                    <div className='favourite' onClick={(e) => {
+                                        e.stopPropagation();
+                                        likeSongHandler(songItem.id);
+                                    }}>
+                                        {favorites.has(songItem.id) ? (
                                             <FaHeart />
                                         ) : (
                                             <FaRegHeart />
                                         )}
                                     </div>
                                     {(req_artist || isplayListSongs) && (
-                                        <i className='deleteSong' onClick={() => {
+                                        <i className='deleteSong' onClick={(e) => {
+                                            e.stopPropagation();
                                             isplayListSongs
                                                 ? songDeleteFromPlayListHandler(songItem.id)
                                                 : songDeleteFromAlbumHandler(songItem.id)
@@ -165,7 +199,7 @@ function AudioList({ volume, onTrackChange, initialSongs, req_artist, isplayList
                 volume={volume}
                 onNext={handleNextSong}
                 onPrev={handlePrevSong}
-                isLiked={currentSong?.favorite}
+                isLiked={favorites.has(currentSong.id)}
                 onLike={() => likeSongHandler(currentSong?.id)}
             />
         </div>

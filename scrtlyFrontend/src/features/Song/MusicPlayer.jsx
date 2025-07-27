@@ -13,9 +13,9 @@ import {
 } from 'react-icons/fa'
 import { BsDownload } from 'react-icons/bs'
 import Hls from 'hls.js'
-import {recordPlay} from "../../Redux/Song/Action.js";
 import {useDispatch} from "react-redux";
 import {BASE_API_URL} from "../../Redux/api.js";
+import {useRecordPlayMutation} from "../../Redux/services/songApi.js";
 
 export function MusicPlayer({
                                 songId,
@@ -41,8 +41,8 @@ export function MusicPlayer({
     const hlsRef = useRef(null)
     const bufferTimeoutRef = useRef(null)
     const initialBufferedRef = useRef(false)
-    const dispatch = useDispatch()
     const playRecordedRef = useRef(false)
+    const [recordPlay] = useRecordPlayMutation();
 
     useEffect(() => {
         const audio = audioRef.current
@@ -141,7 +141,7 @@ export function MusicPlayer({
                 setPlaying(true)
 
                 if (!playRecordedRef.current) {
-                    dispatch(recordPlay(songId))
+                    recordPlay(songId).unwrap()
                     playRecordedRef.current = true
                 }
             })

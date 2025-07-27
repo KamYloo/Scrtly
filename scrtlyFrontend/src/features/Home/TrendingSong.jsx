@@ -1,6 +1,6 @@
 import { FaRegHeart, FaHeart } from "react-icons/fa";
 
-function TrendingSong({ trending, onLike, onListen }) {
+function TrendingSong({ trending, isFav, onLike, onListen }) {
     return (
         <div className='trending'>
             <div className="left">
@@ -12,7 +12,7 @@ function TrendingSong({ trending, onLike, onListen }) {
                     <div className="buttons">
                         <button onClick={onListen}>Listen Now</button>
                         <i onClick={onLike}>
-                            {trending?.favorite ? <FaHeart /> : <FaRegHeart />}
+                            {isFav ? <FaHeart /> : <FaRegHeart />}
                         </i>
                     </div>
                 </div>

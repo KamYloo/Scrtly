@@ -284,6 +284,10 @@
       color: white;
     }
   }
+
+  .noResult {
+    color: white;
+  }
 }
 
 .addSong {

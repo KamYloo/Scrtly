@@ -32,7 +32,9 @@ function Artist({ volume, onTrackChange }) {
     isLoading: tracksLoading,
     isError: tracksError,
     error: tracksErrorData,
-  } = useGetArtistTracksQuery(artistId);
+  } = useGetArtistTracksQuery(artistId, {
+    refetchOnMountOrArgChange: true
+  });
 
   if (artistLoading || tracksLoading) {
     return <Spinner />
@@ -44,7 +46,6 @@ function Artist({ volume, onTrackChange }) {
     return <ErrorOverlay error={tracksErrorData} />;
   }
 
-  console.log(tracks)
   return (
       <div className="mainBox">
         <Banner artist={artistData} />
