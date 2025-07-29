@@ -238,6 +238,17 @@
       font-family: cursive;
       color: white;
     }
+
+    .delete-button {
+      color: #9c0303;
+      position: absolute;
+      top: 0;
+      right: 0;
+      font-size: large;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
   }
 
   .progress-bar {

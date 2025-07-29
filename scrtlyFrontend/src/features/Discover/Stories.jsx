@@ -1,11 +1,10 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useRef, useState} from 'react';
 import { FaChevronRight, FaChevronLeft } from "react-icons/fa";
-import {useDispatch, useSelector} from "react-redux";
 import {AddStory} from "./AddStory.jsx";
 import {StoryViewer} from "./StoryViewer.jsx";
-import {getFollowedUsersStory} from "../../Redux/Story/Action.js";
 import defaultAvatar from "../../assets/user.jpg";
 import {useGetCurrentUserQuery} from "../../Redux/services/authApi.js";
+import {useGetFollowedStoriesQuery, useGetUserStoriesQuery} from "../../Redux/services/storyApi.js";
 
 
 function Stories() {
@@ -17,8 +16,27 @@ function Stories() {
     const { data: reqUser } = useGetCurrentUserQuery(null, {
         skip: !localStorage.getItem('isLoggedIn'),
     });
-  const dispatch = useDispatch()
-  const {story} = useSelector(store => store);
+
+    const {
+        data: myStories = [],
+    } = useGetUserStoriesQuery(undefined, {
+        skip: !reqUser,
+    });
+
+    const {
+        data: followedGroups = [],
+    } = useGetFollowedStoriesQuery(undefined, {
+        skip: !reqUser,
+    });
+
+    const groups = [];
+    if (reqUser) {
+        groups.push({
+            user: reqUser.nickName,
+            stories: myStories,
+        });
+    }
+    followedGroups.forEach((g) => groups.push(g));
 
     const handleScrollLeft = () => {
     storyBoxRef.current.scrollBy({
@@ -40,10 +58,6 @@ function Stories() {
         setShowViewer(true)
     };
 
-    useEffect(() => {
-        dispatch(getFollowedUsersStory())
-    }, [dispatch])
-
   return (
       <div className='stories'>
         <button className="scroll-button left" onClick={handleScrollLeft}>
@@ -54,20 +68,30 @@ function Stories() {
             <img src={reqUser?.profilePicture || defaultAvatar} alt="Add story" />
             <span>+ Story</span>
           </div>
-            {Object.entries(story.stories).map(([user, stories], userIndex) => (
-                <div className="story" key={userIndex} onClick={() => handleStoryClick(userIndex, 0)}>
-                    <img src={stories[0]?.user?.profilePicture || defaultAvatar} alt={stories[0]?.user?.fullName || ''} />
-                    <span>{stories[0]?.user?.fullName || ''}</span>
-                </div>
-            ))}
+            {groups.map(({ user, stories }, uIdx) => {
+                const first = stories[0];
+                return (
+                    <div
+                        key={user}
+                        className='story'
+                        onClick={() => handleStoryClick(uIdx, 0)}
+                    >
+                        <img
+                            src={first?.image || defaultAvatar}
+                            alt={user}
+                        />
+                        <span>{user}</span>
+                    </div>
+                );
+            })}
         </div>
-        <button className="scroll-button right" onClick={handleScrollRight}>
-          <FaChevronRight />
-        </button>
+          <button className='scroll-button right' onClick={handleScrollRight}>
+              <FaChevronRight />
+          </button>
           {addStory && <AddStory onClose={() => setAddStory(((prev) => !prev))}/>}
           {showViewer && (
               <StoryViewer
-                  stories={story.stories}
+                  groups={groups}
                   currentUserIndex={currentUserIndex}
                   currentStoryIndex={currentStoryIndex}
                   onClose={() => setShowViewer(false)}

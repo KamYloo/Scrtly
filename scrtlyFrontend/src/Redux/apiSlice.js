@@ -32,7 +32,7 @@ export const apiSlice  = createApi({
     tagTypes: [
         'Album', 'Track', 'Artist', 'Song', 'User', 'Auth',
         "Post", "Comment", "Chat", "ChatMessages", "Subscription",
-        "Notifications"],
+        "Notifications", "Story"],
     endpoints: () => ({}),
 });
 
