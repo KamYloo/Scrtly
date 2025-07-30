@@ -33,11 +33,13 @@ export const artistApi = apiSlice.injectEndpoints({
         }),
 
         getArtistTracks: builder.query({
-            query: artistId => `/artist/${artistId}/tracks`,
-            providesTags: (result, error, artistId) =>
-                result
+            query: ({ artistId, page = 0, size = 9 }) =>
+                `/artist/${artistId}/tracks?page=${page}&size=${size}`,
+            transformResponse: (response) => response.content,
+            providesTags: (tracks = [], error, { artistId }) =>
+                tracks.length
                     ? [
-                        ...result.content.map(track => ({ type: 'Track', id: track.id })),
+                        ...tracks.map(track => ({ type: 'Track', id: track.id })),
                         { type: 'Track', id: `ARTIST_${artistId}` },
                     ]
                     : [{ type: 'Track', id: `ARTIST_${artistId}` }],

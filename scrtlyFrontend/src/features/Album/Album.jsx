@@ -32,6 +32,7 @@ function Album({ volume, onTrackChange}) {
         error: tracksError,
     } = useGetAlbumTracksQuery(albumId, {
         pollingInterval: pollInterval,
+        refetchOnMountOrArgChange: true
     })
     const [deleteAlbum, { isLoading: isDeleting }] = useDeleteAlbumMutation()
 

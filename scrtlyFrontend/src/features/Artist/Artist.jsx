@@ -11,7 +11,7 @@ import { AboutArtist } from './AboutArtist.jsx'
 import Spinner from '../../Components/Spinner.jsx'
 import ErrorOverlay from '../../Components/ErrorOverlay.jsx'
 import {useGetCurrentUserQuery} from "../../Redux/services/authApi.js";
-import {useFindArtistByIdQuery, useGetArtistTracksQuery} from "../../Redux/services/artistApi.js";
+import {useFindArtistByIdQuery} from "../../Redux/services/artistApi.js";
 
 function Artist({ volume, onTrackChange }) {
   const { artistId } = useParams()
@@ -27,23 +27,12 @@ function Artist({ volume, onTrackChange }) {
     error: artistErrorData,
   } = useFindArtistByIdQuery(artistId);
 
-  const {
-    data: { content: tracks = [] } = { content: [] },
-    isLoading: tracksLoading,
-    isError: tracksError,
-    error: tracksErrorData,
-  } = useGetArtistTracksQuery(artistId, {
-    refetchOnMountOrArgChange: true
-  });
 
-  if (artistLoading || tracksLoading) {
+  if (artistLoading) {
     return <Spinner />
   }
   if (artistError) {
     return <ErrorOverlay error={artistErrorData} />;
-  }
-  if (tracksError) {
-    return <ErrorOverlay error={tracksErrorData} />;
   }
 
   return (
@@ -88,9 +77,9 @@ function Artist({ volume, onTrackChange }) {
         </div>
 
         <Routes>
-          <Route path="popular" element={<AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={tracks} req_artist={artistData?.id === reqUser?.id} initialSongId={playSongId}/>}/>
+          <Route path="popular" element={<AudioList volume={volume} onTrackChange={onTrackChange}  req_artist={artistData?.id === reqUser?.id} artistId={artistId} initialSongId={playSongId}/>}/>
           <Route path="albums" element={<ArtistAlbums artistId={artistId} />} />
-          <Route path="songs" element={<AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={tracks} req_artist={artistData?.id === reqUser?.id}/>}/>
+          <Route path="songs" element={<AudioList volume={volume} onTrackChange={onTrackChange}  req_artist={artistData?.id === reqUser?.id} artistId={artistId}/>}/>
           <Route path="fans" element={<Fans artistId={artistId} fans={artistData?.fans} />}/>
           <Route path="about" element={<AboutArtist artist={artistData} artistBio={artistData?.artistBio} />}/>
         </Routes>
