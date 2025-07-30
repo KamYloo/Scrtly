@@ -12,14 +12,13 @@ export const albumApi = apiSlice.injectEndpoints({
         }),
 
         getAllAlbums: builder.query({
-            query: () => "/album/all",
-            providesTags: result =>
-                result
-                    ? [
-                        ...result.content.map(({ id }) => ({ type: "Album", id })),
-                        { type: "Album", id: "LIST" },
-                    ]
-                    : [{ type: "Album", id: "LIST" }],
+            query: ({ page = 0, size = 9 } = {}) =>
+                `/album/all?page=${page}&size=${size}`,
+            // return only the `content` array
+            transformResponse: response => response.content,
+            providesTags: (albums = [], err, { page, size }) =>
+                albums.map(a => ({ type: "Album", id: a.id }))
+                    .concat([{ type: "Album", id: "LIST" }]),
         }),
 
         getAlbum: builder.query({

@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useCallback, useEffect, useRef, useState} from 'react'
 import "../Styles/AlbumsView&&ArtistsView.css"
 import AlbumBanner from '../assets/albumBanner.png'
 import { BiSearchAlt } from "react-icons/bi";
@@ -7,23 +7,69 @@ import {useNavigate} from "react-router-dom";
 import Spinner from "../Components/Spinner.jsx";
 import ErrorOverlay from "../Components/ErrorOverlay.jsx";
 import {useGetAllAlbumsQuery} from "../Redux/services/albumApi.js";
+import throttle from "lodash.throttle";
 
 function AlbumsView() {
-    const { data, error, isLoading } = useGetAllAlbumsQuery()
-    const albums = data?.content ?? []
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
 
-    const filteredAlbums = albums.filter(albumItem =>
-        albumItem.title.toLowerCase().includes(searchQuery.toLowerCase())
+    const [page, setPage] = useState(0);
+    const size = 9;
+    const [allAlbums, setAllAlbums] = useState([]);
+
+    const {
+        data = [],
+        isLoading,
+        isError,
+        error,
+        isFetching,
+    } = useGetAllAlbumsQuery({ page, size });
+
+    const listRef = useRef();
+
+    // accumulate pages
+    useEffect(() => {
+        if (Array.isArray(data)) {
+            setAllAlbums(prev =>
+                page === 0
+                    ? data
+                    : [
+                        ...prev,
+                        ...data.filter(a => !prev.find(x => x.id === a.id))
+                    ]
+            );
+        }
+    }, [data, page]);
+
+    // infinite scroll
+    const onScroll = useCallback(
+        throttle(() => {
+            const el = listRef.current;
+            if (!el || isFetching || data.length < size) return;
+            if (el.scrollHeight - el.scrollTop - el.clientHeight < 100) {
+                setPage(p => p + 1);
+            }
+        }, 200),
+        [isFetching, data]
     );
+
+    useEffect(() => {
+        const el = listRef.current;
+        if (!el) return;
+        el.addEventListener("scroll", onScroll);
+        return () => el.removeEventListener("scroll", onScroll);
+    }, [onScroll]);
 
     if (isLoading) {
         return <Spinner />;
     }
-    if (error) {
+    if (isError) {
         return <ErrorOverlay error={error} />
     }
+
+    const filtered = allAlbums.filter(a =>
+        a.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     return (
         <div className='albumsView'>
@@ -41,8 +87,8 @@ function AlbumsView() {
                 </div>
                 <button>Search</button>
             </div>
-            <div className="albums">
-                {filteredAlbums.map((item) => (
+            <div className="albums" ref={listRef}>
+                {filtered.map((item) => (
                     <div className="album" key={item.id} onClick={() => navigate(`/album/${item.id}`)}>
                         <i className="play"><FaCirclePlay/></i>
                         <img src={item?.albumImage || ''} alt=""/>

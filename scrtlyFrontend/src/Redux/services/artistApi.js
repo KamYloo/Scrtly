@@ -4,32 +4,25 @@ export const artistApi = apiSlice.injectEndpoints({
     endpoints: builder => ({
         findArtistById: builder.query({
             query: artistId => `/artist/${artistId}`,
-            providesTags: (result, error, artistId) =>
-                result ? [{ type: 'Artist', id: artistId }] : [],
+            providesTags: (res, err, id) => res ? [{ type: "Artist", id }] : [],
         }),
 
-
         getAllArtists: builder.query({
-            query: () => '/artist/all',
-            providesTags: (result) =>
-                result
-                    ? [
-                        ...result.content.map(({ id }) => ({ type: 'Artist', id })),
-                        { type: 'Artist', id: 'LIST' },
-                    ]
-                    : [{ type: 'Artist', id: 'LIST' }],
+            query: ({ page = 0, size = 9 } = {}) =>
+                `/artist/all?page=${page}&size=${size}`,
+            transformResponse: (response) => response.content,
+            providesTags: (artists = [], err, { page, size }) =>
+                artists.map(a => ({ type: "Artist", id: a.id }))
+                    .concat([{ type: "Artist", id: "LIST" }]),
         }),
 
         updateArtist: builder.mutation({
             query: formData => ({
-                url: '/artist/update',
-                method: 'PUT',
+                url: "/artist/update",
+                method: "PUT",
                 body: formData,
             }),
-            invalidatesTags: (result) =>
-                result
-                    ? [{ type: 'Artist', id: result.id }]
-                    : [],
+            invalidatesTags: res => res ? [{ type: "Artist", id: res.id }] : [],
         }),
 
         getArtistTracks: builder.query({
