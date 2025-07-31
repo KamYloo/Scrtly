@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { MenuList } from "./MenuList";
 import "../Styles/MobileNav.css";
-import logo from "../assets/logo.png";
+import logo from "../assets/logo512.png";
 import {FaBell, FaAlignRight, FaCrown} from "react-icons/fa";
 import { RiPlayListLine } from "react-icons/ri";
 import { NotificationsList } from "../features/Notification/NotificationsList.jsx";

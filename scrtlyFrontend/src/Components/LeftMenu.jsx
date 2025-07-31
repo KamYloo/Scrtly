@@ -1,21 +1,21 @@
 import React from 'react'
 import '../Styles/LeftMenu.css'
-import logo from '../assets/logo.png'
+import logo from '../assets/logo512.png'
 
-import { FaEllipsisH } from "react-icons/fa";
 import { BiSearchAlt } from "react-icons/bi";
 import { Menu } from './Menu';
 import { MenuList } from './MenuList';
 import { MenuPlayList } from '../features/PlayList/MenuPlayList.jsx';
 import { TrackList } from './TrackList';
+import {useNavigate} from "react-router-dom";
 
 function LeftMenu({ onVolumeChange, currentTrack, setCreatePlayList}) {
+    const navigate = useNavigate();
     return (
         <div className='LeftMenu'>
-            <div className="logoBox">
+            <div className="logoBox" onClick={() => navigate('/home')}>
                 <img src={logo} alt="" />
-                <h2>Scrtly</h2>
-                <i><FaEllipsisH /></i>
+                <h2>Zuvoria</h2>
             </div>
             <div className="searchBox">
                 <input type="text" placeholder='Search...' />

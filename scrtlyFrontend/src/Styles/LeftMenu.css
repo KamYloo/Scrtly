@@ -14,7 +14,9 @@
     color: white;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 2vh;
+    justify-content: center;
+    cursor: pointer;
 
     img {
         height: 50px;
@@ -34,7 +36,7 @@
 }
 
 .LeftMenu .logoBox h2 {
-    font-size: 20px;
+    font-size: 22px;
 }
 
 .LeftMenu .searchBox {
@@ -293,6 +295,9 @@
             img {
                 height: 40px;
                 width: 40px;
+            }
+            h2 {
+                display: none;
             }
         }
     }

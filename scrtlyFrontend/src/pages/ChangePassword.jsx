@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import '../Styles/Login&Register.css';
-import logo from "../assets/logo.png";
+import logo from "../assets/logo512.png";
 import {useResetPasswordMutation} from "../Redux/services/authApi.js";
 
 function ChangePassword() {

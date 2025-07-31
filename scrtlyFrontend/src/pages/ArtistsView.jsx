@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import "../Styles/AlbumsView&&ArtistsView.css"
-import ArtistBanner from '../assets/ArtistsBanner.png'
+import ArtistBanner from '../assets/artistsBanner.png'
 import Verification from '../assets/check.png'
 import defaultAvatar from "../assets/user.jpg";
 import { BiSearchAlt } from "react-icons/bi";
