@@ -1,6 +1,9 @@
 package com.kamylo.Scrtly_backend.serviceTests;
 
+import com.kamylo.Scrtly_backend.album.mapper.AlbumMapper;
 import com.kamylo.Scrtly_backend.album.web.dto.AlbumDto;
+import com.kamylo.Scrtly_backend.song.mapper.SongMapper;
+import com.kamylo.Scrtly_backend.song.service.HlsService;
 import com.kamylo.Scrtly_backend.song.web.dto.SongDto;
 import com.kamylo.Scrtly_backend.album.domain.AlbumEntity;
 import com.kamylo.Scrtly_backend.artist.domain.ArtistEntity;
@@ -8,9 +11,6 @@ import com.kamylo.Scrtly_backend.song.domain.SongEntity;
 import com.kamylo.Scrtly_backend.user.domain.UserEntity;
 import com.kamylo.Scrtly_backend.common.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.common.handler.CustomException;
-import com.kamylo.Scrtly_backend.album.mapper.AlbumMapperImpl;
-import com.kamylo.Scrtly_backend.common.mapper.Mapper;
-import com.kamylo.Scrtly_backend.song.mapper.SongMapperImpl;
 import com.kamylo.Scrtly_backend.album.repository.AlbumRepository;
 import com.kamylo.Scrtly_backend.artist.repository.ArtistRepository;
 import com.kamylo.Scrtly_backend.song.repository.SongRepository;
@@ -20,7 +20,6 @@ import com.kamylo.Scrtly_backend.user.service.UserService;
 import com.kamylo.Scrtly_backend.album.service.AlbumServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.modelmapper.ModelMapper;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -56,8 +55,14 @@ class AlbumServiceImplTest {
     @Mock
     private SongRepository songRepository;
 
-    private Mapper<AlbumEntity, AlbumDto> albumMapper;
-    private Mapper<SongEntity, SongDto> songMapper;
+    @Mock
+    private AlbumMapper albumMapper;
+
+    @Mock
+    private SongMapper songMapper;
+
+    @Mock
+    private HlsService hlsService;
 
     @InjectMocks
     private AlbumServiceImpl albumService;
@@ -65,8 +70,6 @@ class AlbumServiceImplTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        this.albumMapper = new AlbumMapperImpl(new ModelMapper());
-        this.songMapper = new SongMapperImpl(new ModelMapper());
         albumService = new AlbumServiceImpl(
                 albumRepository,
                 userService,
@@ -75,7 +78,8 @@ class AlbumServiceImplTest {
                 fileService,
                 albumMapper,
                 songMapper,
-                songRepository
+                songRepository,
+                hlsService
         );
     }
 
@@ -104,11 +108,18 @@ class AlbumServiceImplTest {
         albumEntity.setTitle(title);
         albumEntity.setSongs(Collections.emptyList());
 
+        AlbumDto albumDto = new AlbumDto();
+        albumDto.setId(1);
+        albumDto.setTitle(title);
+        albumDto.setTracksCount(0);
+        albumDto.setTotalDuration(0);
+
         when(userRoleService.isArtist(username)).thenReturn(true);
         when(userService.findUserByEmail(username)).thenReturn(user);
         when(albumImage.isEmpty()).thenReturn(false);
         when(fileService.saveFile(albumImage, "albumImages/")).thenReturn("path/to/image");
         when(albumRepository.save(any(AlbumEntity.class))).thenReturn(albumEntity);
+        when(albumMapper.toDto(any(AlbumEntity.class))).thenReturn(albumDto);
 
         AlbumDto result = albumService.createAlbum(title, albumImage, username);
 
@@ -120,15 +131,26 @@ class AlbumServiceImplTest {
     void getAlbums_shouldReturnAlbums() {
         Pageable pageable = PageRequest.of(0, 10);
         AlbumEntity albumEntity = new AlbumEntity();
+        albumEntity.setId(1);
+        albumEntity.setTitle("Test Album");
         albumEntity.setSongs(Collections.emptyList());
+
+        AlbumDto albumDto = new AlbumDto();
+        albumDto.setId(1);
+        albumDto.setTitle("Test Album");
+        albumDto.setTracksCount(0);
+        albumDto.setTotalDuration(0);
+
         Page<AlbumEntity> albumPage = new PageImpl<>(Collections.singletonList(albumEntity));
 
         when(albumRepository.findAll(pageable)).thenReturn(albumPage);
+        when(albumMapper.toDto(any(AlbumEntity.class))).thenReturn(albumDto);
 
         Page<AlbumDto> result = albumService.getAlbums(pageable);
 
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
+        assertEquals("Test Album", result.getContent().get(0).getTitle());
     }
 
     @Test
@@ -146,7 +168,14 @@ class AlbumServiceImplTest {
         albumEntity.setTitle("Test Album");
         albumEntity.setSongs(Collections.emptyList());
 
+        AlbumDto albumDto = new AlbumDto();
+        albumDto.setId(albumId);
+        albumDto.setTitle("Test Album");
+        albumDto.setTracksCount(0);
+        albumDto.setTotalDuration(0);
+
         when(albumRepository.findById(albumId)).thenReturn(Optional.of(albumEntity));
+        when(albumMapper.toDto(any(AlbumEntity.class))).thenReturn(albumDto);
 
         AlbumDto result = albumService.getAlbum(albumId);
 
@@ -164,15 +193,26 @@ class AlbumServiceImplTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         AlbumEntity albumEntity = new AlbumEntity();
+        albumEntity.setId(1);
+        albumEntity.setTitle("Test Album");
         albumEntity.setSongs(Collections.emptyList());
+
+        AlbumDto albumDto = new AlbumDto();
+        albumDto.setId(1);
+        albumDto.setTitle("Test Album");
+        albumDto.setTracksCount(0);
+        albumDto.setTotalDuration(0);
+
         Page<AlbumEntity> albumPage = new PageImpl<>(Collections.singletonList(albumEntity));
 
         when(albumRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(albumPage);
+        when(albumMapper.toDto(any(AlbumEntity.class))).thenReturn(albumDto);
 
         Page<AlbumDto> result = albumService.searchAlbums(artistName, albumName, pageable);
 
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
+        assertEquals("Test Album", result.getContent().get(0).getTitle());
     }
 
     @Test
@@ -185,8 +225,20 @@ class AlbumServiceImplTest {
         SongEntity songEntity = new SongEntity();
         songEntity.setDuration(200);
 
+        SongDto songDto = new SongDto();
+        songDto.setDuration(200);
+
+        AlbumDto albumDto = new AlbumDto();
+        albumDto.setId(albumId);
+        albumDto.setTitle("Test Album");
+        albumDto.setTracksCount(0);
+        albumDto.setTotalDuration(0);
+
         when(albumRepository.findById(albumId)).thenReturn(Optional.of(albumEntity));
+        when(albumMapper.toDto(any(AlbumEntity.class))).thenReturn(albumDto);
+        when(albumMapper.toEntity(any(AlbumDto.class))).thenReturn(albumEntity);
         when(songRepository.findByAlbumId(albumEntity.getId())).thenReturn(Collections.singletonList(songEntity));
+        when(songMapper.toDto(any(SongEntity.class))).thenReturn(songDto);
 
         List<SongDto> result = albumService.getAlbumTracks(albumId);
 
@@ -202,25 +254,12 @@ class AlbumServiceImplTest {
         fakeEntity.setId(albumId);
 
         when(albumRepository.findById(albumId)).thenReturn(Optional.of(fakeEntity));
+        // AlbumMapper zwraca null
+        when(albumMapper.toDto(any(AlbumEntity.class))).thenReturn(null);
 
-        Mapper<AlbumEntity, AlbumDto> albumMapperMock = mock(Mapper.class);
-        when(albumMapperMock.mapFrom(any(AlbumDto.class))).thenReturn(null);
-
-        AlbumServiceImpl serviceWithMockMapper = new AlbumServiceImpl(
-                albumRepository,
-                userService,
-                artistRepository,
-                userRoleService,
-                fileService,
-                albumMapperMock,
-                songMapper,
-                songRepository
-        );
-
-        CustomException exception = assertThrows(CustomException.class, () -> serviceWithMockMapper.getAlbumTracks(albumId));
+        CustomException exception = assertThrows(CustomException.class, () -> albumService.getAlbumTracks(albumId));
         assertEquals(BusinessErrorCodes.ALBUM_NOT_FOUND, exception.getErrorCode());
     }
-
 
     @Test
     void getAlbumsByArtist_shouldReturnAlbums() {
@@ -233,8 +272,15 @@ class AlbumServiceImplTest {
         albumEntity.setTitle("Test Album");
         albumEntity.setSongs(Collections.emptyList());
 
+        AlbumDto albumDto = new AlbumDto();
+        albumDto.setId(10);
+        albumDto.setTitle("Test Album");
+        albumDto.setTracksCount(0);
+        albumDto.setTotalDuration(0);
+
         when(artistRepository.findById(artistId)).thenReturn(Optional.of(artistEntity));
         when(albumRepository.findByArtistId(artistEntity.getId())).thenReturn(List.of(albumEntity));
+        when(albumMapper.toDto(any(AlbumEntity.class))).thenReturn(albumDto);
 
         List<AlbumDto> result = albumService.getAlbumsByArtist(artistId);
 
@@ -255,7 +301,7 @@ class AlbumServiceImplTest {
         user.setArtistEntity(artist);
 
         AlbumEntity albumEntity = new AlbumEntity();
-        albumEntity.setArtist(user);
+        albumEntity.setArtist(user.getArtistEntity());
 
         when(userRoleService.isArtist(username)).thenReturn(true);
         when(albumRepository.findById(albumId)).thenReturn(Optional.of(albumEntity));
@@ -296,7 +342,7 @@ class AlbumServiceImplTest {
         song2.setImageSong("cover2.jpg");
 
         AlbumEntity albumEntity = new AlbumEntity();
-        albumEntity.setArtist(user);
+        albumEntity.setArtist(user.getArtistEntity());
         albumEntity.setSongs(List.of(song1, song2));
         albumEntity.setCoverImage("coverAlbum.jpg");
 
@@ -333,7 +379,7 @@ class AlbumServiceImplTest {
         otherUser.setArtistEntity(albumArtist);
 
         AlbumEntity albumEntity = new AlbumEntity();
-        albumEntity.setArtist(otherUser);
+        albumEntity.setArtist(otherUser.getArtistEntity());
 
         when(userRoleService.isArtist(username)).thenReturn(true);
         when(albumRepository.findById(albumId)).thenReturn(Optional.of(albumEntity));

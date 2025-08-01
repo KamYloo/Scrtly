@@ -1,5 +1,7 @@
 package com.kamylo.Scrtly_backend.serviceTests;
 
+import com.kamylo.Scrtly_backend.chat.mapper.ChatMessageMapper;
+import com.kamylo.Scrtly_backend.chat.mapper.ChatRoomMapper;
 import com.kamylo.Scrtly_backend.chat.web.dto.ChatMessageDto;
 import com.kamylo.Scrtly_backend.chat.web.dto.ChatRoomDto;
 import com.kamylo.Scrtly_backend.chat.web.dto.request.ChatMessageEditRequest;
@@ -8,9 +10,6 @@ import com.kamylo.Scrtly_backend.chat.domain.ChatRoomEntity;
 import com.kamylo.Scrtly_backend.user.domain.UserEntity;
 import com.kamylo.Scrtly_backend.common.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.common.handler.CustomException;
-import com.kamylo.Scrtly_backend.chat.mapper.ChatMessageMapperImpl;
-import com.kamylo.Scrtly_backend.chat.mapper.ChatRoomMapperImpl;
-import com.kamylo.Scrtly_backend.common.mapper.Mapper;
 import com.kamylo.Scrtly_backend.chat.repository.ChatMessageRepository;
 import com.kamylo.Scrtly_backend.chat.web.dto.request.SendMessageRequest;
 import com.kamylo.Scrtly_backend.chat.service.ChatService;
@@ -18,7 +17,6 @@ import com.kamylo.Scrtly_backend.user.service.UserService;
 import com.kamylo.Scrtly_backend.chat.service.impl.ChatMessageServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.modelmapper.ModelMapper;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -50,14 +48,18 @@ public class ChatMessageServiceImplTest {
     @Mock
     private RabbitTemplate rabbitTemplate;
 
+    @Mock
+    private ChatMessageMapper chatMessageMapper;
+
+    @Mock
+    private ChatRoomMapper chatRoomMapper;
+
     @InjectMocks
     private ChatMessageServiceImpl chatMessageService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        Mapper<ChatRoomEntity, ChatRoomDto> chatRoomMapper = new ChatRoomMapperImpl(new ModelMapper());
-        Mapper<ChatMessageEntity, ChatMessageDto> chatMessageMapper = new ChatMessageMapperImpl(new ModelMapper());
         chatMessageService = new ChatMessageServiceImpl(
                 chatMessageRepository,
                 userService,
@@ -93,9 +95,18 @@ public class ChatMessageServiceImplTest {
                 .messageText("Hello World")
                 .build();
 
+        ChatMessageDto chatMessageDto = ChatMessageDto.builder()
+                .id(1L)
+                .chatRoomId(1)
+                .messageText("Hello World")
+                .status("NEW")
+                .build();
+
         when(userService.findUserByEmail(username)).thenReturn(userEntity);
         when(chatService.getChatById(request.getChatId(), username)).thenReturn(chatRoomDto);
+        when(chatRoomMapper.toEntity(chatRoomDto)).thenReturn(chatRoomEntity);
         when(chatMessageRepository.save(any(ChatMessageEntity.class))).thenReturn(chatMessageEntity);
+        when(chatMessageMapper.toDto(chatMessageEntity)).thenReturn(chatMessageDto); // FIX
 
         CompletableFuture<ChatMessageDto> futureResult = chatMessageService.sendMessageAsync(request, username);
         ChatMessageDto result = futureResult.join();
@@ -158,9 +169,23 @@ public class ChatMessageServiceImplTest {
                 .messageText("Original message")
                 .build();
 
+        ChatMessageEntity updatedMessageEntity = ChatMessageEntity.builder()
+                .chatRoom(chatRoomEntity)
+                .user(userEntity)
+                .messageText("Updated message")
+                .build();
+
+        ChatMessageDto chatMessageDto = ChatMessageDto.builder()
+                .id(1L)
+                .chatRoomId(chatId)
+                .messageText("Updated message")
+                .status("EDITED")
+                .build();
+
         when(chatMessageRepository.findById(request.getId())).thenReturn(Optional.of(messageEntity));
         when(userService.findUserByEmail(username)).thenReturn(userEntity);
-        when(chatMessageRepository.save(any(ChatMessageEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(chatMessageRepository.save(any(ChatMessageEntity.class))).thenReturn(updatedMessageEntity);
+        when(chatMessageMapper.toDto(updatedMessageEntity)).thenReturn(chatMessageDto);
 
         CompletableFuture<ChatMessageDto> future = chatMessageService.editMessageAsync(request, chatId, username);
         ChatMessageDto result = future.join();
@@ -213,10 +238,15 @@ public class ChatMessageServiceImplTest {
                 .messageText("Test Message")
                 .build();
 
+        ChatMessageDto chatMessageDto = ChatMessageDto.builder()
+                .messageText("Test Message")
+                .build();
+
         Pageable pageable = PageRequest.of(0, 10);
         Page<ChatMessageEntity> pageEntity = new PageImpl<>(Collections.singletonList(messageEntity), pageable, 1);
 
         when(chatMessageRepository.findByChatRoomIdOrderByCreateDateDesc(chatId, pageable)).thenReturn(pageEntity);
+        when(chatMessageMapper.toDto(messageEntity)).thenReturn(chatMessageDto);
 
         Page<ChatMessageDto> resultPage = chatMessageService.getChatMessages(chatId, pageable);
 

@@ -1,5 +1,6 @@
 package com.kamylo.Scrtly_backend.serviceTests;
 
+import com.kamylo.Scrtly_backend.user.mapper.UserMapper;
 import com.kamylo.Scrtly_backend.user.web.dto.UserDto;
 import com.kamylo.Scrtly_backend.artist.web.dto.ArtistVerificationRequest;
 import com.kamylo.Scrtly_backend.user.web.dto.request.UserRequestDto;
@@ -8,7 +9,6 @@ import com.kamylo.Scrtly_backend.artist.domain.ArtistVerificationToken;
 import com.kamylo.Scrtly_backend.user.domain.RoleEntity;
 import com.kamylo.Scrtly_backend.user.domain.UserEntity;
 import com.kamylo.Scrtly_backend.common.handler.CustomException;
-import com.kamylo.Scrtly_backend.common.mapper.Mapper;
 import com.kamylo.Scrtly_backend.user.repository.UserRepository;
 import com.kamylo.Scrtly_backend.artist.service.ArtistVerificationTokenService;
 import com.kamylo.Scrtly_backend.email.service.EmailService;
@@ -36,7 +36,7 @@ class UserServiceImplTest {
 
     @Mock private UserRepository userRepository;
     @Mock private FileService fileService;
-    @Mock private Mapper<UserEntity, UserDto> mapper;
+    @Mock private UserMapper mapper;
     @Mock private UserLikeChecker userLikeChecker;
     @Mock private MultipartFile multipartFile;
     @Mock private ArtistVerificationTokenService artistVerificationTokenService;
@@ -98,7 +98,7 @@ class UserServiceImplTest {
     @Test
     void findUserByNickname_shouldReturnUserDto() {
         when(userRepository.findByNickName("User1")).thenReturn(Optional.of(user));
-        when(mapper.mapTo(user)).thenReturn(userDto);
+        when(mapper.toDto(user)).thenReturn(userDto);
         assertEquals(userDto, userService.findUserByNickname("User1"));
     }
 
@@ -115,7 +115,7 @@ class UserServiceImplTest {
         when(userRepository.findByNickName("User1")).thenReturn(Optional.of(user));
         when(userRepository.findByEmail("another@example.com")).thenReturn(Optional.of(anotherUser));
         when(userLikeChecker.isUserFollowed(user, anotherUser.getId())).thenReturn(true);
-        when(mapper.mapTo(user)).thenReturn(userDto);
+        when(mapper.toDto(user)).thenReturn(userDto);
 
         UserDto result = userService.getUserProfile("User1", "another@example.com");
 
@@ -127,7 +127,7 @@ class UserServiceImplTest {
     void followUser_shouldToggleFollowStatus() {
         when(userRepository.findById(2L)).thenReturn(Optional.of(anotherUser));
         when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
-        when(mapper.mapTo(anotherUser)).thenReturn(userDto);
+        when(mapper.toDto(anotherUser)).thenReturn(userDto);
 
         assertFalse(user.getFollowings().contains(anotherUser));
 
@@ -156,7 +156,7 @@ class UserServiceImplTest {
 
         when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
         when(userRepository.save(any(UserEntity.class))).thenReturn(user);
-        when(mapper.mapTo(user)).thenReturn(userDto);
+        when(mapper.toDto(user)).thenReturn(userDto);
 
         UserDto updatedUser = userService.updateUser("user@example.com", userRequestDto, null);
 
@@ -169,7 +169,7 @@ class UserServiceImplTest {
         when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
         when(fileService.updateFile(multipartFile, user.getProfilePicture(), "userImages/")).thenReturn("newImagePath");
         when(userRepository.save(any(UserEntity.class))).thenReturn(user);
-        when(mapper.mapTo(user)).thenReturn(userDto);
+        when(mapper.toDto(user)).thenReturn(userDto);
 
         UserDto updatedUser = userService.updateUser("user@example.com", new UserRequestDto(), multipartFile);
 
@@ -181,7 +181,7 @@ class UserServiceImplTest {
         Set<UserEntity> foundUsers = new HashSet<>();
         foundUsers.add(user);
         when(userRepository.searchUser("User")).thenReturn(foundUsers);
-        when(mapper.mapTo(user)).thenReturn(userDto);
+        when(mapper.toDto(user)).thenReturn(userDto);
 
         Set<UserDto> result = userService.searchUser("User");
 
@@ -196,7 +196,7 @@ class UserServiceImplTest {
 
         when(userRepository.findById(2L)).thenReturn(Optional.of(anotherUser));
         when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
-        when(mapper.mapTo(anotherUser)).thenReturn(userDto);
+        when(mapper.toDto(anotherUser)).thenReturn(userDto);
 
         userService.followUser(2L, "user@example.com");
 
@@ -208,7 +208,7 @@ class UserServiceImplTest {
     void updateUser_shouldNotUpdateImage_whenImageIsNull() {
         when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
         when(userRepository.save(any(UserEntity.class))).thenReturn(user);
-        when(mapper.mapTo(user)).thenReturn(userDto);
+        when(mapper.toDto(user)).thenReturn(userDto);
 
         UserDto updatedUser = userService.updateUser("user@example.com", new UserRequestDto(), null);
 
@@ -220,7 +220,7 @@ class UserServiceImplTest {
         when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
         when(multipartFile.isEmpty()).thenReturn(true);
         when(userRepository.save(any(UserEntity.class))).thenReturn(user);
-        when(mapper.mapTo(user)).thenReturn(userDto);
+        when(mapper.toDto(user)).thenReturn(userDto);
 
         UserDto updatedUser = userService.updateUser("user@example.com", new UserRequestDto(), multipartFile);
 
@@ -233,7 +233,7 @@ class UserServiceImplTest {
         when(multipartFile.isEmpty()).thenReturn(false);
         when(fileService.updateFile(multipartFile, user.getProfilePicture(), "userImages/")).thenReturn("newImagePath");
         when(userRepository.save(any(UserEntity.class))).thenReturn(user);
-        when(mapper.mapTo(user)).thenReturn(userDto);
+        when(mapper.toDto(user)).thenReturn(userDto);
 
         UserDto updatedUser = userService.updateUser("user@example.com", new UserRequestDto(), multipartFile);
 

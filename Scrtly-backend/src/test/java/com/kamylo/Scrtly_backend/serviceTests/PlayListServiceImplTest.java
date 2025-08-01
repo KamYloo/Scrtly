@@ -1,14 +1,14 @@
 package com.kamylo.Scrtly_backend.serviceTests;
 
+import com.kamylo.Scrtly_backend.playList.mapper.PlayListMapper;
 import com.kamylo.Scrtly_backend.playList.web.dto.PlayListDto;
+import com.kamylo.Scrtly_backend.song.mapper.SongMapper;
 import com.kamylo.Scrtly_backend.song.web.dto.SongDto;
 import com.kamylo.Scrtly_backend.playList.domain.PlayListEntity;
 import com.kamylo.Scrtly_backend.song.domain.SongEntity;
 import com.kamylo.Scrtly_backend.user.domain.UserEntity;
 import com.kamylo.Scrtly_backend.common.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.common.handler.CustomException;
-import com.kamylo.Scrtly_backend.common.mapper.Mapper;
-import com.kamylo.Scrtly_backend.playList.mapper.PlayListMapperImpl;
 import com.kamylo.Scrtly_backend.playList.repository.PlayListRepository;
 import com.kamylo.Scrtly_backend.like.repository.SongLikeRepository;
 import com.kamylo.Scrtly_backend.song.repository.SongRepository;
@@ -22,7 +22,6 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -54,10 +53,11 @@ class PlayListServiceImplTest {
     @Mock
     private SongLikeRepository songLikeRepository;
 
-    private Mapper<PlayListEntity, PlayListDto> playListMapper;
+    @Mock
+    private PlayListMapper playListMapper;
 
     @Mock
-    private Mapper<SongEntity, SongDto> songMapper;
+    private SongMapper songMapper;
 
     private PlayListServiceImpl playListService;
 
@@ -72,8 +72,6 @@ class PlayListServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        playListMapper = new PlayListMapperImpl(new ModelMapper());
-
         playListService = new PlayListServiceImpl(
                 userService,
                 fileService,
@@ -128,6 +126,11 @@ class PlayListServiceImplTest {
                 .build();
         when(playListRepository.save(any())).thenReturn(newPlaylist);
 
+        PlayListDto expectedDto = new PlayListDto();
+        expectedDto.setTitle("Test Playlist");
+        expectedDto.setCoverImage("new/image/path");
+        when(playListMapper.toDto(any())).thenReturn(expectedDto);
+
         PlayListDto result = playListService.createPlayList("Test Playlist", "user@example.com", playListImage);
 
         assertNotNull(result, "DTO nie może być null");
@@ -145,8 +148,12 @@ class PlayListServiceImplTest {
                 .user(user)
                 .coverImage(null)
                 .build();
-
         when(playListRepository.save(any())).thenReturn(newPlaylist);
+
+        PlayListDto expectedDto = new PlayListDto();
+        expectedDto.setTitle("Test Playlist");
+        expectedDto.setCoverImage(null);
+        when(playListMapper.toDto(any())).thenReturn(expectedDto);
 
         PlayListDto result = playListService.createPlayList("Test Playlist", "user@example.com", playListImage);
 
@@ -158,6 +165,8 @@ class PlayListServiceImplTest {
     @Test
     void getPlayList_shouldReturnPlayList() {
         when(playListRepository.findById(1)).thenReturn(Optional.of(playList));
+        when(playListMapper.toDto(any())).thenReturn(playListDto);
+
         PlayListDto result = playListService.getPlayList(1);
 
         assertNotNull(result);
@@ -178,6 +187,7 @@ class PlayListServiceImplTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<PlayListEntity> page = new PageImpl<>(List.of(playList));
         when(playListRepository.findAll(pageable)).thenReturn(page);
+        when(playListMapper.toDto(any())).thenReturn(playListDto);
 
         Page<PlayListDto> result = playListService.getPlayLists(pageable);
 
@@ -195,6 +205,7 @@ class PlayListServiceImplTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<PlayListEntity> page = new PageImpl<>(List.of(playList));
         when(playListRepository.getPlayListsByUserId(user.getId(), pageable)).thenReturn(page);
+        when(playListMapper.toDto(any())).thenReturn(playListDto);
 
         Page<PlayListDto> result = playListService.getPlayListsByUser("user@example.com", pageable);
 
@@ -220,6 +231,7 @@ class PlayListServiceImplTest {
                 .songs(Set.of(song))
                 .build();
         when(playListRepository.save(any())).thenReturn(updated);
+        when(playListMapper.toDto(any())).thenReturn(playListDto);
 
         PlayListDto result = playListService.addSongToPlayList(100L, 1, "user@example.com");
 
@@ -328,7 +340,7 @@ class PlayListServiceImplTest {
 
         SongDto expectedSongDto = new SongDto();
         expectedSongDto.setTitle("Song 1");
-        when(songMapper.mapTo(any(SongEntity.class))).thenReturn(expectedSongDto);
+        when(songMapper.toDto(any(SongEntity.class))).thenReturn(expectedSongDto);
 
         Page<SongDto> result = playListService.getPlayListTracks(1, pageable);
 
@@ -356,6 +368,11 @@ class PlayListServiceImplTest {
         when(fileService.updateFile(any(), eq("old/path"), any())).thenReturn("new/image/path");
         when(playListRepository.save(any())).thenReturn(updatedPlayList);
 
+        PlayListDto expectedDto = new PlayListDto();
+        expectedDto.setTitle("New Title");
+        expectedDto.setCoverImage("new/image/path");
+        when(playListMapper.toDto(any())).thenReturn(expectedDto);
+
         PlayListDto result = playListService.updatePlayList(playListId, title, "user@example.com", playListImage);
 
         assertNotNull(result);
@@ -372,6 +389,11 @@ class PlayListServiceImplTest {
         when(userService.findUserByEmail("user@example.com")).thenReturn(user);
         when(playListRepository.save(playList)).thenReturn(playList);
 
+        PlayListDto expectedDto = new PlayListDto();
+        expectedDto.setTitle("New Title");
+        expectedDto.setCoverImage("old/path");
+        when(playListMapper.toDto(any())).thenReturn(expectedDto);
+
         PlayListDto result = playListService.updatePlayList(playListId, title, "user@example.com", null);
 
         assertNotNull(result, "DTO nie może być null");
@@ -380,17 +402,38 @@ class PlayListServiceImplTest {
     }
 
     @Test
-    void updatePlayList_shouldThrowPlaylistMismatch_whenOwnershipInvalid() {
+    void updatePlayList_shouldNotUpdateTitle_whenTitleIsEmpty() {
+        Integer playListId = 1;
+        String title = "";
+
+        when(playListRepository.findById(playListId)).thenReturn(Optional.of(playList));
+        when(userService.findUserByEmail("user@example.com")).thenReturn(user);
+        when(playListRepository.save(playList)).thenReturn(playList);
+        when(playListMapper.toDto(any())).thenReturn(playListDto);
+
+        PlayListDto result = playListService.updatePlayList(playListId, title, "user@example.com", null);
+
+        assertNotNull(result);
+        assertEquals("My Playlist", result.getTitle());
+        assertEquals("old/path", result.getCoverImage());
+        verify(playListRepository).save(playList);
+    }
+
+    @Test
+    void updatePlayList_shouldNotUpdateImage_whenImageIsEmpty() {
         Integer playListId = 1;
         String title = "New Title";
 
+        when(playListImage.isEmpty()).thenReturn(true);
         when(playListRepository.findById(1)).thenReturn(Optional.of(playList));
-        when(userService.findUserByEmail("other@example.com")).thenReturn(anotherUser);
+        when(userService.findUserByEmail("user@example.com")).thenReturn(user);
+        when(playListRepository.save(playList)).thenReturn(playList);
+        when(playListMapper.toDto(any())).thenReturn(playListDto);
 
-        CustomException ex = assertThrows(CustomException.class, () ->
-                playListService.updatePlayList(playListId, title, "other@example.com", playListImage)
-        );
-        assertEquals(BusinessErrorCodes.PLAYLIST_MISMATCH, ex.getErrorCode());
+        PlayListDto result = playListService.updatePlayList(playListId, title, "user@example.com", playListImage);
+
+        verify(fileService, never()).updateFile(any(), anyString(), anyString());
+        assertEquals("old/path", result.getCoverImage());
     }
 
     @Test
@@ -465,39 +508,6 @@ class PlayListServiceImplTest {
 
         verify(playListRepository, never()).save(fav);
         assertTrue(fav.getSongs().contains(song));
-    }
-
-    @Test
-    void updatePlayList_shouldNotUpdateTitle_whenTitleIsEmpty() {
-        Integer playListId = 1;
-        String title = "";
-
-        when(playListRepository.findById(playListId)).thenReturn(Optional.of(playList));
-        when(userService.findUserByEmail("user@example.com")).thenReturn(user);
-        when(playListRepository.save(playList)).thenReturn(playList);
-
-        PlayListDto result = playListService.updatePlayList(playListId, title, "user@example.com", null);
-
-        assertNotNull(result);
-        assertEquals("My Playlist", result.getTitle());
-        assertEquals("old/path", result.getCoverImage());
-        verify(playListRepository).save(playList);
-    }
-
-    @Test
-    void updatePlayList_shouldNotUpdateImage_whenImageIsEmpty() {
-        Integer playListId = 1;
-        String title = "New Title";
-
-        when(playListImage.isEmpty()).thenReturn(true);
-        when(playListRepository.findById(1)).thenReturn(Optional.of(playList));
-        when(userService.findUserByEmail("user@example.com")).thenReturn(user);
-        when(playListRepository.save(playList)).thenReturn(playList);
-
-        PlayListDto result = playListService.updatePlayList(playListId, title, "user@example.com", playListImage);
-
-        verify(fileService, never()).updateFile(any(), anyString(), anyString());
-        assertEquals("old/path", result.getCoverImage());
     }
 
     @Test

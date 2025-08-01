@@ -1,12 +1,12 @@
 package com.kamylo.Scrtly_backend.serviceTests;
 
+import com.kamylo.Scrtly_backend.comment.mapper.CommentMapper;
 import com.kamylo.Scrtly_backend.comment.web.dto.CommentDto;
 import com.kamylo.Scrtly_backend.comment.domain.CommentEntity;
 import com.kamylo.Scrtly_backend.post.domain.PostEntity;
 import com.kamylo.Scrtly_backend.user.domain.UserEntity;
 import com.kamylo.Scrtly_backend.notification.events.NotificationEvent;
 import com.kamylo.Scrtly_backend.common.handler.CustomException;
-import com.kamylo.Scrtly_backend.common.mapper.Mapper;
 import com.kamylo.Scrtly_backend.comment.repository.CommentRepository;
 import com.kamylo.Scrtly_backend.post.repository.PostRepository;
 import com.kamylo.Scrtly_backend.comment.web.dto.CommentRequest;
@@ -35,29 +35,14 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class CommentServiceImplTest {
 
-    @InjectMocks
-    private CommentServiceImpl commentService;
-
-    @Mock
-    private CommentRepository commentRepository;
-
-    @Mock
-    private UserService userService;
-
-    @Mock
-    private PostRepository postRepository;
-
-    @Mock
-    private Mapper<CommentEntity, CommentDto> commentMapper;
-
-    @Mock
-    private UserLikeChecker userLikeChecker;
-
-    @Mock
-    private ApplicationEventPublisher eventPublisher;
-
-    @Mock
-    private NotificationService notificationService;
+    @InjectMocks private CommentServiceImpl commentService;
+    @Mock private CommentRepository commentRepository;
+    @Mock private UserService userService;
+    @Mock private PostRepository postRepository;
+    @Mock private CommentMapper commentMapper;
+    @Mock private UserLikeChecker userLikeChecker;
+    @Mock private ApplicationEventPublisher eventPublisher;
+    @Mock private NotificationService notificationService;
 
     private UserEntity user;
     private PostEntity post;
@@ -91,7 +76,7 @@ class CommentServiceImplTest {
         when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
         when(postRepository.findById(1L)).thenReturn(Optional.of(post));
         when(commentRepository.save(any(CommentEntity.class))).thenReturn(comment);
-        when(commentMapper.mapTo(comment)).thenReturn(commentDto);
+        when(commentMapper.toDto(comment)).thenReturn(commentDto);
 
         CommentDto result = commentService.createComment(request, user.getEmail());
 
@@ -115,7 +100,7 @@ class CommentServiceImplTest {
         when(commentRepository.findById(1L)).thenReturn(Optional.of(comment));
         when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
         when(commentRepository.save(any(CommentEntity.class))).thenReturn(comment);
-        when(commentMapper.mapTo(any(CommentEntity.class))).thenReturn(commentDto);
+        when(commentMapper.toDto(any(CommentEntity.class))).thenReturn(commentDto);
 
         CommentDto result = commentService.updateComment(1L, "Updated Comment", user.getEmail());
 
@@ -147,7 +132,7 @@ class CommentServiceImplTest {
         when(commentRepository.findById(1L)).thenReturn(Optional.of(comment));
         when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
         when(commentRepository.save(any(CommentEntity.class))).thenReturn(comment);
-        when(commentMapper.mapTo(any(CommentEntity.class))).thenReturn(commentDto);
+        when(commentMapper.toDto(any(CommentEntity.class))).thenReturn(commentDto);
 
         CommentDto result = commentService.updateComment(1L, "Updated Comment", user.getEmail());
 
@@ -161,7 +146,7 @@ class CommentServiceImplTest {
         when(commentRepository.findById(1L)).thenReturn(Optional.of(comment));
         when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
         when(commentRepository.save(any(CommentEntity.class))).thenReturn(comment);
-        when(commentMapper.mapTo(any(CommentEntity.class))).thenReturn(commentDto);
+        when(commentMapper.toDto(any(CommentEntity.class))).thenReturn(commentDto);
 
         CommentDto result = commentService.updateComment(1L, null, user.getEmail());
 
@@ -175,7 +160,7 @@ class CommentServiceImplTest {
         when(commentRepository.findById(1L)).thenReturn(Optional.of(comment));
         when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
         when(commentRepository.save(any(CommentEntity.class))).thenReturn(comment);
-        when(commentMapper.mapTo(any(CommentEntity.class))).thenReturn(commentDto);
+        when(commentMapper.toDto(any(CommentEntity.class))).thenReturn(commentDto);
 
         CommentDto result = commentService.updateComment(1L, "", user.getEmail());
 
@@ -191,7 +176,7 @@ class CommentServiceImplTest {
 
         when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
         when(commentRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(page);
-        when(commentMapper.mapTo(any(CommentEntity.class))).thenReturn(commentDto);
+        when(commentMapper.toDto(any(CommentEntity.class))).thenReturn(commentDto);
 
         Page<CommentDto> result = commentService.getCommentsByPostId(1L, "latest", pageable, user.getEmail());
 
@@ -207,7 +192,7 @@ class CommentServiceImplTest {
 
         when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
         when(commentRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(page);
-        when(commentMapper.mapTo(any(CommentEntity.class))).thenReturn(commentDto);
+        when(commentMapper.toDto(any(CommentEntity.class))).thenReturn(commentDto);
 
         Page<CommentDto> result = commentService.getCommentsByPostId(1L, "popular", pageable, user.getEmail());
 
@@ -223,7 +208,7 @@ class CommentServiceImplTest {
 
         when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
         when(commentRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(page);
-        when(commentMapper.mapTo(any(CommentEntity.class))).thenReturn(commentDto);
+        when(commentMapper.toDto(any(CommentEntity.class))).thenReturn(commentDto);
 
         Page<CommentDto> result = commentService.getCommentsByPostId(1L, "random_value", pageable, user.getEmail());
 
@@ -270,7 +255,7 @@ class CommentServiceImplTest {
 
         when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
         when(commentRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(page);
-        when(commentMapper.mapTo(any(CommentEntity.class))).thenReturn(commentDto);
+        when(commentMapper.toDto(any(CommentEntity.class))).thenReturn(commentDto);
         when(userLikeChecker.isCommentLikedByUser(any(CommentEntity.class), eq(user.getId()))).thenReturn(true);
 
         Page<CommentDto> result = commentService.getCommentsByPostId(1L, "latest", pageable, user.getEmail());

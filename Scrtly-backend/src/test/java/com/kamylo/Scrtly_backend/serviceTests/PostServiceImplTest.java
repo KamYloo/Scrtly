@@ -1,12 +1,12 @@
 package com.kamylo.Scrtly_backend.serviceTests;
 
+import com.kamylo.Scrtly_backend.post.mapper.PostMapper;
 import com.kamylo.Scrtly_backend.post.web.dto.PostDto;
 import com.kamylo.Scrtly_backend.user.web.dto.UserDto;
 import com.kamylo.Scrtly_backend.post.domain.PostEntity;
 import com.kamylo.Scrtly_backend.user.domain.UserEntity;
 import com.kamylo.Scrtly_backend.common.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.common.handler.CustomException;
-import com.kamylo.Scrtly_backend.common.mapper.Mapper;
 import com.kamylo.Scrtly_backend.post.repository.PostRepository;
 import com.kamylo.Scrtly_backend.notification.service.NotificationService;
 import com.kamylo.Scrtly_backend.user.service.UserService;
@@ -43,7 +43,7 @@ class PostServiceImplTest {
     private FileServiceImpl fileService;
 
     @Mock
-    private Mapper<PostEntity, PostDto> postMapper;
+    private PostMapper postMapper;
 
     @Mock
     private UserLikeChecker userLikeChecker;
@@ -81,7 +81,7 @@ class PostServiceImplTest {
         when(userService.findUserByEmail(username)).thenReturn(user);
         when(fileService.saveFile(any(), anyString())).thenReturn("image/path");
         when(postRepository.save(any(PostEntity.class))).thenReturn(postEntity);
-        when(postMapper.mapTo(any(PostEntity.class))).thenReturn(expectedDto);
+        when(postMapper.toDto(any(PostEntity.class))).thenReturn(expectedDto);
 
         PostDto result = postService.createPost(username, description, file);
 
@@ -111,7 +111,7 @@ class PostServiceImplTest {
 
         when(userService.findUserByEmail(username)).thenReturn(user);
         when(postRepository.save(any(PostEntity.class))).thenReturn(postEntity);
-        when(postMapper.mapTo(any(PostEntity.class))).thenReturn(expectedDto);
+        when(postMapper.toDto(any(PostEntity.class))).thenReturn(expectedDto);
 
         PostDto result = postService.createPost(username, description, file);
 
@@ -146,7 +146,7 @@ class PostServiceImplTest {
         expectedDto.setDescription(newDescription);
         expectedDto.setImage("new/path");
 
-        when(postMapper.mapTo(any(PostEntity.class))).thenReturn(expectedDto);
+        when(postMapper.toDto(any(PostEntity.class))).thenReturn(expectedDto);
 
         PostDto result = postService.updatePost(postId, username, file, newDescription);
 
@@ -221,7 +221,7 @@ class PostServiceImplTest {
         expectedDto.setDescription("New description");
         expectedDto.setImage("old/path");
 
-        when(postMapper.mapTo(any(PostEntity.class))).thenReturn(expectedDto);
+        when(postMapper.toDto(any(PostEntity.class))).thenReturn(expectedDto);
 
         PostDto result = postService.updatePost(postId, username, null, "New description");
 
@@ -256,7 +256,7 @@ class PostServiceImplTest {
         expectedDto.setDescription("Old description");
         expectedDto.setImage("new/path");
 
-        when(postMapper.mapTo(any(PostEntity.class))).thenReturn(expectedDto);
+        when(postMapper.toDto(any(PostEntity.class))).thenReturn(expectedDto);
 
         PostDto result = postService.updatePost(postId, username, file, null);
 
@@ -287,7 +287,7 @@ class PostServiceImplTest {
         expectedDto.setDescription("Updated description");
         expectedDto.setImage("old/path");
 
-        when(postMapper.mapTo(any(PostEntity.class))).thenReturn(expectedDto);
+        when(postMapper.toDto(any(PostEntity.class))).thenReturn(expectedDto);
 
         PostDto result = postService.updatePost(postId, username, null, "Updated description");
 
@@ -321,7 +321,7 @@ class PostServiceImplTest {
         expectedDto.setDescription("Updated description");
         expectedDto.setImage("old/path");
 
-        when(postMapper.mapTo(any(PostEntity.class))).thenReturn(expectedDto);
+        when(postMapper.toDto(any(PostEntity.class))).thenReturn(expectedDto);
 
         PostDto result = postService.updatePost(postId, username, file, "Updated description");
 
@@ -356,7 +356,7 @@ class PostServiceImplTest {
         expectedDto.setDescription("Old description");
         expectedDto.setImage("new/path");
 
-        when(postMapper.mapTo(any(PostEntity.class))).thenReturn(expectedDto);
+        when(postMapper.toDto(any(PostEntity.class))).thenReturn(expectedDto);
 
         PostDto result = postService.updatePost(postId, username, file, null);
 
@@ -391,7 +391,7 @@ class PostServiceImplTest {
         expectedDto.setDescription("Old description");
         expectedDto.setImage("new/path");
 
-        when(postMapper.mapTo(any(PostEntity.class))).thenReturn(expectedDto);
+        when(postMapper.toDto(any(PostEntity.class))).thenReturn(expectedDto);
 
         PostDto result = postService.updatePost(postId, username, file, "");
 
@@ -440,7 +440,7 @@ class PostServiceImplTest {
         when(postRepository.findByUserId(eq(user.getId()), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(Collections.singletonList(postEntity)));
 
-        when(postMapper.mapTo(any(PostEntity.class))).thenReturn(postDto);
+        when(postMapper.toDto(any(PostEntity.class))).thenReturn(postDto);
 
         Page<PostDto> result = postService.getPostsByUser(nickName, pageable);
 
@@ -466,7 +466,7 @@ class PostServiceImplTest {
         when(userService.findUserByEmail(username)).thenReturn(user);
         when(postRepository.findAll(any(Specification.class), eq(pageable)))
                 .thenReturn(new PageImpl<>(Collections.singletonList(postEntity)));
-        when(postMapper.mapTo(any(PostEntity.class))).thenReturn(postDto);
+        when(postMapper.toDto(any(PostEntity.class))).thenReturn(postDto);
         when(userLikeChecker.isPostLikedByUser(any(), eq(user.getId()))).thenReturn(true);
         
         Page<PostDto> result = postService.getPosts(pageable, username, null, null);
