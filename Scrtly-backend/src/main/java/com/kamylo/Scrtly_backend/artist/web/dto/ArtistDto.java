@@ -17,4 +17,5 @@ public class ArtistDto {
     private String profilePicture;
     private boolean observed;
     private int totalFans;
+    private int monthlyPlays;
 }

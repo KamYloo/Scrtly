@@ -27,21 +27,21 @@ function AlbumsView() {
 
     const listRef = useRef();
 
-    // accumulate pages
     useEffect(() => {
-        if (Array.isArray(data)) {
-            setAllAlbums(prev =>
-                page === 0
-                    ? data
-                    : [
-                        ...prev,
-                        ...data.filter(a => !prev.find(x => x.id === a.id))
-                    ]
-            );
+        if (!Array.isArray(data) || data.length === 0) return;
+
+        if (page === 0) {
+            setAllAlbums(data);
+            return;
         }
+
+        setAllAlbums(prev => {
+            const newOnes = data.filter(a => !prev.some(x => x.id === a.id));
+            if (newOnes.length === 0) return prev;
+            return [...prev, ...newOnes];
+        });
     }, [data, page]);
 
-    // infinite scroll
     const onScroll = useCallback(
         throttle(() => {
             const el = listRef.current;
@@ -50,7 +50,7 @@ function AlbumsView() {
                 setPage(p => p + 1);
             }
         }, 200),
-        [isFetching, data]
+        [isFetching, data.length]
     );
 
     useEffect(() => {

@@ -52,7 +52,7 @@ function Banner({artist}) {
                             <h2>{artist?.pseudonym}</h2>
                             <img src={Verification} alt=""/>
                         </div>
-                        <p><i><FaHeadphones/></i> 12,132,5478 <span>Monthly listeners</span></p>
+                        <p><i><FaHeadphones/></i> {artist?.monthlyPlays} <span>Monthly listeners</span></p>
                     </div>
                     <div className="right">
                         {!isOwner && <button className={artist?.observed ? 'following' : 'follow'}

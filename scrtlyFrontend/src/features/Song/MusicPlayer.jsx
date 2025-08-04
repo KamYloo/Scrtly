@@ -19,6 +19,7 @@ import {useRecordPlayMutation} from "../../Redux/services/songApi.js";
 
 export function MusicPlayer({
                                 songId,
+                                artistId,
                                 trackSrc,
                                 hlsManifestUrl,
                                 imgSrc,
@@ -141,7 +142,7 @@ export function MusicPlayer({
                 setPlaying(true)
 
                 if (!playRecordedRef.current) {
-                    recordPlay(songId).unwrap()
+                    recordPlay({songId, artistId}).unwrap()
                     playRecordedRef.current = true
                 }
             })

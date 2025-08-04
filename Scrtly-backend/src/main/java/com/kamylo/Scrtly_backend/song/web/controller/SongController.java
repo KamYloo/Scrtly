@@ -52,8 +52,8 @@ public class SongController {
     }
 
     @PostMapping("/{id}/play")
-    public void recordPlay(@PathVariable Long id) {
-        metricsPublisher.publishSongPlay(id);
+    public void recordPlay(@PathVariable Long id, @RequestParam(value = "artistId", required = false) Long artistId) {
+        metricsPublisher.publishSongPlay(id, artistId);
     }
 
     @GetMapping("/{id}/hls/master")

@@ -64,10 +64,10 @@ export const songApi = apiSlice.injectEndpoints({
         }),
 
         recordPlay: builder.mutation({
-            query: (songId) => ({
+            query: ({ songId, artistId }) => ({
                 url: `/song/${songId}/play`,
                 method: "POST",
-                credentials: "include",
+                params: { artistId },
             }),
             invalidatesTags: (result, error, songId) => [{ type: "Song", id: songId }],
         }),

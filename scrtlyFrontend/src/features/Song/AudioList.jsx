@@ -306,6 +306,7 @@ function AudioList({ volume, onTrackChange, initialSongs, req_artist, isplayList
             </div>
             <MusicPlayer
                 songId={songs[currentIndex]?.id}
+                artistId={songs[currentIndex]?.artist.id}
                 trackSrc={songs[currentIndex]?.track}
                 hlsManifestUrl={songs[currentIndex]?.hlsManifestUrl}
                 imgSrc={encodeURI(songs[currentIndex]?.imageSong||'')}

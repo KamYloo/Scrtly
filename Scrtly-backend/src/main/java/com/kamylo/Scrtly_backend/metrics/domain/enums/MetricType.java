@@ -5,6 +5,7 @@ import java.util.Arrays;
 public enum MetricType {
     ARTIST_VIEW("artistView", "artist:views"),
     SONG_PLAY(  "songPlay",   "song:plays"),
+    ARTIST_PLAY("songPlay",   "artist:plays"),
     ALBUM_VIEW( "albumView",  "album:views");
 
     private final String eventName;

@@ -25,13 +25,19 @@ function ArtistsView() {
     const listRef = useRef();
 
     useEffect(() => {
-        if (data) {
-            setAllArtists(prev =>
-                page === 0
-                    ? data
-                    : [...prev, ...data.filter(a => !prev.find(x => x.id === a.id))]
-            );
+        if (data.length === 0) return;
+
+        if (page === 0) {
+            setAllArtists(data);
+            return;
         }
+
+        setAllArtists(prev => {
+            const toAdd = data.filter(a => !prev.some(x => x.id === a.id));
+            if (toAdd.length === 0) return prev;
+            return [...prev, ...toAdd];
+        });
+
     }, [data, page]);
 
     const onScroll = useCallback(
@@ -42,7 +48,7 @@ function ArtistsView() {
                 setPage(p => p + 1);
             }
         }, 200),
-        [isFetching, data]
+        [isFetching, data.length]
     );
 
     useEffect(() => {
