@@ -57,11 +57,18 @@ export const postApi = apiSlice.injectEndpoints({
         }),
 
         getPostsByUser: builder.query({
-            query: nickName => ({
-                url: `/posts/${encodeURIComponent(nickName)}/all`,
-                method: 'GET',
-            }),
-            providesTags: (result, error, nickName) =>
+            // now takes an object { nickName, page, size }
+            query: ({ nickName, page = 0, size = 10 }) => {
+                const params = new URLSearchParams();
+                params.append('page', page);
+                params.append('size', size);
+                const qs = params.toString() ? `?${params.toString()}` : '';
+                return {
+                    url: `/posts/${encodeURIComponent(nickName)}/all${qs}`,
+                    method: 'GET',
+                };
+            },
+            providesTags: (result, error, { nickName }) =>
                 result
                     ? [
                         ...result.content.map(post => ({ type: 'Post', id: post.id })),

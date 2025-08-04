@@ -1,19 +1,18 @@
 import React, { useState } from 'react';
 import "../../Styles/Profile.css";
 import { useNavigate, useParams } from 'react-router-dom';
-import { useSelector } from "react-redux";
 import Spinner from "../../Components/Spinner.jsx";
 import ErrorOverlay from "../../Components/ErrorOverlay.jsx";
 import ArtistVerificationModal from "./ArtistVerificationModal.jsx";
 import defaultAvatar from "../../assets/user.jpg";
 import {useFindUserQuery, useFollowUserMutation} from "../../Redux/services/userApi.js";
 import {useGetCurrentUserQuery} from "../../Redux/services/authApi.js";
+import {useGetPostsByUserQuery} from "../../Redux/services/postApi.js";
 
 
 function ProfileInfo() {
     const navigate = useNavigate();
     const { nickName } = useParams();
-    const { post } = useSelector(state => state);
     const [showVerifyModal, setShowVerifyModal] = useState(false);
     const [followUser] = useFollowUserMutation();
     const {
@@ -27,6 +26,13 @@ function ProfileInfo() {
     const { data: reqUser } = useGetCurrentUserQuery(null, {
         skip: !localStorage.getItem('isLoggedIn'),
     });
+
+    const {
+        data: postsPage,
+    } = useGetPostsByUserQuery(
+        { nickName, page: 0, size: 1 },
+        { skip: !nickName }
+    );
 
     const handleFollow = async () => {
         await followUser(viewedUser.id).unwrap();
@@ -67,7 +73,7 @@ function ProfileInfo() {
                         )}
                     </div>
                     <div className="stats">
-                        <p>Posts: {post.posts.content.length}</p>
+                        <p>Posts: {postsPage?.totalElements ?? 0}</p>
                         <p>{viewedUser?.observersCount} Followers</p>
                         <p>Following: {viewedUser?.observationsCount}</p>
                     </div>
