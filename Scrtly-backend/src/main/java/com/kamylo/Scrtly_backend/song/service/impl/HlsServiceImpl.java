@@ -45,7 +45,7 @@ public class HlsServiceImpl implements HlsService {
         }
     }
 
-    private String generateHlsInternal(String inputFilePath, Long songId) throws IOException, InterruptedException {
+    public String generateHlsInternal(String inputFilePath, Long songId) throws IOException, InterruptedException {
         Path baseDir = Paths.get(hlsBasePath, songId.toString());
         if (!Files.exists(Paths.get(inputFilePath))) {
             throw new CustomException(BusinessErrorCodes.HLS_GENERATION_FAILED);
