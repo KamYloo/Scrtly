@@ -1,35 +1,40 @@
 package com.kamylo.Scrtly_backend.serviceTests;
 
-import com.kamylo.Scrtly_backend.comment.mapper.CommentMapper;
-import com.kamylo.Scrtly_backend.comment.web.dto.CommentDto;
 import com.kamylo.Scrtly_backend.comment.domain.CommentEntity;
-import com.kamylo.Scrtly_backend.post.domain.PostEntity;
-import com.kamylo.Scrtly_backend.user.domain.UserEntity;
-import com.kamylo.Scrtly_backend.notification.events.NotificationEvent;
-import com.kamylo.Scrtly_backend.common.handler.CustomException;
+import com.kamylo.Scrtly_backend.comment.mapper.CommentMapper;
 import com.kamylo.Scrtly_backend.comment.repository.CommentRepository;
-import com.kamylo.Scrtly_backend.post.repository.PostRepository;
-import com.kamylo.Scrtly_backend.comment.web.dto.CommentRequest;
-import com.kamylo.Scrtly_backend.notification.service.NotificationService;
-import com.kamylo.Scrtly_backend.user.service.UserService;
 import com.kamylo.Scrtly_backend.comment.service.CommentServiceImpl;
-import com.kamylo.Scrtly_backend.common.utils.UserLikeChecker;
+import com.kamylo.Scrtly_backend.comment.web.dto.CommentDto;
+import com.kamylo.Scrtly_backend.comment.web.dto.CommentRequest;
+import com.kamylo.Scrtly_backend.common.handler.CustomException;
 import com.kamylo.Scrtly_backend.notification.domain.enums.NotificationType;
+import com.kamylo.Scrtly_backend.notification.events.NotificationEvent;
+import com.kamylo.Scrtly_backend.notification.service.NotificationService;
+import com.kamylo.Scrtly_backend.post.domain.PostEntity;
+import com.kamylo.Scrtly_backend.post.repository.PostRepository;
+import com.kamylo.Scrtly_backend.user.domain.UserEntity;
+import com.kamylo.Scrtly_backend.user.service.UserService;
+import com.kamylo.Scrtly_backend.common.utils.UserLikeChecker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.Collections;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -56,212 +61,222 @@ class CommentServiceImplTest {
         user.setEmail("user@example.com");
 
         post = new PostEntity();
-        post.setId(1L);
+        post.setId(2L);
         post.setUser(user);
 
-        comment = new CommentEntity();
-        comment.setId(1L);
-        comment.setUser(user);
-        comment.setPost(post);
-        comment.setComment("Test Comment");
+        comment = CommentEntity.builder()
+                .id(3L)
+                .user(user)
+                .post(post)
+                .comment("Test Comment")
+                .build();
 
         commentDto = new CommentDto();
         commentDto.setComment("Test Comment");
     }
 
     @Test
-    void createComment_shouldSaveCommentAndPublishEvent() {
-        CommentRequest request = new CommentRequest(1L, "New Comment", null);
-
+    void createComment_success() {
+        CommentRequest req = new CommentRequest(2L, "Hello", null);
         when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
-        when(postRepository.findById(1L)).thenReturn(Optional.of(post));
+        when(postRepository.findById(2L)).thenReturn(Optional.of(post));
         when(commentRepository.save(any(CommentEntity.class))).thenReturn(comment);
         when(commentMapper.toDto(comment)).thenReturn(commentDto);
 
-        CommentDto result = commentService.createComment(request, user.getEmail());
+        CommentDto result = commentService.createComment(req, user.getEmail());
 
-        assertNotNull(result);
-        assertEquals("Test Comment", result.getComment());
-        verify(eventPublisher, times(1)).publishEvent(any(NotificationEvent.class));
+        assertThat(result).isEqualTo(commentDto);
+        verify(eventPublisher).publishEvent(any(NotificationEvent.class));
     }
 
     @Test
-    void createComment_shouldThrowExceptionWhenPostNotFound() {
-        CommentRequest request = new CommentRequest(1L, "New Comment", null);
-
+    void createComment_postNotFound_shouldThrow() {
+        CommentRequest req = new CommentRequest(2L, "Hello", null);
         when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
-        when(postRepository.findById(1L)).thenReturn(Optional.empty());
+        when(postRepository.findById(2L)).thenReturn(Optional.empty());
 
-        assertThrows(CustomException.class, () -> commentService.createComment(request, user.getEmail()));
+        assertThrows(CustomException.class,
+                () -> commentService.createComment(req, user.getEmail()));
     }
 
     @Test
-    void updateComment_shouldUpdateCommentContent() {
-        when(commentRepository.findById(1L)).thenReturn(Optional.of(comment));
+    void createComment_replyAndMismatch_shouldThrow() {
+        CommentRequest req = new CommentRequest(2L, "Hello", 99L);
+        when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
+        when(postRepository.findById(2L)).thenReturn(Optional.of(post));
+        CommentEntity parent = CommentEntity.builder()
+                .id(99L)
+                .post(PostEntity.builder().id(5L).build())
+                .build();
+        when(commentRepository.findById(99L)).thenReturn(Optional.of(parent));
+
+        assertThrows(CustomException.class,
+                () -> commentService.createComment(req, user.getEmail()));
+    }
+
+    @Test
+    void createComment_withParent_shouldSaveReply() {
+        CommentRequest req = new CommentRequest(2L, "Reply", 3L);
+        when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
+        when(postRepository.findById(2L)).thenReturn(Optional.of(post));
+        CommentEntity parent = CommentEntity.builder()
+                .id(3L)
+                .post(post)
+                .user(user)
+                .comment("Parent")
+                .build();
+        when(commentRepository.findById(3L)).thenReturn(Optional.of(parent));
+        when(commentRepository.save(any(CommentEntity.class))).thenReturn(comment);
+        when(commentMapper.toDto(comment)).thenReturn(commentDto);
+
+        CommentDto result = commentService.createComment(req, user.getEmail());
+
+        assertThat(result).isEqualTo(commentDto);
+        verify(eventPublisher).publishEvent(any(NotificationEvent.class));
+    }
+
+    @Test
+    void createComment_parentNotFound_shouldThrow() {
+        CommentRequest req = new CommentRequest(2L, "Reply", 99L);
+        when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
+        when(postRepository.findById(2L)).thenReturn(Optional.of(post));
+        when(commentRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(CustomException.class,
+                () -> commentService.createComment(req, user.getEmail()));
+    }
+
+    @Test
+    void updateComment_success() {
+        when(commentRepository.findById(3L)).thenReturn(Optional.of(comment));
         when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
         when(commentRepository.save(any(CommentEntity.class))).thenReturn(comment);
         when(commentMapper.toDto(any(CommentEntity.class))).thenReturn(commentDto);
 
-        CommentDto result = commentService.updateComment(1L, "Updated Comment", user.getEmail());
+        CommentDto res = commentService.updateComment(3L, "Updated", user.getEmail());
 
-        assertNotNull(result);
-        assertEquals("Updated Comment", comment.getComment());
+        assertThat(comment.getComment()).isEqualTo("Updated");
+        assertThat(res).isEqualTo(commentDto);
     }
 
     @Test
-    void updateComment_shouldThrowExceptionWhenCommentNotFound() {
-        when(commentRepository.findById(1L)).thenReturn(Optional.empty());
-
-        assertThrows(CustomException.class, () -> commentService.updateComment(1L, "Updated Comment", user.getEmail()));
+    void updateComment_notFound_shouldThrow() {
+        when(commentRepository.findById(3L)).thenReturn(Optional.empty());
+        assertThrows(CustomException.class,
+                () -> commentService.updateComment(3L, "Updated", user.getEmail()));
     }
 
     @Test
-    void updateComment_shouldThrowExceptionWhenNotOwner() {
-        UserEntity anotherUser = new UserEntity();
-        anotherUser.setId(2L);
-
-        comment.setUser(anotherUser);
-        when(commentRepository.findById(1L)).thenReturn(Optional.of(comment));
+    void updateComment_notOwner_shouldThrow() {
+        UserEntity other = new UserEntity(); other.setId(99L);
+        comment.setUser(other);
+        when(commentRepository.findById(3L)).thenReturn(Optional.of(comment));
         when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
 
-        assertThrows(CustomException.class, () -> commentService.updateComment(1L, "Updated Comment", user.getEmail()));
+        assertThrows(CustomException.class,
+                () -> commentService.updateComment(3L, "Updated", user.getEmail()));
     }
 
     @Test
-    void updateComment_shouldUpdateContentWhenNotEmpty() {
-        when(commentRepository.findById(1L)).thenReturn(Optional.of(comment));
-        when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
-        when(commentRepository.save(any(CommentEntity.class))).thenReturn(comment);
-        when(commentMapper.toDto(any(CommentEntity.class))).thenReturn(commentDto);
-
-        CommentDto result = commentService.updateComment(1L, "Updated Comment", user.getEmail());
-
-        assertNotNull(result);
-        verify(commentRepository, times(1)).save(comment);
-        assertEquals("Updated Comment", comment.getComment());
-    }
-
-    @Test
-    void updateComment_shouldNotUpdateContentWhenNull() {
-        when(commentRepository.findById(1L)).thenReturn(Optional.of(comment));
+    void updateComment_nullOrEmptyContent_shouldRetainOld() {
+        when(commentRepository.findById(3L)).thenReturn(Optional.of(comment));
         when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
         when(commentRepository.save(any(CommentEntity.class))).thenReturn(comment);
         when(commentMapper.toDto(any(CommentEntity.class))).thenReturn(commentDto);
 
-        CommentDto result = commentService.updateComment(1L, null, user.getEmail());
+        CommentDto res1 = commentService.updateComment(3L, null, user.getEmail());
+        CommentDto res2 = commentService.updateComment(3L, "", user.getEmail());
 
-        assertNotNull(result);
-        verify(commentRepository, times(1)).save(comment);
-        assertEquals("Test Comment", comment.getComment());
+        assertThat(comment.getComment()).isEqualTo("Test Comment");
+        assertThat(res1).isEqualTo(commentDto);
+        assertThat(res2).isEqualTo(commentDto);
     }
 
     @Test
-    void updateComment_shouldNotUpdateContentWhenEmpty() {
-        when(commentRepository.findById(1L)).thenReturn(Optional.of(comment));
-        when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
-        when(commentRepository.save(any(CommentEntity.class))).thenReturn(comment);
-        when(commentMapper.toDto(any(CommentEntity.class))).thenReturn(commentDto);
-
-        CommentDto result = commentService.updateComment(1L, "", user.getEmail());
-
-        assertNotNull(result);
-        verify(commentRepository, times(1)).save(comment);
-        assertEquals("Test Comment", comment.getComment());
-    }
-
-    @Test
-    void getCommentsByPostId_shouldApplyLatestSorting() {
-        Pageable pageable = PageRequest.of(0, 10);
+    void getCommentsByPostId_sortLatestAndLiked() {
+        Pageable pg = PageRequest.of(0,1);
         Page<CommentEntity> page = new PageImpl<>(Collections.singletonList(comment));
-
         when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
-        when(commentRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(page);
-        when(commentMapper.toDto(any(CommentEntity.class))).thenReturn(commentDto);
+        when(commentRepository.findAll(any(Specification.class), eq(pg))).thenReturn(page);
+        when(commentMapper.toDto(comment)).thenReturn(commentDto);
+        when(userLikeChecker.isCommentLikedByUser(comment, user.getId())).thenReturn(true);
 
-        Page<CommentDto> result = commentService.getCommentsByPostId(1L, "latest", pageable, user.getEmail());
+        Page<CommentDto> res = commentService.getCommentsByPostId(2L, "latest", pg, user.getEmail());
 
-        assertNotNull(result);
-        assertFalse(result.isEmpty());
-        verify(commentRepository, times(1)).findAll(any(Specification.class), eq(pageable));
+        assertThat(res.getContent().get(0).isLikedByUser()).isTrue();
     }
 
     @Test
-    void getCommentsByPostId_shouldApplyPopularSorting() {
-        Pageable pageable = PageRequest.of(0, 10);
+    void getCommentsByPostId_sortPopular() {
+        Pageable pg = PageRequest.of(0,1);
         Page<CommentEntity> page = new PageImpl<>(Collections.singletonList(comment));
+        when(commentRepository.findAll(any(Specification.class), eq(pg))).thenReturn(page);
+        when(commentMapper.toDto(comment)).thenReturn(commentDto);
 
-        when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
-        when(commentRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(page);
-        when(commentMapper.toDto(any(CommentEntity.class))).thenReturn(commentDto);
+        Page<CommentDto> res = commentService.getCommentsByPostId(2L, "popular", pg, null);
 
-        Page<CommentDto> result = commentService.getCommentsByPostId(1L, "popular", pageable, user.getEmail());
-
-        assertNotNull(result);
-        assertFalse(result.isEmpty());
-        verify(commentRepository, times(1)).findAll(any(Specification.class), eq(pageable));
+        assertThat(res).isNotEmpty();
     }
 
     @Test
-    void getCommentsByPostId_shouldNotApplySortingForOtherValues() {
-        Pageable pageable = PageRequest.of(0, 10);
+    void getCommentsByPostId_noSort() {
+        Pageable pg = PageRequest.of(0,1);
         Page<CommentEntity> page = new PageImpl<>(Collections.singletonList(comment));
+        when(commentRepository.findAll(any(Specification.class), eq(pg))).thenReturn(page);
+        when(commentMapper.toDto(comment)).thenReturn(commentDto);
 
-        when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
-        when(commentRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(page);
-        when(commentMapper.toDto(any(CommentEntity.class))).thenReturn(commentDto);
-
-        Page<CommentDto> result = commentService.getCommentsByPostId(1L, "random_value", pageable, user.getEmail());
-
-        assertNotNull(result);
-        assertFalse(result.isEmpty());
-        verify(commentRepository, times(1)).findAll(any(Specification.class), eq(pageable));
+        Page<CommentDto> res = commentService.getCommentsByPostId(2L, "random", pg, null);
+        assertThat(res).isNotEmpty();
     }
 
     @Test
-    void deleteComment_shouldDeleteCommentIfOwner() {
-        when(commentRepository.findById(1L)).thenReturn(Optional.of(comment));
-        when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
-
-        commentService.deleteComment(1L, user.getEmail());
-
-        verify(commentRepository, times(1)).delete(comment);
-        verify(notificationService, times(1))
-                .decrementNotification(post.getUser().getId(), post.getId(), NotificationType.COMMENT);
-    }
-
-    @Test
-    void deleteComment_shouldThrowExceptionWhenCommentNotFound() {
-        when(commentRepository.findById(1L)).thenReturn(Optional.empty());
-
-        assertThrows(CustomException.class, () -> commentService.deleteComment(1L, user.getEmail()));
-    }
-
-    @Test
-    void deleteComment_shouldThrowExceptionWhenNotOwner() {
-        UserEntity anotherUser = new UserEntity();
-        anotherUser.setId(2L);
-
-        comment.setUser(anotherUser);
-        when(commentRepository.findById(1L)).thenReturn(Optional.of(comment));
-        when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
-
-        assertThrows(CustomException.class, () -> commentService.deleteComment(1L, user.getEmail()));
-    }
-
-    @Test
-    void getCommentsByPostId_shouldReturnSortedComments() {
-        Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
+    void getReplies_mappingAndLiked() {
+        Pageable pg = PageRequest.of(0,1);
         Page<CommentEntity> page = new PageImpl<>(Collections.singletonList(comment));
-
         when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
-        when(commentRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(page);
-        when(commentMapper.toDto(any(CommentEntity.class))).thenReturn(commentDto);
-        when(userLikeChecker.isCommentLikedByUser(any(CommentEntity.class), eq(user.getId()))).thenReturn(true);
+        when(commentRepository.findByParentCommentId(3L, pg)).thenReturn(page);
+        when(commentMapper.toDto(comment)).thenReturn(commentDto);
+        when(userLikeChecker.isCommentLikedByUser(comment, user.getId())).thenReturn(false);
 
-        Page<CommentDto> result = commentService.getCommentsByPostId(1L, "latest", pageable, user.getEmail());
+        Page<CommentDto> res = commentService.getReplies(3L, pg, user.getEmail());
 
-        assertNotNull(result);
-        assertFalse(result.isEmpty());
-        assertEquals(1, result.getTotalElements());
+        assertThat(res.getContent().get(0).isLikedByUser()).isFalse();
+    }
+
+    @Test
+    void getReplies_noUsername_shouldNotCheckLikes() {
+        Pageable pg = PageRequest.of(0,1);
+        Page<CommentEntity> page = new PageImpl<>(Collections.singletonList(comment));
+        when(commentRepository.findByParentCommentId(3L, pg)).thenReturn(page);
+        when(commentMapper.toDto(comment)).thenReturn(commentDto);
+
+        Page<CommentDto> res = commentService.getReplies(3L, pg, null);
+
+        assertThat(res).isNotEmpty();
+        assertThat(res.getContent().get(0).isLikedByUser()).isFalse();
+    }
+
+
+    @Test
+    void deleteComment_ownerDeletes() {
+        when(commentRepository.findById(3L)).thenReturn(Optional.of(comment));
+        when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
+
+        commentService.deleteComment(3L, user.getEmail());
+
+        verify(commentRepository).delete(comment);
+        verify(notificationService).decrementNotification(user.getId(), post.getId(), NotificationType.COMMENT);
+    }
+
+    @Test
+    void deleteComment_notFoundOrNotOwner_shouldThrow() {
+        when(commentRepository.findById(3L)).thenReturn(Optional.empty());
+        assertThrows(CustomException.class, () -> commentService.deleteComment(3L, user.getEmail()));
+
+        when(commentRepository.findById(3L)).thenReturn(Optional.of(comment));
+        UserEntity other = new UserEntity(); other.setId(99L);
+        comment.setUser(other);
+        when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
+        assertThrows(CustomException.class, () -> commentService.deleteComment(3L, user.getEmail()));
     }
 }
