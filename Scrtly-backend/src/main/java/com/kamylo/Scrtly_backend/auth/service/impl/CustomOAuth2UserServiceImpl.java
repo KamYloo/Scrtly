@@ -17,7 +17,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class CustomOAuth2UserServiceImpl  implements OAuth2UserService<OidcUserRequest, OidcUser> {
 
-    private final OidcUserService delegate = new OidcUserService();
+    private final OidcUserService delegate;
     private final UserRepository userRepository;
     private final RolesRepository rolesRepository;
 

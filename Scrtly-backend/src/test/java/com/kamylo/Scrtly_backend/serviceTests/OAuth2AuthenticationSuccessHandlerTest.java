@@ -19,7 +19,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.web.RedirectStrategy;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -61,8 +60,8 @@ class OAuth2AuthenticationSuccessHandlerTest {
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(handler, "redirectUrl", REDIRECT_URL);
         handler.setRedirectStrategy(redirectStrategy);
+        handler.setRedirectUrl(REDIRECT_URL);
     }
 
     @Test

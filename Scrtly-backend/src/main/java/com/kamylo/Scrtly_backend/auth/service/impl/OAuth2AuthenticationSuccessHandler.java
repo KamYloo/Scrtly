@@ -21,9 +21,12 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private final JwtService jwtService;
     private final CookieService cookieService;
     private final RefreshTokenService refreshTokenService;
+    private String redirectUrl;
 
     @Value("${mailing.frontend.redirect-url}")
-    private String redirectUrl;
+    public void setRedirectUrl(String redirectUrl) {
+        this.redirectUrl = redirectUrl;
+    }
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
