@@ -20,9 +20,12 @@ import com.kamylo.Scrtly_backend.user.service.UserService;
 import com.kamylo.Scrtly_backend.album.service.AlbumServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,375 +38,355 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+
+@ExtendWith(MockitoExtension.class)
 class AlbumServiceImplTest {
 
-    @Mock
-    private AlbumRepository albumRepository;
+    private static final String ARTIST_EMAIL = "artist@example.com";
+    private static final String ADMIN_EMAIL = "admin@example.com";
+    private static final String USER_EMAIL = "user@example.com";
+    private static final String ALBUM_IMAGE_PATH = "albumImages/";
+    private static final String SAVED_IMAGE_PATH = "path/to/image.jpg";
 
-    @Mock
-    private ArtistRepository artistRepository;
-
-    @Mock
-    private UserService userService;
-
-    @Mock
-    private UserRoleService userRoleService;
-
-    @Mock
-    private FileService fileService;
-
-    @Mock
-    private SongRepository songRepository;
-
-    @Mock
-    private AlbumMapper albumMapper;
-
-    @Mock
-    private SongMapper songMapper;
-
-    @Mock
-    private HlsService hlsService;
+    @Mock private AlbumRepository albumRepository;
+    @Mock private ArtistRepository artistRepository;
+    @Mock private UserService userService;
+    @Mock private UserRoleService userRoleService;
+    @Mock private FileService fileService;
+    @Mock private SongRepository songRepository;
+    @Mock private AlbumMapper albumMapper;
+    @Mock private SongMapper songMapper;
+    @Mock private HlsService hlsService;
 
     @InjectMocks
     private AlbumServiceImpl albumService;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        albumService = new AlbumServiceImpl(
-                albumRepository,
-                userService,
-                artistRepository,
-                userRoleService,
-                fileService,
-                albumMapper,
-                songMapper,
-                songRepository,
-                hlsService
-        );
     }
 
-    @Test
-    void createAlbum_shouldThrowException_whenUserIsNotArtist() {
-        String username = "user@example.com";
-        when(userRoleService.isArtist(username)).thenReturn(false);
-
-        assertThrows(CustomException.class,
-                () -> albumService.createAlbum("Test Album", mock(MultipartFile.class), username));
+    private UserEntity createUserWithArtist(long userId, Integer artistId) {
+        UserEntity u = new UserEntity();
+        u.setId(userId);
+        if (artistId != null) {
+            ArtistEntity a = new ArtistEntity();
+            a.setId(artistId.longValue());
+            u.setArtistEntity(a);
+        }
+        return u;
     }
 
-    @Test
-    void createAlbum_shouldCreateAlbum_whenUserIsArtist() {
-        String title = "Test Album";
-        MultipartFile albumImage = mock(MultipartFile.class);
-        String username = "artist@example.com";
-        UserEntity user = new UserEntity();
-        user.setId(1L);
-        ArtistEntity artist = new ArtistEntity();
-        artist.setId(1L);
-        user.setArtistEntity(artist);
+    private SongEntity createSong(Integer id, String track, String imageSong, int duration) {
+        SongEntity s = new SongEntity();
+        s.setId(Long.valueOf(id));
+        s.setTrack(track);
+        s.setImageSong(imageSong);
+        s.setDuration(duration);
+        return s;
+    }
 
-        AlbumEntity albumEntity = new AlbumEntity();
-        albumEntity.setId(1);
-        albumEntity.setTitle(title);
-        albumEntity.setSongs(Collections.emptyList());
+    private AlbumEntity createAlbumEntity(Integer id, Long artistId, List<SongEntity> songs, String coverImage) {
+        AlbumEntity alb = new AlbumEntity();
+        alb.setId(id);
+        if (artistId != null) {
+            ArtistEntity a = new ArtistEntity();
+            a.setId(artistId);
+            alb.setArtist(a);
+        }
+        alb.setSongs(songs != null ? songs : Collections.emptyList());
+        alb.setCoverImage(coverImage);
+        return alb;
+    }
 
-        AlbumDto albumDto = new AlbumDto();
-        albumDto.setId(1);
-        albumDto.setTitle(title);
-        albumDto.setTracksCount(0);
-        albumDto.setTotalDuration(0);
+    private AlbumDto createAlbumDto(Integer id, String title) {
+        AlbumDto dto = new AlbumDto();
+        dto.setId(id);
+        dto.setTitle(title);
+        dto.setTracksCount(0);
+        dto.setTotalDuration(0);
+        return dto;
+    }
 
-        when(userRoleService.isArtist(username)).thenReturn(true);
+    private void stubRoles(String username, boolean isArtist, boolean isAdmin) {
+        lenient().when(userRoleService.isArtist(username)).thenReturn(isArtist);
+        lenient().when(userRoleService.isAdmin(username)).thenReturn(isAdmin);
+    }
+
+    private void stubFindUser(String username, UserEntity user) {
         when(userService.findUserByEmail(username)).thenReturn(user);
-        when(albumImage.isEmpty()).thenReturn(false);
-        when(fileService.saveFile(albumImage, "albumImages/")).thenReturn("path/to/image");
-        when(albumRepository.save(any(AlbumEntity.class))).thenReturn(albumEntity);
-        when(albumMapper.toDto(any(AlbumEntity.class))).thenReturn(albumDto);
+    }
 
-        AlbumDto result = albumService.createAlbum(title, albumImage, username);
+    private void stubFindAlbumById(Integer albumId, AlbumEntity album) {
+        when(albumRepository.findById(albumId)).thenReturn(Optional.ofNullable(album));
+    }
+
+    @Test
+    void createAlbum_shouldThrow_whenNotArtistNorAdmin() {
+        MultipartFile mockFile = mock(MultipartFile.class);
+        stubRoles(USER_EMAIL, false, false);
+
+        CustomException ex = assertThrows(CustomException.class,
+                () -> albumService.createAlbum("Title", mockFile, USER_EMAIL));
+        assertEquals(BusinessErrorCodes.ARTIST_UNAUTHORIZED, ex.getErrorCode());
+
+        verifyNoInteractions(userService, albumRepository, fileService, albumMapper);
+    }
+
+    @Test
+    void createAlbum_shouldSaveWithImage_whenArtistAndImageProvided() {
+        String title = "My Album";
+        MultipartFile file = mock(MultipartFile.class);
+
+        stubRoles(ARTIST_EMAIL, true, false);
+        UserEntity user = createUserWithArtist(1L, 1);
+        stubFindUser(ARTIST_EMAIL, user);
+
+        when(file.isEmpty()).thenReturn(false);
+        when(fileService.saveFile(file, ALBUM_IMAGE_PATH)).thenReturn(SAVED_IMAGE_PATH);
+
+        AlbumEntity savedEntity = createAlbumEntity(1, 1L, Collections.emptyList(), SAVED_IMAGE_PATH);
+        AlbumDto dto = createAlbumDto(1, title);
+
+        when(albumRepository.save(any(AlbumEntity.class))).thenReturn(savedEntity);
+        when(albumMapper.toDto(any(AlbumEntity.class))).thenReturn(dto);
+
+        AlbumDto result = albumService.createAlbum(title, file, ARTIST_EMAIL);
 
         assertNotNull(result);
         assertEquals(title, result.getTitle());
+
+        ArgumentCaptor<AlbumEntity> captor = ArgumentCaptor.forClass(AlbumEntity.class);
+        verify(albumRepository).save(captor.capture());
+        AlbumEntity passed = captor.getValue();
+        assertEquals(SAVED_IMAGE_PATH, passed.getCoverImage());
+
+        verify(fileService).saveFile(file, ALBUM_IMAGE_PATH);
+        verify(albumMapper).toDto(savedEntity);
     }
 
     @Test
-    void getAlbums_shouldReturnAlbums() {
+    void createAlbum_shouldAllow_whenAdminAndNoImage() {
+        String title = "Admin Album";
+        MultipartFile file = mock(MultipartFile.class);
+
+        stubRoles(ADMIN_EMAIL, false, true);
+        UserEntity adminUser = createUserWithArtist(10L, 10);
+        stubFindUser(ADMIN_EMAIL, adminUser);
+
+        when(file.isEmpty()).thenReturn(true);
+
+        AlbumEntity savedEntity = createAlbumEntity(2, 10L, Collections.emptyList(), null);
+        AlbumDto dto = createAlbumDto(2, title);
+
+        when(albumRepository.save(any(AlbumEntity.class))).thenReturn(savedEntity);
+        when(albumMapper.toDto(any(AlbumEntity.class))).thenReturn(dto);
+
+        AlbumDto result = albumService.createAlbum(title, file, ADMIN_EMAIL);
+
+        assertNotNull(result);
+        assertEquals(title, result.getTitle());
+
+        verify(fileService, never()).saveFile(any(), anyString());
+        verify(albumRepository).save(any(AlbumEntity.class));
+    }
+
+    @Test
+    void getAlbums_returnsPagedDtos() {
         Pageable pageable = PageRequest.of(0, 10);
-        AlbumEntity albumEntity = new AlbumEntity();
-        albumEntity.setId(1);
-        albumEntity.setTitle("Test Album");
-        albumEntity.setSongs(Collections.emptyList());
+        AlbumEntity entity = createAlbumEntity(1, 1L, Collections.emptyList(), null);
+        AlbumDto dto = createAlbumDto(1, "Test");
 
-        AlbumDto albumDto = new AlbumDto();
-        albumDto.setId(1);
-        albumDto.setTitle("Test Album");
-        albumDto.setTracksCount(0);
-        albumDto.setTotalDuration(0);
-
-        Page<AlbumEntity> albumPage = new PageImpl<>(Collections.singletonList(albumEntity));
-
-        when(albumRepository.findAll(pageable)).thenReturn(albumPage);
-        when(albumMapper.toDto(any(AlbumEntity.class))).thenReturn(albumDto);
+        Page<AlbumEntity> page = new PageImpl<>(List.of(entity));
+        when(albumRepository.findAll(pageable)).thenReturn(page);
+        when(albumMapper.toDto(any(AlbumEntity.class))).thenReturn(dto);
 
         Page<AlbumDto> result = albumService.getAlbums(pageable);
 
-        assertNotNull(result);
         assertEquals(1, result.getTotalElements());
-        assertEquals("Test Album", result.getContent().get(0).getTitle());
+        assertEquals("Test", result.getContent().get(0).getTitle());
     }
 
     @Test
-    void getAlbum_shouldThrowException_whenAlbumDoesNotExist() {
-        int albumId = 1;
-        when(albumRepository.findById(albumId)).thenReturn(Optional.empty());
-        assertThrows(CustomException.class, () -> albumService.getAlbum(albumId));
-    }
+    void searchAlbums_usesSpecification_andMaps() {
+        Pageable pageable = PageRequest.of(0, 5);
+        AlbumEntity entity = createAlbumEntity(3, 3L, Collections.emptyList(), null);
+        AlbumDto dto = createAlbumDto(3, "S");
 
-    @Test
-    void getAlbum_shouldReturnAlbum_whenAlbumExists() {
-        Integer albumId = 1;
-        AlbumEntity albumEntity = new AlbumEntity();
-        albumEntity.setId(albumId);
-        albumEntity.setTitle("Test Album");
-        albumEntity.setSongs(Collections.emptyList());
+        Page<AlbumEntity> page = new PageImpl<>(List.of(entity));
+        when(albumRepository.findAll(ArgumentMatchers.<Specification<AlbumEntity>>any(), eq(pageable)))
+                .thenReturn(page);
+        when(albumMapper.toDto(any(AlbumEntity.class))).thenReturn(dto);
 
-        AlbumDto albumDto = new AlbumDto();
-        albumDto.setId(albumId);
-        albumDto.setTitle("Test Album");
-        albumDto.setTracksCount(0);
-        albumDto.setTotalDuration(0);
+        Page<AlbumDto> result = albumService.searchAlbums("A", "B", pageable);
 
-        when(albumRepository.findById(albumId)).thenReturn(Optional.of(albumEntity));
-        when(albumMapper.toDto(any(AlbumEntity.class))).thenReturn(albumDto);
-
-        AlbumDto result = albumService.getAlbum(albumId);
-
-        assertNotNull(result);
-        assertEquals(albumId, result.getId());
-        assertEquals("Test Album", result.getTitle());
-        assertEquals(0, result.getTracksCount());
-        assertEquals(0, result.getTotalDuration());
-    }
-
-    @Test
-    void searchAlbums_shouldReturnAlbums() {
-        String artistName = "Artist";
-        String albumName = "Album";
-        Pageable pageable = PageRequest.of(0, 10);
-
-        AlbumEntity albumEntity = new AlbumEntity();
-        albumEntity.setId(1);
-        albumEntity.setTitle("Test Album");
-        albumEntity.setSongs(Collections.emptyList());
-
-        AlbumDto albumDto = new AlbumDto();
-        albumDto.setId(1);
-        albumDto.setTitle("Test Album");
-        albumDto.setTracksCount(0);
-        albumDto.setTotalDuration(0);
-
-        Page<AlbumEntity> albumPage = new PageImpl<>(Collections.singletonList(albumEntity));
-
-        when(albumRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(albumPage);
-        when(albumMapper.toDto(any(AlbumEntity.class))).thenReturn(albumDto);
-
-        Page<AlbumDto> result = albumService.searchAlbums(artistName, albumName, pageable);
-
-        assertNotNull(result);
         assertEquals(1, result.getTotalElements());
-        assertEquals("Test Album", result.getContent().get(0).getTitle());
     }
 
     @Test
-    void getAlbumTracks_shouldReturnTracks() {
-        int albumId = 1;
-        AlbumEntity albumEntity = new AlbumEntity();
-        albumEntity.setId(albumId);
-        albumEntity.setSongs(Collections.emptyList());
+    void getAlbum_throws_whenNotFound() {
+        Integer id = 100;
+        stubFindAlbumById(id, null);
 
-        SongEntity songEntity = new SongEntity();
-        songEntity.setDuration(200);
+        CustomException ex = assertThrows(CustomException.class, () -> albumService.getAlbum(id));
+        assertEquals(BusinessErrorCodes.ALBUM_NOT_FOUND, ex.getErrorCode());
+    }
+
+    @Test
+    void getAlbum_returnsDto_whenFound() {
+        Integer id = 5;
+        AlbumEntity entity = createAlbumEntity(id, 2L, Collections.emptyList(), null);
+        AlbumDto dto = createAlbumDto(id, "Found");
+
+        stubFindAlbumById(id, entity);
+        when(albumMapper.toDto(entity)).thenReturn(dto);
+
+        AlbumDto r = albumService.getAlbum(id);
+        assertEquals(id, r.getId());
+        assertEquals("Found", r.getTitle());
+    }
+
+    @Test
+    void getAlbumTracks_returnsMappedTracks() {
+        Integer albumId = 11;
+        AlbumEntity entity = createAlbumEntity(albumId, 2L, Collections.emptyList(), null);
+        SongEntity song = createSong(21, "t.mp3", "s.jpg", 200);
+        AlbumDto albumDto = createAlbumDto(albumId, "ALB");
+
+        when(albumRepository.findById(albumId)).thenReturn(Optional.of(entity));
+        when(albumMapper.toDto(entity)).thenReturn(albumDto);
+        when(albumMapper.toEntity(albumDto)).thenReturn(entity);
+        when(songRepository.findByAlbumId(albumId)).thenReturn(List.of(song));
 
         SongDto songDto = new SongDto();
         songDto.setDuration(200);
+        when(songMapper.toDto(song)).thenReturn(songDto);
 
-        AlbumDto albumDto = new AlbumDto();
-        albumDto.setId(albumId);
-        albumDto.setTitle("Test Album");
-        albumDto.setTracksCount(0);
-        albumDto.setTotalDuration(0);
-
-        when(albumRepository.findById(albumId)).thenReturn(Optional.of(albumEntity));
-        when(albumMapper.toDto(any(AlbumEntity.class))).thenReturn(albumDto);
-        when(albumMapper.toEntity(any(AlbumDto.class))).thenReturn(albumEntity);
-        when(songRepository.findByAlbumId(albumEntity.getId())).thenReturn(Collections.singletonList(songEntity));
-        when(songMapper.toDto(any(SongEntity.class))).thenReturn(songDto);
-
-        List<SongDto> result = albumService.getAlbumTracks(albumId);
-
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals(200, result.get(0).getDuration());
+        List<SongDto> tracks = albumService.getAlbumTracks(albumId);
+        assertEquals(1, tracks.size());
+        assertEquals(200, tracks.get(0).getDuration());
     }
 
     @Test
-    void getAlbumTracks_shouldThrowException_whenAlbumMapperReturnsNull() {
-        int albumId = 999;
-        AlbumEntity fakeEntity = new AlbumEntity();
-        fakeEntity.setId(albumId);
+    void getAlbumTracks_throws_whenMapperReturnsNull() {
+        Integer albumId = 999;
+        AlbumEntity entity = createAlbumEntity(albumId, 2L, null, null);
 
-        when(albumRepository.findById(albumId)).thenReturn(Optional.of(fakeEntity));
-        // AlbumMapper zwraca null
-        when(albumMapper.toDto(any(AlbumEntity.class))).thenReturn(null);
+        when(albumRepository.findById(albumId)).thenReturn(Optional.of(entity));
+        when(albumMapper.toDto(entity)).thenReturn(null);
 
-        CustomException exception = assertThrows(CustomException.class, () -> albumService.getAlbumTracks(albumId));
-        assertEquals(BusinessErrorCodes.ALBUM_NOT_FOUND, exception.getErrorCode());
+        CustomException ex = assertThrows(CustomException.class, () -> albumService.getAlbumTracks(albumId));
+        assertEquals(BusinessErrorCodes.ALBUM_NOT_FOUND, ex.getErrorCode());
     }
 
     @Test
-    void getAlbumsByArtist_shouldReturnAlbums() {
+    void getAlbumsByArtist_returnsDtos() {
         Long artistId = 1L;
-        ArtistEntity artistEntity = new ArtistEntity();
-        artistEntity.setId(artistId);
+        ArtistEntity artist = new ArtistEntity();
+        artist.setId(artistId);
+        AlbumEntity entity = createAlbumEntity(50, artistId, Collections.emptyList(), null);
+        AlbumDto dto = createAlbumDto(50, "ByArtist");
 
-        AlbumEntity albumEntity = new AlbumEntity();
-        albumEntity.setId(10);
-        albumEntity.setTitle("Test Album");
-        albumEntity.setSongs(Collections.emptyList());
-
-        AlbumDto albumDto = new AlbumDto();
-        albumDto.setId(10);
-        albumDto.setTitle("Test Album");
-        albumDto.setTracksCount(0);
-        albumDto.setTotalDuration(0);
-
-        when(artistRepository.findById(artistId)).thenReturn(Optional.of(artistEntity));
-        when(albumRepository.findByArtistId(artistEntity.getId())).thenReturn(List.of(albumEntity));
-        when(albumMapper.toDto(any(AlbumEntity.class))).thenReturn(albumDto);
+        when(artistRepository.findById(artistId)).thenReturn(Optional.of(artist));
+        when(albumRepository.findByArtistId(artistId)).thenReturn(List.of(entity));
+        when(albumMapper.toDto(entity)).thenReturn(dto);
 
         List<AlbumDto> result = albumService.getAlbumsByArtist(artistId);
-
-        assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals("Test Album", result.get(0).getTitle());
+        assertEquals("ByArtist", result.get(0).getTitle());
     }
 
     @Test
-    void deleteAlbum_shouldDeleteAlbum_whenUserIsArtist() {
-        int albumId = 1;
-        String username = "artist@example.com";
+    void getAlbumsByArtist_throws_whenArtistNotFound() {
+        Long id = 999L;
+        when(artistRepository.findById(id)).thenReturn(Optional.empty());
 
-        UserEntity user = new UserEntity();
-        user.setId(1L);
-        ArtistEntity artist = new ArtistEntity();
-        artist.setId(1L);
-        user.setArtistEntity(artist);
+        CustomException ex = assertThrows(CustomException.class, () -> albumService.getAlbumsByArtist(id));
+        assertEquals(BusinessErrorCodes.ARTIST_NOT_FOUND, ex.getErrorCode());
+    }
 
-        AlbumEntity albumEntity = new AlbumEntity();
-        albumEntity.setArtist(user.getArtistEntity());
+    @Test
+    void deleteAlbum_throws_whenNotArtistNorAdmin() {
+        Integer albumId = 1;
+        stubRoles(USER_EMAIL, false, false);
 
-        when(userRoleService.isArtist(username)).thenReturn(true);
-        when(albumRepository.findById(albumId)).thenReturn(Optional.of(albumEntity));
-        when(userService.findUserByEmail(username)).thenReturn(user);
+        CustomException ex = assertThrows(CustomException.class, () -> albumService.deleteAlbum(albumId, USER_EMAIL));
+        assertEquals(BusinessErrorCodes.ARTIST_UNAUTHORIZED, ex.getErrorCode());
+        verify(albumRepository, never()).findById(anyInt());
+    }
 
-        albumService.deleteAlbum(albumId, username);
+    @Test
+    void deleteAlbum_throws_whenAlbumMissing() {
+        Integer albumId = 2;
+        stubRoles(ARTIST_EMAIL, true, false);
+        stubFindAlbumById(albumId, null);
 
+        CustomException ex = assertThrows(CustomException.class, () -> albumService.deleteAlbum(albumId, ARTIST_EMAIL));
+        assertEquals(BusinessErrorCodes.ALBUM_NOT_FOUND, ex.getErrorCode());
+        verify(albumRepository, never()).deleteById(anyInt());
+        verify(fileService, never()).deleteFile(anyString());
+    }
+
+    @Test
+    void deleteAlbum_deletesFilesAndHls_whenArtistOwnsAlbum() {
+        Integer albumId = 3;
+        stubRoles(ARTIST_EMAIL, true, false);
+
+        UserEntity user = createUserWithArtist(1L, 1);
+        stubFindUser(ARTIST_EMAIL, user);
+
+        SongEntity s1 = createSong(101, "t1.mp3", "i1.jpg", 100);
+        SongEntity s2 = createSong(102, "t2.mp3", "i2.jpg", 120);
+        AlbumEntity album = createAlbumEntity(albumId, 1L, List.of(s1, s2), "cover.jpg");
+
+        stubFindAlbumById(albumId, album);
+
+        albumService.deleteAlbum(albumId, ARTIST_EMAIL);
+
+        verify(fileService).deleteFile("t1.mp3");
+        verify(fileService).deleteFile("i1.jpg");
+        verify(hlsService).deleteHlsFolder(101L);
+        verify(fileService).deleteFile("t2.mp3");
+        verify(fileService).deleteFile("i2.jpg");
+        verify(hlsService).deleteHlsFolder(102L);
+        verify(fileService).deleteFile("cover.jpg");
         verify(albumRepository).deleteById(albumId);
     }
 
     @Test
-    void deleteAlbum_shouldThrowException_whenUserIsNotArtist() {
-        int albumId = 1;
-        String username = "user@example.com";
+    void deleteAlbum_throws_whenArtistMismatch_andNotAdmin() {
+        Integer albumId = 4;
+        stubRoles(ARTIST_EMAIL, true, false);
 
-        when(userRoleService.isArtist(username)).thenReturn(false);
+        UserEntity user = createUserWithArtist(1L, 1);
+        stubFindUser(ARTIST_EMAIL, user);
 
-        assertThrows(CustomException.class, () -> albumService.deleteAlbum(albumId, username));
+        AlbumEntity album = createAlbumEntity(albumId, 99L, Collections.emptyList(), null);
+        stubFindAlbumById(albumId, album);
+
+        CustomException ex = assertThrows(CustomException.class, () -> albumService.deleteAlbum(albumId, ARTIST_EMAIL));
+        assertEquals(BusinessErrorCodes.ARTIST_MISMATCH, ex.getErrorCode());
+        verify(albumRepository, never()).deleteById(anyInt());
     }
 
     @Test
-    void deleteAlbum_shouldDeleteAlbumAndRelatedFiles_whenAlbumHasSongs() {
-        int albumId = 1;
-        String username = "artist@example.com";
+    void deleteAlbum_allowsAdminEvenIfNotArtist() {
+        Integer albumId = 5;
+        stubRoles(ADMIN_EMAIL, false, true);
 
-        UserEntity user = new UserEntity();
-        user.setId(1L);
-        ArtistEntity artist = new ArtistEntity();
-        artist.setId(1L);
-        user.setArtistEntity(artist);
+        UserEntity admin = createUserWithArtist(50L, 50);
+        stubFindUser(ADMIN_EMAIL, admin);
 
-        SongEntity song1 = new SongEntity();
-        song1.setTrack("track1.mp3");
-        song1.setImageSong("cover1.jpg");
+        SongEntity s = createSong(999, "track.mp3", "img.jpg", 10);
+        AlbumEntity album = createAlbumEntity(albumId, 200L, List.of(s), "albumCover.jpg");
+        stubFindAlbumById(albumId, album);
 
-        SongEntity song2 = new SongEntity();
-        song2.setTrack("track2.mp3");
-        song2.setImageSong("cover2.jpg");
+        assertDoesNotThrow(() -> albumService.deleteAlbum(albumId, ADMIN_EMAIL));
 
-        AlbumEntity albumEntity = new AlbumEntity();
-        albumEntity.setArtist(user.getArtistEntity());
-        albumEntity.setSongs(List.of(song1, song2));
-        albumEntity.setCoverImage("coverAlbum.jpg");
-
-        when(userRoleService.isArtist(username)).thenReturn(true);
-        when(albumRepository.findById(albumId)).thenReturn(Optional.of(albumEntity));
-        when(userService.findUserByEmail(username)).thenReturn(user);
-
-        albumService.deleteAlbum(albumId, username);
-
-        verify(fileService).deleteFile("track1.mp3");
-        verify(fileService).deleteFile("cover1.jpg");
-        verify(fileService).deleteFile("track2.mp3");
-        verify(fileService).deleteFile("cover2.jpg");
-        verify(fileService).deleteFile("coverAlbum.jpg");
-
+        verify(fileService).deleteFile("track.mp3");
+        verify(fileService).deleteFile("img.jpg");
+        verify(hlsService).deleteHlsFolder(999L);
+        verify(fileService).deleteFile("albumCover.jpg");
         verify(albumRepository).deleteById(albumId);
-    }
-
-    @Test
-    void deleteAlbum_shouldThrowException_whenArtistDoesNotMatchAlbumArtist() {
-        int albumId = 1;
-        String username = "artist@example.com";
-
-        UserEntity user = new UserEntity();
-        user.setId(1L);
-        ArtistEntity userArtist = new ArtistEntity();
-        userArtist.setId(1L);
-        user.setArtistEntity(userArtist);
-
-        UserEntity otherUser = new UserEntity();
-        otherUser.setId(2L);
-        ArtistEntity albumArtist = new ArtistEntity();
-        albumArtist.setId(2L);
-        otherUser.setArtistEntity(albumArtist);
-
-        AlbumEntity albumEntity = new AlbumEntity();
-        albumEntity.setArtist(otherUser.getArtistEntity());
-
-        when(userRoleService.isArtist(username)).thenReturn(true);
-        when(albumRepository.findById(albumId)).thenReturn(Optional.of(albumEntity));
-        when(userService.findUserByEmail(username)).thenReturn(user);
-
-        assertThrows(CustomException.class, () -> albumService.deleteAlbum(albumId, username));
-    }
-
-    @Test
-    void getAlbumsByArtist_shouldThrowException_whenArtistNotFound() {
-        Long artistId = 999L;
-        when(artistRepository.findById(artistId)).thenReturn(Optional.empty());
-
-        CustomException exception = assertThrows(CustomException.class, () -> albumService.getAlbumsByArtist(artistId));
-        assertEquals(BusinessErrorCodes.ARTIST_NOT_FOUND, exception.getErrorCode());
-    }
-
-    @Test
-    void getAlbum_shouldThrowException_whenAlbumNotFound() {
-        int albumId = 1;
-        when(albumRepository.findById(albumId)).thenReturn(Optional.empty());
-
-        CustomException exception = assertThrows(CustomException.class, () -> albumService.getAlbum(albumId));
-        assertEquals(BusinessErrorCodes.ALBUM_NOT_FOUND, exception.getErrorCode());
     }
 
 }
