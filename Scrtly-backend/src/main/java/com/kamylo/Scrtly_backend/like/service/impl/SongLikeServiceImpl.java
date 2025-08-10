@@ -1,6 +1,7 @@
-package com.kamylo.Scrtly_backend.like.service;
+package com.kamylo.Scrtly_backend.like.service.impl;
 
 import com.kamylo.Scrtly_backend.like.mapper.SongLikeMapper;
+import com.kamylo.Scrtly_backend.like.service.SongLikeService;
 import com.kamylo.Scrtly_backend.like.web.dto.SongLikeDto;
 import com.kamylo.Scrtly_backend.song.domain.SongEntity;
 import com.kamylo.Scrtly_backend.like.domain.SongLikeEntity;
