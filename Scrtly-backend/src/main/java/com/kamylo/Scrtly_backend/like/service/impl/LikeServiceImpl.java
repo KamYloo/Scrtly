@@ -1,7 +1,8 @@
-package com.kamylo.Scrtly_backend.like.service;
+package com.kamylo.Scrtly_backend.like.service.impl;
 
 import com.kamylo.Scrtly_backend.like.mapper.CommentLikeMapper;
 import com.kamylo.Scrtly_backend.like.mapper.PostLikeMapper;
+import com.kamylo.Scrtly_backend.like.service.LikeService;
 import com.kamylo.Scrtly_backend.like.web.dto.PostStatsDto;
 import com.kamylo.Scrtly_backend.like.web.dto.CommentStatsDto;
 import com.kamylo.Scrtly_backend.comment.domain.CommentEntity;
@@ -36,24 +37,6 @@ public class LikeServiceImpl implements LikeService {
     private final ApplicationEventPublisher eventPublisher;
     private final NotificationService notificationService;
     private final UserLikeChecker userLikeChecker;
-
-   /* @Override
-    public List<LikeEntity> getLikesByPost(Long postId) throws PostException {
-       Optional<PostEntity> post = postRepository.findById(postId);
-       if (post.isPresent()) {
-           return likeRepository.findByPostId(post.get().getId());
-       }
-       throw new PostException("PostEntity not found with id: " + postId);
-    }
-
-    @Override
-    public List<LikeEntity> getLikesByComment(Long commentId) throws CommentException {
-       CommentEntity commentEntity = commentService.findCommentById(commentId);
-       if (commentEntity != null) {
-           return likeRepository.findByCommentId(commentId);
-       }
-      throw new CommentException("CommentEntity not found with id: " + commentId);
-    }*/
 
     @Override
     @Transactional
