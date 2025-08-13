@@ -1,7 +1,7 @@
 package com.kamylo.Scrtly_backend.artist.web.controller;
 
 import com.kamylo.Scrtly_backend.artist.web.dto.ArtistDto;
-import com.kamylo.Scrtly_backend.metrics.service.MetricsPublisher;
+import com.kamylo.Scrtly_backend.metrics.messaging.publisher.MetricsPublisher;
 import com.kamylo.Scrtly_backend.song.web.dto.SongDto;
 import com.kamylo.Scrtly_backend.common.response.PagedResponse;
 import com.kamylo.Scrtly_backend.artist.service.ArtistService;

@@ -1,6 +1,6 @@
 package com.kamylo.Scrtly_backend.song.web.controller;
 
-import com.kamylo.Scrtly_backend.metrics.service.MetricsPublisher;
+import com.kamylo.Scrtly_backend.metrics.messaging.publisher.MetricsPublisher;
 import com.kamylo.Scrtly_backend.song.web.dto.SongDto;
 import com.kamylo.Scrtly_backend.song.web.dto.SongRequest;
 import com.kamylo.Scrtly_backend.song.service.SongService;

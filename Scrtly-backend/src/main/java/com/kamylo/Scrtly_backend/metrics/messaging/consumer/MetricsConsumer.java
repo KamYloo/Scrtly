@@ -1,4 +1,4 @@
-package com.kamylo.Scrtly_backend.metrics.service;
+package com.kamylo.Scrtly_backend.metrics.messaging.consumer;
 
 import com.kamylo.Scrtly_backend.metrics.domain.MetricEvent;
 import com.kamylo.Scrtly_backend.metrics.domain.enums.MetricType;
