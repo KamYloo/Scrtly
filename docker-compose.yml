@@ -20,15 +20,27 @@ services:
       RABBITMQ_DEFAULT_USER: "${RABBIT_USER}"
       RABBITMQ_DEFAULT_PASS: "${RABBIT_PASS}"
     ports:
-      - "15672:15672"
-      - "5672:5672"
-      - "61613:61613"
+      - '5672:5672'
+      - '15672:15672'
+      - "62400:61613"
+      - '15674:15674'
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
       - ./rabbitmq-plugins.conf:/etc/rabbitmq/plugins.conf:ro
     networks:
       - scrtly-net
       
+  redis:
+    image: redis:latest
+    container_name: scrtly_redis
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}"]
+    ports:
+      - '6379:6379'
+    networks:
+      - scrtly-net
+    volumes:
+      - redis_data:/data
+
   backend:
     image: kamyloo/scrtly-backend
     restart: always
@@ -44,6 +56,9 @@ services:
       SPRING_DATASOURCE_PASSWORD: "${POSTGRES_PASSWORD}"
       SPRING_RABBITMQ_HOST: "rabbitmq"
       SPRING_RABBITMQ_PORT: "5672"
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: "6379"
+      SPRING_REDIS_PASSWORD: "${REDIS_PASSWORD}"
       MAIL_USERNAME: "${MAIL_USERNAME}"
       MAIL_PASSWORD: "${MAIL_PASSWORD}"
       SECRET_KEY: "${SECRET_KEY}"
@@ -51,6 +66,7 @@ services:
     depends_on:
       - postgres
       - rabbitmq
+      - redis
     volumes:
       - uploads:/uploads
     networks:
@@ -63,7 +79,8 @@ services:
     ports: 
       - "5002:5002"
     environment:
-      VITE_APP_BACKEND_URL: http://145.239.91.66:5001
+      VITE_APP_BACKEND_URL: https://api.zuvoria.pl/api
+      VITE_STRIPE_PUBLIC_KEY: ${VITE_STRIPE_PUBLIC_KEY}
     depends_on:
       - backend
     networks:
@@ -73,9 +90,17 @@ services:
     image: certbot/certbot
     container_name: certbot
     volumes:
-      - /etc/letsencrypt:/etc/letsencrypt
-      - /var/www/certbot:/var/www/certbot
-    command: certonly --webroot -w /var/www/certbot --keep-until-expiring --email ${CERTBOT_EMAIL} -d ${CERTBOT_DOMAIN1} -d ${CERTBOT_DOMAIN2} -d ${CERTBOT_DOMAIN3} --agree-tos
+      - ./letsencrypt:/etc/letsencrypt
+      - ./certbot:/var/www/certbot
+    command: >
+      certonly
+      --webroot -w /var/www/certbot
+      --keep-until-expiring
+      --email ${CERTBOT_EMAIL}
+      -d ${CERTBOT_DOMAIN1}
+      -d ${CERTBOT_DOMAIN2}
+      -d ${CERTBOT_DOMAIN3}
+      --agree-tos
     networks:
       - scrtly-net
 
@@ -88,13 +113,14 @@ services:
       - WATCHTOWER_CLEANUP=true
       - REPO_USER=${DOCKER_HUB_USERNAME}
       - REPO_PASS=${DOCKER_HUB_ACCESS_TOKEN}
-    command: --interval 300  # Checks for updates every 5 minutes
+    command: --interval 300
     networks:
       - scrtly-net
 
 volumes:
   pgdata:
   rabbitmq_data:
+  redis_data:
   certbot-ssl:
   certbot-challenge:
   uploads:
