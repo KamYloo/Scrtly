@@ -131,11 +131,6 @@ public class SecurityConfig implements WebMvcConfigurer {
         return config.getAuthenticationManager();
     }
 
-    @Bean
-    public OidcUserService oidcUserService() {
-        return new OidcUserService();
-    }
-
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/uploads/**")
