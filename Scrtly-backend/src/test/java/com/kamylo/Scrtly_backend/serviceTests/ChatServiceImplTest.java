@@ -1,12 +1,12 @@
 package com.kamylo.Scrtly_backend.serviceTests;
 
+import com.kamylo.Scrtly_backend.chat.mapper.ChatRoomMapper;
 import com.kamylo.Scrtly_backend.chat.web.dto.ChatRoomDto;
 import com.kamylo.Scrtly_backend.chat.web.dto.request.ChatRoomRequest;
 import com.kamylo.Scrtly_backend.chat.domain.ChatRoomEntity;
 import com.kamylo.Scrtly_backend.user.domain.UserEntity;
 import com.kamylo.Scrtly_backend.common.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.common.handler.CustomException;
-import com.kamylo.Scrtly_backend.common.mapper.Mapper;
 import com.kamylo.Scrtly_backend.chat.repository.ChatRepository;
 import com.kamylo.Scrtly_backend.user.service.UserService;
 import com.kamylo.Scrtly_backend.chat.service.impl.ChatServiceImpl;
@@ -34,7 +34,7 @@ public class ChatServiceImplTest {
     private UserService userService;
 
     @Mock
-    private Mapper<ChatRoomEntity, ChatRoomDto> chatRoomMapper;
+    private ChatRoomMapper chatRoomMapper;
 
     @InjectMocks
     private ChatServiceImpl chatService;
@@ -74,7 +74,7 @@ public class ChatServiceImplTest {
 
         ChatRoomDto expectedDto = new ChatRoomDto();
         expectedDto.setChatRoomName(savedChatRoom.getChatRoomName());
-        when(chatRoomMapper.mapTo(savedChatRoom)).thenReturn(expectedDto);
+        when(chatRoomMapper.toDto(savedChatRoom)).thenReturn(expectedDto);
 
         ChatRoomDto result = chatService.createChat(username, chatRoomRequest);
 
@@ -84,7 +84,7 @@ public class ChatServiceImplTest {
         verify(userService, times(1)).findUserById(2L);
         verify(userService, times(1)).findUserById(3L);
         verify(chatRepository, times(1)).save(any(ChatRoomEntity.class));
-        verify(chatRoomMapper, times(1)).mapTo(savedChatRoom);
+        verify(chatRoomMapper, times(1)).toDto(savedChatRoom);
     }
 
 
@@ -107,7 +107,7 @@ public class ChatServiceImplTest {
 
         ChatRoomDto expectedDto = new ChatRoomDto();
         expectedDto.setChatRoomName(chatRoom.getChatRoomName());
-        when(chatRoomMapper.mapTo(chatRoom)).thenReturn(expectedDto);
+        when(chatRoomMapper.toDto(chatRoom)).thenReturn(expectedDto);
 
         ChatRoomDto result = chatService.getChatById(chatId, username);
 
@@ -115,7 +115,7 @@ public class ChatServiceImplTest {
         assertEquals(expectedDto.getChatRoomName(), result.getChatRoomName());
         verify(chatRepository, times(1)).findById(chatId);
         verify(userService, times(1)).findUserByEmail(username);
-        verify(chatRoomMapper, times(1)).mapTo(chatRoom);
+        verify(chatRoomMapper, times(1)).toDto(chatRoom);
     }
 
     @Test
@@ -187,8 +187,8 @@ public class ChatServiceImplTest {
         ChatRoomDto dto2 = new ChatRoomDto();
         dto2.setChatRoomName("Chat_2");
 
-        when(chatRoomMapper.mapTo(chatRoom1)).thenReturn(dto1);
-        when(chatRoomMapper.mapTo(chatRoom2)).thenReturn(dto2);
+        when(chatRoomMapper.toDto(chatRoom1)).thenReturn(dto1);
+        when(chatRoomMapper.toDto(chatRoom2)).thenReturn(dto2);
 
         List<ChatRoomDto> result = chatService.findChatsByUser(username);
 
@@ -219,8 +219,8 @@ public class ChatServiceImplTest {
 
         when(chatRepository.findById(chatId)).thenReturn(Optional.of(chatRoom));
         when(userService.findUserByEmail(username)).thenReturn(user);
-        when(chatRoomMapper.mapTo(chatRoom)).thenReturn(chatRoomDto);
-        when(chatRoomMapper.mapFrom(chatRoomDto)).thenReturn(chatRoom);
+        when(chatRoomMapper.toDto(chatRoom)).thenReturn(chatRoomDto);
+        when(chatRoomMapper.toEntity(chatRoomDto)).thenReturn(chatRoom);
 
         chatService.deleteChat(chatId, username);
 

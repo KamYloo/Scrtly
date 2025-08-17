@@ -238,6 +238,17 @@
       font-family: cursive;
       color: white;
     }
+
+    .delete-button {
+      color: #9c0303;
+      position: absolute;
+      top: 0;
+      right: 0;
+      font-size: large;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
   }
 
   .progress-bar {
@@ -352,6 +363,7 @@
         cursor: pointer;
         color: rgba(255, 255, 255, 0.836);
         position: relative;
+        z-index: 5;
 
         i {
           font-size: 20px;
@@ -588,6 +600,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
+  z-index: 6;
 
   .imgPost {
     flex: 5;

@@ -1,33 +1,41 @@
 package com.kamylo.Scrtly_backend.serviceTests;
 
-import com.kamylo.Scrtly_backend.user.web.dto.UserDto;
-import com.kamylo.Scrtly_backend.artist.web.dto.ArtistVerificationRequest;
-import com.kamylo.Scrtly_backend.user.web.dto.request.UserRequestDto;
+import com.kamylo.Scrtly_backend.common.handler.CustomException;
+import com.kamylo.Scrtly_backend.common.service.FileService;
+import com.kamylo.Scrtly_backend.common.utils.UserLikeChecker;
 import com.kamylo.Scrtly_backend.email.EmailTemplateName;
+import com.kamylo.Scrtly_backend.email.service.EmailService;
+import com.kamylo.Scrtly_backend.payment.domain.enums.SubscriptionStatus;
+import com.kamylo.Scrtly_backend.payment.repository.SubscriptionRepository;
 import com.kamylo.Scrtly_backend.artist.domain.ArtistVerificationToken;
+import com.kamylo.Scrtly_backend.artist.service.ArtistVerificationTokenService;
+import com.kamylo.Scrtly_backend.artist.web.dto.ArtistVerificationRequest;
 import com.kamylo.Scrtly_backend.user.domain.RoleEntity;
 import com.kamylo.Scrtly_backend.user.domain.UserEntity;
-import com.kamylo.Scrtly_backend.common.handler.CustomException;
-import com.kamylo.Scrtly_backend.common.mapper.Mapper;
+import com.kamylo.Scrtly_backend.user.mapper.UserMapper;
 import com.kamylo.Scrtly_backend.user.repository.UserRepository;
-import com.kamylo.Scrtly_backend.artist.service.ArtistVerificationTokenService;
-import com.kamylo.Scrtly_backend.email.service.EmailService;
-import com.kamylo.Scrtly_backend.common.service.FileService;
 import com.kamylo.Scrtly_backend.user.service.impl.UserServiceImpl;
-import com.kamylo.Scrtly_backend.common.utils.UserLikeChecker;
+import com.kamylo.Scrtly_backend.user.web.dto.UserDto;
+import com.kamylo.Scrtly_backend.user.web.dto.request.UserRequestDto;
 import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -36,11 +44,12 @@ class UserServiceImplTest {
 
     @Mock private UserRepository userRepository;
     @Mock private FileService fileService;
-    @Mock private Mapper<UserEntity, UserDto> mapper;
+    @Mock private UserMapper mapper;
     @Mock private UserLikeChecker userLikeChecker;
     @Mock private MultipartFile multipartFile;
     @Mock private ArtistVerificationTokenService artistVerificationTokenService;
     @Mock private EmailService emailService;
+    @Mock private SubscriptionRepository subscriptionRepo;
 
     @InjectMocks private UserServiceImpl userService;
 
@@ -68,244 +77,290 @@ class UserServiceImplTest {
     }
 
     @Test
-    void findUserByEmail_shouldReturnUser() {
+    void findUserByEmail_whenExists_shouldReturnEntity() {
         when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
-        assertEquals(user, userService.findUserByEmail("user@example.com"));
+        assertThat(userService.findUserByEmail("user@example.com")).isEqualTo(user);
     }
 
     @Test
-    void findUserByEmail_shouldThrowException_whenUserNotFound() {
-        lenient().when(userRepository.findByEmail("unknown@example.com")).thenReturn(Optional.empty());
-        UsernameNotFoundException ex = assertThrows(UsernameNotFoundException.class,
-                () -> userService.findUserByEmail("unknown@example.com"));
-        assertEquals("User not found", ex.getMessage());
+    void findUserByEmail_whenNotExists_shouldThrow() {
+        when(userRepository.findByEmail("unknown@example.com")).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> userService.findUserByEmail("unknown@example.com"))
+                .isInstanceOf(UsernameNotFoundException.class)
+                .hasMessage("User not found");
     }
 
     @Test
-    void findUserById_shouldReturnUser() {
+    void findUserById_whenExists_shouldReturnEntity() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        assertEquals(user, userService.findUserById(1L));
+        assertThat(userService.findUserById(1L)).isEqualTo(user);
     }
 
     @Test
-    void findUserById_shouldThrowException_whenUserNotFound() {
+    void findUserById_whenNotExists_shouldThrow() {
         when(userRepository.findById(999L)).thenReturn(Optional.empty());
-        UsernameNotFoundException ex = assertThrows(UsernameNotFoundException.class,
-                () -> userService.findUserById(999L));
-        assertEquals("User not found", ex.getMessage());
+        assertThatThrownBy(() -> userService.findUserById(999L))
+                .isInstanceOf(UsernameNotFoundException.class)
+                .hasMessage("User not found");
     }
 
     @Test
-    void findUserByNickname_shouldReturnUserDto() {
+    void findUserByNickname_whenExists_shouldReturnDto() {
         when(userRepository.findByNickName("User1")).thenReturn(Optional.of(user));
-        when(mapper.mapTo(user)).thenReturn(userDto);
-        assertEquals(userDto, userService.findUserByNickname("User1"));
+        when(mapper.toDto(user)).thenReturn(userDto);
+        assertThat(userService.findUserByNickname("User1")).isEqualTo(userDto);
     }
 
     @Test
-    void findUserByNickname_shouldThrowException_whenUserNotFound() {
+    void findUserByNickname_whenNotExists_shouldThrow() {
         when(userRepository.findByNickName("unknownNick")).thenReturn(Optional.empty());
-        UsernameNotFoundException ex = assertThrows(UsernameNotFoundException.class,
-                () -> userService.findUserByNickname("unknownNick"));
-        assertEquals("User not found", ex.getMessage());
+        assertThatThrownBy(() -> userService.findUserByNickname("unknownNick"))
+                .isInstanceOf(UsernameNotFoundException.class)
+                .hasMessage("User not found");
     }
 
     @Test
-    void getUserProfile_shouldReturnUserDto_withObservedStatus() {
+    void getUserProfile_whenNicknameNotExists_shouldThrow() {
+        when(userRepository.findByNickName("noNick")).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> userService.getUserProfile("noNick", "user@example.com"))
+                .isInstanceOf(UsernameNotFoundException.class)
+                .hasMessage("User not found");
+    }
+
+    @Test
+    void getUserProfile_whenReqUserEmailNotExists_shouldThrow() {
         when(userRepository.findByNickName("User1")).thenReturn(Optional.of(user));
+        when(userRepository.findByEmail("bad@example.com")).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> userService.getUserProfile("User1", "bad@example.com"))
+                .isInstanceOf(UsernameNotFoundException.class)
+                .hasMessage("User not found");
+    }
+
+    @Test
+    void getUserProfile_whenObserved_shouldSetObservedTrue() {
         when(userRepository.findByEmail("another@example.com")).thenReturn(Optional.of(anotherUser));
+        when(userRepository.findByNickName("User1")).thenReturn(Optional.of(user));
         when(userLikeChecker.isUserFollowed(user, anotherUser.getId())).thenReturn(true);
-        when(mapper.mapTo(user)).thenReturn(userDto);
+        when(mapper.toDto(user)).thenReturn(userDto);
 
         UserDto result = userService.getUserProfile("User1", "another@example.com");
-
-        assertNotNull(result);
-        assertTrue(result.isObserved());
+        assertThat(result.isObserved()).isTrue();
     }
 
     @Test
-    void followUser_shouldToggleFollowStatus() {
+    void getUserProfile_whenNotObserved_shouldSetObservedFalse() {
+        when(userRepository.findByEmail("another@example.com")).thenReturn(Optional.of(anotherUser));
+        when(userRepository.findByNickName("User1")).thenReturn(Optional.of(user));
+        when(userLikeChecker.isUserFollowed(user, anotherUser.getId())).thenReturn(false);
+        when(mapper.toDto(user)).thenReturn(userDto);
+
+        UserDto result = userService.getUserProfile("User1", "another@example.com");
+        assertThat(result.isObserved()).isFalse();
+    }
+
+    @Test
+    void getUserProfile_whenRequesterNull_shouldSetObservedFalse() {
+        when(userRepository.findByNickName("User1")).thenReturn(Optional.of(user));
+        when(mapper.toDto(user)).thenReturn(userDto);
+
+        UserDto result = userService.getUserProfile("User1", null);
+        assertThat(result.isObserved()).isFalse();
+    }
+
+    @Test
+    void followUser_whenNotFollowing_shouldFollowAndReturnDto() {
+        when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
         when(userRepository.findById(2L)).thenReturn(Optional.of(anotherUser));
-        when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
-        when(mapper.mapTo(anotherUser)).thenReturn(userDto);
-
-        assertFalse(user.getFollowings().contains(anotherUser));
-
-        UserDto followed = userService.followUser(2L, "user@example.com");
-        assertTrue(user.getFollowings().contains(anotherUser));
-        assertTrue(anotherUser.getFollowers().contains(user));
-
-        UserDto unfollowed = userService.followUser(2L, "user@example.com");
-        assertFalse(user.getFollowings().contains(anotherUser));
-        assertFalse(anotherUser.getFollowers().contains(user));
-    }
-
-    @Test
-    void followUser_shouldThrowException_whenFollowingSelf() {
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
-
-        assertThrows(CustomException.class, () -> userService.followUser(1L, "user@example.com"));
-    }
-
-    @Test
-    void updateUser_shouldUpdateProfileInfo() {
-        UserRequestDto userRequestDto = new UserRequestDto();
-        userRequestDto.setFullName("Updated Name");
-        userRequestDto.setDescription("New Description");
-
-        when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
-        when(userRepository.save(any(UserEntity.class))).thenReturn(user);
-        when(mapper.mapTo(user)).thenReturn(userDto);
-
-        UserDto updatedUser = userService.updateUser("user@example.com", userRequestDto, null);
-
-        assertEquals("Updated Name", user.getFullName());
-        assertEquals("New Description", user.getDescription());
-    }
-
-    @Test
-    void updateUser_shouldUpdateProfilePicture_whenImageProvided() {
-        when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
-        when(fileService.updateFile(multipartFile, user.getProfilePicture(), "userImages/")).thenReturn("newImagePath");
-        when(userRepository.save(any(UserEntity.class))).thenReturn(user);
-        when(mapper.mapTo(user)).thenReturn(userDto);
-
-        UserDto updatedUser = userService.updateUser("user@example.com", new UserRequestDto(), multipartFile);
-
-        assertEquals("newImagePath", user.getProfilePicture());
-    }
-
-    @Test
-    void searchUser_shouldReturnMatchingUsers() {
-        Set<UserEntity> foundUsers = new HashSet<>();
-        foundUsers.add(user);
-        when(userRepository.searchUser("User")).thenReturn(foundUsers);
-        when(mapper.mapTo(user)).thenReturn(userDto);
-
-        Set<UserDto> result = userService.searchUser("User");
-
-        assertEquals(1, result.size());
-        assertTrue(result.stream().anyMatch(dto -> "User1".equals(dto.getNickName())));
-    }
-
-    @Test
-    void followUser_shouldUnfollow_whenAlreadyFollowing() {
-        user.getFollowings().add(anotherUser);
-        anotherUser.getFollowers().add(user);
-
-        when(userRepository.findById(2L)).thenReturn(Optional.of(anotherUser));
-        when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
-        when(mapper.mapTo(anotherUser)).thenReturn(userDto);
+        when(mapper.toDto(anotherUser)).thenReturn(userDto);
 
         userService.followUser(2L, "user@example.com");
-
-        assertFalse(user.getFollowings().contains(anotherUser));
-        assertFalse(anotherUser.getFollowers().contains(user));
+        assertThat(user.getFollowings()).contains(anotherUser);
+        assertThat(anotherUser.getFollowers()).contains(user);
     }
 
     @Test
-    void updateUser_shouldNotUpdateImage_whenImageIsNull() {
+    void followUser_whenFollowingAlready_shouldUnfollow() {
+        user.getFollowings().add(anotherUser);
+        anotherUser.getFollowers().add(user);
+        when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
+        when(userRepository.findById(2L)).thenReturn(Optional.of(anotherUser));
+        when(mapper.toDto(anotherUser)).thenReturn(userDto);
+
+        userService.followUser(2L, "user@example.com");
+        assertThat(user.getFollowings()).doesNotContain(anotherUser);
+        assertThat(anotherUser.getFollowers()).doesNotContain(user);
+    }
+
+    @Test
+    void followUser_whenFollowingSelf_shouldThrow() {
+        when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        assertThatThrownBy(() -> userService.followUser(1L, "user@example.com"))
+                .isInstanceOf(CustomException.class);
+    }
+
+    @Test
+    void updateUser_whenValidRequest_shouldUpdateFieldsAndSave() {
+        when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
+        UserRequestDto req = new UserRequestDto();
+        req.setFullName("Updated Name");
+        req.setDescription("New Description");
+
+        when(userRepository.save(any(UserEntity.class))).thenReturn(user);
+        when(mapper.toDto(user)).thenReturn(userDto);
+
+        userService.updateUser("user@example.com", req, null);
+
+        ArgumentCaptor<UserEntity> captor = ArgumentCaptor.forClass(UserEntity.class);
+        verify(userRepository).save(captor.capture());
+        UserEntity saved = captor.getValue();
+        assertThat(saved.getFullName()).isEqualTo("Updated Name");
+        assertThat(saved.getDescription()).isEqualTo("New Description");
+    }
+
+    @Test
+    void updateUser_whenImageEmptyOrNull_shouldNotChangeProfilePicture() {
         when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
         when(userRepository.save(any(UserEntity.class))).thenReturn(user);
-        when(mapper.mapTo(user)).thenReturn(userDto);
 
-        UserDto updatedUser = userService.updateUser("user@example.com", new UserRequestDto(), null);
+        userService.updateUser("user@example.com", new UserRequestDto(), null);
+        assertThat(user.getProfilePicture()).isNull();
 
-        assertNull(user.getProfilePicture());
-    }
-
-    @Test
-    void updateUser_shouldNotUpdateImage_whenImageIsEmpty() {
-        when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
         when(multipartFile.isEmpty()).thenReturn(true);
-        when(userRepository.save(any(UserEntity.class))).thenReturn(user);
-        when(mapper.mapTo(user)).thenReturn(userDto);
-
-        UserDto updatedUser = userService.updateUser("user@example.com", new UserRequestDto(), multipartFile);
-
-        assertNull(user.getProfilePicture());
+        userService.updateUser("user@example.com", new UserRequestDto(), multipartFile);
+        assertThat(user.getProfilePicture()).isNull();
     }
 
     @Test
-    void updateUser_shouldUpdateImage_whenValidImageProvided() {
+    void updateUser_whenImageProvided_shouldUpdateProfilePicture() {
         when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
         when(multipartFile.isEmpty()).thenReturn(false);
         when(fileService.updateFile(multipartFile, user.getProfilePicture(), "userImages/")).thenReturn("newImagePath");
         when(userRepository.save(any(UserEntity.class))).thenReturn(user);
-        when(mapper.mapTo(user)).thenReturn(userDto);
+        when(mapper.toDto(user)).thenReturn(userDto);
 
-        UserDto updatedUser = userService.updateUser("user@example.com", new UserRequestDto(), multipartFile);
-
-        assertEquals("newImagePath", user.getProfilePicture());
+        userService.updateUser("user@example.com", new UserRequestDto(), multipartFile);
+        assertThat(user.getProfilePicture()).isEqualTo("newImagePath");
     }
 
     @Test
-    void getUserProfile_shouldThrowException_whenNickNameNotFound() {
-        when(userRepository.findByNickName("nonexistentNick")).thenReturn(Optional.empty());
-        UsernameNotFoundException exception = assertThrows(UsernameNotFoundException.class,
-                () -> userService.getUserProfile("nonexistentNick", "req@example.com"));
-        assertEquals("User not found", exception.getMessage());
+    void searchUser_whenMatches_shouldReturnDtoSet() {
+        when(userRepository.searchUser("User")).thenReturn(Set.of(user));
+        when(mapper.toDto(user)).thenReturn(userDto);
+
+        Set<UserDto> result = userService.searchUser("User");
+        assertThat(result).hasSize(1).extracting(UserDto::getNickName).containsExactly("User1");
     }
 
     @Test
-    void getUserProfile_shouldThrowException_whenReqUserNotFound() {
-        when(userRepository.findByNickName("existingNick")).thenReturn(Optional.of(user));
-        when(userRepository.findByEmail("nonexistentReq@example.com")).thenReturn(Optional.empty());
-        UsernameNotFoundException exception = assertThrows(UsernameNotFoundException.class,
-                () -> userService.getUserProfile("existingNick", "nonexistentReq@example.com"));
-        assertEquals("User not found", exception.getMessage());
+    void searchUser_whenNoMatches_shouldReturnEmptySet() {
+        when(userRepository.searchUser("Nobody")).thenReturn(Set.of());
+
+        Set<UserDto> result = userService.searchUser("Nobody");
+        assertThat(result).isEmpty();
     }
 
     @Test
-    void requestArtistVerification_shouldSendEmailToAdmins() throws MessagingException {
-        ArtistVerificationRequest request = new ArtistVerificationRequest();
-        request.setRequestedArtistName("requestedArtist");
+    void isPremium_whenActiveSubscriptionExists_shouldReturnTrue() {
+        when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
+        when(subscriptionRepo.existsByUserIdAndStatusAndCurrentPeriodEndAfter(
+                eq(1L), eq(SubscriptionStatus.ACTIVE), any(LocalDateTime.class)))
+                .thenReturn(true);
 
-        ArtistVerificationToken tokenInstance = new ArtistVerificationToken();
-        tokenInstance.setToken("testToken");
-        tokenInstance.setRequestedArtistName("requestedArtist");
+        assertThat(userService.isPremium("user@example.com")).isTrue();
+    }
+
+    @Test
+    void isPremium_whenNoActiveSubscription_shouldReturnFalse() {
+        when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
+        when(subscriptionRepo.existsByUserIdAndStatusAndCurrentPeriodEndAfter(
+                eq(1L), eq(SubscriptionStatus.ACTIVE), any(LocalDateTime.class)))
+                .thenReturn(false);
+
+        assertThat(userService.isPremium("user@example.com")).isFalse();
+    }
+
+    @Test
+    void requestArtistVerification_whenFirstRequest_andAdminsExist_shouldSendEmails() throws MessagingException {
+        when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
+        ArtistVerificationRequest req = new ArtistVerificationRequest();
+        req.setRequestedArtistName("artist");
 
         when(artistVerificationTokenService.getTokenByUser(user)).thenReturn(null);
-        when(artistVerificationTokenService.createArtistVerificationToken(user, "requestedArtist")).thenReturn(tokenInstance);
+        ArtistVerificationToken token = new ArtistVerificationToken();
+        token.setToken("token");
+        token.setRequestedArtistName("artist");
+        when(artistVerificationTokenService.createArtistVerificationToken(user, "artist")).thenReturn(token);
 
-        RoleEntity adminRole = new RoleEntity();
-        adminRole.setName("ADMIN");
-        Set<RoleEntity> adminRoles = new HashSet<>();
-        adminRoles.add(adminRole);
-        UserEntity admin = new UserEntity();
-        admin.setId(100L);
-        admin.setEmail("admin@example.com");
-        admin.setFullName("Admin User");
-        admin.setRoles(adminRoles);
-
-        when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
+        RoleEntity adminRole = new RoleEntity(); adminRole.setName("ADMIN");
+        UserEntity admin = new UserEntity(); admin.setId(100L); admin.setEmail("admin@example.com"); admin.setFullName("Admin"); admin.setRoles(Set.of(adminRole));
         when(userRepository.findAll()).thenReturn(List.of(admin));
 
-        userService.requestArtistVerification("user@example.com", request);
+        userService.requestArtistVerification("user@example.com", req);
 
-        verify(emailService, times(1)).sendEmail(eq("admin@example.com"),
-                eq("Admin User"),
-                eq(EmailTemplateName.ARTIST_VERIFICATION),
-                anyString(),
-                eq("Artist Verification"),
-                eq("requestedArtist"),
-                eq(user));
+        verify(emailService).sendEmail(eq("admin@example.com"), eq("Admin"), eq(EmailTemplateName.ARTIST_VERIFICATION), anyString(), eq("Artist Verification"), eq("artist"), eq(user));
     }
 
     @Test
-    void requestArtistVerification_shouldThrowException_whenUserIsAlreadyArtist() {
-        RoleEntity artistRole = new RoleEntity();
-        artistRole.setName("ARTIST");
-        Set<RoleEntity> roles = new HashSet<>();
-        roles.add(artistRole);
-        user.setRoles(roles);
-
-        ArtistVerificationRequest request = new ArtistVerificationRequest();
-        request.setRequestedArtistName("requestedArtist");
-
+    void requestArtistVerification_whenTokenExists_shouldReuseAndSendEmail() throws MessagingException {
         when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
-        assertThrows(CustomException.class, () ->
-                userService.requestArtistVerification("user@example.com", request));
+        ArtistVerificationRequest req = new ArtistVerificationRequest();
+        req.setRequestedArtistName("artist");
+
+        ArtistVerificationToken existing = new ArtistVerificationToken(); existing.setToken("existing"); existing.setRequestedArtistName("artist");
+        when(artistVerificationTokenService.getTokenByUser(user)).thenReturn(existing);
+
+        RoleEntity adminRole = new RoleEntity(); adminRole.setName("ADMIN");
+        UserEntity admin = new UserEntity(); admin.setId(100L); admin.setEmail("admin@example.com"); admin.setFullName("Admin"); admin.setRoles(Set.of(adminRole));
+        when(userRepository.findAll()).thenReturn(List.of(admin));
+
+        userService.requestArtistVerification("user@example.com", req);
+        verify(emailService).sendEmail(anyString(), anyString(), eq(EmailTemplateName.ARTIST_VERIFICATION), anyString(), anyString(), anyString(), eq(user));
+    }
+
+    @Test
+    void requestArtistVerification_whenNoAdmins_shouldNotThrowOrSend() throws MessagingException {
+        when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
+        ArtistVerificationRequest req = new ArtistVerificationRequest();
+        req.setRequestedArtistName("artist");
+
+        when(artistVerificationTokenService.getTokenByUser(user)).thenReturn(null);
+        ArtistVerificationToken token = new ArtistVerificationToken(); token.setToken("t"); token.setRequestedArtistName("artist");
+        when(artistVerificationTokenService.createArtistVerificationToken(user, "artist")).thenReturn(token);
+
+        when(userRepository.findAll()).thenReturn(List.of());
+        userService.requestArtistVerification("user@example.com", req);
+        verifyNoInteractions(emailService);
+    }
+
+    @Test
+    void requestArtistVerification_whenUserIsArtist_shouldThrow() {
+        when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
+        RoleEntity artistRole = new RoleEntity(); artistRole.setName("ARTIST");
+        user.getRoles().add(artistRole);
+
+        ArtistVerificationRequest req = new ArtistVerificationRequest();
+        req.setRequestedArtistName("artist");
+        assertThatThrownBy(() -> userService.requestArtistVerification("user@example.com", req))
+                .isInstanceOf(CustomException.class);
+    }
+
+    @Test
+    void requestArtistVerification_whenEmailFails_shouldNotThrow() throws MessagingException {
+        when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
+        ArtistVerificationRequest req = new ArtistVerificationRequest();
+        req.setRequestedArtistName("artist");
+
+        when(artistVerificationTokenService.getTokenByUser(user)).thenReturn(null);
+        ArtistVerificationToken token = new ArtistVerificationToken(); token.setToken("t"); token.setRequestedArtistName("artist");
+        when(artistVerificationTokenService.createArtistVerificationToken(user, "artist")).thenReturn(token);
+
+        RoleEntity adminRole = new RoleEntity(); adminRole.setName("ADMIN");
+        UserEntity admin = new UserEntity(); admin.setId(100L); admin.setEmail("admin@example.com"); admin.setFullName("Admin"); admin.setRoles(Set.of(adminRole));
+        when(userRepository.findAll()).thenReturn(List.of(admin));
+        doThrow(new MessagingException("fail")).when(emailService)
+                .sendEmail(anyString(), anyString(), any(), anyString(), anyString(), anyString(), any(UserEntity.class));
+
+        userService.requestArtistVerification("user@example.com", req);
     }
 }

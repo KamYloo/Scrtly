@@ -1,5 +1,7 @@
 package com.kamylo.Scrtly_backend.common.handler;
 
+import com.stripe.exception.SignatureVerificationException;
+import com.stripe.exception.StripeException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

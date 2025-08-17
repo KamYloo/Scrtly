@@ -2,14 +2,16 @@ import React from 'react'
 import { FaUserEdit, FaEllipsisH, FaAngleRight } from "react-icons/fa";
 import { BsCameraVideoFill } from "react-icons/bs";
 import {useNavigate} from "react-router-dom";
-import {useSelector} from "react-redux";
 import defaultAvatar from "../../assets/user.jpg";
+import {useGetCurrentUserQuery} from "../../Redux/services/authApi.js";
 
 
 // eslint-disable-next-line react/prop-types
 function UserInfo() {
     const navigate = useNavigate();
-    const { reqUser } = useSelector(state => state.auth);
+    const { data: reqUser } = useGetCurrentUserQuery(null, {
+        skip: !localStorage.getItem('isLoggedIn'),
+    });
 
     return (
         <div className='userInfo'>

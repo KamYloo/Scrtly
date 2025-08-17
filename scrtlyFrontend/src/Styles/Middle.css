@@ -146,6 +146,12 @@
     color: black;
 }
 
+.banner .content .artist .right .following {
+    background: transparent;
+    color: aqua;
+    border: 1px solid aqua;
+}
+
 .mainBox .menuList {
     display: flex;
     justify-content: space-between;
@@ -387,6 +393,15 @@
     background: rgba(255, 255, 255, 0.04);
     border-radius: 5px;
     transition: box-shadow 0.3s;
+}
+
+.songs.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.songs.disabled .songName {
+    color: #999;
 }
 
 @media screen and (max-width : 748px) {

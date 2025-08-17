@@ -6,6 +6,7 @@ import com.kamylo.Scrtly_backend.auth.service.ActivationTokenService;
 import com.kamylo.Scrtly_backend.auth.service.JwtService;
 import com.kamylo.Scrtly_backend.auth.service.PasswordResetTokenService;
 import com.kamylo.Scrtly_backend.auth.service.RefreshTokenService;
+import com.kamylo.Scrtly_backend.user.mapper.UserMapper;
 import com.kamylo.Scrtly_backend.user.web.dto.UserDto;
 import com.kamylo.Scrtly_backend.auth.web.dto.request.LoginRequestDto;
 import com.kamylo.Scrtly_backend.auth.web.dto.request.RegisterRequestDto;
@@ -15,7 +16,6 @@ import com.kamylo.Scrtly_backend.email.EmailTemplateName;
 import com.kamylo.Scrtly_backend.email.service.EmailService;
 import com.kamylo.Scrtly_backend.common.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.common.handler.CustomException;
-import com.kamylo.Scrtly_backend.common.mapper.Mapper;
 import com.kamylo.Scrtly_backend.user.repository.RolesRepository;
 import com.kamylo.Scrtly_backend.user.repository.UserRepository;
 import com.kamylo.Scrtly_backend.auth.service.impl.AuthServiceImpl;
@@ -61,7 +61,7 @@ public class AuthServiceImplTest {
     @Mock
     private PasswordResetTokenService passwordResetTokenService;
     @Mock
-    private Mapper<UserEntity, UserDto> mapper;
+    private UserMapper mapper;
 
     @InjectMocks
     private AuthServiceImpl authService;
@@ -109,7 +109,7 @@ public class AuthServiceImplTest {
         when(activationTokenService.createActivationToken(userEntity)).thenReturn(activationToken);
         when(activationTokenService.getActivationTokenByUser(userEntity)).thenReturn(activationToken);
 
-        when(mapper.mapTo(userEntity)).thenReturn(new UserDto());
+        when(mapper.toDto(userEntity)).thenReturn(new UserDto());
 
         UserDto result = authService.createUser(registerRequest);
 

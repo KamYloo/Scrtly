@@ -1,22 +1,40 @@
 import { useEffect } from "react";
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch} from "react-redux";
 
-import {sendNotification} from "../../Redux/NotificationService/Action.js";
 import {connectWebSocket} from "../../utils/websocketClient.js";
+import {useGetCurrentUserQuery} from "../../Redux/services/authApi.js";
+import {notificationApi} from "../../Redux/services/notificationApi.js";
 
 
 const NotificationsListener = () => {
     const dispatch = useDispatch();
-    const { reqUser } = useSelector(state => state.auth);
+    const { data: reqUser } = useGetCurrentUserQuery(null, {
+        skip: !localStorage.getItem('isLoggedIn'),
+    });
 
     useEffect(() => {
-        if (reqUser) {
-            const client = connectWebSocket(reqUser.email, (notification) => {
-                dispatch(sendNotification(notification));
-            });
+        if (!reqUser) return;
 
-            return () => client.deactivate();
-        }
+        const client = connectWebSocket(reqUser.email, (notification) => {
+            dispatch(
+                notificationApi.util.updateQueryData(
+                    "getNotifications",
+                    { page: 0, size: 10 },
+                    (draft) => {
+                        draft.notifications.unshift(notification);
+                        draft.notifications = [
+                            ...new Map(
+                                draft.notifications.map((n) => [n.id, n])
+                            ).values(),
+                        ];
+                    }
+                )
+            );
+        });
+
+        return () => {
+            client.deactivate();
+        };
     }, [reqUser, dispatch]);
 
     return null;

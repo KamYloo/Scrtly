@@ -1,100 +1,120 @@
 import React, {useEffect, useRef, useState} from 'react'
-import {FaChevronLeft, FaChevronRight} from "react-icons/fa";
+import {FaChevronLeft, FaChevronRight, FaTrash} from "react-icons/fa";
+import {useDeleteStoryMutation} from "../../Redux/services/storyApi.js";
+import {useGetCurrentUserQuery} from "../../Redux/services/authApi.js";
+import toast from "react-hot-toast";
 
 // eslint-disable-next-line react/prop-types
-function StoryViewer({ stories, currentUserIndex, currentStoryIndex, onClose }) {
-    const [currentStory, setCurrentStory] = useState(currentStoryIndex)
-    const [progress, setProgress] = useState(0)
-    const [userIndex, setUserIndex] = useState(currentUserIndex)
-    const intervalRef = useRef()
+function StoryViewer({ groups, currentUserIndex, currentStoryIndex, onClose }) {
+    const [userIndex, setUserIndex] = useState(currentUserIndex);
+    const [storyIndex, setStoryIndex] = useState(currentStoryIndex);
+    const [progress, setProgress] = useState(0);
+    const intervalRef = useRef();
+    const { data: currentUser } = useGetCurrentUserQuery(null, {
+        skip: !localStorage.getItem('isLoggedIn'),
+    });
+    const [deleteStory, { isLoading: isDeleting }] = useDeleteStoryMutation();
 
-    const userEntries = Object.entries(stories);
-    const currentUserStories = userEntries[userIndex]?.[1] || []
+    const group = groups[userIndex] || { user: '', stories: [] };
+    const stories = group.stories;
+    const story = stories[storyIndex];
 
-    const handleNextStory = () => {
-        if (currentStory < currentUserStories.length - 1) {
-            setCurrentStory((prevStory) => prevStory + 1)
-        } else {
-            handleNextUser()
-        }
-        setProgress(0)
-    }
-
-    const handlePreviousStory = () => {
-        if (currentStory > 0) {
-            setCurrentStory((prevStory) => prevStory - 1)
-        } else {
-            handlePreviousUser()
-        }
-        setProgress(0)
-    }
-
-    const handleNextUser = () => {
-        if (userIndex < userEntries.length - 1) {
-            setUserIndex((prevIndex) => prevIndex + 1)
-            setCurrentStory(0)
-        } else {
-            onClose()
-        }
-        setProgress(0)
-    }
-
-    const handlePreviousUser = () => {
+    const nextStory = () => {
+        setProgress(0);
+        if (storyIndex < stories.length - 1) {
+            setStoryIndex(i => i + 1);
+        } else nextUser();
+    };
+    const prevStory = () => {
+        setProgress(0);
+        if (storyIndex > 0) {
+            setStoryIndex(i => i - 1);
+        } else prevUser();
+    };
+    const nextUser = () => {
+        setProgress(0);
+        if (userIndex < groups.length - 1) {
+            setUserIndex(i => i + 1);
+            setStoryIndex(0);
+        } else onClose();
+    };
+    const prevUser = () => {
+        setProgress(0);
         if (userIndex > 0) {
-            setUserIndex((prevIndex) => prevIndex - 1)
-            setCurrentStory(userEntries[userIndex - 1]?.[1]?.length - 1 || 0)
-        } else {
-            onClose()
-        }
-        setProgress(0)
-    }
+            const prevGroup = groups[userIndex - 1];
+            setUserIndex(i => i - 1);
+            setStoryIndex((prevGroup.stories.length || 1) - 1);
+        } else onClose();
+    };
 
     useEffect(() => {
-        if (intervalRef.current) {
-            clearInterval(intervalRef.current)
-        }
-
+        clearInterval(intervalRef.current);
         intervalRef.current = setInterval(() => {
-            setProgress((prevProgress) => {
-                if (prevProgress >= 100) {
-                    handleNextStory()
+            setProgress(p => {
+                if (p >= 100) {
+                    nextStory();
                     return 0;
                 }
-                return prevProgress + 2
+                return p + 2;
             });
-        }, 100)
+        }, 100);
+        return () => clearInterval(intervalRef.current);
+    }, [userIndex, storyIndex]);
 
-        return () => clearInterval(intervalRef.current)
-    }, [currentStory, userIndex])
 
+    const handleDelete = async () => {
+        if (!window.confirm('Delete this story?')) return;
+        try {
+            await deleteStory(story.id).unwrap();
+            toast.success('Story deleted successfully.');
+            onClose();
+        } catch (err) {
+            toast.error(err.data.businessErrornDescription);
+        }
+    };
 
-    if (!currentUserStories.length) {
+    if (!stories.length) {
         return (
             <div className="story-viewer-modal">
-                <button className="close-button" onClick={onClose}>X</button>
-                <p>No stories available</p>
+                <button className="close-button" onClick={onClose}>×</button>
+                <p>No stories</p>
             </div>
-        )
+        );
     }
+
 
     return (
         <div className="story-viewer-modal">
-            <button className="close-button" onClick={onClose}>X</button>
-            <button className="nav-button left" onClick={handlePreviousStory}>
+            <button className="close-button" onClick={onClose}>×</button>
+
+
+            <button className="nav-button left" onClick={prevStory}>
                 <FaChevronLeft />
             </button>
+
             <div className="story-content">
+                {group.user === currentUser?.nickName && (
+                    <button
+                        className="delete-button"
+                        onClick={handleDelete}
+                        disabled={isDeleting}
+                        title="Delete your story"
+                    >
+                        <FaTrash />
+                    </button>
+                )}
                 <div className="progress-bar">
-                    <div className="progress" style={{width: `${progress}%`}}></div>
+                    <div className="progress" style={{ width: `${progress}%` }} />
                 </div>
-                <img src={currentUserStories[currentStory]?.image} alt={`Story ${currentStory}`} />
-                <p>{currentUserStories[0]?.user?.fullName}</p>
+                <img src={story.image} alt="" />
+                <p className="user-name">{group.user}</p>
             </div>
-            <button className="nav-button right" onClick={handleNextStory}>
+
+            <button className="nav-button right" onClick={nextStory}>
                 <FaChevronRight />
             </button>
         </div>
-    )
+    );
 }
 
 export { StoryViewer }

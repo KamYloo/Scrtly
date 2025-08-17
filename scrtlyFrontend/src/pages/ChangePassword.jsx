@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import '../Styles/Login&Register.css';
-import {BASE_API_URL} from "../Redux/api.js";
-import logo from "../assets/logo.png"; // Upewnij się, że ścieżka do CSS jest prawidłowa
+import logo from "../assets/logo512.png";
+import {useResetPasswordMutation} from "../Redux/services/authApi.js";
 
 function ChangePassword() {
     const { userId, token } = useParams();
@@ -14,6 +14,7 @@ function ChangePassword() {
         passwordConfirmation: ''
     });
     const [errors, setErrors] = useState({});
+    const [resetPassword, { isLoading }] = useResetPasswordMutation();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -43,22 +44,11 @@ function ChangePassword() {
             return;
         }
         try {
-            const response = await fetch(`${BASE_API_URL}/api/auth/reset-password/${userId}/${token}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
-            });
-            if (response.ok) {
-                toast.success("Password has been reset successfully.");
-                navigate('/login');
-            } else {
-                const errorText = await response.text();
-                toast.error("Failed to reset password. " + errorText);
-            }
-        } catch (error) {
-            toast.error("Error: " + error.message);
+            await resetPassword({ userId, token, passwords: { password: formData.password, passwordConfirmation: formData.passwordConfirmation } }).unwrap();
+            toast.success('Password has been reset successfully.');
+            navigate('/login');
+        } catch (err) {
+            toast.error(err.data.businessErrornDescription);
         }
     };
 
@@ -92,7 +82,9 @@ function ChangePassword() {
                         />
                         {errors.passwordConfirmation && <p className="error">{errors.passwordConfirmation}</p>}
                     </div>
-                    <button type="submit">Reset Password</button>
+                    <button type="submit" disabled={isLoading}>
+                        {isLoading ? 'Resetting...' : 'Reset Password'}
+                    </button>
                 </form>
                 <div className="registerLink">
                     <p>

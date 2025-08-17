@@ -1,24 +1,28 @@
 import React, { useState } from 'react'
 import EmojiPicker from 'emoji-picker-react'
 import { BsEmojiSmileFill } from "react-icons/bs";
-import { useDispatch, useSelector } from "react-redux";
-import { createComment } from "../../Redux/Comment/Action.js";
+import toast from "react-hot-toast";
+import {useCreateCommentMutation} from "../../Redux/services/commentApi.js";
 
 function AddComment({ post, parentCommentId }) {
-    const dispatch = useDispatch()
     const [commentText, setCommentText] = useState('')
     const [openEmoji, setOpenEmoji] = useState(false)
-    const { loading } = useSelector(state => state.comment);
+    const [createComment, { isLoading }] = useCreateCommentMutation();
 
     const handleEmoji = (e) => {
         setCommentText(prev => prev + e.emoji)
         setOpenEmoji(false)
     }
 
-    const handleCommentCreation = () => {
-        // Include parentCommentId only if replying to a comment
-        dispatch(createComment({ postId: post.id, comment: commentText, parentCommentId }))
-        setCommentText('')
+    const handleSend = async () => {
+        try {
+            await createComment({ postId: post.id, parentCommentId, comment: commentText }).unwrap();
+            toast.success('Comment created successfully.');
+            setCommentText('');
+        } catch (err) {
+            toast.error(err.data.businessErrornDescription);
+        }
+
     }
 
     return (
@@ -32,10 +36,10 @@ function AddComment({ post, parentCommentId }) {
             <textarea 
                 value={commentText}
                 onChange={e => setCommentText(e.target.value)} 
-                placeholder={parentCommentId ? 'Odpowiedz na komentarz...' : 'Dodaj komentarz...'}
+                placeholder={parentCommentId ? 'Reply to comment...' : 'Add a comment...'}
             ></textarea>
-            <button onClick={handleCommentCreation} disabled={loading}>
-                {loading ? "Sending..." : "Send"}
+            <button onClick={handleSend} disabled={isLoading}>
+                {isLoading ? "Sending..." : "Send"}
             </button>
         </div>
     )

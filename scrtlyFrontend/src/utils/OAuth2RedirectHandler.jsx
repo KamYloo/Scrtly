@@ -1,23 +1,28 @@
-// src/pages/OAuth2RedirectHandler.jsx
 import { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
-import {currentUser} from "../Redux/AuthService/Action.js";
+
+import {useGetCurrentUserQuery} from "../Redux/services/authApi.js";
+import {useNavigate} from "react-router-dom";
 
 export function OAuth2RedirectHandler() {
-    const dispatch = useDispatch()
     const navigate = useNavigate()
+    const { data: user, isSuccess, isError, error } =
+        useGetCurrentUserQuery(null, {
+            skip: false,
+            refetchOnMountOrArgChange: true,
+        })
 
     useEffect(() => {
-        dispatch(currentUser())
-            .then(() => {
-                localStorage.setItem('isLoggedIn', '1')
-                navigate('/home')
-            })
-            .catch(() => {
-                navigate('/login')
-            })
-    }, [dispatch, navigate])
+        if (isSuccess) {
+            localStorage.setItem('isLoggedIn', '1')
+            navigate('/home')
+        }
+    }, [isSuccess, navigate])
+
+    useEffect(() => {
+        if (isError) {
+            navigate('/login')
+        }
+    }, [isError, error, navigate])
 
     return <div>Login in progress…</div>
 }

@@ -1,5 +1,6 @@
 package com.kamylo.Scrtly_backend.post.service;
 
+import com.kamylo.Scrtly_backend.post.mapper.PostMapper;
 import com.kamylo.Scrtly_backend.post.web.dto.PostDto;
 import com.kamylo.Scrtly_backend.user.web.dto.UserDto;
 import com.kamylo.Scrtly_backend.post.domain.PostEntity;
@@ -7,7 +8,6 @@ import com.kamylo.Scrtly_backend.common.service.impl.FileServiceImpl;
 import com.kamylo.Scrtly_backend.user.domain.UserEntity;
 import com.kamylo.Scrtly_backend.common.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.common.handler.CustomException;
-import com.kamylo.Scrtly_backend.common.mapper.Mapper;
 import com.kamylo.Scrtly_backend.post.repository.PostRepository;
 import com.kamylo.Scrtly_backend.notification.service.NotificationService;
 import com.kamylo.Scrtly_backend.user.service.UserService;
@@ -28,7 +28,7 @@ public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final UserService userService;
     private final FileServiceImpl fileService;
-    private final Mapper<PostEntity, PostDto> postMapper;
+    private final PostMapper postMapper;
     private final UserLikeChecker userLikeChecker;
     private final NotificationService notificationService;
 
@@ -48,7 +48,7 @@ public class PostServiceImpl implements PostService {
                .build();
 
        PostEntity savedPost = postRepository.save(newPost);
-       return postMapper.mapTo(savedPost);
+       return postMapper.toDto(savedPost);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class PostServiceImpl implements PostService {
            if (description != null && !description.isEmpty()) {
                post.setDescription(description);
            }
-           return postMapper.mapTo(postRepository.save(post));
+           return postMapper.toDto(postRepository.save(post));
        } else {
            throw new CustomException(BusinessErrorCodes.POST_MISMATCH);
        }
@@ -89,7 +89,7 @@ public class PostServiceImpl implements PostService {
     public Page<PostDto> getPostsByUser(String nickName, Pageable pageable) {
 
         UserDto user = userService.findUserByNickname(nickName);
-        return postRepository.findByUserId(user.getId(), pageable).map(postMapper::mapTo);
+        return postRepository.findByUserId(user.getId(), pageable).map(postMapper::toDto);
     }
 
     @Override
@@ -103,7 +103,7 @@ public class PostServiceImpl implements PostService {
         Page<PostEntity> page = postRepository.findAll(spec, pageable);
 
         return page.map(postEntity -> {
-            PostDto dto = postMapper.mapTo(postEntity);
+            PostDto dto = postMapper.toDto(postEntity);
             if (user != null) {
                 dto.setLikedByUser(
                         userLikeChecker.isPostLikedByUser(postEntity, user.getId())

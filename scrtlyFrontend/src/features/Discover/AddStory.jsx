@@ -1,36 +1,37 @@
 import React, {useState} from 'react'
 import {MdCancel} from "react-icons/md";
-import {useDispatch, useSelector} from "react-redux";
-import {createStory} from "../../Redux/Story/Action.js";
 import toast from "react-hot-toast";
+import {useCreateStoryMutation} from "../../Redux/services/storyApi.js";
 
 // eslint-disable-next-line react/prop-types
 function AddStory({onClose}) {
     const [image, setImage] = useState(null)
-    const dispatch = useDispatch()
-    const { loading } = useSelector(state => state.story);
-
+    const [createStory, { isLoading }] = useCreateStoryMutation();
 
     const handleFileChange = (e) => {
         setImage(e.target.files[0])
     };
 
-    const handleStoryCreation = (e) => {
+    const handleStoryCreation = async (e) => {
         e.preventDefault()
-        const formData = new FormData()
-        formData.append('file', image)
 
-        dispatch(createStory(formData))
-            .then(() => {
-                toast.success('Story created successfully.');
-            })
-            .catch(() => {
-                toast.error('Failed to create story. Please try again.');
-            })
-            .finally(() => {
-                setImage(null);
-                onClose();
-            });
+        if (!image) {
+            toast.error('Please pick an image first');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', image);
+
+        try {
+            await createStory(formData).unwrap();
+            toast.success('Story created successfully.');
+            onClose();
+        } catch (err) {
+            toast.error(err.data.businessErrornDescription);
+        } finally {
+            setImage(null);
+        }
     }
 
     return (
@@ -46,8 +47,8 @@ function AddStory({onClose}) {
                         Pick Image
                     </button>
                 </div>
-                <button type="submit" className='submit' disabled={loading}>
-                    {loading ? "Sending..." : "Send"}
+                <button type="submit" className='submit' disabled={isLoading}>
+                    {isLoading ? "Sending..." : "Send"}
                 </button>
             </form>
         </div>

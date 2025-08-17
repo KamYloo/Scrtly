@@ -2,18 +2,14 @@ import React, { useEffect, useState } from 'react'
 import '../Styles/ChatView.css'
 import { ChatList } from '../features/Chat/ChatList.jsx'
 import { Chat } from '../features/Chat/Chat.jsx'
-import { useDispatch, useSelector } from "react-redux";
-import { getUserChats } from "../Redux/Chat/Action.js";
+import {useGetUserChatsQuery} from "../Redux/services/chatApi.js";
 
 function ChatView() {
   const [currentChat, setCurrentChat] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 1080);
-  const dispatch = useDispatch();
-  const { chat } = useSelector(store => store);
-
-  useEffect(() => {
-    dispatch(getUserChats())
-  }, [dispatch]);
+  const {
+    data: chats = [],
+  } = useGetUserChatsQuery();
 
   useEffect(() => {
     const handleResize = () => {
@@ -34,12 +30,12 @@ function ChatView() {
           {currentChat ? (
             <Chat chat={currentChat} onBack={() => setCurrentChat(null)} />
           ) : (
-            <ChatList chat={chat} onChatSelect={handleCurrentChatRoom} />
+            <ChatList chats={chats} onChatSelect={handleCurrentChatRoom} />
           )}
         </>
       ) : (
         <>
-          <ChatList chat={chat} onChatSelect={handleCurrentChatRoom} />
+          <ChatList chats={chats} onChatSelect={handleCurrentChatRoom} />
           {currentChat ? (
             <Chat chat={currentChat} />
           ) : (

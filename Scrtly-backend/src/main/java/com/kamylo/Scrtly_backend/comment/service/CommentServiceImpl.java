@@ -1,5 +1,6 @@
 package com.kamylo.Scrtly_backend.comment.service;
 
+import com.kamylo.Scrtly_backend.comment.mapper.CommentMapper;
 import com.kamylo.Scrtly_backend.comment.web.dto.CommentDto;
 import com.kamylo.Scrtly_backend.comment.domain.CommentEntity;
 import com.kamylo.Scrtly_backend.post.domain.PostEntity;
@@ -8,7 +9,6 @@ import com.kamylo.Scrtly_backend.notification.domain.enums.NotificationType;
 import com.kamylo.Scrtly_backend.notification.events.NotificationEvent;
 import com.kamylo.Scrtly_backend.common.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.common.handler.CustomException;
-import com.kamylo.Scrtly_backend.common.mapper.Mapper;
 import com.kamylo.Scrtly_backend.comment.repository.CommentRepository;
 
 import com.kamylo.Scrtly_backend.post.repository.PostRepository;
@@ -32,7 +32,7 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final UserService userService;
     private final PostRepository postRepository;
-    private final Mapper<CommentEntity, CommentDto> commentMapper;
+    private final CommentMapper commentMapper;
     private final UserLikeChecker userLikeChecker;
     private final ApplicationEventPublisher eventPublisher;
     private final NotificationService notificationService;
@@ -69,7 +69,7 @@ public class CommentServiceImpl implements CommentService {
                 NotificationType.COMMENT,
                 username
         ));
-       return commentMapper.mapTo(savedCommentEntity);
+       return commentMapper.toDto(savedCommentEntity);
     }
 
     @Override
@@ -80,7 +80,7 @@ public class CommentServiceImpl implements CommentService {
             if (content != null && !content.isEmpty()) {
                 comment.setComment(content);
             }
-            return commentMapper.mapTo(commentRepository.save(comment));
+            return commentMapper.toDto(commentRepository.save(comment));
         } else {
             throw new CustomException(BusinessErrorCodes.COMMENT_MISMATCH);
         }
@@ -97,7 +97,7 @@ public class CommentServiceImpl implements CommentService {
         }
 
         return commentRepository.findAll(spec, pageable).map(commentEntity -> {
-            CommentDto commentDto = commentMapper.mapTo(commentEntity);
+            CommentDto commentDto = commentMapper.toDto(commentEntity);
             if (user != null) {
                 commentDto.setLikedByUser(
                         userLikeChecker.isCommentLikedByUser(commentEntity, user.getId())
@@ -111,7 +111,7 @@ public class CommentServiceImpl implements CommentService {
     public Page<CommentDto> getReplies(Long parentCommentId, Pageable pageable, String username) {
         UserEntity user = (username != null) ? userService.findUserByEmail(username) : null;
         return commentRepository.findByParentCommentId(parentCommentId, pageable).map(commentEntity -> {
-            CommentDto commentDto = commentMapper.mapTo(commentEntity);
+            CommentDto commentDto = commentMapper.toDto(commentEntity);
             if (user != null) {
                 commentDto.setLikedByUser(
                         userLikeChecker.isCommentLikedByUser(commentEntity, user.getId())

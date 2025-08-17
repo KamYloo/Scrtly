@@ -1,14 +1,14 @@
 package com.kamylo.Scrtly_backend.artist.service.impl;
 
+import com.kamylo.Scrtly_backend.artist.mapper.ArtistMapper;
 import com.kamylo.Scrtly_backend.artist.service.ArtistService;
 import com.kamylo.Scrtly_backend.artist.web.dto.ArtistDto;
+import com.kamylo.Scrtly_backend.song.mapper.SongMapper;
 import com.kamylo.Scrtly_backend.song.web.dto.SongDto;
 import com.kamylo.Scrtly_backend.artist.domain.ArtistEntity;
-import com.kamylo.Scrtly_backend.song.domain.SongEntity;
 import com.kamylo.Scrtly_backend.user.domain.UserEntity;
 import com.kamylo.Scrtly_backend.common.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.common.handler.CustomException;
-import com.kamylo.Scrtly_backend.common.mapper.Mapper;
 import com.kamylo.Scrtly_backend.artist.repository.ArtistRepository;
 import com.kamylo.Scrtly_backend.song.repository.SongRepository;
 import com.kamylo.Scrtly_backend.user.repository.UserRepository;
@@ -36,20 +36,21 @@ public class ArtistServiceImpl implements ArtistService {
     private final SongRepository songRepository;
     private final UserService userService;
     private final UserRoleService userRoleService;
-    private final Mapper<ArtistEntity, ArtistDto> artistMapper;
-    private final Mapper<SongEntity, SongDto> songMapper;
+    private final ArtistMapper artistMapper;
+    private final SongMapper songMapper;
+
     private final FileService fileService;
 
     @Override
     public Page<ArtistDto> getArtists(Pageable pageable) {
-        return artistRepository.findAll(pageable).map(artistMapper::mapTo);
+        return artistRepository.findAll(pageable).map(artistMapper::toDto);
     }
 
     @Override
     public ArtistDto getArtistById(Long artistId) {
         ArtistEntity artistEntity = artistRepository.findById(artistId).orElseThrow(
                 () -> new CustomException(BusinessErrorCodes.ARTIST_NOT_FOUND));
-        return artistMapper.mapTo(artistEntity);
+        return artistMapper.toDto(artistEntity);
     }
 
     @Override
@@ -62,7 +63,7 @@ public class ArtistServiceImpl implements ArtistService {
             observed = ArtistUtil.isArtistFollowed(artistEntity.getUser(), user.getId());
         }
 
-        ArtistDto artistDto = artistMapper.mapTo(artistEntity);
+        ArtistDto artistDto = artistMapper.toDto(artistEntity);
         artistDto.setObserved(observed);
         return artistDto;
     }
@@ -71,7 +72,7 @@ public class ArtistServiceImpl implements ArtistService {
     public Set<ArtistDto> searchArtistsByName(String pseudonym) {
         Set<ArtistEntity> artists = artistRepository.findByPseudonym(pseudonym);
         return artists.stream()
-                .map(artistMapper::mapTo)
+                .map(artistMapper::toDto)
                 .collect(Collectors.toCollection(HashSet::new));
     }
 
@@ -93,13 +94,13 @@ public class ArtistServiceImpl implements ArtistService {
             artistEntity.setBannerImg(imagePath);
         }
         userRepository.save(user);
-        return artistMapper.mapTo(artistEntity);
+        return artistMapper.toDto(artistEntity);
     }
 
     @Override
     public Page<SongDto> getArtistTracks(Long artistId, Pageable pageable) {
-       artistMapper.mapFrom(getArtistById(artistId));
-       return songRepository.findByArtistId(artistId, pageable).map(songMapper::mapTo);
+       artistMapper.toEntity(getArtistById(artistId));
+       return songRepository.findByArtistId(artistId, pageable).map(songMapper::toDto);
     }
 
 }

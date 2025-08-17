@@ -3,6 +3,7 @@ package com.kamylo.Scrtly_backend.auth.service.impl;
 import com.kamylo.Scrtly_backend.auth.domain.ActivationToken;
 import com.kamylo.Scrtly_backend.auth.domain.PasswordResetToken;
 import com.kamylo.Scrtly_backend.auth.service.*;
+import com.kamylo.Scrtly_backend.user.mapper.UserMapper;
 import com.kamylo.Scrtly_backend.user.web.dto.UserDto;
 import com.kamylo.Scrtly_backend.auth.web.dto.request.LoginRequestDto;
 import com.kamylo.Scrtly_backend.auth.web.dto.request.RegisterRequestDto;
@@ -11,7 +12,6 @@ import com.kamylo.Scrtly_backend.email.EmailTemplateName;
 import com.kamylo.Scrtly_backend.email.service.EmailService;
 import com.kamylo.Scrtly_backend.common.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.common.handler.CustomException;
-import com.kamylo.Scrtly_backend.common.mapper.Mapper;
 import com.kamylo.Scrtly_backend.user.repository.RolesRepository;
 import com.kamylo.Scrtly_backend.user.repository.UserRepository;
 import com.kamylo.Scrtly_backend.user.domain.RoleEntity;
@@ -44,7 +44,7 @@ public class AuthServiceImpl implements AuthService {
     private final EmailService emailService;
     private final ActivationTokenService activationTokenService;
     private final PasswordResetTokenService passwordResetTokenService;
-    private final Mapper<UserEntity, UserDto> mapper;
+    private final UserMapper userMapper;
 
     @Value("${mailing.backend.activation-url}")
     private String activationUrl;
@@ -82,7 +82,7 @@ public class AuthServiceImpl implements AuthService {
         UserEntity savedUser = userRepository.save(user);
         activationTokenService.createActivationToken(savedUser);
         sendValidationEmail(savedUser);
-        return mapper.mapTo(savedUser);
+        return userMapper.toDto(savedUser);
     }
 
     @Override
@@ -164,19 +164,6 @@ public class AuthServiceImpl implements AuthService {
         user.setPassword(passwordEncoder.encode(restPasswordRequest.getPassword()));
         userRepository.save(user);
         passwordResetTokenService.deleteToken(resetToken);
-    }
-
-    @Override
-    public UserDto verifyToken(String token) {
-        if(!jwtService.validateJwtToken(token)){
-            throw new CustomException(BusinessErrorCodes.INVALID_TOKEN);
-        }
-        String userName = jwtService.extractUserName(token);
-
-        UserEntity user = userRepository.findByEmail(userName).orElseThrow(
-                () -> new UsernameNotFoundException("User not found"));
-
-        return mapper.mapTo(user);
     }
 
     private void sendValidationEmail(UserEntity user) throws MessagingException {

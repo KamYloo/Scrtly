@@ -1,0 +1,156 @@
+.billing-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    background: #121212;
+    min-height: 50vh;
+    max-height: 100vh;
+    min-width: 20vw;
+    color: #fff;
+    margin: auto;
+    border-radius: 12px;
+    box-shadow: 0px 12px 25px rgba(0, 0, 0, 0.6);
+
+}
+
+.billing-page h1 {
+    font-size: 2rem;
+    margin-bottom: 24px;
+}
+
+.bp--loading {
+    font-size: 1.1rem;
+    color: #aaa;
+}
+
+.bp__card {
+    background: rgba(31, 31, 31, 0.25);
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+    padding: 24px;
+    min-width: 14vw;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.bp__header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.bp__plan-info h2 {
+    margin: 0;
+    font-size: 1.4rem;
+}
+
+.bp__price {
+    margin: 4px 0 0;
+    color: #ccc;
+}
+
+.bp__body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.bp__row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.95rem;
+}
+
+.bp__no-sub {
+    text-align: center;
+    color: #aaa;
+    font-style: italic;
+}
+
+.badge {
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.badge--green {
+    background: #2e7d32;
+    color: #d0f5be;
+}
+
+.badge--orange {
+    background: #ff8f00;
+    color: #fff4e5;
+}
+
+.badge--gray {
+    background: #555;
+    color: #ddd;
+}
+
+.badge--blue {
+    background: #1565c0;
+    color: #d0e8ff;
+}
+
+.bp__btn {
+    margin-top: 12px;
+    padding: 10px 16px;
+    background: #00c8c8;
+    color: #121212;
+    font-size: 0.95rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.bp__btn:hover {
+    background: #00efef;
+}
+
+.bp__btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.bp__logo {
+    width: 30vh;
+    height: 25vh;
+    object-fit: cover;
+    margin-right: 8px;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+
+.bp__logo-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.bp__header--vertical {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.bp__body--active {
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 2px 12px rgba(0,200,200,0.08);
+    margin-bottom: 8px;
+}
+
+@media screen and (max-width: 748px) {
+    .billing-page  {
+        height: calc(100dvh - 10px);
+    }
+}

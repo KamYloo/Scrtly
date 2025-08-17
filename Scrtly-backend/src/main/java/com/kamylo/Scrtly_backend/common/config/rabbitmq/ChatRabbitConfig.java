@@ -1,9 +1,12 @@
 package com.kamylo.Scrtly_backend.common.config.rabbitmq;
 
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,6 +42,16 @@ public class ChatRabbitConfig {
                 .bind(chatQueue)
                 .to(chatExchange)
                 .with(chatRoutingKey);
+    }
+
+    @Bean("chatRabbitTemplate")
+    public RabbitTemplate chatRabbitTemplate(ConnectionFactory cf,
+                                             Jackson2JsonMessageConverter conv) {
+        RabbitTemplate template = new RabbitTemplate(cf);
+        template.setMessageConverter(conv);
+        template.setExchange(chatExchangeName);
+        template.setRoutingKey(chatRoutingKey);
+        return template;
     }
 
    /* @Bean

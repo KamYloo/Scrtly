@@ -1,22 +1,25 @@
-import React, {useEffect, useState} from 'react'
+import React, {useState} from 'react'
 import "../../Styles/Album&&PlayList.css"
 import { AudioList } from '../Song/AudioList.jsx'
 import {useParams} from "react-router-dom";
-import {useDispatch, useSelector} from "react-redux";
-import {getPlayList, getPlayListTracks} from "../../Redux/PlayList/Action.js";
 import {AddSongToPlayList} from "./AddSongToPlayList.jsx";
 import {PlayListForm} from "./PlayListForm.jsx";
 import Spinner from "../../Components/Spinner.jsx";
 import ErrorOverlay from "../../Components/ErrorOverlay.jsx";
+import {useGetPlaylistQuery} from "../../Redux/services/playlistApi.js";
 
 // eslint-disable-next-line react/prop-types
 function PlayList({ volume, onTrackChange}) {
     const [editPlayList, setEditPlayList] = useState(false)
     const {playListId} = useParams();
-    const dispatch = useDispatch();
-    const {playList, song} = useSelector(store => store);
     const [addSong, setAddSong] = useState(false)
-    //const navigate = useNavigate();
+
+    const {
+        data: playList,
+        isLoading: loadingPlaylist,
+        isError: errorPlaylist,
+        error: playlistError,
+    } = useGetPlaylistQuery(playListId);
 
     function formatTime(seconds) {
         const hours = Math.floor(seconds / 3600);
@@ -30,33 +33,17 @@ function PlayList({ volume, onTrackChange}) {
         return `${hoursDisplay}${minutesDisplay}${secondsDisplay}`.trim();
     }
 
-
-    useEffect(() => {
-        dispatch(getPlayList(playListId))
-    }, [playListId, playList.uploadSong, dispatch, playList.deletedSong]);
-
-    useEffect(() => {
-        dispatch(getPlayListTracks(playListId))
-    }, [playListId, playList.uploadSong, dispatch]);
-
-
-    if (playList.loading || song.loading) {
-        return <Spinner />;
-    }
-    if (playList.error) {
-        return <ErrorOverlay message={playList.error} />
-    } else if (song.loading) {
-        return <ErrorOverlay message={song.error}/>
-    }
+    if (loadingPlaylist) return <Spinner />;
+    if (errorPlaylist) return <ErrorOverlay error={playlistError} />;
 
     return (
         <div className='playListDetail'>
             <div className="topSection">
-                <img src={playList.findPlayList?.coverImage} alt="" />
+                <img src={playList?.coverImage} alt="" />
                 <div className="playListData">
                     <p>PlayList</p>
-                    <h1 className='playListName'>{playList.findPlayList?.title}</h1>
-                    <p className='stats'>{playList.findPlayList?.user.fullName} • {playList.findPlayList?.tracksCount} Songs <span>• {playList.findPlayList?.creationDate} • {formatTime(playList.findPlayList?.totalDuration)}</span> </p>
+                    <h1 className='playListName'>{playList?.title}</h1>
+                    <p className='stats'>{playList?.user.fullName} • {playList?.tracksCount} Songs <span>• {playList?.creationDate} • {formatTime(playList?.totalDuration)}</span> </p>
                 </div>
                 <div className="buttons">
                     <button className="addSongBtn" onClick={() =>
@@ -65,9 +52,9 @@ function PlayList({ volume, onTrackChange}) {
                     <button className="editPlayListBtn" onClick={()=> setEditPlayList((prev) => !prev)}>Update</button>
                 </div>
             </div>
-            <AudioList volume={volume} onTrackChange={onTrackChange} initialSongs={playList?.songs.content} isplayListSongs={true} playListId={playListId}/>
+            <AudioList volume={volume} onTrackChange={onTrackChange} isplayListSongs={true} playListId={playListId}/>
             {addSong && <AddSongToPlayList onClose={() => setAddSong(((prev) => !prev))} playListId={playListId} />}
-            {editPlayList && <PlayListForm onClose={() => setEditPlayList((prev) => !prev)} isEdit={playList.findPlayList} />}
+            {editPlayList && <PlayListForm onClose={() => setEditPlayList((prev) => !prev)} isEdit={playList} />}
         </div>
     )
 }

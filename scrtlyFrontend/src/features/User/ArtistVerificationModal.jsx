@@ -1,28 +1,22 @@
-import React, {useEffect, useState} from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import {verifyArtistAction} from "../../Redux/UserService/Action.js";
+import React, {useState} from 'react';
 import toast from "react-hot-toast";
+import {useVerifyArtistMutation} from "../../Redux/services/userApi.js";
 
 
 function ArtistVerificationModal({ onClose }) {
     const [artistName, setArtistName] = useState('');
-    const dispatch = useDispatch();
-    const {error } = useSelector(state => state.userService);
+    const [verifyArtist, { isLoading }] = useVerifyArtistMutation();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        dispatch(verifyArtistAction(artistName))
-            .then(() => {
-                toast.success('Verification has been sent for review');
-                onClose();
-            })
-    };
-
-    useEffect(() => {
-        if (error) {
-            toast.error(error);
+        try {
+            await verifyArtist(artistName).unwrap();
+            toast.success('Verification has been sent for review');
+            onClose();
+        } catch (err) {
+            toast.error(err.data.businessErrornDescription);
         }
-    }, [error]);
+    };
 
     return (
         <div className="verifyArtist">
@@ -40,8 +34,10 @@ function ArtistVerificationModal({ onClose }) {
                         required
                     />
                 </div>
-                <button type="submit" className="submit">Send application</button>
-                <button type="button" className="submit" onClick={onClose} style={{ marginTop: '10px' }}>
+                <button type="submit" className="submit" disabled={isLoading}>
+                    {isLoading ? 'Sending…' : 'Send application'}
+                </button>
+                <button type="button" className="submit" onClick={onClose} style={{marginTop: '10px'}}>
                     Cancel
                 </button>
             </form>

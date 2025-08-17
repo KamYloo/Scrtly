@@ -13,8 +13,13 @@ import {
 } from 'react-icons/fa'
 import { BsDownload } from 'react-icons/bs'
 import Hls from 'hls.js'
+import {useDispatch} from "react-redux";
+import {BASE_API_URL} from "../../Redux/api.js";
+import {useRecordPlayMutation} from "../../Redux/services/songApi.js";
 
 export function MusicPlayer({
+                                songId,
+                                artistId,
                                 trackSrc,
                                 hlsManifestUrl,
                                 imgSrc,
@@ -37,6 +42,8 @@ export function MusicPlayer({
     const hlsRef = useRef(null)
     const bufferTimeoutRef = useRef(null)
     const initialBufferedRef = useRef(false)
+    const playRecordedRef = useRef(false)
+    const [recordPlay] = useRecordPlayMutation();
 
     useEffect(() => {
         const audio = audioRef.current
@@ -49,10 +56,10 @@ export function MusicPlayer({
         initialBufferedRef.current = false
 
         if (Hls.isSupported()) {
-            const hls = new Hls({ maxBufferLength: maxBufferSeconds, autoStartLoad: false })
+            const hls = new Hls({ maxBufferLength: maxBufferSeconds, autoStartLoad: false,  xhrSetup: (xhr) => {xhr.withCredentials = true}})
             hlsRef.current = hls
             hls.attachMedia(audio)
-            hls.loadSource(hlsManifestUrl)
+            hls.loadSource(`${BASE_API_URL}${hlsManifestUrl}`)
 
             const onMeta = () => {
                 setDuration(audio.duration)
@@ -115,6 +122,10 @@ export function MusicPlayer({
         }
     }, [hlsManifestUrl])
 
+    useEffect(() => {
+        playRecordedRef.current = false
+    }, [songId])
+
     const startPlayback = () => {
         const audio = audioRef.current
         if (!audio) return
@@ -127,7 +138,18 @@ export function MusicPlayer({
         }
 
         audio.play()
-        setPlaying(true)
+            .then(() => {
+                setPlaying(true)
+
+                if (!playRecordedRef.current) {
+                    recordPlay({songId, artistId}).unwrap()
+                    playRecordedRef.current = true
+                }
+            })
+            .catch(err => {
+                console.error('Play failed:', err)
+            })
+
         rafRef.current = requestAnimationFrame(updateWhilePlaying)
     }
 

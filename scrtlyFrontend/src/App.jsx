@@ -1,17 +1,12 @@
-import React, { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { } from 'react';
 import './App.css';
 import AppRoutes from "./AppRoutes.jsx";
-import {currentUser} from "./Redux/AuthService/Action.js";
+import {useGetCurrentUserQuery} from "./Redux/services/authApi.js";
 
 function App() {
-    const dispatch = useDispatch();
-
-    useEffect(() => {
-        if (localStorage.getItem('isLoggedIn')) {
-            dispatch(currentUser());
-        }
-    }, [dispatch]);
+    useGetCurrentUserQuery(null, {
+        skip: !localStorage.getItem('isLoggedIn'),
+    });
 
     return <AppRoutes />;
 }

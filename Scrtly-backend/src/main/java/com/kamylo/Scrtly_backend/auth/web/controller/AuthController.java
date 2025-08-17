@@ -4,6 +4,7 @@ import com.kamylo.Scrtly_backend.auth.service.AuthService;
 import com.kamylo.Scrtly_backend.auth.service.CookieService;
 import com.kamylo.Scrtly_backend.auth.service.JwtService;
 import com.kamylo.Scrtly_backend.auth.service.RefreshTokenService;
+import com.kamylo.Scrtly_backend.user.mapper.UserMapper;
 import com.kamylo.Scrtly_backend.user.web.dto.UserDto;
 import com.kamylo.Scrtly_backend.auth.web.dto.request.LoginRequestDto;
 import com.kamylo.Scrtly_backend.auth.web.dto.request.RegisterRequestDto;
@@ -13,7 +14,6 @@ import com.kamylo.Scrtly_backend.auth.web.dto.response.RefreshTokenResponse;
 import com.kamylo.Scrtly_backend.auth.domain.RefreshTokenEntity;
 import com.kamylo.Scrtly_backend.user.domain.UserEntity;
 import com.kamylo.Scrtly_backend.common.handler.CustomException;
-import com.kamylo.Scrtly_backend.common.mapper.Mapper;
 import com.kamylo.Scrtly_backend.user.service.UserService;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,7 +39,7 @@ public class AuthController {
     private final CookieService cookieService;
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
-    private final Mapper<UserEntity, UserDto> mapper;
+    private final UserMapper userMapper;
 
     @Value("${mailing.frontend.redirect-url}")
     private String redirectUrl;
@@ -55,7 +55,8 @@ public class AuthController {
         Map<String, String> tokens  = authService.verify(loginRequest);
         response.addCookie(cookieService.getNewCookie("jwt_zuvoria_v1", tokens.get("jwt_zuvoria_v1"), 2 * 60 * 60));
         response.addCookie(cookieService.getNewCookie("refresh_zuvoria_v1", tokens.get("refresh_zuvoria_v1"), 7 * 24 * 60 * 60));
-        UserDto userDto = mapper.mapTo(userService.findUserByEmail(loginRequest.getEmail()));
+        UserDto userDto = userMapper.toDto(userService.findUserByEmail(loginRequest.getEmail()));
+        userDto.setPremium(userService.isPremium(loginRequest.getEmail()));
         LoginResponseDto responseDto = LoginResponseDto.builder()
                 .user(userDto)
                 .build();
@@ -97,7 +98,10 @@ public class AuthController {
         if (ud == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        UserDto dto = mapper.mapTo(userService.findUserByEmail(ud.getUsername()));
+        var email = ud.getUsername();
+        var user = userService.findUserByEmail(email);
+        var dto = userMapper.toDto(user);
+        dto.setPremium(userService.isPremium(email));
         return ResponseEntity.ok(dto);
     }
 
@@ -116,7 +120,7 @@ public class AuthController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/reset-password/{userId}/{token}")
+    @PostMapping("/change-password/{userId}/{token}")
     public ResponseEntity<?> reset_password(
             @PathVariable Long userId,
             @PathVariable String token,

@@ -1,12 +1,12 @@
 package com.kamylo.Scrtly_backend.serviceTests;
 
+import com.kamylo.Scrtly_backend.story.mapper.StoryMapper;
 import com.kamylo.Scrtly_backend.user.web.dto.UserMinimalDto;
 import com.kamylo.Scrtly_backend.story.web.dto.StoryDto;
 import com.kamylo.Scrtly_backend.story.domain.StoryEntity;
 import com.kamylo.Scrtly_backend.user.domain.UserEntity;
 import com.kamylo.Scrtly_backend.common.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.common.handler.CustomException;
-import com.kamylo.Scrtly_backend.common.mapper.Mapper;
 import com.kamylo.Scrtly_backend.story.repository.StoryRepository;
 import com.kamylo.Scrtly_backend.user.service.UserService;
 import com.kamylo.Scrtly_backend.common.service.impl.FileServiceImpl;
@@ -40,7 +40,7 @@ public class StoryServiceImplTest {
     private FileServiceImpl fileService;
 
     @Mock
-    private Mapper<StoryEntity, StoryDto> storyMapper;
+    private StoryMapper storyMapper;
 
     @InjectMocks
     private StoryServiceImpl storyService;
@@ -80,7 +80,7 @@ public class StoryServiceImplTest {
         when(storyRepository.save(any(StoryEntity.class))).thenReturn(storyWithImage);
         StoryDto dtoWithImage = new StoryDto();
         dtoWithImage.setImage("new/image/path");
-        when(storyMapper.mapTo(any(StoryEntity.class))).thenReturn(dtoWithImage);
+        when(storyMapper.toDto(any(StoryEntity.class))).thenReturn(dtoWithImage);
 
         StoryDto result = storyService.createStory("user@example.com", multipartFile);
 
@@ -88,7 +88,7 @@ public class StoryServiceImplTest {
         assertEquals("new/image/path", result.getImage());
         verify(fileService, times(1)).saveFile(multipartFile, "storyImages/");
         verify(storyRepository, times(1)).save(any(StoryEntity.class));
-        verify(storyMapper, times(1)).mapTo(any(StoryEntity.class));
+        verify(storyMapper, times(1)).toDto(any(StoryEntity.class));
     }
 
     @Test
@@ -104,7 +104,7 @@ public class StoryServiceImplTest {
         when(storyRepository.save(any(StoryEntity.class))).thenReturn(storyWithoutImage);
         StoryDto dtoWithoutImage = new StoryDto();
         dtoWithoutImage.setImage(null);
-        when(storyMapper.mapTo(any(StoryEntity.class))).thenReturn(dtoWithoutImage);
+        when(storyMapper.toDto(any(StoryEntity.class))).thenReturn(dtoWithoutImage);
 
         StoryDto result = storyService.createStory("user@example.com", multipartFile);
 
@@ -119,7 +119,7 @@ public class StoryServiceImplTest {
         when(userService.findUserByEmail("user@example.com")).thenReturn(user);
         when(storyRepository.getStoriesByUserId(user.getId()))
                 .thenReturn(Collections.singletonList(story));
-        when(storyMapper.mapTo(story)).thenReturn(storyDto);
+        when(storyMapper.toDto(story)).thenReturn(storyDto);
 
         List<StoryDto> result = storyService.getStoriesByUser("user@example.com");
 
@@ -166,8 +166,8 @@ public class StoryServiceImplTest {
         when(userService.findUserByEmail("user@example.com")).thenReturn(user1);
         when(storyRepository.getStoriesByFollowedUsers(user1.getId()))
                 .thenReturn(Arrays.asList(story1, story2));
-        when(storyMapper.mapTo(story1)).thenReturn(dto1);
-        when(storyMapper.mapTo(story2)).thenReturn(dto2);
+        when(storyMapper.toDto(story1)).thenReturn(dto1);
+        when(storyMapper.toDto(story2)).thenReturn(dto2);
 
         Map<String, List<StoryDto>> result =
                 storyService.getGroupedStoriesByFollowedUsers("user@example.com");

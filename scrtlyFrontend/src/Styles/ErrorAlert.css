@@ -5,6 +5,7 @@
     height: 100dvh;
     width: 100vw;
     flex-grow: 1;
+    flex-direction: column;
 }
 
 .error-alert .error {
@@ -20,12 +21,18 @@
     z-index: 1000;
 }
 
-.error-message {
-    margin-top: 1rem;
-    font-size: clamp(1rem, 2vw, 2rem);
-    color: #fff;
-    text-align: center;
-    padding: 0 1rem;
-    word-wrap: break-word;
+.error-details {
+    display: flex;
+    flex-direction: column;
+    p {
+        margin-top: 1rem;
+        font-size: 2vh;
+        color: #fff;
+        text-align: center;
+        padding: 0 1rem;
+        word-wrap: break-word;
+    }
 }
+
+
 

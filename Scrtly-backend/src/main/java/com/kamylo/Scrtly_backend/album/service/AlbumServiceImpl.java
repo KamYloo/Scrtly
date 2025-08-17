@@ -1,15 +1,16 @@
 package com.kamylo.Scrtly_backend.album.service;
 
+import com.kamylo.Scrtly_backend.album.mapper.AlbumMapper;
 import com.kamylo.Scrtly_backend.album.web.dto.AlbumDto;
 import com.kamylo.Scrtly_backend.common.service.FileService;
+import com.kamylo.Scrtly_backend.song.mapper.SongMapper;
+import com.kamylo.Scrtly_backend.song.service.HlsService;
 import com.kamylo.Scrtly_backend.song.web.dto.SongDto;
 import com.kamylo.Scrtly_backend.album.domain.AlbumEntity;
 import com.kamylo.Scrtly_backend.artist.domain.ArtistEntity;
-import com.kamylo.Scrtly_backend.song.domain.SongEntity;
 import com.kamylo.Scrtly_backend.user.domain.UserEntity;
 import com.kamylo.Scrtly_backend.common.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.common.handler.CustomException;
-import com.kamylo.Scrtly_backend.common.mapper.Mapper;
 import com.kamylo.Scrtly_backend.album.repository.AlbumRepository;
 import com.kamylo.Scrtly_backend.artist.repository.ArtistRepository;
 import com.kamylo.Scrtly_backend.song.repository.SongRepository;
@@ -35,15 +36,16 @@ public class AlbumServiceImpl implements AlbumService {
     private final ArtistRepository artistRepository;
     private final UserRoleService userRoleService;
     private final FileService fileService;
-    private final Mapper<AlbumEntity, AlbumDto> albumMapper;
-    private final Mapper<SongEntity, SongDto> songMapper;
+    private final AlbumMapper albumMapper;
+    private final SongMapper songMapper;
     private final SongRepository songRepository;
+    private final HlsService hlsService;
 
     @Override
     @Transactional
     public AlbumDto createAlbum(String title, MultipartFile albumImage, String username) {
         validateArtistOrAdmin(username);
-        UserEntity artist = userService.findUserByEmail(username);
+        ArtistEntity artist = userService.findUserByEmail(username).getArtistEntity();
 
         String imagePath = null;
         if (!albumImage.isEmpty()) {
@@ -57,19 +59,19 @@ public class AlbumServiceImpl implements AlbumService {
                 .build();
 
         AlbumEntity savedAlbum = albumRepository.save(album);
-        return albumMapper.mapTo(savedAlbum);
+        return albumMapper.toDto(savedAlbum);
     }
 
     @Override
     public Page<AlbumDto> getAlbums(Pageable pageable) {
-        return albumRepository.findAll(pageable).map(albumMapper::mapTo);
+        return albumRepository.findAll(pageable).map(albumMapper::toDto);
     }
 
     @Override
     public AlbumDto getAlbum(Integer albumId) {
         AlbumEntity album = albumRepository.findById(albumId)
                 .orElseThrow(() -> new CustomException(BusinessErrorCodes.ALBUM_NOT_FOUND));
-        return albumMapper.mapTo(album);
+        return albumMapper.toDto(album);
     }
 
     @Override
@@ -78,7 +80,7 @@ public class AlbumServiceImpl implements AlbumService {
                 .where(AlbumSpecification.artistContains(artistName))
                 .and(AlbumSpecification.titleContains(albumName));
 
-        return albumRepository.findAll(spec, pageable).map(albumMapper::mapTo);
+        return albumRepository.findAll(spec, pageable).map(albumMapper::toDto);
     }
 
     @Override
@@ -87,19 +89,19 @@ public class AlbumServiceImpl implements AlbumService {
                 .orElseThrow(() -> new CustomException(BusinessErrorCodes.ARTIST_NOT_FOUND));
         return albumRepository.findByArtistId(artistEntity.getId())
                 .stream()
-                .map(albumMapper::mapTo)
+                .map(albumMapper::toDto)
                 .toList();
     }
 
     @Override
     public List<SongDto> getAlbumTracks(Integer albumId) {
-        AlbumEntity albumEntity = albumMapper.mapFrom(getAlbum(albumId));
+        AlbumEntity albumEntity = albumMapper.toEntity(getAlbum(albumId));
         if (albumEntity == null) {
             throw new CustomException(BusinessErrorCodes.ALBUM_NOT_FOUND);
         }
         return songRepository.findByAlbumId(albumEntity.getId())
                 .stream()
-                .map(songMapper::mapTo)
+                .map(songMapper::toDto)
                 .toList();
     }
 
@@ -117,6 +119,7 @@ public class AlbumServiceImpl implements AlbumService {
         albumEntity.getSongs().forEach(song -> {
             fileService.deleteFile(song.getTrack());
             fileService.deleteFile(song.getImageSong());
+            hlsService.deleteHlsFolder(song.getId());
         });
         fileService.deleteFile(albumEntity.getCoverImage());
         albumRepository.deleteById(albumId);

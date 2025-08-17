@@ -1,50 +1,57 @@
 import React, {useState} from 'react'
-import {useDispatch, useSelector} from "react-redux";
-import {searchSong} from "../../Redux/Song/Action.js";
-import {addSongToPlayList} from "../../Redux/PlayList/Action.js";
+import toast from "react-hot-toast";
+import {useLazySearchSongQuery} from "../../Redux/services/songApi.js";
+import {useUploadSongToPlaylistMutation} from "../../Redux/services/playlistApi.js";
 
 function AddSongToPlayList({playListId}) {
     const [keyword, setKeyword] = useState('');
-    const dispatch = useDispatch();
-    const { song } = useSelector(state => state);
-    const { loading } = useSelector(state => state.playList);
 
-    const handleSearch = async (e) => {
+    const [triggerSearch, { data: searchResults = [], isLoading: isSearching, isError: searchError }] =
+        useLazySearchSongQuery();
+
+    const [uploadSong, { isLoading: isAdding }] = useUploadSongToPlaylistMutation();
+
+    const handleSearch = (e) => {
         e.preventDefault();
-        if (keyword.trim() !== '') {
-            dispatch(searchSong({ keyword }));
-        }
-    }
+        if (keyword.trim() === '') return;
+        triggerSearch(keyword);
+    };
 
-    const handleAddSong = (songId) => {
-        dispatch(addSongToPlayList({playListId, songId}));
+    const handleAddSong = async (songId) => {
+        try {
+            await uploadSong({ playListId, songId }).unwrap();
+            toast.success('Song added to playList successfully.');
+        } catch (err) {
+            toast.error(err.data.businessErrornDescription);
+        }
     }
 
     return (
         <div className='searchSong'>
             <form onSubmit={handleSearch}>
                 <input type="text" placeholder='title...' onChange={(e) => setKeyword(e.target.value)}/>
-                <button>Search</button>
+                <button disabled={keyword.trim() === ''}>Search</button>
             </form>
-            {song.searchResults && song.searchResults.length > 0 ? (
+            {!isSearching && searchResults.length > 0 ? (
                 <div className="songList">
-                    {song.searchResults.map((song) => (
+                    {searchResults.map((song) => (
                         <div className="song" key={song.id}>
                             <div className="detail">
                                 <img src={song?.imageSong} alt="" />
                                 <div className="songData">
                                     <span>{song?.title}</span>
-                                    <p>{song?.artist.artistName}</p>
+                                    <p>{song?.artist.pseudonym}</p>
                                 </div>
                             </div>
-                            <button onClick={() => handleAddSong(song.id)} disabled={loading}>
-                                {loading ? "Adding..." : "Add Song"}
+                            <button onClick={() => handleAddSong(song.id)} disabled={isAdding }>
+                                {isAdding  ? "Adding..." : "Add Song"}
                             </button>
                         </div>
                     ))}
                 </div>
             ) : (
-                <p>No songs found</p>
+                !isSearching && !searchError && searchResults.length === 0 && (
+                    <p className="noResult">No songs found</p>)
             )}
 
         </div>

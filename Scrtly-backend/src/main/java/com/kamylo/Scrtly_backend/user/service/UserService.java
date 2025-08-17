@@ -18,4 +18,5 @@ public interface UserService {
      UserDto updateUser(String username, UserRequestDto userRequestDto, MultipartFile userImage);
      Set<UserDto> searchUser(String query);
      void requestArtistVerification(String username, ArtistVerificationRequest request);
+     boolean isPremium(String email);
 }

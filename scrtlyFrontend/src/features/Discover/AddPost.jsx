@@ -2,22 +2,23 @@ import React, {useState} from 'react'
 import { IoMdPhotos } from "react-icons/io";
 import { BsEmojiSmileFill , BsCameraVideoFill} from "react-icons/bs";
 import EmojiPicker from 'emoji-picker-react'
-import {useDispatch, useSelector} from "react-redux";
-import {createPost} from "../../Redux/Post/Action.js";
 import {useNavigate} from "react-router-dom";
 import toast from "react-hot-toast";
 import defaultAvatar from "../../assets/user.jpg";
+import {useGetCurrentUserQuery} from "../../Redux/services/authApi.js";
+import {useCreatePostMutation} from "../../Redux/services/postApi.js";
 
 
 
 function AddPost() {
-  const dispatch = useDispatch()
+  const navigate = useNavigate();
+  const { data: reqUser } = useGetCurrentUserQuery(null, {
+    skip: !localStorage.getItem('isLoggedIn'),
+  });
+  const [createPost, { isLoading: isPosting }] = useCreatePostMutation();
   const [descriptionText, setDescriptionText] = useState('')
   const [filePic, setFilePic] = useState(null)
   const [openEmoji, setOpenEmoji] = useState(false)
-  const { reqUser } = useSelector(state => state.auth);
-  const navigate = useNavigate();
-  const { loading } = useSelector(state => state.post);
 
   const handleFileChange = (e) => {
     setFilePic(e.target.files[0])
@@ -28,22 +29,19 @@ function AddPost() {
     setOpenEmoji(false)
   }
 
-  const handlePostCreation = () => {
+  const handlePostCreation = async () => {
     const formData = new FormData()
     formData.append('file', filePic)
     formData.append('description', descriptionText)
-
-    dispatch(createPost(formData))
-        .then(() => {
-          toast.success('Post created successfully.');
-        })
-        .catch(() => {
-          toast.error('Failed to create post. Please try again.');
-        })
-        .finally(() => {
-          setDescriptionText('')
-          setFilePic(null)
-        });
+    try {
+      await createPost(formData).unwrap();
+      toast.success('Post created successfully.');
+    } catch (err) {
+      toast.error(err.data.businessErrornDescription);
+    } finally {
+      setDescriptionText('')
+      setFilePic(null)
+    }
   }
 
   return (
@@ -71,8 +69,8 @@ function AddPost() {
           </div>
         </div>
         <div className="right">
-          <button onClick={handlePostCreation} disabled={loading}>
-            {loading ? "Sending..." : "Send"}
+          <button onClick={handlePostCreation} disabled={isPosting }>
+            {isPosting  ? "Sending..." : "Send"}
           </button>
           <div className="emoji">
             <i onClick={() => setOpenEmoji((prev) => !prev)}><BsEmojiSmileFill/></i>

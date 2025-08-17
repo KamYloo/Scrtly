@@ -1,38 +1,34 @@
 import React, {useEffect, useState} from 'react'
 import {MdCancel} from "react-icons/md";
-import {useDispatch, useSelector} from "react-redux";
-import {createAlbum} from "../../Redux/Album/Action.js";
 import toast from "react-hot-toast";
+import {useCreateAlbumMutation} from "../../Redux/services/albumApi.js";
 
 function CreateAlbum({onClose}) {
     const [title, setTitle] = useState()
     const [albumImg, setAlbumImg] = useState(null)
     const [preview, setPreview] = useState('');
-    const dispatch = useDispatch()
-    const { loading } = useSelector(state => state.album);
+    const [createAlbum, { isLoading }] = useCreateAlbumMutation()
 
     const handleFileChange = (e) => {
         setAlbumImg(e.target.files[0])
     };
 
-    const createAlbumHandler = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault()
         const formData = new FormData();
         formData.append('file', albumImg);
         formData.append('title', title);
 
-        dispatch(createAlbum(formData))
-            .then(() => {
-                toast.success('Album created successfully.');
-            })
-            .catch(() => {
-                toast.error('Failed to create album. Please try again.');
-            })
-            .finally(() => {
-                setAlbumImg(null);
-                setTitle(null);
-                onClose();
-            });
+        try {
+            await createAlbum(formData).unwrap()
+            toast.success('Album created successfully.')
+            onClose()
+        } catch (err) {
+            toast.error(err.data.businessErrornDescription)
+        } finally {
+            setAlbumImg(null);
+            setTitle(null);
+        }
     };
 
 
@@ -52,14 +48,14 @@ function CreateAlbum({onClose}) {
             <div className="title">
                 <h2>Create Album</h2>
             </div>
-            <form onSubmit={createAlbumHandler}>
+            <form onSubmit={handleSubmit}>
                 <div className="editPic">
                     <div className="left">
                         <img className="trackImg" src={preview} alt=""/>
                         <span>{albumImg?.name}</span>
                     </div>
                     <div className="right">
-                        <input type="file" onChange={handleFileChange}/>
+                        <input type="file" accept="image/*"  onChange={handleFileChange}/>
                         <button type="button"
                                 onClick={() => document.querySelector('input[type="file"]').click()}>
                             Select Img
@@ -70,8 +66,8 @@ function CreateAlbum({onClose}) {
                     <h4>Title</h4>
                     <input type="text" value={title} onChange={(e) => setTitle(e.target.value)}></input>
                 </div>
-                <button type="submit" className='submit' disabled={loading}>
-                    {loading ? "Creating..." : "Send"}
+                <button type="submit" className='submit' disabled={isLoading}>
+                    {isLoading ? "Creating..." : "Send"}
                 </button>
             </form>
         </div>

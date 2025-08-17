@@ -1,12 +1,12 @@
 package com.kamylo.Scrtly_backend.story.service;
 
+import com.kamylo.Scrtly_backend.story.mapper.StoryMapper;
 import com.kamylo.Scrtly_backend.story.web.dto.StoryDto;
 import com.kamylo.Scrtly_backend.common.service.impl.FileServiceImpl;
 import com.kamylo.Scrtly_backend.story.domain.StoryEntity;
 import com.kamylo.Scrtly_backend.user.domain.UserEntity;
 import com.kamylo.Scrtly_backend.common.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.common.handler.CustomException;
-import com.kamylo.Scrtly_backend.common.mapper.Mapper;
 import com.kamylo.Scrtly_backend.story.repository.StoryRepository;
 import com.kamylo.Scrtly_backend.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ public class StoryServiceImpl implements StoryService {
     private final StoryRepository storyRepository;
     private final UserService userService;
     private final FileServiceImpl fileService;
-    private final Mapper<StoryEntity, StoryDto> storyMapper;
+    private final StoryMapper storyMapper;
 
     @Override
     @Transactional
@@ -43,7 +43,7 @@ public class StoryServiceImpl implements StoryService {
                 .build();
 
         StoryEntity savedStory = storyRepository.save(story);
-        return storyMapper.mapTo(savedStory);
+        return storyMapper.toDto(savedStory);
     }
 
     @Override
@@ -51,7 +51,7 @@ public class StoryServiceImpl implements StoryService {
         UserEntity user = userService.findUserByEmail(username);
 
         List<StoryEntity> stories = storyRepository.getStoriesByUserId(user.getId());
-        return stories.stream().map(storyMapper::mapTo).toList();
+        return stories.stream().map(storyMapper::toDto).toList();
     }
 
     @Override
@@ -59,8 +59,8 @@ public class StoryServiceImpl implements StoryService {
         UserEntity user = userService.findUserByEmail(username);
         List<StoryEntity> stories = storyRepository.getStoriesByFollowedUsers(user.getId());
         List<StoryDto> dtoList = stories.stream()
-                .map(storyMapper::mapTo)
-                .collect(Collectors.toList());
+                .map(storyMapper::toDto)
+                .toList();
 
         return dtoList.stream()
                 .collect(Collectors.groupingBy(

@@ -1,5 +1,6 @@
 package com.kamylo.Scrtly_backend.notification.service;
 
+import com.kamylo.Scrtly_backend.notification.mapper.NotificationMapper;
 import com.kamylo.Scrtly_backend.notification.web.dto.NotificationDto;
 import com.kamylo.Scrtly_backend.notification.domain.NotificationEntity;
 import com.kamylo.Scrtly_backend.post.domain.PostEntity;
@@ -7,28 +8,27 @@ import com.kamylo.Scrtly_backend.user.domain.UserEntity;
 import com.kamylo.Scrtly_backend.notification.domain.enums.NotificationType;
 import com.kamylo.Scrtly_backend.common.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.common.handler.CustomException;
-import com.kamylo.Scrtly_backend.common.mapper.Mapper;
 import com.kamylo.Scrtly_backend.notification.repository.NotificationRepository;
 import com.kamylo.Scrtly_backend.post.repository.PostRepository;
 import com.kamylo.Scrtly_backend.user.service.UserService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
     private final PostRepository postRepository;
     private final RabbitTemplate rabbitTemplate;
     private final UserService userService;
-    private final Mapper<NotificationEntity, NotificationDto> notificationMapper;
+    private final NotificationMapper notificationMapper;
 
     @Value("${notification.exchange}")
     private String notifExchangeName;
@@ -36,7 +36,21 @@ public class NotificationServiceImpl implements NotificationService {
     @Value("${notification.routing-key-prefix}")
     private String notifRoutingKey;
 
+    public NotificationServiceImpl(
+            NotificationRepository notificationRepository,
+            PostRepository postRepository,
+            @Qualifier("notificationRabbitTemplate") RabbitTemplate rabbitTemplate,
+            UserService userService,
+            NotificationMapper notificationMapper) {
+        this.notificationRepository = notificationRepository;
+        this.postRepository = postRepository;
+        this.rabbitTemplate = rabbitTemplate;
+        this.userService = userService;
+        this.notificationMapper = notificationMapper;
+    }
+
     @Override
+    @Transactional
     public void createOrUpdateNotification(Long userId, Long postId, NotificationType type, String triggeringUserName) {
         UserEntity recipient = userService.findUserById(userId);
         UserEntity sender = userService.findUserByEmail(triggeringUserName);
@@ -73,6 +87,7 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
+    @Transactional
     public void decrementNotification(Long recipientId, Long postId, NotificationType type) {
         UserEntity recipient = userService.findUserById(recipientId);
         PostEntity post = postRepository.findById(postId).orElseThrow(
@@ -121,7 +136,7 @@ public class NotificationServiceImpl implements NotificationService {
 
 
     private void sendNotification(NotificationEntity notification) {
-        NotificationDto notificationDto = notificationMapper.mapTo(notification);
+        NotificationDto notificationDto = notificationMapper.toDto(notification);
         String routingKey = notifRoutingKey + notification.getRecipient().getUsername();
         rabbitTemplate.convertAndSend(
                 notifExchangeName,
@@ -133,7 +148,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public Page<NotificationDto> getOwnerNotifications(String username, Pageable pageable) {
         UserEntity user = userService.findUserByEmail(username);
-        return notificationRepository.findByRecipientIdOrderByUpdatedDateDescCreatedDateDesc(user.getId(), pageable).map(notificationMapper::mapTo);
+        return notificationRepository.findByRecipientIdOrderByUpdatedDateDescCreatedDateDesc(user.getId(), pageable).map(notificationMapper::toDto);
     }
 
     @Override

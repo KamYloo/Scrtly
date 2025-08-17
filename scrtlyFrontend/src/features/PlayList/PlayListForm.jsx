@@ -1,45 +1,43 @@
 import React, {useEffect, useState} from 'react'
 import {MdCancel} from "react-icons/md";
-import {useDispatch, useSelector} from "react-redux";
-import {createPlayList, updatePlayList} from "../../Redux/PlayList/Action.js";
 import toast from "react-hot-toast";
+import {useCreatePlaylistMutation, useUpdatePlaylistMutation} from "../../Redux/services/playlistApi.js";
 
 function PlayListForm({onClose, isEdit}) {
     const [title, setTitle] = useState(isEdit?.title || "")
     const [playListImg, setPlayListImg] = useState(null)
     const [preview, setPreview] = useState(isEdit?.playListImage ? `${isEdit.playListImage}` : '');
-    const dispatch = useDispatch()
-    const { loading } = useSelector(state => state.playList);
+    const [createPlaylist, { isLoading: creating }] = useCreatePlaylistMutation();
+    const [updatePlaylist, { isLoading: updating }] = useUpdatePlaylistMutation();
+    const loading = creating || updating;
+
 
     const handleFileChange = (e) => {
         setPlayListImg(e.target.files[0])
     };
 
-    const playListHandler = () => {
-        const formData = new FormData()
-        formData.append('file', playListImg)
-        formData.append('title', title)
-        if (isEdit) {
-            formData.append("playListId", isEdit?.id)
-            dispatch(updatePlayList(formData))
-                .then(() => {
-                    toast.success('Playlist updated successfully.');
-                })
-                .catch(() => {
-                    toast.error('Failed to update playlist. Please try again.');
-                });
-        } else {
-            dispatch(createPlayList(formData))
-                .then(() => {
-                    toast.success('Playlist created successfully.');
-                })
-                .catch(() => {
-                    toast.error('Failed to create playlist. Please try again.');
-                });
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!title.trim()) {
+            toast.error('Title is required');
+            return;
         }
-        setTitle('')
-        setPlayListImg(null)
-        onClose()
+        const form = new FormData();
+        form.append('title', title);
+        if (playListImg) form.append('file', playListImg);
+        try {
+            if (isEdit) {
+                form.append('playListId', isEdit.id);
+                await updatePlaylist(form).unwrap();
+                toast.success('Playlist updated successfully.');
+            } else {
+                await createPlaylist(form).unwrap();
+                toast.success('Playlist created successfully.');
+            }
+            onClose();
+        } catch (err) {
+            toast.error(err.data.businessErrornDescription);
+        }
     }
 
     useEffect(() => {
@@ -52,13 +50,14 @@ function PlayListForm({onClose, isEdit}) {
         }
     }, [playListImg])
 
+
     return (
         <div className='createPlayList'>
             <i className='cancel' onClick={onClose}><MdCancel/></i>
             <div className="title">
                 <h2>{isEdit ? "Edit PlayList" : "Create PlayList"}</h2>
             </div>
-            <form onSubmit={playListHandler}>
+            <form onSubmit={handleSubmit}>
                 <div className="editPic">
                     <div className="left">
                         <img className="trackImg" src={preview} alt=""/>
