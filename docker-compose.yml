@@ -80,7 +80,7 @@ services:
       - "5002:5002"
     environment:
       VITE_APP_BACKEND_URL: https://api.zuvoria.pl/api
-      VITE_STRIPE_PUBLIC_KEY: ${VITE_STRIPE_PUBLIC_KEY}
+      VITE_STRIPE_PUBLIC_KEY: "${VITE_STRIPE_PUBLIC_KEY}"
     depends_on:
       - backend
     networks:
