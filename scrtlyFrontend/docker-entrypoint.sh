@@ -1,3 +1,4 @@
+#!/bin/sh
 cat > /app/dist/env.js <<EOF
 window.__env = {
   VITE_APP_BACKEND_URL: "${VITE_APP_BACKEND_URL:-}",
@@ -6,3 +7,4 @@ window.__env = {
 EOF
 
 exec "$@"
+
