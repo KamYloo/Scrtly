@@ -1,2 +1,3 @@
 import { loadStripe } from "@stripe/stripe-js";
-export const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+const stripeKey = window.__ENV?.VITE_STRIPE_PUBLIC_KEY || import.meta.env.VITE_STRIPE_PUBLIC_KEY;
+export const stripePromise = loadStripe(stripeKey);
