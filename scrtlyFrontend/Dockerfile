@@ -21,6 +21,7 @@ RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 RUN npm install -g serve
 
+EXPOSE 5002
+
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["serve", "-s", "dist", "-l", "5002"]
-
-
