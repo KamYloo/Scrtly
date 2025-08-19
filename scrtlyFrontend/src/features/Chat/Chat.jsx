@@ -1,17 +1,17 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import throttle from 'lodash/throttle';
 import EmojiPicker from 'emoji-picker-react';
-import { FaPhoneAlt, FaInfoCircle, FaImage, FaCamera, FaMicrophone } from "react-icons/fa";
-import { BsCameraVideoFill, BsEmojiSmileFill } from "react-icons/bs";
-import { useDispatch } from "react-redux";
-import { formatDistanceToNow } from 'date-fns';
-import { Client } from '@stomp/stompjs';
+import {FaCamera, FaImage, FaInfoCircle, FaMicrophone, FaPhoneAlt} from "react-icons/fa";
+import {BsCameraVideoFill, BsEmojiSmileFill} from "react-icons/bs";
+import {useDispatch} from "react-redux";
+import {formatDistanceToNow} from 'date-fns';
+import {Client} from '@stomp/stompjs';
 import SockJS from 'sockjs-client/dist/sockjs';
-import { useNavigate } from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import defaultAvatar from '../../assets/user.jpg';
-import { BASE_API_URL } from '../../Redux/api.js';
-import { useGetCurrentUserQuery } from '../../Redux/services/authApi.js';
-import { chatMessageApi, useGetMessagesByChatQuery } from '../../Redux/services/chatMessageApi.js';
+import {BASE_API_URL} from '../../Redux/api.js';
+import {useGetCurrentUserQuery} from '../../Redux/services/authApi.js';
+import {chatMessageApi, useGetMessagesByChatQuery} from '../../Redux/services/chatMessageApi.js';
 
 function Chat({ chat, onBack }) {
     const dispatch = useDispatch();
@@ -42,11 +42,17 @@ function Chat({ chat, onBack }) {
     useEffect(() => {
         if (!pageData) return;
         const msgs = pageData.content.slice().reverse();
+
         setAllMessages(prev => {
-            const newMsgs = msgs.filter(m => !prev.some(pm => pm.id === m.id));
-            return page === 0 ? [...newMsgs] : [...newMsgs, ...prev];
+            const mapById = new Map();
+            prev.forEach(m => mapById.set(m.id, m));
+            msgs.forEach(m => mapById.set(m.id, m));
+
+            return Array.from(mapById.values())
+                .sort((a, b) => new Date(a.createDate) - new Date(b.createDate));
         });
-    }, [pageData, page]);
+    }, [pageData]);
+
 
     useEffect(() => {
         setPage(0);
@@ -80,11 +86,9 @@ function Chat({ chat, onBack }) {
         [pageData, isFetching]
     );
 
-    // Format time ago
     const formatTimeAgo = timestamp =>
         formatDistanceToNow(new Date(timestamp), { addSuffix: true });
 
-    // Handle incoming STOMP messages
     const onMessageReceive = ({ body }) => {
         let msg;
         try { msg = JSON.parse(body); } catch { return; }
