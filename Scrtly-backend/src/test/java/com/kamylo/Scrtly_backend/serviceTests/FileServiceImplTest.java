@@ -206,4 +206,75 @@ public class FileServiceImplTest {
             assertTrue(url.startsWith(CDN_BASE + DIRECTORY));
         }
     }
+
+    @Test
+    public void testUpdateFile_existingFileStartsWithCdn_deletesCorrectRelativeFile() throws IOException {
+        FileServiceImpl service = getService();
+        MultipartFile file = Mockito.mock(MultipartFile.class);
+        Mockito.when(file.getOriginalFilename()).thenReturn("new.jpg");
+        Mockito.when(file.getInputStream()).thenReturn(new ByteArrayInputStream("x".getBytes()));
+
+        String existingFileUrl = CDN_BASE + DIRECTORY + "oldfile.jpg";
+        Path folderPath = Path.of(BASE_DIR + DIRECTORY);
+        Path oldFilePath = Path.of(BASE_DIR + DIRECTORY + "oldfile.jpg");
+
+        try (MockedStatic<Files> filesMock = Mockito.mockStatic(Files.class)) {
+            filesMock.when(() -> Files.exists(eq(folderPath))).thenReturn(true);
+            filesMock.when(() -> Files.exists(eq(oldFilePath))).thenReturn(true);
+            filesMock.when(() -> Files.delete(eq(oldFilePath))).thenAnswer(invocation -> null);
+            filesMock.when(() -> Files.copy(any(InputStream.class), any(Path.class), eq(StandardCopyOption.REPLACE_EXISTING)))
+                    .thenReturn(10L);
+
+            String result = service.updateFile(file, existingFileUrl, DIRECTORY);
+
+            assertTrue(result.startsWith(CDN_BASE + DIRECTORY));
+            filesMock.verify(() -> Files.delete(eq(oldFilePath)));
+        }
+    }
+
+    @Test
+    public void testDeleteFile_withCdnPrefix_andFileExists_deletes() {
+        FileServiceImpl service = getService();
+        String fileUrl = CDN_BASE + DIRECTORY + "del.jpg";
+        Path expectedPath = Path.of(BASE_DIR + DIRECTORY + "del.jpg");
+
+        try (MockedStatic<Files> filesMock = Mockito.mockStatic(Files.class)) {
+            filesMock.when(() -> Files.exists(eq(expectedPath))).thenReturn(true);
+            filesMock.when(() -> Files.delete(eq(expectedPath))).thenAnswer(invocation -> null);
+
+            assertDoesNotThrow(() -> service.deleteFile(fileUrl));
+            filesMock.verify(() -> Files.delete(eq(expectedPath)));
+        }
+    }
+
+    @Test
+    public void testDeleteFile_withCdnPrefix_andFileNotExists_noDelete() {
+        FileServiceImpl service = getService();
+        String fileUrl = CDN_BASE + DIRECTORY + "nodel.jpg";
+        Path expectedPath = Path.of(BASE_DIR + DIRECTORY + "nodel.jpg");
+
+        try (MockedStatic<Files> filesMock = Mockito.mockStatic(Files.class)) {
+            filesMock.when(() -> Files.exists(eq(expectedPath))).thenReturn(false);
+
+            assertDoesNotThrow(() -> service.deleteFile(fileUrl));
+
+            filesMock.verify(() -> Files.delete(any(Path.class)), Mockito.never());
+        }
+    }
+
+    @Test
+    public void testDeleteFile_withCdnPrefix_deleteThrows_throwsCustomException() {
+        FileServiceImpl service = getService();
+        String fileUrl = CDN_BASE + DIRECTORY + "delfail.jpg";
+        Path expectedPath = Path.of(BASE_DIR + DIRECTORY + "delfail.jpg");
+
+        try (MockedStatic<Files> filesMock = Mockito.mockStatic(Files.class)) {
+            filesMock.when(() -> Files.exists(eq(expectedPath))).thenReturn(true);
+            filesMock.when(() -> Files.delete(eq(expectedPath))).thenThrow(new IOException("boom"));
+
+            CustomException ex = assertThrows(CustomException.class, () -> service.deleteFile(fileUrl));
+            assertEquals(BusinessErrorCodes.IMAGE_NOT_FOUND, ex.getErrorCode());
+        }
+    }
+
 }
