@@ -75,9 +75,9 @@ public class AlbumServiceImpl implements AlbumService {
     }
 
     @Override
-    public Page<AlbumDto> searchAlbums(String artistName, String albumName, Pageable pageable) {
+    public Page<AlbumDto> searchAlbums(String pseudonym, String albumName, Pageable pageable) {
         Specification<AlbumEntity> spec = Specification
-                .where(AlbumSpecification.artistContains(artistName))
+                .where(AlbumSpecification.artistContains(pseudonym))
                 .and(AlbumSpecification.titleContains(albumName));
 
         return albumRepository.findAll(spec, pageable).map(albumMapper::toDto);
