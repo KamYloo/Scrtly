@@ -80,7 +80,7 @@ function Artist({ volume, onTrackChange }) {
           <Route path="popular" element={<AudioList volume={volume} onTrackChange={onTrackChange}  req_artist={artistData?.id === reqUser?.id} artistId={artistId} initialSongId={playSongId}/>}/>
           <Route path="albums" element={<ArtistAlbums artistId={artistId} />} />
           <Route path="songs" element={<AudioList volume={volume} onTrackChange={onTrackChange}  req_artist={artistData?.id === reqUser?.id} artistId={artistId}/>}/>
-          <Route path="fans" element={<Fans artistId={artistId} fans={artistData?.fans} />}/>
+          <Route path="fans" element={<Fans artistId={artistId}/>}/>
           <Route path="about" element={<AboutArtist artist={artistData} artistBio={artistData?.artistBio} />}/>
         </Routes>
       </div>

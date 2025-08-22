@@ -1,4 +1,4 @@
-// src/Redux/services/messageApi.js
+
 import { apiSlice } from '../apiSlice.js';
 
 export const chatMessageApi = apiSlice.injectEndpoints({

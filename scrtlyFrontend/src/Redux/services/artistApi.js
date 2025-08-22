@@ -38,6 +38,11 @@ export const artistApi = apiSlice.injectEndpoints({
                     : [{ type: 'Track', id: `ARTIST_${artistId}` }],
         }),
 
+        getArtistFans: builder.query({
+            query: ({ artistId, page = 0, size = 9 }) =>
+                `/artist/${artistId}/fans?page=${page}&size=${size}`,
+        }),
+
     }),
     overrideExisting: false,
 });
@@ -47,4 +52,5 @@ export const {
     useGetAllArtistsQuery,
     useUpdateArtistMutation,
     useGetArtistTracksQuery,
+    useGetArtistFansQuery,
 } = artistApi;

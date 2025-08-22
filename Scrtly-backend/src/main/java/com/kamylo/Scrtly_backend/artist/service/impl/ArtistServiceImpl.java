@@ -11,11 +11,14 @@ import com.kamylo.Scrtly_backend.common.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.common.handler.CustomException;
 import com.kamylo.Scrtly_backend.artist.repository.ArtistRepository;
 import com.kamylo.Scrtly_backend.song.repository.SongRepository;
+import com.kamylo.Scrtly_backend.user.mapper.UserMapper;
+import com.kamylo.Scrtly_backend.user.mapper.UserMinimalMapper;
 import com.kamylo.Scrtly_backend.user.repository.UserRepository;
 import com.kamylo.Scrtly_backend.common.service.FileService;
 import com.kamylo.Scrtly_backend.user.service.UserRoleService;
 import com.kamylo.Scrtly_backend.user.service.UserService;
 import com.kamylo.Scrtly_backend.common.utils.ArtistUtil;
+import com.kamylo.Scrtly_backend.user.web.dto.UserMinimalDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -38,6 +41,7 @@ public class ArtistServiceImpl implements ArtistService {
     private final UserRoleService userRoleService;
     private final ArtistMapper artistMapper;
     private final SongMapper songMapper;
+    private final UserMinimalMapper userMapper;
 
     private final FileService fileService;
 
@@ -101,6 +105,11 @@ public class ArtistServiceImpl implements ArtistService {
     public Page<SongDto> getArtistTracks(Long artistId, Pageable pageable) {
        artistMapper.toEntity(getArtistById(artistId));
        return songRepository.findByArtistId(artistId, pageable).map(songMapper::toDto);
+    }
+
+    @Override
+    public Page<UserMinimalDto> getFans(Long artistId, Pageable pageable) {
+        return userRepository.findFollowersByUserId(artistId, pageable).map(userMapper::toDto);
     }
 
 }

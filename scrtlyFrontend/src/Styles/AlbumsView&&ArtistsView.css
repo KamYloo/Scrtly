@@ -217,7 +217,7 @@
 
 
 @media screen and (max-width: 748px) {
-    .albumsView, .artistsView {
+    .albumsView, .artistsView, .fans, .artistAlbums {
         height: calc(100dvh - 120px);
         .searchBox {
             .search {
@@ -225,7 +225,7 @@
             }
         }
 
-        .albums, .artists {
+        .albums, .artists, .users {
             display: flex;
             justify-content: center;
             grid-template-columns: repeat(1, 1fr);

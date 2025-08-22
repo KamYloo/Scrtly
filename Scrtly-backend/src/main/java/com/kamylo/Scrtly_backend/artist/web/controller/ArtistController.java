@@ -5,12 +5,14 @@ import com.kamylo.Scrtly_backend.metrics.messaging.publisher.MetricsPublisher;
 import com.kamylo.Scrtly_backend.song.web.dto.SongDto;
 import com.kamylo.Scrtly_backend.common.response.PagedResponse;
 import com.kamylo.Scrtly_backend.artist.service.ArtistService;
+import com.kamylo.Scrtly_backend.user.web.dto.UserMinimalDto;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.security.Principal;
@@ -49,5 +51,15 @@ public class ArtistController {
     public ResponseEntity<PagedResponse<SongDto>> getArtistTracksHandler(@PathVariable Long artistId, @PageableDefault(size = 9) Pageable pageable) {
         Page<SongDto> songs = artistService.getArtistTracks(artistId, pageable);
         return new ResponseEntity<>(PagedResponse.of(songs), HttpStatus.OK);
+    }
+
+    @GetMapping("/{artistId}/fans")
+    @Transactional(readOnly = true)
+    public ResponseEntity<PagedResponse<UserMinimalDto>> getArtistFans(
+            @PathVariable Long artistId,
+            @PageableDefault(size = 9) Pageable pageable) {
+
+        Page<UserMinimalDto> fansPage = artistService.getFans(artistId, pageable);
+        return new ResponseEntity<>(PagedResponse.of(fansPage), HttpStatus.OK);
     }
 }
