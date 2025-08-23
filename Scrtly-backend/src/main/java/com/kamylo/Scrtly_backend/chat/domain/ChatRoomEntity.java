@@ -36,9 +36,11 @@ public class ChatRoomEntity {
             joinColumns = @JoinColumn(name = "chat_room_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
+    @Builder.Default
     private List<UserEntity> participants = new ArrayList<>();
 
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Builder.Default
     private List<ChatMessageEntity> messages = new ArrayList<>();
 
     @CreatedDate
