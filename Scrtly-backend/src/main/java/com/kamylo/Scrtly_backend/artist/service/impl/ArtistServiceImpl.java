@@ -108,8 +108,8 @@ public class ArtistServiceImpl implements ArtistService {
     }
 
     @Override
-    public Page<UserMinimalDto> getFans(Long artistId, Pageable pageable) {
-        return userRepository.findFollowersByUserId(artistId, pageable).map(userMapper::toDto);
+    public Page<UserMinimalDto> getFans(Long artistId, Pageable pageable, String query) {
+        return userRepository.findFollowersByUserId(artistId, query, pageable).map(userMapper::toDto);
     }
 
 }

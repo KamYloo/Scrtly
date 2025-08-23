@@ -181,7 +181,8 @@
 }
 
 
-.mainBox .menuList ul li::before {
+.mainBox .menuList ul li::before,
+.mainBox .menuList ul li a.active::before{
     position: absolute;
     content: '';
     bottom: -20px;

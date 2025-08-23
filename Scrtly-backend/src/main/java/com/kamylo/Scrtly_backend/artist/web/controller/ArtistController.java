@@ -57,9 +57,10 @@ public class ArtistController {
     @Transactional(readOnly = true)
     public ResponseEntity<PagedResponse<UserMinimalDto>> getArtistFans(
             @PathVariable Long artistId,
+            @RequestParam(value = "query", required = false) String query,
             @PageableDefault(size = 9) Pageable pageable) {
 
-        Page<UserMinimalDto> fansPage = artistService.getFans(artistId, pageable);
+        Page<UserMinimalDto> fansPage = artistService.getFans(artistId, pageable, query);
         return new ResponseEntity<>(PagedResponse.of(fansPage), HttpStatus.OK);
     }
 }

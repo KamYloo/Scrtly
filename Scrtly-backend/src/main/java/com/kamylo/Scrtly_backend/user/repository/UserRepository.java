@@ -25,7 +25,9 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     @Query("select u from UserEntity u where u.fullName like %:query% or u.nickName like %:query%")
     Set<UserEntity> searchUser(@Param("query") String query);
 
-    @Query("select f from UserEntity u join u.followers f where u.id = :userId")
-    Page<UserEntity> findFollowersByUserId(@Param("userId") Long userId, Pageable pageable);
+    @Query("select f from UserEntity u join u.followers f " +
+            "where u.id = :userId " +
+            "and ( :query is null or :query = '' or lower(f.fullName) like concat('%', lower(:query), '%') )")
+    Page<UserEntity> findFollowersByUserId(@Param("userId") Long userId, @Param("query") String query, Pageable pageable);
 
 }

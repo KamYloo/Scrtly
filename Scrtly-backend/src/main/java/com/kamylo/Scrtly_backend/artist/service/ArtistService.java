@@ -16,5 +16,5 @@ public interface ArtistService {
     Set<ArtistDto> searchArtistsByName(String artistName);
     ArtistDto updateArtist(String username, MultipartFile bannerImg, String artistBio);
     Page<SongDto> getArtistTracks(Long artistId, Pageable pageable);
-    Page<UserMinimalDto> getFans(Long artistId, Pageable pageable);
+    Page<UserMinimalDto> getFans(Long artistId, Pageable pageable, String query);
 }

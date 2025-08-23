@@ -39,8 +39,25 @@ export const artistApi = apiSlice.injectEndpoints({
         }),
 
         getArtistFans: builder.query({
-            query: ({ artistId, page = 0, size = 9 }) =>
-                `/artist/${artistId}/fans?page=${page}&size=${size}`,
+            query: ({ artistId, page = 0, size = 9, query = undefined }) => {
+                const params = new URLSearchParams();
+                params.set('page', page);
+                params.set('size', size);
+                if (query != null && String(query).trim() !== '') {
+                    params.set('query', query);
+                }
+                return `/artist/${artistId}/fans?${params.toString()}`;
+            },
+            transformResponse: (response) => response?.data ?? response,
+            providesTags: (fansPage = {}, error, { artistId }) => {
+                const items = fansPage?.content ?? [];
+                return items.length
+                    ? [
+                        ...items.map(u => ({ type: 'User', id: u.id })),
+                        { type: 'User', id: `ARTIST_${artistId}_FANS` },
+                    ]
+                    : [{ type: 'User', id: `ARTIST_${artistId}_FANS` }];
+            },
         }),
 
     }),

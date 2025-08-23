@@ -5,6 +5,8 @@ import {useNavigate} from "react-router-dom";
 import defaultAvatar from "../../assets/user.jpg";
 import throttle from "lodash.throttle";
 import {useGetArtistFansQuery} from "../../Redux/services/artistApi.js";
+import {debounce} from "lodash";
+import {SearchBox} from "../../Components/SearchBox.jsx";
 
 
 // eslint-disable-next-line react/prop-types
@@ -17,8 +19,26 @@ function Fans({artistId}) {
     const seenIdsRef = useRef(new Set());
     const [totalPages, setTotalPages] = useState(undefined);
 
+    const [query, setQuery] = useState('');
+    const [debouncedQuery, setDebouncedQuery] = useState('');
+
+    const debouncerRef = useRef(null);
+    useEffect(() => {
+        debouncerRef.current = debounce((q) => {
+            // reset pagination and list when query changes
+            setDebouncedQuery(q);
+            setPage(0);
+            setFans([]);
+            seenIdsRef.current = new Set();
+            setTotalPages(undefined);
+        }, 400);
+        return () => {
+            if (debouncerRef.current && debouncerRef.current.cancel) debouncerRef.current.cancel();
+        };
+    }, []);
+
     const { data, isFetching } = useGetArtistFansQuery(
-        { artistId, page, size },
+        { artistId, page, size, query: debouncedQuery },
         { skip: !artistId }
     );
 
@@ -27,18 +47,18 @@ function Fans({artistId}) {
         setFans([]);
         seenIdsRef.current = new Set();
         setTotalPages(undefined);
+        setQuery('');
+        setDebouncedQuery('');
     }, [artistId]);
 
     useEffect(() => {
         if (!data) return;
 
-        const payload = data?.data ?? data;
+        const payload = data;
         const incoming = Array.isArray(payload.content) ? payload.content : [];
 
-        console.log('payload', payload);
-        console.log('incoming.length', incoming.length, incoming);
-
         if (typeof payload.totalPages === "number") setTotalPages(payload.totalPages);
+
         if (incoming.length === 0) return;
 
         setFans(prev => {
@@ -63,10 +83,10 @@ function Fans({artistId}) {
                     seen.add(f.id);
                 }
             }
+            seenIdsRef.current = seen;
             return next;
         });
     }, [data, page]);
-
 
     const handleScroll = useCallback(
         throttle(() => {
@@ -92,10 +112,17 @@ function Fans({artistId}) {
         };
     }, [handleScroll]);
 
+    const onSearchChange = (e) => {
+        const v = e.target.value;
+        setQuery(v);
+        if (debouncerRef.current) debouncerRef.current(v);
+    };
+
     return (
         <div className='fans'>
+            <SearchBox onSearchChange={onSearchChange} value={query} placeholder={"Search fans..."} />
             <div className="users">
-                { fans?.map((item) => (
+                {fans?.map((item) => (
                     <div className="user" key={item.id} onClick={() => navigate(`/profile/${item.nickName}`)}>
                         <i className="push"><FaUser/></i>
                         <div className="imgPic">
