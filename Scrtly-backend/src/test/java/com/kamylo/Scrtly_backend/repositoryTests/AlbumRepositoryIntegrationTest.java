@@ -15,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -62,8 +63,10 @@ class AlbumRepositoryIntegrationTest {
         AlbumEntity album = AlbumEntity.builder()
                 .title(title)
                 .artist(artist)
+                .releaseDate(LocalDate.now())
+                .coverImage("cover.jpg")
                 .build();
-        AlbumEntity saved = albumRepository.save(album);
+        albumRepository.save(album);
         em.flush();
     }
 

@@ -38,14 +38,19 @@ export const albumApi = apiSlice.injectEndpoints({
         }),
 
         getArtistAlbums: builder.query({
-            query: artistId => `/album/artist/${artistId}`,
-            providesTags: result =>
-                result
-                    ? [
-                        ...result.map(({ id }) => ({ type: "Album", id })),
-                        { type: "Album", id: `ARTIST_${result.artistId}` },
-                    ]
-                    : [{ type: "Album", id: `ARTIST_${artistId}` }],
+            query: ({ artistId, page = 0, size = 9, query = '' }) => {
+                const q = query ? `&query=${encodeURIComponent(query)}` : '';
+                return `/album/artist/${artistId}?page=${page}&size=${size}${q}`;
+            },
+            providesTags: (result, error, arg) => {
+                const artistId = arg?.artistId;
+                if (!result || !Array.isArray(result.content)) {
+                    return [{ type: "Album", id: `ARTIST_${artistId}` }];
+                }
+                const tags = result.content.map(({ id }) => ({ type: "Album", id }));
+                tags.push({ type: "Album", id: `ARTIST_${artistId}` });
+                return tags;
+            },
         }),
 
         uploadSong: builder.mutation({

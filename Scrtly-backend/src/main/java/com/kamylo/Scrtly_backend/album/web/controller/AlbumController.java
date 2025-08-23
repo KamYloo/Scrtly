@@ -41,9 +41,12 @@ public class AlbumController {
     }
 
     @GetMapping("/artist/{artistId}")
-    public ResponseEntity<List<AlbumDto>> getAlbumsByArtist(@PathVariable("artistId") Long artistId) {
-        List<AlbumDto> albums = albumService.getAlbumsByArtist(artistId);
-        return new ResponseEntity<>(albums, HttpStatus.OK);
+    public ResponseEntity<PagedResponse<AlbumDto>> getAlbumsByArtist(
+            @PathVariable("artistId") Long artistId,
+            @RequestParam(value = "query", required = false) String query,
+            @PageableDefault(size = 9) Pageable pageable) {
+        Page<AlbumDto> albumsPage = albumService.getAlbumsByArtist(artistId, query, pageable);
+        return new ResponseEntity<>(PagedResponse.of(albumsPage), HttpStatus.OK);
     }
 
     @GetMapping("/{albumId}")

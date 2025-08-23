@@ -84,13 +84,16 @@ public class AlbumServiceImpl implements AlbumService {
     }
 
     @Override
-    public List<AlbumDto> getAlbumsByArtist(Long artistId) {
-        ArtistEntity artistEntity = artistRepository.findById(artistId)
-                .orElseThrow(() -> new CustomException(BusinessErrorCodes.ARTIST_NOT_FOUND));
-        return albumRepository.findByArtistId(artistEntity.getId())
-                .stream()
-                .map(albumMapper::toDto)
-                .toList();
+    public Page<AlbumDto> getAlbumsByArtist(Long artistId, String albumName, Pageable pageable) {
+        Page<AlbumEntity> page;
+        if (albumName == null || albumName.trim().isEmpty()) {
+            page = albumRepository.findByArtistId(artistId, pageable);
+        } else {
+            String trimmed = albumName.trim();
+            page = albumRepository.findByArtistIdAndTitleIgnoreCaseContaining(artistId, trimmed, pageable);
+        }
+
+        return page.map(albumMapper::toDto);
     }
 
     @Override
