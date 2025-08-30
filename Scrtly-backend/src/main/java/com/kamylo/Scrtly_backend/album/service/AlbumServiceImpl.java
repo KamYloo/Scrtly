@@ -12,7 +12,6 @@ import com.kamylo.Scrtly_backend.user.domain.UserEntity;
 import com.kamylo.Scrtly_backend.common.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.common.handler.CustomException;
 import com.kamylo.Scrtly_backend.album.repository.AlbumRepository;
-import com.kamylo.Scrtly_backend.artist.repository.ArtistRepository;
 import com.kamylo.Scrtly_backend.song.repository.SongRepository;
 import com.kamylo.Scrtly_backend.album.repository.AlbumSpecification;
 import com.kamylo.Scrtly_backend.user.service.UserRoleService;
@@ -33,7 +32,6 @@ public class AlbumServiceImpl implements AlbumService {
 
     private final AlbumRepository albumRepository;
     private final UserService userService;
-    private final ArtistRepository artistRepository;
     private final UserRoleService userRoleService;
     private final FileService fileService;
     private final AlbumMapper albumMapper;
@@ -48,7 +46,7 @@ public class AlbumServiceImpl implements AlbumService {
         ArtistEntity artist = userService.findUserByEmail(username).getArtistEntity();
 
         String imagePath = null;
-        if (!albumImage.isEmpty()) {
+        if (albumImage != null && !albumImage.isEmpty()) {
             imagePath = fileService.saveFile(albumImage, "albumImages/");
         }
 

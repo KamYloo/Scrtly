@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import {useCreateAlbumMutation} from "../../Redux/services/albumApi.js";
 
 function CreateAlbum({onClose}) {
-    const [title, setTitle] = useState()
+    const [title, setTitle] = useState("")
     const [albumImg, setAlbumImg] = useState(null)
     const [preview, setPreview] = useState('');
     const [createAlbum, { isLoading }] = useCreateAlbumMutation()
@@ -16,7 +16,9 @@ function CreateAlbum({onClose}) {
     const handleSubmit = async (event) => {
         event.preventDefault()
         const formData = new FormData();
-        formData.append('file', albumImg);
+        if (albumImg) {
+            formData.append('file', albumImg);
+        }
         formData.append('title', title);
 
         try {
@@ -27,7 +29,7 @@ function CreateAlbum({onClose}) {
             toast.error(err.data.businessErrornDescription)
         } finally {
             setAlbumImg(null);
-            setTitle(null);
+            setTitle("");
         }
     };
 

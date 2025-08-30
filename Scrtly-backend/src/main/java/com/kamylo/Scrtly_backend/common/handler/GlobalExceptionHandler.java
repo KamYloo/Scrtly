@@ -1,7 +1,7 @@
 package com.kamylo.Scrtly_backend.common.handler;
 
-import com.stripe.exception.SignatureVerificationException;
-import com.stripe.exception.StripeException;
+import jakarta.validation.ConstraintViolationException;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -11,10 +11,12 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -52,23 +54,6 @@ public class GlobalExceptionHandler {
                 .body(
                         ExceptionResponse.builder()
                                 .error(exp.getMessage())
-                                .build()
-                );
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ExceptionResponse> handlerException(MethodArgumentNotValidException exp){
-        Set<String> errors = new HashSet<>();
-        exp.getBindingResult().getAllErrors()
-                .forEach(error -> {
-                    String errorMessage = error.getDefaultMessage();
-                    errors.add(errorMessage);
-                });
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(
-                        ExceptionResponse.builder()
-                                .validationErrors(errors)
                                 .build()
                 );
     }
@@ -111,4 +96,45 @@ public class GlobalExceptionHandler {
                                 .build()
                 );
     }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ExceptionResponse> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
+        Set<String> validationErrors = ex.getBindingResult().getAllErrors().stream()
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+        String mainMessage = validationErrors.stream().findFirst().orElse("Validation failed");
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(
+                        ExceptionResponse.builder()
+                                .businessErrornDescription(mainMessage)
+                                .validationErrors(validationErrors)
+                                .build()
+                );
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ExceptionResponse> handleMaxUpload(MaxUploadSizeExceededException ex) {
+        String msg = "The file exceeds the maximum allowed size.";
+        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
+                .body(ExceptionResponse.builder()
+                        .businessErrornDescription(msg)
+                        .error(ex.getMessage())
+                        .build());
+    }
+
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ExceptionResponse> handleConstraintViolation(ConstraintViolationException ex) {
+        Set<String> errors = ex.getConstraintViolations().stream()
+                .map(v -> v.getPropertyPath() + ": " + v.getMessage())
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+        String main = errors.stream().findFirst().orElse("Constraint violation");
+        return ResponseEntity.badRequest().body(ExceptionResponse.builder()
+                .businessErrornDescription(main)
+                .validationErrors(errors)
+                .build());
+    }
+
 }

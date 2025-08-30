@@ -1,8 +1,7 @@
 package com.kamylo.Scrtly_backend.artist.web.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-
-import javax.validation.constraints.NotNull;
 
 @Data
 public class ArtistVerificationRequest {
