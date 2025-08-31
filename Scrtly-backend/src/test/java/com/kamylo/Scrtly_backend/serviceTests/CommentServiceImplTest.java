@@ -5,7 +5,7 @@ import com.kamylo.Scrtly_backend.comment.mapper.CommentMapper;
 import com.kamylo.Scrtly_backend.comment.repository.CommentRepository;
 import com.kamylo.Scrtly_backend.comment.service.CommentServiceImpl;
 import com.kamylo.Scrtly_backend.comment.web.dto.CommentDto;
-import com.kamylo.Scrtly_backend.comment.web.dto.CommentRequest;
+import com.kamylo.Scrtly_backend.comment.web.dto.request.CommentRequest;
 import com.kamylo.Scrtly_backend.common.handler.CustomException;
 import com.kamylo.Scrtly_backend.notification.domain.enums.NotificationType;
 import com.kamylo.Scrtly_backend.notification.events.NotificationEvent;
