@@ -1,18 +1,20 @@
 package com.kamylo.Scrtly_backend.album.web.controller;
 
-import com.kamylo.Scrtly_backend.album.web.dto.AlbumCreateRequest;
+import com.kamylo.Scrtly_backend.album.web.dto.request.AlbumCreateRequest;
 import com.kamylo.Scrtly_backend.album.web.dto.AlbumDto;
 import com.kamylo.Scrtly_backend.metrics.messaging.publisher.MetricsPublisher;
 import com.kamylo.Scrtly_backend.song.web.dto.SongDto;
 import com.kamylo.Scrtly_backend.common.response.PagedResponse;
 import com.kamylo.Scrtly_backend.album.service.AlbumService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +39,11 @@ public class AlbumController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<PagedResponse<AlbumDto>> getAlbums(@PageableDefault(size = 9) Pageable pageable) {
+    public ResponseEntity<PagedResponse<AlbumDto>> getAlbums(
+            @RequestParam(defaultValue = "0") @Min(0) int page,
+            @RequestParam(defaultValue = "9") @Min(1) @Max(100) int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
         Page<AlbumDto> albums = albumService.getAlbums(pageable);
         return new ResponseEntity<>(PagedResponse.of(albums), HttpStatus.OK);
     }
@@ -46,7 +52,10 @@ public class AlbumController {
     public ResponseEntity<PagedResponse<AlbumDto>> getAlbumsByArtist(
             @PathVariable @Positive(message = "artistId must be positive") Long artistId,
             @RequestParam(value = "query", required = false) @Size(max = 200, message = "query too long") String query,
-            @PageableDefault(size = 9) Pageable pageable) {
+            @RequestParam(defaultValue = "0") @Min(0) int page,
+            @RequestParam(defaultValue = "9") @Min(1) @Max(100) int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
         Page<AlbumDto> albumsPage = albumService.getAlbumsByArtist(artistId, query, pageable);
         return new ResponseEntity<>(PagedResponse.of(albumsPage), HttpStatus.OK);
     }

@@ -1,7 +1,7 @@
 package com.kamylo.Scrtly_backend.user.web.controller;
 
 import com.kamylo.Scrtly_backend.user.web.dto.UserDto;
-import com.kamylo.Scrtly_backend.artist.web.dto.ArtistVerificationRequest;
+import com.kamylo.Scrtly_backend.artist.web.dto.request.ArtistVerificationRequest;
 import com.kamylo.Scrtly_backend.user.web.dto.request.UserRequestDto;
 import com.kamylo.Scrtly_backend.user.service.UserService;
 import lombok.RequiredArgsConstructor;

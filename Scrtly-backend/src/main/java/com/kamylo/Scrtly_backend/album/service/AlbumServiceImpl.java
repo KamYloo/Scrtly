@@ -45,10 +45,7 @@ public class AlbumServiceImpl implements AlbumService {
         validateArtistOrAdmin(username);
         ArtistEntity artist = userService.findUserByEmail(username).getArtistEntity();
 
-        String imagePath = null;
-        if (albumImage != null && !albumImage.isEmpty()) {
-            imagePath = fileService.saveFile(albumImage, "albumImages/");
-        }
+        String imagePath = fileService.saveFile(albumImage, "albumImages/");
 
         AlbumEntity album = AlbumEntity.builder()
                 .title(title)

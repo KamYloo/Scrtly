@@ -1,4 +1,4 @@
-package com.kamylo.Scrtly_backend.album.web.dto;
+package com.kamylo.Scrtly_backend.album.web.dto.request;
 
 import com.kamylo.Scrtly_backend.common.config.FileConstraint;
 import jakarta.validation.constraints.NotBlank;
@@ -18,6 +18,6 @@ public class AlbumCreateRequest {
     private String title;
 
     @NotNull(message = "{album.image.required}")
-    @FileConstraint(allowed = {"image/png","image/jpeg"}, maxSizeKb = 10240, message = "{album.image.tooLarge}")
+    @FileConstraint(allowed = {"image/png","image/jpeg"}, maxSizeKb = 10240, message = "{image.tooLarge}")
     private MultipartFile file;
 }
