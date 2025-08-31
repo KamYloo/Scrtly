@@ -12,6 +12,7 @@ import com.kamylo.Scrtly_backend.chat.service.ChatService;
 import com.kamylo.Scrtly_backend.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
@@ -26,6 +27,7 @@ public class ChatServiceImpl implements ChatService {
     private final ChatRoomMapper chatRoomMapper;
 
     @Override
+    @Transactional
     public ChatRoomDto createChat(String username, ChatRoomRequest chatRoomRequest) {
         UserEntity reqUser = userService.findUserByEmail(username);
         Set<UserEntity> users = chatRoomRequest.getUserIds().stream()
@@ -60,6 +62,7 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
+    @Transactional
     public void deleteChat(Integer chatId, String username) {
         ChatRoomEntity chatRoom = chatRoomMapper.toEntity(getChatById(chatId, username));
         chatRepository.delete(chatRoom);

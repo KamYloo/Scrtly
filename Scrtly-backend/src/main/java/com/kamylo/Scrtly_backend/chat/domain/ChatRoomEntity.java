@@ -25,9 +25,7 @@ public class ChatRoomEntity {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer id;
 
-    @NotBlank(message = "Chat room name must not be blank")
     @Size(max = 255, message = "Chat room name cannot exceed 255 characters")
-    @Column(nullable = false)
     private String chatRoomName;
 
     @ManyToMany(fetch = FetchType.LAZY)
