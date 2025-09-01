@@ -31,12 +31,8 @@ public class PostEntity {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @NotBlank(message = "Image must not be blank")
-    @Size(max = 255, message = "Image URL cannot exceed 255 characters")
-    @Column(nullable = false, length = 255)
     private String image;
 
-    @NotBlank(message = "Description must not be blank")
     @Size(max = 1000, message = "Description cannot exceed 1000 characters")
     @Column(nullable = false, length = 1000)
     private String description;
