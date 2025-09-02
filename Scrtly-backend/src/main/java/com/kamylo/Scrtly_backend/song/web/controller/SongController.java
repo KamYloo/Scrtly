@@ -2,7 +2,7 @@ package com.kamylo.Scrtly_backend.song.web.controller;
 
 import com.kamylo.Scrtly_backend.metrics.messaging.publisher.MetricsPublisher;
 import com.kamylo.Scrtly_backend.song.web.dto.SongDto;
-import com.kamylo.Scrtly_backend.song.web.dto.SongRequest;
+import com.kamylo.Scrtly_backend.song.web.dto.request.SongRequest;
 import com.kamylo.Scrtly_backend.song.service.SongService;
 import com.kamylo.Scrtly_backend.user.service.UserService;
 import jakarta.validation.Valid;
@@ -17,7 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.IOException;
@@ -27,8 +26,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.Set;
-
-import static io.lettuce.core.pubsub.PubSubOutput.Type.message;
 
 @RequiredArgsConstructor
 @RestController

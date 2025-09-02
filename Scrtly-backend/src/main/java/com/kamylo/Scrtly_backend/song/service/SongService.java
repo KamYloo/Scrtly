@@ -1,9 +1,8 @@
 package com.kamylo.Scrtly_backend.song.service;
 
 import com.kamylo.Scrtly_backend.song.web.dto.SongDto;
-import com.kamylo.Scrtly_backend.song.web.dto.SongRequest;
+import com.kamylo.Scrtly_backend.song.web.dto.request.SongRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.IOException;

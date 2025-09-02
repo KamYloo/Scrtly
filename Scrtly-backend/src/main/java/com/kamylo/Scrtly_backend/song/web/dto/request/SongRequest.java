@@ -1,4 +1,4 @@
-package com.kamylo.Scrtly_backend.song.web.dto;
+package com.kamylo.Scrtly_backend.song.web.dto.request;
 
 import com.kamylo.Scrtly_backend.common.config.FileConstraint;
 import jakarta.validation.constraints.NotBlank;

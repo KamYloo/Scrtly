@@ -12,7 +12,7 @@ import com.kamylo.Scrtly_backend.song.mapper.SongMapper;
 import com.kamylo.Scrtly_backend.song.service.HlsService;
 import com.kamylo.Scrtly_backend.song.service.impl.SongServiceImpl;
 import com.kamylo.Scrtly_backend.song.web.dto.SongDto;
-import com.kamylo.Scrtly_backend.song.web.dto.SongRequest;
+import com.kamylo.Scrtly_backend.song.web.dto.request.SongRequest;
 import com.kamylo.Scrtly_backend.song.domain.SongEntity;
 import com.kamylo.Scrtly_backend.song.repository.SongRepository;
 import com.kamylo.Scrtly_backend.user.domain.UserEntity;

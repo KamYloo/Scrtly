@@ -2,6 +2,9 @@ package com.kamylo.Scrtly_backend.story.web.controller;
 
 import com.kamylo.Scrtly_backend.story.web.dto.StoryDto;
 import com.kamylo.Scrtly_backend.story.service.StoryService;
+import com.kamylo.Scrtly_backend.story.web.dto.request.StoryRequest;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +23,8 @@ public class StoryController {
     private final StoryService storyService;
 
     @PostMapping("/create")
-    public ResponseEntity<StoryDto> createStoryHandler(@RequestParam("file") MultipartFile file, Principal principal) {
-        StoryDto story = storyService.createStory(principal.getName(), file);
+    public ResponseEntity<StoryDto> createStoryHandler(@Valid @ModelAttribute StoryRequest request, Principal principal) {
+        StoryDto story = storyService.createStory(principal.getName(), request.getFile());
         return new ResponseEntity<>(story, HttpStatus.CREATED);
     }
 
@@ -38,7 +41,7 @@ public class StoryController {
     }
 
     @DeleteMapping("/delete/{storyId}")
-    public ResponseEntity<?> deleteStory(@PathVariable Long storyId, Principal principal) {
+    public ResponseEntity<?> deleteStory(@PathVariable @Positive(message = "{id.positive}") Long storyId, Principal principal) {
        storyService.deleteStory(storyId, principal.getName());
        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

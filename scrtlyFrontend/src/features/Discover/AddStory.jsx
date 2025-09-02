@@ -21,7 +21,8 @@ function AddStory({onClose}) {
         }
 
         const formData = new FormData();
-        formData.append('file', image);
+        if (image)
+            formData.append('file', image);
 
         try {
             await createStory(formData).unwrap();
