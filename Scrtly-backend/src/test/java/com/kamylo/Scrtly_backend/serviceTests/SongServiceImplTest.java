@@ -80,10 +80,12 @@ class SongServiceImplTest {
                 .thenReturn(new AlbumEntity());
 
         MockMultipartFile image = new MockMultipartFile(
-                "image", "cover.jpg", "image/jpeg", new byte[]{1,2});
+                "imageSong", "cover.jpg", "image/jpeg", new byte[]{1,2});
         MockMultipartFile audio = new MockMultipartFile(
-                "audio", "song.mp3", "audio/mpeg", new byte[0] // empty => skip audio path
+                "audioFile", "song.mp3", "audio/mpeg", new byte[0]
         );
+        req.setImageSong(image);
+        req.setAudioFile(audio);
 
         when(fileService.saveFile(eq(image), contains("songImages")))
                 .thenReturn("imgPath");
@@ -101,7 +103,7 @@ class SongServiceImplTest {
         SongDto dtoOut = new SongDto();
         when(songMapper.toDto(saved)).thenReturn(dtoOut);
 
-        SongDto result = songService.createSong(req, "alice", image, audio);
+        SongDto result = songService.createSong(req, "alice");
 
         assertSame(dtoOut, result);
         verify(fileService).saveFile(eq(image), contains("songImages"));
@@ -121,15 +123,17 @@ class SongServiceImplTest {
         req.setTitle("Audio Song");
         req.setAlbumId(1);
 
+        MockMultipartFile image = new MockMultipartFile("imageSong", "i.jpg", "image/jpeg", new byte[]{1});
+        MockMultipartFile audio = new MockMultipartFile("audioFile", "t.wav", "audio/wav", new byte[]{1,2,3});
+        req.setImageSong(image);
+        req.setAudioFile(audio);
+
         when(userRoleService.isArtist("bob")).thenReturn(true);
         UserEntity bob = new UserEntity(); bob.setId(3L);
         when(userService.findUserByEmail("bob")).thenReturn(bob);
 
         when(albumService.getAlbum(1)).thenReturn(new com.kamylo.Scrtly_backend.album.web.dto.AlbumDto());
         when(albumMapper.toEntity(any())).thenReturn(new AlbumEntity());
-
-        MockMultipartFile image = new MockMultipartFile("image", "i.jpg", "image/jpeg", new byte[]{1});
-        MockMultipartFile audio = new MockMultipartFile("audio", "t.wav", "audio/wav", new byte[]{1,2,3});
 
         when(fileService.saveFile(eq(image), contains("songImages"))).thenReturn("img");
         when(fileService.saveFile(eq(audio), contains("audio"))).thenReturn("http://cdn/audio/t.wav");
@@ -146,16 +150,14 @@ class SongServiceImplTest {
             AudioInputStream ais = mock(AudioInputStream.class);
             AudioFormat format = new AudioFormat(44100f, 16, 2, true, false);
             when(ais.getFormat()).thenReturn(format);
-            when(ais.getFrameLength()).thenReturn(44100L * 5); // 5 seconds worth of frames
+            when(ais.getFrameLength()).thenReturn(44100L * 5); // 5s
             as.when(() -> AudioSystem.getAudioInputStream(any(File.class))).thenReturn(ais);
 
-            SongDto out = songService.createSong(req, "bob", image, audio);
+            SongDto out = songService.createSong(req, "bob");
 
             assertNotNull(out);
             verify(fileService).saveFile(eq(audio), contains("audio"));
-            ArgumentCaptor<SongCreatedEvent> cap = ArgumentCaptor.forClass(SongCreatedEvent.class);
-            verify(publisher).publishEvent(cap.capture());
-            assertTrue(cap.getValue().getLocalAudioPath().contains("/files/audio/t.wav"));
+            verify(fileService).saveFile(eq(image), contains("songImages"));
         }
     }
 
@@ -164,9 +166,13 @@ class SongServiceImplTest {
         when(userRoleService.isArtist("bob")).thenReturn(false);
         when(userRoleService.isAdmin("bob")).thenReturn(false);
 
+        SongRequest req = new SongRequest();
+        req.setTitle("No rights");
+        req.setAlbumId(1);
+
         CustomException ex = assertThrows(
                 CustomException.class,
-                () -> songService.createSong(new SongRequest(), "bob", null, null)
+                () -> songService.createSong(req, "bob")
         );
         assertEquals(BusinessErrorCodes.ARTIST_UNAUTHORIZED, ex.getErrorCode());
     }

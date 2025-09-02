@@ -62,21 +62,21 @@ public class SongServiceImpl implements SongService {
 
     @Override
     @Transactional
-    public SongDto createSong(SongRequest songRequest, String username, MultipartFile imageSong, MultipartFile audioFile) throws IOException, UnsupportedAudioFileException {
+    public SongDto createSong(SongRequest songRequest, String username) throws IOException, UnsupportedAudioFileException {
         validateArtistOrAdmin(username);
 
         ArtistEntity artist = userService.findUserByEmail(username).getArtistEntity();
         AlbumEntity album = albumMapper.toEntity(albumService.getAlbum(songRequest.getAlbumId()));
 
         String imagePath = null;
-        if (!imageSong.isEmpty()) {
-            imagePath = fileService.saveFile(imageSong, "songImages/");
+        if (!songRequest.getImageSong().isEmpty()) {
+            imagePath = fileService.saveFile(songRequest.getImageSong(), "songImages/");
         }
 
         String audioPath = null;
         int duration = 0;
-        if (!audioFile.isEmpty()) {
-            audioPath = fileService.saveFile(audioFile, "audio/");
+        if (!songRequest.getAudioFile().isEmpty()) {
+            audioPath = fileService.saveFile(songRequest.getAudioFile(), "audio/");
             String srcAudio = "";
             if (audioPath.startsWith(cdnBaseUrl)) {
                 srcAudio = audioPath.replace(cdnBaseUrl + "audio/", "");
@@ -92,7 +92,7 @@ public class SongServiceImpl implements SongService {
                 .imageSong(imagePath)
                 .track(audioPath)
                 .duration(duration)
-                .contentType(audioFile.getContentType())
+                .contentType(songRequest.getAudioFile().getContentType())
                 .build();
 
         SongEntity savedSong = songRepository.save(songEntity);

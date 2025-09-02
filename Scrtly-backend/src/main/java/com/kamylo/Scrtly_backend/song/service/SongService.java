@@ -11,7 +11,7 @@ import java.util.Set;
 
 @Service
 public interface SongService {
- SongDto createSong(SongRequest songRequest, String username, MultipartFile imageSong, MultipartFile audioFile) throws IOException, UnsupportedAudioFileException;
+ SongDto createSong(SongRequest songRequest, String username) throws IOException, UnsupportedAudioFileException;
  Set<SongDto> searchSongByTitle(String title);
  void deleteSong(Long songId, String username);
 }
