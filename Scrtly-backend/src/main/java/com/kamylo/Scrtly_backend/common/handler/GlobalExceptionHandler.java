@@ -62,7 +62,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ExceptionResponse> handleNoResourceFoundException(NoHandlerFoundException exp) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
-                .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
                 .body(
                         ExceptionResponse.builder()
                                 .businessErrornDescription("Endpoint not found")

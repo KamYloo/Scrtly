@@ -13,11 +13,13 @@ import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
 import java.util.concurrent.CompletableFuture;
 
+@Validated
 @AllArgsConstructor
 @RestController
 public class RealTimeChat {

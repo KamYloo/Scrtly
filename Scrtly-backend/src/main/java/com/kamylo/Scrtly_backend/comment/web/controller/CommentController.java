@@ -16,9 +16,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 
+@Validated
 @RestController
 @RequestMapping("/comments")
 @AllArgsConstructor
@@ -45,7 +47,7 @@ public class CommentController {
     }
 
     @GetMapping("/replies/{parentCommentId}")
-    public ResponseEntity<PagedResponse<CommentDto>> getReplies( @PathVariable @Positive(message = "{comment.parentId.positive}") Long parentCommentId,
+    public ResponseEntity<PagedResponse<CommentDto>> getReplies(@PathVariable @Positive(message = "{comment.parentId.positive}") Long parentCommentId,
                                                                 @RequestParam(defaultValue = "0") @Min(0) int page,
                                                                 @RequestParam(defaultValue = "9") @Min(1) @Max(100) int size,
                                                                 Principal principal) {

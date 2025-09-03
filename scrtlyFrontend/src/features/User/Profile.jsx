@@ -14,7 +14,6 @@ function Profile() {
 
     const size = 9;
 
-    // pagination state
     const [page, setPage] = useState(0);
     const [allPosts, setAllPosts] = useState([]);
 
@@ -39,7 +38,6 @@ function Profile() {
         }
 
         setAllPosts(prev => {
-            // filter out duplicates
             const toAdd = newBatch.filter(p => !prev.some(x => x.id === p.id));
             if (toAdd.length === 0) return prev;
             return [...prev, ...toAdd];

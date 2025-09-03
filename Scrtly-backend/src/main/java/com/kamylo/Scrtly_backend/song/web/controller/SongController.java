@@ -16,6 +16,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -27,6 +28,7 @@ import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.Set;
 
+@Validated
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/song")
