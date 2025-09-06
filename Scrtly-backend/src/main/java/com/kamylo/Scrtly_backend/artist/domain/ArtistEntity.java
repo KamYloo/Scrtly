@@ -20,7 +20,6 @@ public class ArtistEntity {
     @Size(max = 100, message = "Pseudonym cannot exceed 100 characters")
     private String pseudonym;
 
-    @NotBlank(message = "Banner image must not be blank")
     @Size(max = 255, message = "Banner image URL must be at most 255 characters")
     private String bannerImg;
 

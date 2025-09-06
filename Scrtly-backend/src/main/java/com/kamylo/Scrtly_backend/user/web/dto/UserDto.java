@@ -21,7 +21,4 @@ public class UserDto {
     private boolean isPremium;
     private int observersCount;
     private int observationsCount;
-
-    /*private Set<UserDto> followers = new HashSet<>();
-    private Set<UserDto> following = new HashSet<>();*/
 }

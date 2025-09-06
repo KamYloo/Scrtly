@@ -33,7 +33,7 @@ public class ArtistController {
     private final MetricsPublisher metricsPublisher;
 
     @GetMapping("/{artistId}")
-    public ResponseEntity<ArtistDto> getArtist(@PathVariable @Positive(message = "artistId must be positive") Long artistId, Principal principal) {
+    public ResponseEntity<ArtistDto> getArtist(@PathVariable @Positive(message = "{id.positive}") Long artistId, Principal principal) {
         metricsPublisher.publishArtistView(artistId);
         String username = (principal != null ? principal.getName() : null);
         ArtistDto artist = artistService.getArtistProfile(artistId, username);
@@ -60,7 +60,7 @@ public class ArtistController {
 
     @GetMapping("/{artistId}/tracks")
     public ResponseEntity<PagedResponse<SongDto>> getArtistTracksHandler(
-            @PathVariable @Positive(message = "artistId must be positive") Long artistId,
+            @PathVariable @Positive(message = "{id.positive}") Long artistId,
             @RequestParam(defaultValue = "0") @Min(0) int page,
             @RequestParam(defaultValue = "9") @Min(1) @Max(200) int size) {
 
@@ -72,7 +72,7 @@ public class ArtistController {
     @GetMapping("/{artistId}/fans")
     @Transactional(readOnly = true)
     public ResponseEntity<PagedResponse<UserMinimalDto>> getArtistFans(
-            @PathVariable @Positive(message = "artistId must be positive") Long artistId,
+            @PathVariable @Positive(message = "{id.positive}") Long artistId,
             @RequestParam(value = "query", required = false) @Size(max = 200, message = "query too long") String query,
             @RequestParam(defaultValue = "0") @Min(0) int page,
             @RequestParam(defaultValue = "9") @Min(1) @Max(100) int size) {

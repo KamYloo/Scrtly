@@ -51,7 +51,7 @@ public class AlbumController {
 
     @GetMapping("/artist/{artistId}")
     public ResponseEntity<PagedResponse<AlbumDto>> getAlbumsByArtist(
-            @PathVariable @Positive(message = "artistId must be positive") Long artistId,
+            @PathVariable @Positive(message = "{id.positive}") Long artistId,
             @RequestParam(value = "query", required = false) @Size(max = 200, message = "query too long") String query,
             @RequestParam(defaultValue = "0") @Min(0) int page,
             @RequestParam(defaultValue = "9") @Min(1) @Max(100) int size) {
@@ -62,20 +62,20 @@ public class AlbumController {
     }
 
     @GetMapping("/{albumId}")
-    public ResponseEntity<AlbumDto> getAlbum(@PathVariable @Positive(message = "albumId must be positive") Integer albumId) {
+    public ResponseEntity<AlbumDto> getAlbum(@PathVariable @Positive(message = "{id.positive}") Integer albumId) {
         metricsPublisher.publishAlbumView(albumId);
         AlbumDto album = albumService.getAlbum(albumId);
         return new ResponseEntity<>(album, HttpStatus.OK);
     }
 
     @GetMapping("/{albumId}/tracks")
-    public ResponseEntity<List<SongDto>> getAlbumTracks(@PathVariable @Positive(message = "albumId must be positive") Integer albumId) {
+    public ResponseEntity<List<SongDto>> getAlbumTracks(@PathVariable @Positive(message = "{id.positive}") Integer albumId) {
         List<SongDto> songs = albumService.getAlbumTracks(albumId);
         return new  ResponseEntity<>(songs, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{albumId}")
-    public ResponseEntity<?> deleteAlbum(@PathVariable @Positive(message = "albumId must be positive") Integer albumId , Principal principal) {
+    public ResponseEntity<?> deleteAlbum(@PathVariable @Positive(message = "{id.positive}") Integer albumId , Principal principal) {
         albumService.deleteAlbum(albumId, principal.getName());
         return ResponseEntity.ok(albumId);
     }

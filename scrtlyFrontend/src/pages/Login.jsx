@@ -44,7 +44,21 @@ function Login() {
             localStorage.setItem('isLoggedIn', '1')
             navigate('/home')
         } catch (err) {
-            toast.error(err.data.businessErrornDescription);
+            const message =
+                // przypadek gdy backend zwraca obiekt z polem businessErrornDescription
+                err?.data?.businessErrornDescription ??
+                // backend zwraca { message: '...' } albo { error: '...' }
+                err?.data?.message ??
+                err?.data?.error ??
+                // gdy data jest string (np. "Unauthorized")
+                (typeof err?.data === 'string' ? err.data : undefined) ??
+                // fallbacky od RTK Query / fetch
+                err?.error ??
+                err?.message ??
+                'Login failed';
+
+            // nie rzucamy dalej, wyświetlamy komunikat i zapisujemy do stanu (opcjonalnie)
+            toast.error(message);
         }
     }
 

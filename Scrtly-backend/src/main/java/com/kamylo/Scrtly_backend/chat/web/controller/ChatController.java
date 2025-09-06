@@ -30,7 +30,7 @@ public class ChatController {
 
     @GetMapping("/{chatId}")
     public ResponseEntity<ChatRoomDto> getChatById(
-            @PathVariable @Positive(message = "chatId must be positive") Integer chatId,
+            @PathVariable @Positive(message = "{id.positive}") Integer chatId,
             Principal principal) {
         ChatRoomDto chatRoom = chatService.getChatById(chatId, principal.getName());
         return new ResponseEntity<>(chatRoom, HttpStatus.OK);
@@ -44,7 +44,7 @@ public class ChatController {
 
     @DeleteMapping("/delete/{chatId}")
     public ResponseEntity<?> deleteChatHandler(
-            @PathVariable @Positive(message = "chatId must be positive") Integer chatId,
+            @PathVariable @Positive(message = "{id.positive}") Integer chatId,
             Principal principal) {
         chatService.deleteChat(chatId, principal.getName());
         return ResponseEntity.ok(chatId);
