@@ -1,83 +1,102 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Artist Verification</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Artist Verification — ScrtlyMusic</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            color: #333;
-        }
-        .container {
-            max-width: 600px;
-            margin: 30px auto;
-            padding: 20px;
-            background-color: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            text-align: center;
-            color: #007bff;
-        }
-        .greeting, .message {
-            font-size: 16px;
-            margin-bottom: 20px;
-        }
-        .activation-link {
-            text-align: center;
-            margin: 30px 0;
-        }
-        .activation-link a {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #28a745;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 5px;
-        }
-        .details {
-            font-size: 15px;
-            margin: 15px 0;
-        }
-        .footer {
-            font-size: 14px;
-            text-align: center;
-            color: #777;
-            margin-top: 30px;
+        body,table,td,a{ -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; }
+        table,td{ mso-table-lspace:0pt; mso-table-rspace:0pt; }
+        img{ -ms-interpolation-mode:bicubic; }
+
+        .email-wrap{ width:100%; background-color:#f4f4f4; padding:24px 0; }
+        .email-body{ max-width:640px; margin:0 auto; background:#ffffff; border-radius:12px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.06); }
+
+        .header{ background:#ffffff; padding:16px 20px; color:#111; border-bottom:4px solid #66d1d6; }
+        .brand{ display:flex; align-items:center; gap:12px; }
+        .brand img{ display:block; border:0; max-width:120px; height:auto; }
+        .brand-title{ font-family:Arial,Helvetica,sans-serif; font-size:18px; font-weight:700; color:#111; }
+
+        .content{ padding:26px 22px; color:#111; font-family:Arial,Helvetica,sans-serif; }
+        h1{ margin:0 0 12px; font-size:20px; color:#0b0b0b; }
+        p{ margin:0 0 14px; line-height:1.6; color:#2e2e2e; }
+
+        .details{ background:#fbfbfb; border:1px solid #e6e6e6; padding:14px; border-radius:8px; margin:18px 0; }
+        .detail-row{ display:flex; gap:8px; align-items:center; margin:6px 0; font-size:15px; color:#222; }
+        .detail-label{ min-width:95px; color:#555; font-size:13px; }
+        .detail-value{ color:#111; font-weight:600; word-break:break-word; }
+
+        .cta{ text-align:center; margin:24px 0; }
+        .btn{ display:inline-block; padding:12px 22px; border-radius:6px; text-decoration:none; font-weight:700; font-size:15px; color:#fff; }
+        .btn-primary{ background:#00a6a6; box-shadow:0 3px 8px rgba(0,166,166,0.12); }
+        .muted{ color:#666; font-size:13px; }
+
+        .footer{ background:#f7f7f7; color:#111; text-align:center; padding:18px; font-size:13px; border-top:1px solid #e8e8e8; }
+        .footer a{ color:#006a6a; text-decoration:none; }
+        .footer .team{ font-weight:700; color:#0b0b0b; margin:4px 0 8px; }
+
+        @media (max-width:480px){
+            .brand-title{ font-size:16px; }
+            .content{ padding:18px 16px; }
+            .detail-label{ min-width:80px; }
         }
     </style>
 </head>
-<body>
-<div class="container">
-    <h1>Artist Verification</h1>
-    <p class="greeting" th:text="'Hello, ' + ${username} + ','">Hello, Administrator,</p>
-    <p class="message">
-        We have received a request to verify a user as an artist.
-        Below are the user's details:
-    </p>
-    <div class="details">
-        <p><strong>ArtistName:</strong> <span th:text="${artistName}">artistName</span></p>
-        <p><strong>FullName:</strong> <span th:text="${fullNameUser}">username</span></p>
-        <p><strong>Email:</strong> <span th:text="${userEmail}">email@example.com</span></p>
-    </div>
-    <p class="message">
-        To verify this artist, please click on the button below:
-    </p>
-    <div class="activation-link">
-        <a th:href="${confirmationUrl}" target="_blank">Verify Artist</a>
-    </div>
-    <p class="message">
-        If you are not an administrator or do not recognize this request, please ignore this email.
-    </p>
-    <div class="footer">
-        <p>Best regards,</p>
-        <p>The ScrtlyMusic Team</p>
-    </div>
-</div>
+<body style="margin:0;padding:0;background:#f4f4f4;">
+<table role="presentation" class="email-wrap" width="100%" cellpadding="0" cellspacing="0">
+    <tr>
+        <td align="center">
+            <table role="presentation" class="email-body" width="100%" cellpadding="0" cellspacing="0">
+
+                <tr>
+                    <td class="header">
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="padding:6px 12px;">
+                                    <div class="brand">
+                                        <img src="https://example.com/logo.png" alt="ScrtlyMusic" width="120" style="display:block;border:0;" th:src="${logoUrl}" />
+                                        <div class="brand-title">ScrtlyMusic — Artist Verification</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="content">
+                        <h1 th:text="'Hello, ' + ${username} + ','">Hello, Administrator,</h1>
+
+                        <p>We have received a request to verify a user as an artist. Below are the user's details:</p>
+
+                        <div class="details">
+                            <div class="detail-row"><div class="detail-label">Artist name:</div><div class="detail-value" th:text="${artistName}">artistName</div></div>
+                            <div class="detail-row"><div class="detail-label">Full name:</div><div class="detail-value" th:text="${fullNameUser}">username</div></div>
+                            <div class="detail-row"><div class="detail-label">Email:</div><div class="detail-value" th:text="${userEmail}">email@example.com</div></div>
+                        </div>
+
+                        <p>To confirm this artist verification, please click the button below:</p>
+
+                        <div class="cta">
+                            <a class="btn btn-primary" th:href="${confirmationUrl}" href="https://example.com/verify?token=REPLACE" target="_blank">Confirm artist</a>
+                        </div>
+
+                        <p class="muted">If you are not an administrator or do not recognize this request, please ignore this message.</p>
+
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="footer">
+                        <p style="margin:6px 0 4px;">Best regards,</p>
+                        <p class="team">The ScrtlyMusic Team</p>
+                        <p style="margin:0; font-size:12px; color:#333;">Questions? <a href="mailto:hello@scrtlymusic.example">hello@scrtlymusic.example</a></p>
+                    </td>
+                </tr>
+
+            </table>
+        </td>
+    </tr>
+</table>
 </body>
 </html>
