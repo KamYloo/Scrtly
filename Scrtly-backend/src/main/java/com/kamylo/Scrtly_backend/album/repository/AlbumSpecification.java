@@ -4,11 +4,11 @@ import com.kamylo.Scrtly_backend.album.domain.AlbumEntity;
 import org.springframework.data.jpa.domain.Specification;
 
 public class AlbumSpecification {
-    public static Specification<AlbumEntity> artistContains(String artistName) {
+    public static Specification<AlbumEntity> artistContains(String pseudonym) {
         return (root, query, criteriaBuilder) ->
-                artistName == null || artistName.trim().isEmpty()
+                pseudonym == null || pseudonym.trim().isEmpty()
                         ? criteriaBuilder.conjunction()
-                        : criteriaBuilder.like(criteriaBuilder.lower(root.get("artist").get("artistName")), "%" + artistName.trim().toLowerCase() + "%");
+                        : criteriaBuilder.like(criteriaBuilder.lower(root.get("artist").get("pseudonym")), "%" + pseudonym.trim().toLowerCase() + "%");
     }
 
     public static Specification<AlbumEntity> titleContains(String title) {

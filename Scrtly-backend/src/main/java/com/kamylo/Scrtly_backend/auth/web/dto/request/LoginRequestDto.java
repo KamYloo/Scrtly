@@ -1,15 +1,16 @@
 package com.kamylo.Scrtly_backend.auth.web.dto.request;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
+
 
 @Data
 public class LoginRequestDto {
-    @NotNull(message = "Email is required")
+    @NotBlank(message = "Email is required")
     @Email(message = "Email is not formated")
     private String email;
-    @NotNull(message = "Password is required")
+    @NotBlank(message = "Password is required")
     private String password;
 }
 

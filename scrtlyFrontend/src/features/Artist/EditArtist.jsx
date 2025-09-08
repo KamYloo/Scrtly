@@ -16,7 +16,9 @@ function EditArtist({artist, onClose}) {
     const handleSubmit  = async (e) => {
         e.preventDefault()
         const formData = new FormData()
-        formData.append('bannerImg', bannerImg)
+        if (bannerImg) {
+            formData.append('bannerImg', bannerImg);
+        }
         formData.append('artistBio', artistBio)
 
         try {

@@ -86,6 +86,9 @@ export const playlistApi = apiSlice.injectEndpoints({
                 method: "PUT",
                 credentials: "include",
             }),
+            invalidatesTags: (result, error, { playListId }) => [
+                { type: "Track", id: `PLAYLIST_${playListId}` },
+            ],
             async onQueryStarted({ playListId, songId }, { dispatch, queryFulfilled }) {
                 const patchTracks = dispatch(
                     apiSlice.util.updateQueryData(
@@ -123,6 +126,7 @@ export const playlistApi = apiSlice.injectEndpoints({
                 }
             },
         }),
+
 
         deleteSongFromPlaylist: builder.mutation({
             query: ({ playListId, songId }) => ({

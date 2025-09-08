@@ -22,7 +22,8 @@ function EditPost({ post, onClose }) {
         e.preventDefault();
         const formData = new FormData();
         formData.append('postId', post?.id);
-        formData.append('file', postImg);
+        if (postImg)
+            formData.append('file', postImg);
         formData.append('description', description);
 
         try {

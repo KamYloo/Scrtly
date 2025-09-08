@@ -543,12 +543,13 @@
 
       .description {
         width: 100%;
-        height: 2vh;
+        height: auto;
 
         p {
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
+          margin: 0;
+          white-space: normal;
+          overflow-wrap: break-word;
+          word-break: break-word;
           color: white;
         }
       }

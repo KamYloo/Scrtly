@@ -25,9 +25,7 @@ public class ChatRoomEntity {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer id;
 
-    @NotBlank(message = "Chat room name must not be blank")
     @Size(max = 255, message = "Chat room name cannot exceed 255 characters")
-    @Column(nullable = false)
     private String chatRoomName;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -36,9 +34,11 @@ public class ChatRoomEntity {
             joinColumns = @JoinColumn(name = "chat_room_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
+    @Builder.Default
     private List<UserEntity> participants = new ArrayList<>();
 
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Builder.Default
     private List<ChatMessageEntity> messages = new ArrayList<>();
 
     @CreatedDate

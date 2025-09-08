@@ -38,7 +38,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-
 @ExtendWith(MockitoExtension.class)
 class AlbumServiceImplTest {
 
@@ -95,6 +94,8 @@ class AlbumServiceImplTest {
         }
         alb.setSongs(songs != null ? songs : Collections.emptyList());
         alb.setCoverImage(coverImage);
+        // Title/releaseDate not strictly needed for tests, but set a title to avoid NPEs in some mappers
+        alb.setTitle("Title-" + id);
         return alb;
     }
 
@@ -225,7 +226,7 @@ class AlbumServiceImplTest {
     @Test
     void getAlbum_throws_whenNotFound() {
         Integer id = 100;
-        stubFindAlbumById(id, null);
+        when(albumRepository.findById(id)).thenReturn(Optional.empty());
 
         CustomException ex = assertThrows(CustomException.class, () -> albumService.getAlbum(id));
         assertEquals(BusinessErrorCodes.ALBUM_NOT_FOUND, ex.getErrorCode());
@@ -237,7 +238,7 @@ class AlbumServiceImplTest {
         AlbumEntity entity = createAlbumEntity(id, 2L, Collections.emptyList(), null);
         AlbumDto dto = createAlbumDto(id, "Found");
 
-        stubFindAlbumById(id, entity);
+        when(albumRepository.findById(id)).thenReturn(Optional.of(entity));
         when(albumMapper.toDto(entity)).thenReturn(dto);
 
         AlbumDto r = albumService.getAlbum(id);
@@ -279,29 +280,40 @@ class AlbumServiceImplTest {
     }
 
     @Test
-    void getAlbumsByArtist_returnsDtos() {
-        Long artistId = 1L;
-        ArtistEntity artist = new ArtistEntity();
-        artist.setId(artistId);
-        AlbumEntity entity = createAlbumEntity(50, artistId, Collections.emptyList(), null);
-        AlbumDto dto = createAlbumDto(50, "ByArtist");
+    void getAlbumsByArtist_paged_returnsPage_whenNoQuery() {
+        Long artistId = 7L;
+        Pageable pageable = PageRequest.of(0, 9);
+        AlbumEntity entity = createAlbumEntity(77, artistId, Collections.emptyList(), null);
+        AlbumDto dto = createAlbumDto(77, "PagedNoQuery");
 
-        when(artistRepository.findById(artistId)).thenReturn(Optional.of(artist));
-        when(albumRepository.findByArtistId(artistId)).thenReturn(List.of(entity));
-        when(albumMapper.toDto(entity)).thenReturn(dto);
+        // REMOVED unnecessary stub: artistRepository.existsById(artistId) -- service does not call it anymore
+        Page<AlbumEntity> page = new PageImpl<>(List.of(entity), pageable, 1);
+        when(albumRepository.findByArtistId(eq(artistId), eq(pageable))).thenReturn(page);
+        when(albumMapper.toDto(any(AlbumEntity.class))).thenReturn(dto);
 
-        List<AlbumDto> result = albumService.getAlbumsByArtist(artistId);
-        assertEquals(1, result.size());
-        assertEquals("ByArtist", result.get(0).getTitle());
+        Page<AlbumDto> result = albumService.getAlbumsByArtist(artistId, null, pageable);
+
+        assertEquals(1, result.getTotalElements());
+        assertEquals("PagedNoQuery", result.getContent().get(0).getTitle());
     }
 
     @Test
-    void getAlbumsByArtist_throws_whenArtistNotFound() {
-        Long id = 999L;
-        when(artistRepository.findById(id)).thenReturn(Optional.empty());
+    void getAlbumsByArtist_paged_returnsFilteredPage_whenQueryProvided() {
+        Long artistId = 8L;
+        Pageable pageable = PageRequest.of(0, 9);
+        AlbumEntity entity = createAlbumEntity(88, artistId, Collections.emptyList(), null);
+        AlbumDto dto = createAlbumDto(88, "Filtered");
 
-        CustomException ex = assertThrows(CustomException.class, () -> albumService.getAlbumsByArtist(id));
-        assertEquals(BusinessErrorCodes.ARTIST_NOT_FOUND, ex.getErrorCode());
+        // REMOVED unnecessary stub: artistRepository.existsById(artistId) -- service does not call it anymore
+        Page<AlbumEntity> page = new PageImpl<>(List.of(entity), pageable, 1);
+        when(albumRepository.findByArtistIdAndTitleIgnoreCaseContaining(eq(artistId), eq("Filtered"), eq(pageable)))
+                .thenReturn(page);
+        when(albumMapper.toDto(any(AlbumEntity.class))).thenReturn(dto);
+
+        Page<AlbumDto> result = albumService.getAlbumsByArtist(artistId, "Filtered", pageable);
+
+        assertEquals(1, result.getTotalElements());
+        assertEquals("Filtered", result.getContent().get(0).getTitle());
     }
 
     @Test
@@ -318,7 +330,7 @@ class AlbumServiceImplTest {
     void deleteAlbum_throws_whenAlbumMissing() {
         Integer albumId = 2;
         stubRoles(ARTIST_EMAIL, true, false);
-        stubFindAlbumById(albumId, null);
+        when(albumRepository.findById(albumId)).thenReturn(Optional.empty());
 
         CustomException ex = assertThrows(CustomException.class, () -> albumService.deleteAlbum(albumId, ARTIST_EMAIL));
         assertEquals(BusinessErrorCodes.ALBUM_NOT_FOUND, ex.getErrorCode());

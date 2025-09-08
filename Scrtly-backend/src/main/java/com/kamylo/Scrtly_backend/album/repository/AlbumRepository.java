@@ -17,5 +17,11 @@ public interface AlbumRepository extends JpaRepository<AlbumEntity, Integer>, Jp
     List<AlbumEntity> findByArtistId(Long artistId);
 
     @EntityGraph(attributePaths = {"artist"})
+    Page<AlbumEntity> findByArtistId(Long artistId, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"artist"})
+    Page<AlbumEntity> findByArtistIdAndTitleIgnoreCaseContaining(Long artistId, String title, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"artist"})
     Page<AlbumEntity> findAll(Specification<AlbumEntity> spec, Pageable pageable);
 }

@@ -9,7 +9,7 @@ import com.kamylo.Scrtly_backend.payment.domain.enums.SubscriptionStatus;
 import com.kamylo.Scrtly_backend.payment.repository.SubscriptionRepository;
 import com.kamylo.Scrtly_backend.artist.domain.ArtistVerificationToken;
 import com.kamylo.Scrtly_backend.artist.service.ArtistVerificationTokenService;
-import com.kamylo.Scrtly_backend.artist.web.dto.ArtistVerificationRequest;
+import com.kamylo.Scrtly_backend.artist.web.dto.request.ArtistVerificationRequest;
 import com.kamylo.Scrtly_backend.user.domain.RoleEntity;
 import com.kamylo.Scrtly_backend.user.domain.UserEntity;
 import com.kamylo.Scrtly_backend.user.mapper.UserMapper;

@@ -12,7 +12,7 @@ import com.kamylo.Scrtly_backend.common.handler.CustomException;
 import com.kamylo.Scrtly_backend.comment.repository.CommentRepository;
 
 import com.kamylo.Scrtly_backend.post.repository.PostRepository;
-import com.kamylo.Scrtly_backend.comment.web.dto.CommentRequest;
+import com.kamylo.Scrtly_backend.comment.web.dto.request.CommentRequest;
 import com.kamylo.Scrtly_backend.notification.service.NotificationService;
 import com.kamylo.Scrtly_backend.user.service.UserService;
 import com.kamylo.Scrtly_backend.comment.repository.CommentSpecification;
@@ -77,9 +77,7 @@ public class CommentServiceImpl implements CommentService {
         CommentEntity comment = commentRepository.findById(commentId).orElseThrow(
                 () -> new CustomException(BusinessErrorCodes.COMMENT_NOT_FOUND));
         if (validateCommentOwnership(username, comment)) {
-            if (content != null && !content.isEmpty()) {
-                comment.setComment(content);
-            }
+            comment.setComment(content);
             return commentMapper.toDto(commentRepository.save(comment));
         } else {
             throw new CustomException(BusinessErrorCodes.COMMENT_MISMATCH);

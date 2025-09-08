@@ -12,7 +12,6 @@ import com.kamylo.Scrtly_backend.user.domain.UserEntity;
 import com.kamylo.Scrtly_backend.common.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.common.handler.CustomException;
 import com.kamylo.Scrtly_backend.album.repository.AlbumRepository;
-import com.kamylo.Scrtly_backend.artist.repository.ArtistRepository;
 import com.kamylo.Scrtly_backend.song.repository.SongRepository;
 import com.kamylo.Scrtly_backend.album.repository.AlbumSpecification;
 import com.kamylo.Scrtly_backend.user.service.UserRoleService;
@@ -33,7 +32,6 @@ public class AlbumServiceImpl implements AlbumService {
 
     private final AlbumRepository albumRepository;
     private final UserService userService;
-    private final ArtistRepository artistRepository;
     private final UserRoleService userRoleService;
     private final FileService fileService;
     private final AlbumMapper albumMapper;
@@ -47,10 +45,7 @@ public class AlbumServiceImpl implements AlbumService {
         validateArtistOrAdmin(username);
         ArtistEntity artist = userService.findUserByEmail(username).getArtistEntity();
 
-        String imagePath = null;
-        if (!albumImage.isEmpty()) {
-            imagePath = fileService.saveFile(albumImage, "albumImages/");
-        }
+        String imagePath = fileService.saveFile(albumImage, "albumImages/");
 
         AlbumEntity album = AlbumEntity.builder()
                 .title(title)
@@ -75,22 +70,25 @@ public class AlbumServiceImpl implements AlbumService {
     }
 
     @Override
-    public Page<AlbumDto> searchAlbums(String artistName, String albumName, Pageable pageable) {
+    public Page<AlbumDto> searchAlbums(String pseudonym, String albumName, Pageable pageable) {
         Specification<AlbumEntity> spec = Specification
-                .where(AlbumSpecification.artistContains(artistName))
+                .where(AlbumSpecification.artistContains(pseudonym))
                 .and(AlbumSpecification.titleContains(albumName));
 
         return albumRepository.findAll(spec, pageable).map(albumMapper::toDto);
     }
 
     @Override
-    public List<AlbumDto> getAlbumsByArtist(Long artistId) {
-        ArtistEntity artistEntity = artistRepository.findById(artistId)
-                .orElseThrow(() -> new CustomException(BusinessErrorCodes.ARTIST_NOT_FOUND));
-        return albumRepository.findByArtistId(artistEntity.getId())
-                .stream()
-                .map(albumMapper::toDto)
-                .toList();
+    public Page<AlbumDto> getAlbumsByArtist(Long artistId, String albumName, Pageable pageable) {
+        Page<AlbumEntity> page;
+        if (albumName == null || albumName.trim().isEmpty()) {
+            page = albumRepository.findByArtistId(artistId, pageable);
+        } else {
+            String trimmed = albumName.trim();
+            page = albumRepository.findByArtistIdAndTitleIgnoreCaseContaining(artistId, trimmed, pageable);
+        }
+
+        return page.map(albumMapper::toDto);
     }
 
     @Override

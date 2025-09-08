@@ -13,6 +13,7 @@ import com.kamylo.Scrtly_backend.user.service.AdminService;
 import com.kamylo.Scrtly_backend.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +25,7 @@ public class AdminServiceImpl implements AdminService {
     private final RolesRepository rolesRepository;
 
     @Override
+    @Transactional
     public void verifyUserAsArtist(Long userId, String token) {
 
         UserEntity user = userService.findUserById(userId);

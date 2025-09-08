@@ -41,8 +41,18 @@ export const userApi = apiSlice.injectEndpoints({
                 body: formData,
             }),
             invalidatesTags: (result) => [
-                { type: 'User', id: result?.nickName || 'CURRENT' },
+                { type: 'User', id: result?.nickName ?? 'CURRENT' },
+                { type: 'User', id: 'CURRENT' }
             ],
+            async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+                try {
+                    const { data } = await queryFulfilled;
+                    dispatch(apiSlice.util.updateQueryData('getCurrentUser', undefined, draft => {
+                        Object.assign(draft, data);
+                    }));
+                } catch {
+                }
+            }
         }),
 
         verifyArtist: builder.mutation({

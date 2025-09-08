@@ -1,47 +1,88 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Account Activation</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Account Activation — ScrtlyMusic</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
-        .container {
-            max-width: 600px;
-            margin: 10px auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        .activation-link {
-            display: block;
-            text-align: center;
-            margin-top: 20px;
-        }
-        .activation-link a {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 5px;
+        body,table,td,a{ -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; }
+        table,td{ mso-table-lspace:0pt; mso-table-rspace:0pt; }
+        img{ -ms-interpolation-mode:bicubic; }
+
+        .email-wrap{ width:100%; background:#f4f4f4; padding:24px 0; }
+        .email-body{ max-width:640px; margin:0 auto; background:#ffffff; border-radius:12px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.06); }
+
+        .header{ background:#ffffff; padding:16px 20px; color:#111; border-bottom:4px solid #66d1d6; }
+        .brand{ display:flex; align-items:center; gap:12px; }
+        .brand img{ display:block; border:0; max-width:120px; height:auto; }
+        .brand-title{ font-family:Arial,Helvetica,sans-serif; font-size:18px; font-weight:700; color:#111; }
+
+        .content{ padding:26px 22px; color:#111; font-family:Arial,Helvetica,sans-serif; }
+        h1{ margin:0 0 12px; font-size:20px; color:#0b0b0b; }
+        p{ margin:0 0 14px; line-height:1.6; color:#2e2e2e; }
+
+        .cta{ text-align:center; margin:24px 0; }
+        .btn{ display:inline-block; padding:12px 22px; border-radius:6px; text-decoration:none; font-weight:700; font-size:15px; color:#fff; }
+        .btn-primary{ background:#00a6a6; box-shadow:0 3px 8px rgba(0,166,166,0.12); }
+
+        .muted{ color:#666; font-size:13px; }
+
+        .footer{ background:#f7f7f7; color:#111; text-align:center; padding:18px; font-size:13px; border-top:1px solid #e8e8e8; }
+        .footer a{ color:#006a6a; text-decoration:none; }
+        .footer .team{ font-weight:700; color:#0b0b0b; margin:4px 0 8px; }
+
+        @media (max-width:480px){
+            .brand-title{ font-size:16px; }
+            .content{ padding:18px 16px; }
         }
     </style>
 </head>
-<body>
-<div class="container">
-    <h1>Account Activation</h1>
-    <p class="greeting" th:text="'Hello ' + ${username} + ','"></p>
-    <p>Thank you for signing up! Please use the button below to activate your account:</p>
-    <div class="activation-link">
-        <a th:href="${confirmationUrl}" target="_blank">Activate your account</a>
-    </div>
-</div>
+<body style="margin:0;padding:0;background:#f4f4f4;">
+<table role="presentation" class="email-wrap" width="100%" cellpadding="0" cellspacing="0">
+    <tr>
+        <td align="center">
+            <table role="presentation" class="email-body" width="100%" cellpadding="0" cellspacing="0">
+
+                <tr>
+                    <td class="header">
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="padding:6px 12px;">
+                                    <div class="brand">
+                                        <img src="https://example.com/logo.png" alt="ScrtlyMusic" width="120" th:src="${logoUrl}" />
+                                        <div class="brand-title">ScrtlyMusic — Account Activation</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="content">
+                        <h1 th:text="'Hello ' + ${username} + ','">Hello, User,</h1>
+
+                        <p>Thank you for signing up! Please use the button below to activate your account:</p>
+
+                        <div class="cta">
+                            <a class="btn btn-primary" th:href="${confirmationUrl}" href="https://example.com/activate?token=REPLACE" target="_blank">Activate your account</a>
+                        </div>
+
+                        <p class="muted">If you did not sign up for this account, you can safely ignore this email.</p>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="footer">
+                        <p style="margin:6px 0 4px;">Best regards,</p>
+                        <p class="team">The ScrtlyMusic Team</p>
+                        <p style="margin:0; font-size:12px; color:#333;">Questions? <a href="mailto:hello@scrtlymusic.example">hello@scrtlymusic.example</a></p>
+                    </td>
+                </tr>
+
+            </table>
+        </td>
+    </tr>
+</table>
 </body>
 </html>

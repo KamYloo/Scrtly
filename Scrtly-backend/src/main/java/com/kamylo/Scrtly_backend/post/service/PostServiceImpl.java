@@ -37,10 +37,11 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public PostDto createPost(String username, String description, MultipartFile postImage) {
        UserEntity user = userService.findUserByEmail(username);
-       String imagePath = null;
-       if (!postImage.isEmpty()) {
-           imagePath = fileService.saveFile(postImage, "postImages/");
-       }
+        String imagePath = null;
+
+        if (postImage != null && !postImage.isEmpty()) {
+            imagePath = fileService.saveFile(postImage, "postImages/");
+        }
        PostEntity newPost = PostEntity.builder()
                .user(user)
                .description(description)
@@ -77,7 +78,9 @@ public class PostServiceImpl implements PostService {
         PostEntity post = postRepository.findById(postId).orElseThrow(
                 () -> new CustomException(BusinessErrorCodes.POST_NOT_FOUND));
         if (validatePostOwnership(username, post)) {
-            fileService.deleteFile(post.getImage());
+            if (post.getImage() != null && !post.getImage().isEmpty()) {
+                fileService.deleteFile(post.getImage());
+            }
             notificationService.deleteNotificationsByPost(post);
             postRepository.deleteById(postId);
         } else {

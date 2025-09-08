@@ -45,9 +45,7 @@ function ProfileEdit() {
       type: 'application/json',
     });
     formData.append('userDetails', jsonBlob);
-    if (profilePicture) {
-      formData.append("profilePicture", profilePicture);
-    }
+    formData.append("profilePicture", profilePicture);
 
     try {
       const result = await updateUser(formData).unwrap();

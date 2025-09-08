@@ -164,9 +164,11 @@ function Feed() {
                 </>
               )}
             </div>
-            <div className="middle">
-              <img src={item?.image} alt="" />
-            </div>
+            {item?.image && (
+                <div className="middle">
+                  <img src={item.image} alt={item.description ?? "post image"} loading="lazy" />
+                </div>
+            )}
             <div className="description">
               <p>{item.description}</p>
             </div>

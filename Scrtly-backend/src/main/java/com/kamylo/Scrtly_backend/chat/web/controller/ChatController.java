@@ -3,14 +3,18 @@ package com.kamylo.Scrtly_backend.chat.web.controller;
 import com.kamylo.Scrtly_backend.chat.web.dto.ChatRoomDto;
 import com.kamylo.Scrtly_backend.chat.web.dto.request.ChatRoomRequest;
 import com.kamylo.Scrtly_backend.chat.service.ChatService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
 
+@Validated
 @AllArgsConstructor
 @RestController
 @RequestMapping("/chats")
@@ -19,13 +23,15 @@ public class ChatController {
     private final ChatService chatService;
 
     @PostMapping("/create")
-    public ResponseEntity<ChatRoomDto> createChatRoom(@RequestBody ChatRoomRequest chatRoomRequest, Principal principal) {
+    public ResponseEntity<ChatRoomDto> createChatRoom(@Valid @RequestBody ChatRoomRequest chatRoomRequest, Principal principal) {
         ChatRoomDto chatRoom = chatService.createChat(principal.getName(), chatRoomRequest);
         return new ResponseEntity<>(chatRoom, HttpStatus.CREATED);
     }
 
     @GetMapping("/{chatId}")
-    public ResponseEntity<ChatRoomDto> getChatById(@PathVariable Integer chatId, Principal principal) {
+    public ResponseEntity<ChatRoomDto> getChatById(
+            @PathVariable @Positive(message = "{id.positive}") Integer chatId,
+            Principal principal) {
         ChatRoomDto chatRoom = chatService.getChatById(chatId, principal.getName());
         return new ResponseEntity<>(chatRoom, HttpStatus.OK);
     }
@@ -37,7 +43,9 @@ public class ChatController {
     }
 
     @DeleteMapping("/delete/{chatId}")
-    public ResponseEntity<?> deleteChatHandler(@PathVariable Integer chatId, Principal principal) {
+    public ResponseEntity<?> deleteChatHandler(
+            @PathVariable @Positive(message = "{id.positive}") Integer chatId,
+            Principal principal) {
         chatService.deleteChat(chatId, principal.getName());
         return ResponseEntity.ok(chatId);
     }

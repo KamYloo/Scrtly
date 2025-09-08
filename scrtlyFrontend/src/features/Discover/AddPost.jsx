@@ -16,7 +16,7 @@ function AddPost() {
     skip: !localStorage.getItem('isLoggedIn'),
   });
   const [createPost, { isLoading: isPosting }] = useCreatePostMutation();
-  const [descriptionText, setDescriptionText] = useState('')
+  const [descriptionText, setDescriptionText] = useState("")
   const [filePic, setFilePic] = useState(null)
   const [openEmoji, setOpenEmoji] = useState(false)
 
@@ -31,7 +31,8 @@ function AddPost() {
 
   const handlePostCreation = async () => {
     const formData = new FormData()
-    formData.append('file', filePic)
+    if (filePic)
+      formData.append('file', filePic)
     formData.append('description', descriptionText)
     try {
       await createPost(formData).unwrap();
@@ -39,7 +40,7 @@ function AddPost() {
     } catch (err) {
       toast.error(err.data.businessErrornDescription);
     } finally {
-      setDescriptionText('')
+      setDescriptionText("")
       setFilePic(null)
     }
   }
@@ -62,10 +63,10 @@ function AddPost() {
                   onChange={handleFileChange}
               />
             </div>
-            <div className="attachment">
+           {/* <div className="attachment">
               <i><BsCameraVideoFill/></i>
               <span>Video</span>
-            </div>
+            </div>*/}
           </div>
         </div>
         <div className="right">

@@ -4,7 +4,7 @@ import com.kamylo.Scrtly_backend.payment.repository.SubscriptionRepository;
 import com.kamylo.Scrtly_backend.user.mapper.UserMapper;
 import com.kamylo.Scrtly_backend.user.service.UserService;
 import com.kamylo.Scrtly_backend.user.web.dto.UserDto;
-import com.kamylo.Scrtly_backend.artist.web.dto.ArtistVerificationRequest;
+import com.kamylo.Scrtly_backend.artist.web.dto.request.ArtistVerificationRequest;
 import com.kamylo.Scrtly_backend.email.EmailTemplateName;
 import com.kamylo.Scrtly_backend.artist.domain.ArtistVerificationToken;
 import com.kamylo.Scrtly_backend.user.domain.UserEntity;
