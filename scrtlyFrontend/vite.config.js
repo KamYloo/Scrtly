@@ -23,6 +23,7 @@ export default defineConfig({
         ]
       },
       workbox: {
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         runtimeCaching: [
           {
             urlPattern: ({ request }) => request.destination === 'document',
@@ -44,6 +45,19 @@ export default defineConfig({
       }
     })
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('lottie-web')) return 'lottie'
+            return 'vendor'
+          }
+        }
+      }
+    },
+    chunkSizeWarningLimit: 2000
+  },
   server: {
     host: '0.0.0.0',
     port: 5002,
