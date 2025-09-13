@@ -30,8 +30,13 @@ public class RefreshTokenRepositoryIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        user = new UserEntity();
-        user.setEmail("refreshuser@example.com");
+        user = UserEntity.builder()
+                .email("refreshuser@example.com")
+                .nickName("refreshuser")
+                .fullName("Refresh User")
+                .password("secret")
+                .enable(true)
+                .build();
         testEntityManager.persist(user);
         testEntityManager.flush();
     }

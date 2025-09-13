@@ -77,7 +77,9 @@ public class CommentServiceImpl implements CommentService {
         CommentEntity comment = commentRepository.findById(commentId).orElseThrow(
                 () -> new CustomException(BusinessErrorCodes.COMMENT_NOT_FOUND));
         if (validateCommentOwnership(username, comment)) {
-            comment.setComment(content);
+            if (content != null && !content.trim().isEmpty()) {
+                comment.setComment(content);
+            }
             return commentMapper.toDto(commentRepository.save(comment));
         } else {
             throw new CustomException(BusinessErrorCodes.COMMENT_MISMATCH);

@@ -41,7 +41,7 @@ class AlbumRepositoryIntegrationTest {
         UserEntity user = UserEntity.builder()
                 .fullName(name + " owner")
                 .nickName(name.toLowerCase() + "_nick")
-                .email(name.toLowerCase() + "@example.com")
+                .email(name.toLowerCase()+"@example.com")
                 .password("secret")
                 .enable(true)
                 .build();
@@ -72,7 +72,7 @@ class AlbumRepositoryIntegrationTest {
 
     @Test
     void findByArtistId_returnsAlbumsWithArtist() {
-        ArtistEntity artist = persistArtist("The Beatles");
+        ArtistEntity artist = persistArtist("TheBeatles");
         persistAlbum("Abbey Road", artist);
         persistAlbum("Let It Be", artist);
 
@@ -81,12 +81,12 @@ class AlbumRepositoryIntegrationTest {
         assertThat(results).hasSize(2);
         assertThat(results)
                 .extracting(a -> a.getArtist().getPseudonym())
-                .allMatch(name -> name.equals("The Beatles"));
+                .allMatch(name -> name.equals("TheBeatles"));
     }
 
     @Test
     void findAll_withTitleSpecification_filtersAndPaginates() {
-        ArtistEntity a = persistArtist("Some Artist");
+        ArtistEntity a = persistArtist("SomeArtist");
         persistAlbum("Love Song", a);
         persistAlbum("Another Love", a);
         persistAlbum("No Match", a);
@@ -104,7 +104,7 @@ class AlbumRepositoryIntegrationTest {
 
     @Test
     void findAll_withArtistSpecification_caseInsensitive() {
-        ArtistEntity beatles = persistArtist("The Beatles");
+        ArtistEntity beatles = persistArtist("TheBeatles");
         ArtistEntity queen = persistArtist("Queen");
 
         persistAlbum("Help!", beatles);
@@ -115,7 +115,7 @@ class AlbumRepositoryIntegrationTest {
         Page<AlbumEntity> page = albumRepository.findAll(spec, PageRequest.of(0, 10));
 
         assertThat(page.getTotalElements()).isEqualTo(1L);
-        assertThat(page.getContent().get(0).getArtist().getPseudonym()).isEqualTo("The Beatles");
+        assertThat(page.getContent().get(0).getArtist().getPseudonym()).isEqualTo("TheBeatles");
     }
 
     @Test
@@ -133,8 +133,8 @@ class AlbumRepositoryIntegrationTest {
 
     @Test
     void specifications_combinedTitleAndArtist() {
-        ArtistEntity special = persistArtist("Special Artist");
-        ArtistEntity other = persistArtist("Other Artist");
+        ArtistEntity special = persistArtist("SpecialArtist");
+        ArtistEntity other = persistArtist("OtherArtist");
 
         persistAlbum("Unique Title", special);
         persistAlbum("Unique Title", other);
@@ -146,7 +146,7 @@ class AlbumRepositoryIntegrationTest {
         Page<AlbumEntity> page = albumRepository.findAll(spec, PageRequest.of(0, 10));
 
         assertThat(page.getTotalElements()).isEqualTo(1L);
-        assertThat(page.getContent().get(0).getArtist().getPseudonym()).isEqualTo("Special Artist");
+        assertThat(page.getContent().get(0).getArtist().getPseudonym()).isEqualTo("SpecialArtist");
         assertThat(page.getContent().get(0).getTitle()).isEqualTo("Unique Title");
     }
 }

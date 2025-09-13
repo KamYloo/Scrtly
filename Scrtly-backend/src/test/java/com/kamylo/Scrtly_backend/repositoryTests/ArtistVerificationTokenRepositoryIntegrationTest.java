@@ -27,8 +27,13 @@ public class ArtistVerificationTokenRepositoryIntegrationTest {
 
     @Test
     void testFindByUser_whenTokenExists() {
-        UserEntity user = new UserEntity();
-        user.setEmail("artist@example.com");
+        UserEntity user = UserEntity.builder()
+                .email("artist@example.com")
+                .nickName("artist_nick")
+                .fullName("Artist Example")
+                .password("secret")
+                .enable(true)
+                .build();
         testEntityManager.persist(user);
 
         ArtistVerificationToken token = new ArtistVerificationToken();
@@ -48,8 +53,13 @@ public class ArtistVerificationTokenRepositoryIntegrationTest {
 
     @Test
     void testFindByUser_whenTokenDoesNotExist() {
-        UserEntity user = new UserEntity();
-        user.setEmail("newartist@example.com");
+        UserEntity user = UserEntity.builder()
+                .email("newartist@example.com")
+                .nickName("newartist_nick")
+                .fullName("New Artist")
+                .password("secret")
+                .enable(true)
+                .build();
         testEntityManager.persist(user);
         testEntityManager.flush();
 
