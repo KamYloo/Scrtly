@@ -1,28 +1,31 @@
 # Topic: Scrtly - Music Platform with Chat, Posts and Stories.
 
 ## Background of the Problem
-Nowadays, more and more people use streaming platforms such as Spotify to discover new music and create personalized playlists. However, many users lack features that would allow for better interaction with other listeners and artists. Additionally, popular social media offer limited possibilities for integration with music content. There is a need for a solution that combines music streaming with social features, enabling interaction between users and artists in one place.
+Today, more and more users are using music streaming services to discover new songs and create personalized playlists. However, existing solutions often lack satisfactory integration of social features that would enable direct interaction between listeners and creators within a single service. As a result, the need to combine high-quality playback with communication and music promotion methods has been identified as a significant product challenge.
 
 The music platform that we propose will allow users not only to listen to their favorite songs, but also communicate with each other via chat and share posts and stories in the "Discovery" tab. Thanks to this feature, users will be able to discover new music through recommendations from friends and artists, and artists will gain a new tool to promote their songs and build an engaged community.
-## Challenge
-Design and create a music platform that combines streaming of songs with social functions, such as chat and the ability to share posts and stories in the "Discovery" tab. The system must support music library management, playlist creation, communication between users and publishing multimedia content (posts, stories).
-## Functional requirements
-### User registration and management:
-- Users can create an account, edit their profile (including adding profile photos, descriptions), manage their playlists and publish posts and stories..
-- Artists can create dedicated profiles, share their songs.
-### Music streaming and content management:
-- Users can browse and listen to songs from a wide music library and create playlists.
-- follow each other
-### Social functions (chat and Discovery):
-- Users can talk to each other using one-on-one chat.
-- The “Discovery” tab allows users to browse posts and stories added by other users and artists, allowing for better discovery of new music and artists.
-### Posting and Stories:
-- Artists and users can add posts (e.g. reviews, recommendations) and stories with photos or promotional content.
-- Ability to comment and react to posts and stories.
-## Technology
-The project will be implemented using Spring on the backend and React on the frontend. The system will use a PostgreSQL database in the Docker environment. Real-time communication, such as chat, will be implemented using WebSockets with the STOMP protocol.
+## Project Goal and Challenge
+The project's goal is to design and implement a music platform that combines music streaming with social features—specifically, two-way chat and the ability to publish posts and stories in the "Discover" tab. The system will enable music library management, playlist creation and sharing, user-to-user communication, and the publishing of multimedia content in a user-friendly and secure manner.
+## Functional Requirements (Short)
+- Registration and management of user and artist accounts; artist profiles will be enriched with discography and statistics sections.
+- Browse the catalog, search, and play adaptively, with the ability to create and share playlists.
+- Social features: publish posts, comments, reactions, and share stories in the dedicated "Discover" tab.
+- Real-time communication: one-on-one chat with multimedia messaging support.
+- Monetization mechanisms: premium subscriptions processed through the Stripe payment gateway; access to the highest-quality audio will be limited to subscribers.
+- Recommendation system: quick recommendations based on monthly trends (trending artists, songs, albums) and social signals.
+
+## Technologies used (in brief)
+The backend will be implemented using the Spring platform (Spring Boot), while the user interface will be implemented in React technology. Real-time communication will be implemented using WebSockets (STOMP protocol), and data persistence will be ensured by a PostgreSQL relational database. The RabbitMQ broker will be used to handle asynchronous tasks and queuing, while fast aggregates and caches will be maintained in Redis. FFmpeg will be used to prepare HLS (HTTP Live Streaming) stream variants. Payment mechanisms will be integrated with the Stripe platform.
+
+## Deployment Architecture and Infrastructure
+The application will be deployed on a virtual server (VPS) and run as a set of Docker containers. The production configuration includes seven containers, each representing a PostgreSQL database server, RabbitMQ broker, Redis storage, a backend container, a frontend container, the certbot service for managing TLS certificates, and the Watchtower tool for supporting container image updates. Media content (HLS segments and static assets) will be distributed using the Cloudflare content delivery network (CDN), which will offload the origin (VPS) and reduce playback startup times. A reverse proxy (e.g., nginx) will be configured to terminate TLS, handle API requests, and redirect WebSocket connections.
+
+## Recommendation and Monetization Mechanisms
+
+The recommendation system will be designed with a two-stage model: fast, aggregated recommendations based on monthly trending items (global artist, track, and album rankings) will be generated in batch mode and cached in Redis; personalized suggestions will be prepared in addition to this mechanism using signals related to listens, likes, and social interactions. Payments and subscriptions will be handled by Stripe.
+
 ## Summary
-The music platform combines streaming with social features, allowing for more interactive discovery of new music and building relationships with other users and artists.
+The developed platform will combine high-quality streaming functionality with extensive social features, enabling more interactive music discovery and deepening the relationship between artists and audiences. Deployment in a containerized environment on a VPS using Cloudflare as a CDN and predefined components (PostgreSQL, RabbitMQ, Redis, backend, frontend, certbot, Watchtower) will achieve the required levels of performance, availability, and security. Recommendation mechanisms and integration with Stripe will form the basis for the development of a subscription-based business model and creator promotion.
 
 ## Sample Screenshots
 ![image1](https://github.com/user-attachments/assets/fc80c89e-cbae-4fb7-a72d-b614a38c9278)
