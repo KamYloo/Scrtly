@@ -34,6 +34,7 @@ function MobileNav({setCreatePlayList}) {
 
   const handleLogout = async () => {
     try {
+      setShowUserDropdown(false);
       await logout().unwrap();
       toast.success("Logged out successfully");
       navigate("/login");
@@ -102,7 +103,7 @@ function MobileNav({setCreatePlayList}) {
                       Logout
                     </div>
                     {!currentUser.premium ? (
-                        <div className="dropdown-item">
+                        <div className="dropdown-item" onClick={() => setShowUserDropdown(false)}>
                           <SubscribeButton
                               successUrl={`${base}/success`}
                               cancelUrl={`${base}/cancel`}
@@ -110,15 +111,18 @@ function MobileNav({setCreatePlayList}) {
                         </div>
                     ):
                         <div className="dropdown-item">
-                          <i onClick={() => navigate('/account/billing')} title="My subscribe">
-                          <FaCrown/>
-                          <p>My <span>Premium</span></p>
+                          <i onClick={() => {
+                            setShowUserDropdown(false);
+                            navigate('/account/billing');
+                          }} title="My subscribe">
+                            <FaCrown/>
+                            <p>My <span>Premium</span></p>
                           </i>
                         </div>}
                   </>
                 ) : (
-                  <div
-                    className="dropdown-item"
+                    <div
+                        className="dropdown-item"
                     onClick={() => {
                       navigate("/login");
                       setShowUserDropdown(false);
