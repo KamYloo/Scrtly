@@ -17,7 +17,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Data
+@Getter
+@Setter
 @EntityListeners(AuditingEntityListener.class)
 public class ChatRoomEntity {
 
