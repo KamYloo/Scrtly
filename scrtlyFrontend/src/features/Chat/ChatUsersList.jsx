@@ -74,7 +74,7 @@ function ChatUsersList({ chats, onChatSelect }) {
                                 />
                                 <div className="text">
                                     <span>{displayName}</span>
-                                    <p>Last message...</p>
+                                   {/* <p>Last message...</p>*/}
                                 </div>
                                 <i onClick={(e) => {
                                     e.stopPropagation();

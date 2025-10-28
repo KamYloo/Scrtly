@@ -17,10 +17,10 @@ function LeftMenu({ onVolumeChange, currentTrack, setCreatePlayList}) {
                 <img src={logo} alt="" />
                 <h2>Zuvoria</h2>
             </div>
-            <div className="searchBox">
+           {/* <div className="searchBox">
                 <input type="text" placeholder='Search...' />
                 <i className='searchIcon'><BiSearchAlt /></i>
-            </div>
+            </div>*/}
 
             <Menu title={'Menu'} menuObject={MenuList}/>
             <MenuPlayList setCreatePlayList={setCreatePlayList}/>

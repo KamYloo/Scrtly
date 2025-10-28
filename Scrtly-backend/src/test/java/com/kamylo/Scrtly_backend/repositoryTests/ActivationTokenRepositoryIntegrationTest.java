@@ -31,12 +31,22 @@ public class ActivationTokenRepositoryIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        tokenUser = new UserEntity();
-        tokenUser.setEmail("test@example.com");
+        tokenUser = UserEntity.builder()
+                .email("test@example.com")
+                .nickName("testnick")
+                .fullName("Test User")
+                .password("secret")
+                .enable(true)
+                .build();
         testEntityManager.persist(tokenUser);
 
-        secondaryUser = new UserEntity();
-        secondaryUser.setEmail("user2@example.com");
+        secondaryUser = UserEntity.builder()
+                .email("user2@example.com")
+                .nickName("user2")
+                .fullName("User Two")
+                .password("secret")
+                .enable(true)
+                .build();
         testEntityManager.persist(secondaryUser);
 
         testEntityManager.flush();
@@ -81,8 +91,13 @@ public class ActivationTokenRepositoryIntegrationTest {
 
     @Test
     void findByUser_shouldReturnEmpty_whenNoTokenAssociatedWithUser() {
-        UserEntity noTokenUser = new UserEntity();
-        noTokenUser.setEmail("no.token@example.com");
+        UserEntity noTokenUser = UserEntity.builder()
+                .email("no.token@example.com")
+                .nickName("notoken")
+                .fullName("No Token")
+                .password("secret")
+                .enable(true)
+                .build();
         testEntityManager.persist(noTokenUser);
         testEntityManager.flush();
 

@@ -29,12 +29,22 @@ public class PasswordResetTokenRepositoryIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        userWithToken = new UserEntity();
-        userWithToken.setEmail("user.token@example.com");
+        userWithToken = UserEntity.builder()
+                .email("user.token@example.com")
+                .nickName("user_token")
+                .fullName("User Token")
+                .password("secret")
+                .enable(true)
+                .build();
         testEntityManager.persist(userWithToken);
 
-        userWithoutToken = new UserEntity();
-        userWithoutToken.setEmail("user.notoken@example.com");
+        userWithoutToken = UserEntity.builder()
+                .email("user.notoken@example.com")
+                .nickName("user_notoken")
+                .fullName("User NoToken")
+                .password("secret")
+                .enable(true)
+                .build();
         testEntityManager.persist(userWithoutToken);
 
         testEntityManager.flush();

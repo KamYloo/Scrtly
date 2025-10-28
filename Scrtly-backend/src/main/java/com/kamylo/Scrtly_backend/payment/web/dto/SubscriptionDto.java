@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class SubscriptionDto {
+    private Long id;
     private String status;
     private LocalDateTime startDate;
     private LocalDateTime currentPeriodEnd;
