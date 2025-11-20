@@ -316,6 +316,7 @@ function AudioList({ volume, onTrackChange, initialSongs, req_artist, isplayList
                 onPrev={()=>setMainSong((currentIndex-1+songs.length)%songs.length)}
                 isLiked={favorites.has(songs[currentIndex]?.id)}
                 onLike={()=>likeSongHandler(songs[currentIndex]?.id)}
+                nextTrackInfo={songs[currentIndex + 1]}
             />
         </div>
     )
