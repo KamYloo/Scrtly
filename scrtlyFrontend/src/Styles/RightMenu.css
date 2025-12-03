@@ -3,7 +3,7 @@
     width: 100px;
     min-width: 100px;
     z-index: 1;
-    background: rgba(27, 27, 27, 0.418);
+    background: var(--bg-color5);
     backdrop-filter: blur(10px);
     border-left: 1px solid rgba(255, 255, 255, 0.103);
     transition: all 0.3s ease;
@@ -27,7 +27,7 @@
 .rightMenu .profile i,
 .rightMenu .profile p {
     margin: 20px 0;
-    color: white;
+    color: var(--text-primary);
     text-align: center;
     font-size: 20px;
     position: relative;
@@ -38,7 +38,7 @@
 }
 
 .rightMenu .top i p span {
-    color: #848484;
+    color: var(--text-header);
     margin-right: 5px;
 }
 
@@ -81,7 +81,7 @@
     position: absolute;
     width: 30vh;
     height: 100vh;
-    background: rgba(18, 16, 16, 0.85);
+    background: var(--bg-color6);
     top: 0;
     right: 100px;
     display: flex;
@@ -89,7 +89,7 @@
     align-items: center;
     padding: 2vh;
     h5 {
-        color: white;
+        color: var(--text-primary);
         font-weight: bold;
         font-size: 24px;
     }
@@ -117,7 +117,7 @@
         background: rgba(48, 48, 48, 0.83);
         border-radius: 10px;
         padding: 1vh;
-        color: rgba(255, 255, 255, 0.88);
+        color: var(--text-secondary2);
         width: 100%;
         position: relative;
     }
@@ -150,7 +150,7 @@
         -webkit-line-clamp: 4;
         overflow: hidden;
         text-overflow: ellipsis;
-        color: rgba(255, 255, 255, 0.88);
+        color: var(--text-secondary2);
         line-height: 1.2em;
         max-height: 5em;
         margin: 0;
@@ -159,7 +159,7 @@
     }
 
     .notificationsListItem span {
-        color: rgba(255, 255, 255, 0.5);
+        color: var(--text-secondary3);
         font-size: 0.9em;
     }
 

@@ -3,7 +3,7 @@
     width: 100vh;
     z-index: 1;
     flex-grow: 1;
-    background: rgba(31, 31, 31, 0.596);
+    background: var(--bg-color10);
     backdrop-filter: blur(3px);
     transition: all 0.3s ease;
 }
@@ -20,7 +20,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    filter: grayscale(100);
+    filter: grayscale(100%);
 }
 
 .banner .content {
@@ -51,7 +51,7 @@
 }
 
 .banner .content .top p {
-    color: rgb(129, 129, 129);
+    color: var(--text-header);
     font-size: 14px;
     font-weight: 600;
     letter-spacing: 1px;
@@ -99,7 +99,7 @@
 }
 
 .banner .content .artist .left p span {
-    color: rgb(129, 129, 129);
+    color: #919191;
     margin-left: 5px;
 }
 
@@ -131,7 +131,7 @@
 
 
 .banner .content .artist .right button {
-    background: rgba(0, 0, 0, 0.589);
+    background: var(--bg-color11);
     margin-right: 0;
     border: 1px solid rgba(255, 255, 255, 0.11);
 }
@@ -142,13 +142,13 @@
 }
 
 .banner .content .artist .right .follow {
-    background: aqua;
+    background: var(--button-color);
     color: black;
 }
 
 .banner .content .artist .right .following {
     background: transparent;
-    color: aqua;
+    color: var(--button-color);
     border: 1px solid aqua;
 }
 
@@ -157,7 +157,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 15px 25px;
-    background: rgb(44, 44, 44);
+    background: var(--bg-color12);
     z-index: 2;
     height: 5.5vh;
 }
@@ -175,7 +175,7 @@
 
 .mainBox .menuList ul li a {
     text-decoration: none;
-    color: rgb(151, 151, 151);
+    color: var(--text-secondary3);
     font-size: 14px;
     font-weight: bold;
 }
@@ -189,7 +189,7 @@
     width: 0px;
     height: 5px;
     border-radius: 5px;
-    background: white;
+    background: var(--text-primary);
 }
 
 .mainBox .menuList ul li:hover::before,
@@ -200,12 +200,12 @@
 
 .mainBox .menuList ul li:hover a,
 .mainBox .menuList ul li a.active {
-    color: white;
+    color: var(--text-primary);
     transition: 0.3s;
 }
 
 .mainBox .menuList p {
-    color: white;
+    color: var(--text-primary);
     font-size: 14px;
 }
 
@@ -217,7 +217,7 @@
 .mainBox .menuList p span {
     font-size: 12px;
     text-align: center;
-    color: rgb(151, 151, 151);
+    color: var(--text-secondary3);
     margin-left: 6px;
 }
 
@@ -229,12 +229,12 @@
 
 .audioList .title {
     font-size: 18px;
-    color: white;
+    color: var(--text-primary);
 }
 
 .audioList .title span {
     font-size: 12px;
-    color: rgb(151, 151, 151);
+    color: var(--text-secondary3);
 }
 
 .songsBox {
@@ -248,15 +248,15 @@
     align-items: center;
     font-size: 14px;
     font-weight: 600;
-    color: rgb(151, 151, 151);
+    color: var(--text-secondary3);
     width: 100%;
     margin: 10px 0;
-    padding: 5px;
+    padding: 5px 10px;
 }
 
 .songsBox .songs:hover,
 .songsBox .songs.active {
-    color: white;
+    color: var(--text-primary);
     transition: 0.3s;
 }
 
@@ -278,7 +278,7 @@
     height: 45px;
     min-width: 45px;
     border-radius: 0.5em;
-    background: rgb(49, 49, 56);
+    background: var(--bg-color13);
     margin-right: 10px;
     overflow: hidden;
 }
@@ -335,9 +335,9 @@
     position: relative;
     .playLists {
         overflow-y: auto;
-        color: black;
+        color: var(--button-text);
         position: absolute;
-        background: white;
+        background: var(--text-primary);
         width: 15vh;
         height: 7vh;
         right: 0;
@@ -357,8 +357,8 @@
         }
 
         p:hover {
-            color: aqua;
-            background: black;
+            color: var(--button-color);
+            background: var(--button-text);
         }
     }
 }
@@ -371,7 +371,7 @@
     overflow: auto;
     p {
         width: 100%;
-        color: #d8d1d1;
+        color: var(--text-secondary2);
         font-size: 20px;
         padding: 2vh 4vh;
         word-wrap: break-word;
@@ -390,8 +390,8 @@
 }
 
 .songs.playing {
-    box-shadow: 0 4px 8px rgba(44, 44, 51, 0.7);
-    background: rgba(255, 255, 255, 0.04);
+    box-shadow: var(--shadow5);
+    background: var(--bg-color14);
     border-radius: 5px;
     transition: box-shadow 0.3s;
 }
@@ -402,7 +402,7 @@
 }
 
 .songs.disabled .songName {
-    color: #999;
+    color: var(--text-secondary3);
 }
 
 @media screen and (max-width : 748px) {

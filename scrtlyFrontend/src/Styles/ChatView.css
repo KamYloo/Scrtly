@@ -3,7 +3,7 @@
   width: calc(100vw - 380px);
   z-index: 1;
   flex-grow: 1;
-  background: rgba(31, 31, 31, 0.596);
+  background: var(--bg-color10);
   backdrop-filter: blur(3px);
   transition: all 0.3s ease;
   display: flex;
@@ -27,7 +27,7 @@
 
 .chatView .chatNone {
   flex: 3;
-  color: rgba(255, 255, 255, 0.651);
+  color: var(--text-secondary);
   text-align: center;
   margin-top: 10vh;
   font-size: 30px;
@@ -55,7 +55,7 @@
   }
 
   h2 {
-    color: white;
+    color: var(--text-primary);
     font-size: 22px;
     font-weight: bold;
   }
@@ -67,7 +67,7 @@
 
   i {
     width: 20px;
-    color: white;
+    color: var(--text-primary);
   }
 }
 
@@ -86,7 +86,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      background: rgba(10, 10, 10, 0.63);
+      background: var(--bg-color7);
       border-radius: 10px;
       padding: 10px;
       max-width: 100%;
@@ -95,23 +95,23 @@
         background-color: transparent;
         outline: none;
         border: none;
-        color: white;
+        color: var(--text-primary);
         width: 100%;
       }
 
       i {
-        color: white;
+        color: var(--text-primary);
       }
     }
 
     .addUserBtn {
       width: 36px;
       height: 36px;
-      background: rgba(10, 10, 10, 0.63);
+      background: var(--bg-color7);
       padding: 5px;
       border-radius: 10px;
       cursor: pointer;
-      color: white;
+      color: var(--text-primary);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -142,18 +142,18 @@
 
       span {
         font-weight: 500;
-        color: white;
+        color: var(--text-primary);
       }
 
       p {
         font-size: 14px;
         font-weight: 300;
-        color: white;
+        color: var(--text-primary);
       }
     }
 
     i {
-      color: white;
+      color: var(--text-primary);
       font-size: 24px;
       margin-left: auto;
       transition: 0.3s ease-in-out;
@@ -195,14 +195,14 @@
 
         span {
           font-size: 18px;
-          color: white;
+          color: var(--text-primary);
           font-weight: bold;
         }
 
         p {
           font-weight: 300;
           font-size: 14px;
-          color: gray;
+          color: var(--text-header);
         }
       }
     }
@@ -212,7 +212,7 @@
       gap: 20px;
 
       i {
-        color: white;
+        color: var(--text-primary);
         font-size: 16px;
       }
     }
@@ -231,8 +231,7 @@
       max-width: 70%;
       display: flex;
       gap: 20px;
-      justify-content: center;
-      align-items: center;
+      align-items: flex-start;
 
       img {
         width: 40px;
@@ -246,9 +245,9 @@
 
     .text {
       display: flex;
-      flex: 1;
       flex-direction: column;
       gap: 5px;
+      max-width: 100%;
 
       img {
         width: 100%;
@@ -258,17 +257,17 @@
       }
 
       p {
-        background: rgb(52, 52, 54);
+        background: rgb(55, 55, 55);
         padding: 20px;
         border-radius: 10px;
-        color: white;
+        color: #cdcdcd;;
         word-wrap: break-word;
         white-space: pre-wrap;
         overflow-wrap: break-word;
       }
 
       span {
-        color: white;
+        color: var(--text-primary);
         font-size: 13px;
       }
 
@@ -288,8 +287,8 @@
           cursor: pointer;
         }
         button:hover {
-          color: aqua;
-          background: rgba(9, 9, 9, 0.75);
+          color: var(--button-color);
+          background: var( --bg-color7);
         }
       }
     }
@@ -338,16 +337,16 @@
     }
 
     i {
-      color: white;
+      color: var(--text-primary);
       font-size: 18px;
       cursor: pointer;
     }
 
     input {
-      background: rgba(10, 10, 10, 0.63);
+      background: var(--bg-color7);
       border: none;
       outline: none;
-      color: white;
+      color: var(--text-primary);
       padding: 20px;
       font-size: 16px;
       border-radius: 10px;
@@ -366,9 +365,9 @@
     }
 
     .sendButton {
-      background: rgb(51, 51, 56);
+      background: var(--bg-color13);
       padding: 10px 20px;
-      color: white;
+      color: var(--text-primary);
       border: none;
       border-radius: 5px;
       cursor: pointer;
@@ -413,7 +412,7 @@
       background: rgb(53, 53, 53);
       border: none;
       cursor: pointer;
-      color: white;
+      color: var(--text-primary);
     }
   }
 
@@ -437,7 +436,7 @@
       }
 
       span {
-        color: white;
+        color: var(--text-primary);
       }
     }
 
@@ -447,7 +446,7 @@
       background: rgb(53, 53, 53);
       border: none;
       cursor: pointer;
-      color: white;
+      color: var(--text-primary);
     }
   }
 }
@@ -457,7 +456,7 @@
   border: none;
   border-radius: 10px;
   background: rgb(53, 53, 53);
-  color: white;
+  color: var(--text-primary);
   cursor: pointer;
   transition: background 0.3s ease-in-out;
 }
@@ -483,7 +482,7 @@
   border: none;
   outline: none;
   background: rgba(10, 10, 10, 0.63);
-  color: white;
+  color: var(--text-primary);
 }
 
 .addUser {
@@ -493,7 +492,7 @@
 .editMessageInput {
   padding: 10px;
   background: rgba(52, 52, 54, 0.8);
-  color: white;
+  color: var(--text-primary);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 5px;
   font-size: 16px;
@@ -614,7 +613,7 @@
   .chat .top .backBtn {
     background: none;
     border: none;
-    color: white;
+    color: var(--text-primary);
     font-size: 16px;
     padding: 10px;
     cursor: pointer;

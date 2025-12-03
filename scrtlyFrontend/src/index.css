@@ -1,3 +1,107 @@
+:root {
+  --bg-color: rgba(255, 255, 255, 0.85);
+  --bg-color2: rgba(255, 255, 255, 0.95);
+  --bg-color3: rgba(255, 255, 255, 0.8);
+  --bg-color4: rgba(0, 0, 0, 0.05);
+  --bg-color5: rgba(255, 255, 255, 0.8);
+  --bg-color6: rgba(255, 255, 255, 0.95);
+  --bg-color7: rgba(255, 255, 255, 0.85);
+  --bg-color8: rgba(0, 0, 0, 0.06);
+  --bg-color9: rgba(0, 0, 0, 0.04);
+  --bg-color10: rgba(255, 255, 255, 0.85);
+  --bg-color11: rgba(0, 0, 0, 0.2);
+  --bg-color12: rgba(239, 239, 239, 0.9);
+  --bg-color13: #f0f2f5;
+  --bg-color14: rgba(0, 0, 0, 0.05);
+  --bg-color15: rgba(239, 239, 239, 0.9);
+  --bg-color16: rgba(174, 174, 174, 0.65);
+
+  --text-primary: #1c1e21;
+  --text-secondary: rgba(0, 0, 0, 0.6);
+  --text-secondary2: #65676b;
+  --text-secondary3: #8a8d91;
+  --text-secondary4: #4b4c4f;
+  --text-secondary5: #606770;
+  --text-header: #4a4a4a;
+
+  --button-color: #00bcd4;
+  --button-text: #ffffff;
+  --icon-color: #65676b;
+  --hover-bg: #f0f2f5;
+
+  --shadow: 0px 1px 2px rgba(0, 0, 0, 0.1);
+  --shadow2: 0px 4px 12px rgba(0, 0, 0, 0.15);
+  --shadow3: 0px 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow4: 0px 8px 15px rgba(0, 0, 0, 0.23);
+  --shadow5: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+  --bg-color-home1: #64b5f6;
+  --bg-color-home2: #1976d2;
+
+  --bg-color-home3: #bcaaa4;
+  --bg-color-home4: #8d6e63;
+
+  --bg-color-home5: #ff8a65;
+  --bg-color-home6: #d84315;
+
+  --bg-color-home7: #4db6ac;
+  --bg-color-home8: #00796b;
+
+  --bg-color-home9: #ba68c8;
+  --bg-color-home10: #8e24aa;
+
+  --bg-color-home11: #7986cb;
+  --bg-color-home12: #303f9f;
+}
+
+[data-theme='dark'] {
+  --bg-color: rgba(0, 0, 0, 0.137);
+  --bg-color2: rgba(0, 0, 0, 0.575);
+  --bg-color3: rgba(27, 27, 27, 0.644);
+  --bg-color4: rgba(255, 255, 255, 0.123);
+  --bg-color5: rgba(27, 27, 27, 0.418);
+  --bg-color6: rgba(18, 16, 16, 0.85);
+  --bg-color7: rgba(7, 7, 7, 0.575);
+  --bg-color8: rgba(0, 0, 0, 0.38);
+  --bg-color9: rgba(0, 0, 0, 0.329);
+  --bg-color10: rgba(31, 31, 31, 0.596);
+  --bg-color11: rgba(0, 0, 0, 0.589);
+  --bg-color12: rgb(44, 44, 44);
+  --bg-color13: rgb(49, 49, 56);
+  --bg-color14: rgba(255, 255, 255, 0.04);
+  --bg-color15: rgba(31, 31, 31, 0.9);
+  --bg-color16: rgba(15, 15, 15, 0.651);
+  --menu-bg: #242526;
+  --text-primary: white;
+  --text-secondary: rgba(255, 255, 255, 0.623);
+  --text-secondary2: #cdcdcd;
+  --text-secondary3: #919191;
+  --text-secondary4: rgb(177, 177, 177);
+  --text-secondary5: rgb(167, 167, 167);
+  --text-header: grey;
+  --button-color: aqua;
+  --button-text: black;
+  --icon-color: #b0b3b8;
+  --hover-bg: #3a3b3c;
+  --shadow: 0px 0px 10px rgba(0,0,0,0.5);
+  --shadow2: 0px 12px 25px rgba(0, 0, 0, 0.6);
+  --shadow3: 0px 0px 20px rgba(0, 0, 0, 0.384);
+  --shadow4: 0px 8px 15px rgba(35, 35, 35, 0.4);
+  --shadow5: 0 4px 8px rgba(44, 44, 51, 0.7);
+  --bg-color-home1: #476a8a;
+  --bg-color-home2: #235788;
+  --bg-color-home3: #a69984;
+  --bg-color-home4: #a78653;
+  --bg-color-home5: #a24c34;
+  --bg-color-home6: #a33617;
+  --bg-color-home7: #0d4045;
+  --bg-color-home8: #073236;
+  --bg-color-home9: #a67894;
+  --bg-color-home10: #a74280;
+  --bg-color-home11: #5547a5;
+  --bg-color-home12: #3724a5;
+}
+
 * {
   margin: 0;
   padding: 0;
