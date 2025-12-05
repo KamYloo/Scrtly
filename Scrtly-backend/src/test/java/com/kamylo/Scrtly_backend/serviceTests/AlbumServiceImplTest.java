@@ -94,7 +94,6 @@ class AlbumServiceImplTest {
         }
         alb.setSongs(songs != null ? songs : Collections.emptyList());
         alb.setCoverImage(coverImage);
-        // Title/releaseDate not strictly needed for tests, but set a title to avoid NPEs in some mappers
         alb.setTitle("Title-" + id);
         return alb;
     }
@@ -286,7 +285,6 @@ class AlbumServiceImplTest {
         AlbumEntity entity = createAlbumEntity(77, artistId, Collections.emptyList(), null);
         AlbumDto dto = createAlbumDto(77, "PagedNoQuery");
 
-        // REMOVED unnecessary stub: artistRepository.existsById(artistId) -- service does not call it anymore
         Page<AlbumEntity> page = new PageImpl<>(List.of(entity), pageable, 1);
         when(albumRepository.findByArtistId(eq(artistId), eq(pageable))).thenReturn(page);
         when(albumMapper.toDto(any(AlbumEntity.class))).thenReturn(dto);
@@ -304,7 +302,6 @@ class AlbumServiceImplTest {
         AlbumEntity entity = createAlbumEntity(88, artistId, Collections.emptyList(), null);
         AlbumDto dto = createAlbumDto(88, "Filtered");
 
-        // REMOVED unnecessary stub: artistRepository.existsById(artistId) -- service does not call it anymore
         Page<AlbumEntity> page = new PageImpl<>(List.of(entity), pageable, 1);
         when(albumRepository.findByArtistIdAndTitleIgnoreCaseContaining(eq(artistId), eq("Filtered"), eq(pageable)))
                 .thenReturn(page);

@@ -16,7 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "album")
+@Table(name = "album", indexes = {
+        @Index(name = "idx_album_title", columnList = "title")
+})
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder

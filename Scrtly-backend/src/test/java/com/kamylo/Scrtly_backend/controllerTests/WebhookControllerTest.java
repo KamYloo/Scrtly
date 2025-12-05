@@ -31,7 +31,6 @@ class WebhookControllerTest {
 
     @Test
     void handle_checkoutSession_completed_invokesHandler() {
-        // Arrange
         Event event = mock(Event.class, RETURNS_DEEP_STUBS);
         Session session = mock(Session.class);
         when(session.getClientReferenceId()).thenReturn("123");
@@ -39,76 +38,62 @@ class WebhookControllerTest {
         when(event.getDataObjectDeserializer().getObject()).thenReturn(Optional.of(session));
         when(stripe.constructEvent("payload", "sig")).thenReturn(event);
 
-        // Act
         ResponseEntity<Void> resp = controller.handle("payload", "sig");
 
-        // Assert
         assertEquals(200, resp.getStatusCodeValue());
         verify(subscriptionService).handleCheckoutSession(session, 123L);
     }
 
     @Test
     void handle_invoice_payment_succeeded_invokesHandler() {
-        // Arrange
         Event event = mock(Event.class, RETURNS_DEEP_STUBS);
         Invoice invoice = mock(Invoice.class);
         when(event.getType()).thenReturn("invoice.payment_succeeded");
         when(event.getDataObjectDeserializer().getObject()).thenReturn(Optional.of(invoice));
         when(stripe.constructEvent("p", "s")).thenReturn(event);
 
-        // Act
         ResponseEntity<Void> resp = controller.handle("p", "s");
 
-        // Assert
         assertEquals(200, resp.getStatusCodeValue());
         verify(subscriptionService).handleInvoicePaymentSucceeded(invoice);
     }
 
     @Test
     void handle_subscription_deleted_invokesHandler() {
-        // Arrange
         Event event = mock(Event.class, RETURNS_DEEP_STUBS);
         Subscription sub = mock(Subscription.class);
         when(event.getType()).thenReturn("customer.subscription.deleted");
         when(event.getDataObjectDeserializer().getObject()).thenReturn(Optional.of(sub));
         when(stripe.constructEvent("p2", "s2")).thenReturn(event);
 
-        // Act
         ResponseEntity<Void> resp = controller.handle("p2", "s2");
 
-        // Assert
         assertEquals(200, resp.getStatusCodeValue());
         verify(subscriptionService).handleSubscriptionDeleted(sub);
     }
 
     @Test
     void handle_invoice_payment_failed_invokesHandler() {
-        // Arrange
         Event event = mock(Event.class, RETURNS_DEEP_STUBS);
         Invoice invoice = mock(Invoice.class);
         when(event.getType()).thenReturn("invoice.payment_failed");
         when(event.getDataObjectDeserializer().getObject()).thenReturn(Optional.of(invoice));
         when(stripe.constructEvent("p3", "s3")).thenReturn(event);
 
-        // Act
         ResponseEntity<Void> resp = controller.handle("p3", "s3");
 
-        // Assert
         assertEquals(200, resp.getStatusCodeValue());
         verify(subscriptionService).handleInvoicePaymentFailed(invoice);
     }
 
     @Test
     void handle_unknown_type_noHandlersCalled() {
-        // Arrange
         Event event = mock(Event.class);
         when(event.getType()).thenReturn("some.other.event");
         when(stripe.constructEvent(anyString(), anyString())).thenReturn(event);
 
-        // Act
         ResponseEntity<Void> resp = controller.handle("x", "y");
 
-        // Assert
         assertEquals(200, resp.getStatusCodeValue());
         verifyNoInteractions(subscriptionService);
     }

@@ -7,7 +7,9 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @Entity
-@Table(name = "artist")
+@Table(name = "artist", indexes = {
+        @Index(name = "idx_artist_pseudonym", columnList = "pseudonym", unique = true)
+})
 @AllArgsConstructor
 @NoArgsConstructor
 @Data

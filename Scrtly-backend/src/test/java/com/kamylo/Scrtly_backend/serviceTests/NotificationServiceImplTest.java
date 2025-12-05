@@ -112,7 +112,6 @@ class NotificationServiceImplTest {
 
         service.createOrUpdateNotification(10L, 100L, NotificationType.LIKE, "senderUser");
 
-        // updated count should be 3
         assertEquals(3, existing.getCount());
         assertNotNull(existing.getUpdatedDate());
         verify(notificationRepository).save(existing);
@@ -126,7 +125,6 @@ class NotificationServiceImplTest {
         when(postRepository.findById(100L)).thenReturn(Optional.of(post));
         when(notificationRepository.findByRecipientAndTypeAndPost(recipient, NotificationType.COMMENT, post))
                 .thenReturn(Optional.empty());
-        // simulate save returning entity with id
         when(notificationRepository.save(any(NotificationEntity.class))).thenAnswer(inv -> {
             NotificationEntity n = inv.getArgument(0);
             n.setId(5L);
