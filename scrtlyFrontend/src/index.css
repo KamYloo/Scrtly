@@ -15,6 +15,12 @@
   --bg-color14: rgba(0, 0, 0, 0.05);
   --bg-color15: rgba(239, 239, 239, 0.9);
   --bg-color16: rgba(174, 174, 174, 0.65);
+  --bg-color17: rgba(255, 255, 255, 0.7);
+  --bg-color18: rgba(97, 97, 97, 0.96);
+  --bg-color19: rgba(216, 216, 216, 0.91);
+  --bg-color20: rgba(255, 255, 255, 0.85);
+  --bg-color21: rgb(255, 255, 255);
+  --bg-color22: rgba(255, 255, 255, 0.85);
 
   --text-primary: #1c1e21;
   --text-secondary: rgba(0, 0, 0, 0.6);
@@ -22,10 +28,13 @@
   --text-secondary3: #8a8d91;
   --text-secondary4: #4b4c4f;
   --text-secondary5: #606770;
+  --text-secondary6: rgba(37, 36, 36, 0.87);
   --text-header: #4a4a4a;
 
   --button-color: #00bcd4;
+  --button-color-hover: #00dcf3;
   --button-text: #ffffff;
+  --button-cancel: #0c0000;
   --icon-color: #65676b;
   --hover-bg: #f0f2f5;
 
@@ -34,6 +43,8 @@
   --shadow3: 0px 2px 8px rgba(0, 0, 0, 0.08);
   --shadow4: 0px 8px 15px rgba(0, 0, 0, 0.23);
   --shadow5: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --shadow6: rgba(113, 113, 113, 0.7) 0px 13px 27px -5px,
+  rgba(43, 42, 42, 0.67) 0px 8px 16px -8px;
 
   --bg-color-home1: #64b5f6;
   --bg-color-home2: #1976d2;
@@ -71,6 +82,12 @@
   --bg-color14: rgba(255, 255, 255, 0.04);
   --bg-color15: rgba(31, 31, 31, 0.9);
   --bg-color16: rgba(15, 15, 15, 0.651);
+  --bg-color17: rgba(0, 0, 0, 0.411);
+  --bg-color18: rgba(19, 19, 20, 0.945);
+  --bg-color19: rgba(0, 0, 0, 0.9);
+  --bg-color20: rgba(0, 0, 0, 0);
+  --bg-color21: #1b1b1b;
+  --bg-color22: rgba(18, 16, 16, 0.95);
   --menu-bg: #242526;
   --text-primary: white;
   --text-secondary: rgba(255, 255, 255, 0.623);
@@ -78,9 +95,12 @@
   --text-secondary3: #919191;
   --text-secondary4: rgb(177, 177, 177);
   --text-secondary5: rgb(167, 167, 167);
+  --text-secondary6: rgba(255, 255, 255, 0.836);
   --text-header: grey;
   --button-color: aqua;
+  --button-color-hover: rgb(4, 214, 214);
   --button-text: black;
+  --button-cancel: wheat;
   --icon-color: #b0b3b8;
   --hover-bg: #3a3b3c;
   --shadow: 0px 0px 10px rgba(0,0,0,0.5);
@@ -88,6 +108,8 @@
   --shadow3: 0px 0px 20px rgba(0, 0, 0, 0.384);
   --shadow4: 0px 8px 15px rgba(35, 35, 35, 0.4);
   --shadow5: 0 4px 8px rgba(44, 44, 51, 0.7);
+  --shadow6: rgba(0, 0, 0, 0.699) 0px 13px 27px -5px,
+             rgba(2, 2, 2, 0.671) 0px 8px 16px -8px;
   --bg-color-home1: #476a8a;
   --bg-color-home2: #235788;
   --bg-color-home3: #a69984;

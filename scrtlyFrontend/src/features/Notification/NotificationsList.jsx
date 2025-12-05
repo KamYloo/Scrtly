@@ -18,7 +18,6 @@ export function NotificationsList() {
         if (data?.notifications) {
             setAllNotifications((prev) => {
                 if (page === 0) return data.notifications;
-                // filter out any that we already have
                 const existingIds = new Set(prev.map(n => n.id));
                 const newOnes = data.notifications.filter(n => !existingIds.has(n.id));
                 return [...prev, ...newOnes];
@@ -26,7 +25,6 @@ export function NotificationsList() {
         }
     }, [data, page]);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     const onScroll = useCallback(
         throttle(() => {
             const el = containerRef.current;

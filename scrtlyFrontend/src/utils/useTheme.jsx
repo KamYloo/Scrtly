@@ -6,7 +6,7 @@ export const useTheme = () => {
         if (savedTheme) {
             return savedTheme;
         }
-        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        return 'dark';
     };
 
     const [theme, setTheme] = useState(getInitialTheme);

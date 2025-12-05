@@ -56,8 +56,7 @@
       white-space: nowrap;
       background: var(--bg-color16);
       border-radius: 10px;
-      box-shadow: rgba(0, 0, 0, 0.699) 0px 13px 27px -5px,
-        rgba(2, 2, 2, 0.671) 0px 8px 16px -8px;
+      box-shadow: var(--shadow6);
       width: 80%;
       height: 15vh;
       gap: 32px;
@@ -81,7 +80,7 @@
           background: rgb(59, 59, 65);
           border-radius: 50%;
           object-fit: cover;
-          border: 2px solid aqua;
+          border: 2px solid var(--button-color);
           transition: 0.3s ease;
         }
 
@@ -94,9 +93,9 @@
   }
 
   .addStory {
-    border: 2px solid white;
+    border: 2px solid var(--text-primary);
     border-radius: 10px;
-    background: rgba(0, 0, 0, 0.411);
+    background: var(--bg-color17);
     width: max-content;
     height: max-content;
     padding: 30px;
@@ -116,7 +115,7 @@
         font-size: xx-large;
         color: var(--text-primary);
         font-family: cursive;
-        text-shadow: 5px 0 20px black;
+        text-shadow: 5px 0 20px rgba(0, 0, 0, 0.6);
       }
     }
 
@@ -132,7 +131,7 @@
         padding: 20px;
         margin: 20px;
         border-radius: 10px;
-        background: rgba(54, 54, 54, 0.644);
+        background: var(--bg-color8);
 
         input {
           display: none;
@@ -142,7 +141,7 @@
           outline: none;
           border: none;
           padding: 10px;
-          background: aqua;
+          background: var(--button-color);
           color: black;
           font-size: 13px;
           font-weight: bold;
@@ -152,7 +151,7 @@
         }
 
         button:hover {
-          background: rgb(4, 214, 214);
+          background: var(--button-color-hover);
         }
       }
 
@@ -161,7 +160,7 @@
         border: none;
         padding: 10px 40px;
         border-radius: 10px;
-        background: aqua;
+        background: var(--button-color);
         color: black;
         font-size: 13px;
         font-weight: bold;
@@ -170,7 +169,7 @@
       }
 
       .submit:hover {
-        background: rgb(4, 214, 214);
+        background: var(--button-color-hover);
       }
     }
   }
@@ -181,7 +180,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: var(--bg-color11);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -256,7 +255,7 @@
     left: 0;
     width: 80%;
     height: 4px;
-    background-color: rgba(255, 255, 255, 0.3);
+    background-color: var(--bg-color14);
   }
 
   .progress {
@@ -277,10 +276,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: rgba(15, 15, 15, 0.651);
+    background: var(--bg-color16);
     border-radius: 10px;
-    box-shadow: rgba(0, 0, 0, 0.699) 0px 13px 27px -5px,
-      rgba(2, 2, 2, 0.671) 0px 8px 16px -8px;
+    box-shadow: var(--shadow6);
     width: 65%;
     height: 13vh;
     padding: 2vh 4vh;
@@ -304,7 +302,7 @@
         border: none;
         outline: none;
         border-radius: 10px;
-        background-color: rgba(0, 0, 0, 0.315);
+        background-color: var(--bg-color17);
         padding: 10px;
         width: 100%;
         height: 6vh;
@@ -322,7 +320,7 @@
           display: flex;
           align-items: center;
           gap: 5px;
-          color: rgba(255, 255, 255, 0.836);
+          color: var(--text-primary);
 
           i {
             font-size: 18px;
@@ -346,7 +344,7 @@
         outline: none;
         border: none;
         padding: 8px;
-        background: aqua;
+        background: var(--button-color);
         color: black;
         font-size: 12px;
         font-weight: bold;
@@ -356,12 +354,12 @@
       }
 
       button:hover {
-        background: rgb(4, 214, 214);
+        background: var(--button-color-hover);
       }
 
       .emoji {
         cursor: pointer;
-        color: rgba(255, 255, 255, 0.836);
+        color: var(--text-primary);
         position: relative;
         z-index: 5;
 
@@ -390,10 +388,9 @@
       flex-direction: column;
       align-items: center;
       overflow: scroll;
-      background: rgba(15, 15, 15, 0.651);
+      background: var(--bg-color16);
       border-radius: 10px;
-      box-shadow: rgba(0, 0, 0, 0.699) 0px 13px 27px -5px,
-        rgba(2, 2, 2, 0.671) 0px 8px 16px -8px;
+      box-shadow: var(--shadow6);
       width: 65%;
       height: 59vh;
       padding: 2vh 4vh;
@@ -431,7 +428,7 @@
             outline: none;
             border: none;
             background: var(--text-primary);
-            color: #000000;
+            color: var(--button-text);
             font-size: 14px;
             font-weight: bold;
             padding: 1vh 2vh;
@@ -441,7 +438,7 @@
           select {
             width: 100%;
             height: 100%;
-            color: #000000;
+            color: var(--button-text);
             font-size: 12px;
             background: var(--text-primary);
             outline: none;
@@ -493,6 +490,7 @@
             width: 100%;
             height: 3vh;
             background: var(--text-primary);
+            color: var(--button-text);
             padding: 0 1vh;
             border-radius: 5px;
             cursor: pointer;
@@ -503,7 +501,8 @@
           }
 
           .option:hover {
-            background: aqua;
+            background: var(--hover-bg);
+            color: var(--text-primary);
           }
         }
 
@@ -513,12 +512,12 @@
           background: rgb(59, 59, 65);
           border-radius: 50%;
           object-fit: cover;
-          border: 2px solid aqua;
+          border: 2px solid var(--button-color);
           cursor: pointer;
         }
 
         .userData {
-          color: rgba(255, 255, 255, 0.836);
+          color: var(--text-secondary6);
           font-size: 18px;
           font-weight: 600;
 
@@ -565,7 +564,7 @@
           display: flex;
           align-items: center;
           gap: 5px;
-          color: rgba(255, 255, 255, 0.836);
+          color: var(--text-secondary6);
           cursor: pointer;
 
           i {
@@ -582,7 +581,7 @@
   right: 1vh;
   top: 1vh;
   font-size: 24px;
-  color: wheat;
+  color: var(--button-cancel);
   cursor: pointer;
 }
 
@@ -593,7 +592,7 @@
   padding: 20px;
   position: absolute;
   border-radius: 10px;
-  background: rgba(19, 19, 20, 0.945);
+  background: var(--bg-color18);
   top: 9vh;
   right: 0;
   left: 0;
@@ -688,7 +687,7 @@
         position: absolute;
         right: 3vh;
         font-size: 25px;
-        color: var(--text-primary);
+        color: white;
         margin-left: 2vh;
         margin-top: 1vh;
         cursor: pointer;
@@ -705,7 +704,7 @@
       .commentIcons i {
         position: static;
         font-size: 1.2rem;
-        color: var(--text-primary);
+        color: white;
         margin: 0;
         cursor: pointer;
       }
@@ -732,7 +731,7 @@
 
       .emoji {
         i {
-          color: var(--text-primary);
+          color: white;
           font-size: 20px;
           cursor: pointer;
         }
@@ -748,7 +747,7 @@
         outline: none;
         border: none;
         padding: 8px;
-        background: aqua;
+        background: var(--button-color);
         color: black;
         font-size: 12px;
         font-weight: bold;
@@ -758,7 +757,7 @@
       }
 
       button:hover {
-        background: rgb(4, 214, 214);
+        background: var(--button-color-hover);
       }
 
       textarea {
@@ -769,9 +768,13 @@
         padding: 10px;
         width: 80%;
         height: 6vh;
-        color: var(--text-primary);
+        color: white;
         font-size: 14px;
         resize: vertical;
+      }
+
+      textarea::placeholder {
+        color: white;
       }
     }
   }
@@ -809,7 +812,7 @@
 .replyBtn {
   background: none;
   border: none;
-  color: var(--text-primary);
+  color: white;
   cursor: pointer;
   font-size: 0.9rem;
   padding: 0;
@@ -821,7 +824,7 @@
 }
 
 .replyingTo {
-  color: var(--text-primary);
+  color: white;
   padding: 5px 10px;
   border-radius: 5px;
   display: flex;
@@ -835,7 +838,7 @@
   border: none;
   padding: 8px 16px;
   border-radius: 10px;
-  background: aqua;
+  background: var(--button-color);
   color: black;
   font-size: 13px;
   font-weight: bold;
@@ -844,7 +847,7 @@
 }
 
 .replyingTo button:hover {
-  background: rgb(4, 214, 214);
+  background: var(--button-color-hover);
 }
 
 @media screen and (max-height: 900px) {
