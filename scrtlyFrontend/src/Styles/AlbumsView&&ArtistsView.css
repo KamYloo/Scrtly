@@ -3,7 +3,7 @@
     width: 100vw;
     z-index: 1;
     flex-grow: 1;
-    background: rgba(7, 7, 7, 0.575);
+    background: var(--bg-color7);
     backdrop-filter: blur(3px);
     transition: all 0.3s ease;
     display: flex;
@@ -41,15 +41,16 @@
         margin-top: 3vh;
         height: 6vh;
         margin-bottom: 3vh;
+        box-shadow: none;
 
         .search {
             width: 25vh;
             height: 45px;
             position: relative;
-            color: aliceblue;
+            color: var(--text-primary);
             overflow: hidden;
             border-radius: 10px;
-            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.384);
+
 
             input {
                 width: 100%;
@@ -58,7 +59,7 @@
                 border: none;
                 background: rgba(255, 255, 255, 0.63);
                 padding-left: 45px;
-                color: black;
+                color: var(--button-text);
                 font-size: 14px;
                 font-weight: bold;
 
@@ -66,7 +67,7 @@
 
             .searchIcon {
                 position: absolute;
-                color: aliceblue;
+                color: var(--text-primary);
                 top: 0;
                 left: 0;
                 width: 45px;
@@ -81,8 +82,8 @@
             outline: none;
             border: none;
             padding: 10px 15px;
-            background: aqua;
-            color: black;
+            background: var(--button-color);
+            color: var(--button-text);
             border-radius: 10px;
             font-size: 12px;
             font-weight: 600;
@@ -107,18 +108,18 @@
             justify-content: center;
             z-index: 4;
             position: relative;
-            background-color: rgba(0, 0, 0, 0.38);
+            background-color: var(--bg-color8);
             padding: 20px;
             border-radius: 8px;
             width: 29vh;
             height: 34vh;
-            box-shadow: 0px 8px 15px rgba(35, 35, 35, 0.4);
+            box-shadow: var(--shadow4);
             transition: transform 0.3s ease-in-out, box-shadow 0.2s ease-in-out;
             will-change: transform;
             cursor: pointer;
             &:hover {
                 transform: scale(1.05);
-                box-shadow: 0px 12px 25px rgba(0, 0, 0, 0.6);
+                box-shadow: var(--shadow2);
 
                 img {
                     filter: grayscale(100);
@@ -136,10 +137,10 @@
 
             span, p {
                 font-size: 15px;
-                color: white;
+                color: var(--text-primary);
             }
             span {
-                color: #cdcdcd;
+                color: var(--text-secondary2);
             }
             p {
                 font-family: cursive;
@@ -154,7 +155,7 @@
                 z-index: 5;
                 font-size: 4vh;
                 opacity: 0;
-                color: aqua;
+                color: var(--button-color);
                 transition: opacity 0.3s ease-in-out;
                 pointer-events: none;
             }
@@ -163,8 +164,8 @@
                 display: flex;
                 height: 5vh;
                 width: 5vh;
-                background: aqua;
-                color: black;
+                background: var(--button-color);
+                color: var(--button-text);
                 border-radius: 100%;
                 font-size: 3vh;
                 align-items: center;

@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { MenuList } from "./MenuList";
 import "../Styles/MobileNav.css";
 import logo from "../assets/logo512.png";
-import {FaBell, FaAlignRight, FaCrown} from "react-icons/fa";
+import {FaBell, FaAlignRight, FaCrown, FaMoon, FaSun} from "react-icons/fa";
 import { RiPlayListLine } from "react-icons/ri";
 import { NotificationsList } from "../features/Notification/NotificationsList.jsx";
 import toast from "react-hot-toast";
@@ -12,6 +12,7 @@ import { MenuPlayList } from "../features/PlayList/MenuPlayList.jsx";
 import {SubscribeButton} from "../features/Payment/SubscribeButton.jsx";
 import {useGetCurrentUserQuery, useLogoutMutation} from "../Redux/services/authApi.js";
 import {useGetNotificationsQuery} from "../Redux/services/notificationApi.js";
+import {useTheme} from "../utils/useTheme.jsx";
 
 function MobileNav({setCreatePlayList}) {
   const [showNotifications, setShowNotifications] = useState(false);
@@ -21,6 +22,7 @@ function MobileNav({setCreatePlayList}) {
   const { data: currentUser } = useGetCurrentUserQuery(null, { skip: !localStorage.getItem('isLoggedIn') });
   const [logout] = useLogoutMutation();
   const base = window.location.origin;
+  const { theme, toggleTheme } = useTheme();
 
   const { unseenCount } = useGetNotificationsQuery(
       { page: 0, size: 10 },
@@ -55,6 +57,11 @@ function MobileNav({setCreatePlayList}) {
   const toggleUserDropdown = () => {
     setShowUserDropdown((prev) => !prev);
   };
+
+  const handleThemeSwitch = () => {
+    toggleTheme();
+    setShowUserDropdown(false);
+  }
 
   return (
     <>
@@ -95,41 +102,47 @@ function MobileNav({setCreatePlayList}) {
             {showUserDropdown && (
               <div className="dropdown-menu">
                 {currentUser ? (
-                  <>
-                    <div className="dropdown-item" onClick={handleProfileClick}>
-                      Profile
-                    </div>
-                    <div className="dropdown-item" onClick={handleLogout}>
-                      Logout
-                    </div>
-                    {!currentUser.premium ? (
-                        <div className="dropdown-item" onClick={() => setShowUserDropdown(false)}>
-                          <SubscribeButton
-                              successUrl={`${base}/success`}
-                              cancelUrl={`${base}/cancel`}
-                          />
-                        </div>
-                    ):
-                        <div className="dropdown-item">
-                          <i onClick={() => {
-                            setShowUserDropdown(false);
-                            navigate('/account/billing');
-                          }} title="My subscribe">
-                            <FaCrown/>
-                            <p>My <span>Premium</span></p>
-                          </i>
-                        </div>}
-                  </>
+                    <>
+                      <div className="dropdown-item" onClick={handleProfileClick}>
+                        Profile
+                      </div>
+                      <div className="dropdown-item" onClick={handleLogout}>
+                        Logout
+                      </div>
+                      {!currentUser.premium ? (
+                              <div className="dropdown-item" onClick={() => setShowUserDropdown(false)}>
+                                <SubscribeButton
+                                    successUrl={`${base}/success`}
+                                    cancelUrl={`${base}/cancel`}
+                                />
+                              </div>
+                          ) :
+                          <div className="dropdown-item">
+                            <i onClick={() => {
+                              setShowUserDropdown(false);
+                              navigate('/account/billing');
+                            }} title="My subscribe">
+                              <FaCrown/>
+                              <p>My <span>Premium</span></p>
+                            </i>
+                          </div>}
+                      <div className="dropdown-item" onClick={handleThemeSwitch}>
+                        {theme === 'light' ? <FaMoon/> : <FaSun/>}
+                        <span style={{marginLeft: '5px'}}>
+                        {theme === 'light' ? "Dark Mode" : "Light Mode"}
+                    </span>
+                      </div>
+                    </>
                 ) : (
                     <div
                         className="dropdown-item"
-                    onClick={() => {
-                      navigate("/login");
-                      setShowUserDropdown(false);
-                    }}
-                  >
-                    Login
-                  </div>
+                        onClick={() => {
+                          navigate("/login");
+                          setShowUserDropdown(false);
+                        }}
+                    >
+                      Login
+                    </div>
                 )}
               </div>
             )}

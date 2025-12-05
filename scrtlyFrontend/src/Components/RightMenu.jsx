@@ -1,16 +1,18 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../Styles/RightMenu.css";
-import { FaBell, FaCogs, FaCrown, FaRegHeart, FaSun } from "react-icons/fa";
+import {FaBell, FaCogs, FaCrown, FaMoon, FaRegHeart, FaSun} from "react-icons/fa";
 import { NotificationsList } from "../features/Notification/NotificationsList.jsx";
 import toast from "react-hot-toast";
 import defaultAvatar from "../assets/user.jpg";
 import {SubscribeButton} from "../features/Payment/SubscribeButton.jsx";
 import {useGetCurrentUserQuery, useLogoutMutation} from "../Redux/services/authApi.js";
 import {useGetNotificationsQuery} from "../Redux/services/notificationApi.js";
+import {useTheme} from "../utils/useTheme.jsx";
 
 function RightMenu() {
   const [openNotifications, setOpenNotifications] = useState(false);
+  const { theme, toggleTheme } = useTheme();
   const base = window.location.origin;
   const [logout] = useLogoutMutation();
   const { data: currentUser } = useGetCurrentUserQuery(null, { skip: !localStorage.getItem('isLoggedIn') });
@@ -77,12 +79,14 @@ function RightMenu() {
         </i>*/}
       </div>
       <div className="profile">
-       {/* <i>
-          <FaSun/>
-        </i>
-        <i>
+          <i onClick={toggleTheme} title={theme === 'light' ? "Switch to Dark Mode" : "Switch to Light Mode"}>
+              {theme === 'light' ? <FaMoon /> : <FaSun />}
+          </i>
+
+          {/* <i>
           <FaCogs/>
-        </i>*/}
+        </i>
+        */}
         <div className="profileImg" onClick={handleProfileClick}>
           <img
               src={currentUser?.profilePicture || defaultAvatar}

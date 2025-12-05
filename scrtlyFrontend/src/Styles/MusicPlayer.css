@@ -6,7 +6,7 @@
     left: 0;
     right: 0;
     display: flex;
-    background: rgba(31, 31, 31, 0.9);
+    background: var(--bg-color15);
     z-index: 50;
     height: 100px;
 }
@@ -54,7 +54,7 @@
 .musicPlayer .songAttributes .top .right {
     display: flex;
     align-items: center;
-    color: rgb(219, 215, 215);
+    color: var(--text-secondary2);
     font-size: 16px;
     cursor: pointer;
 }
@@ -63,7 +63,7 @@
     display: flex;
     align-items: center;
     gap: 1.5rem;
-    color: rgb(219, 215, 215);
+    color: var(--text-secondary2);
     font-size: 16px;
     cursor: pointer;
 }
@@ -89,7 +89,7 @@
 
 .musicPlayer .songAttributes .top .middle .back i:nth-child(2),
 .musicPlayer .songAttributes .top .middle .forward i:nth-child(1) {
-    color: rgb(175, 175, 175) !important;
+    color: var(--text-secondary4) !important;
 }
 
 .musicPlayer .songAttributes .top .middle .playPause {
@@ -97,11 +97,11 @@
     height: 30px;
     min-width: 30px;
     border-radius: 100%;
-    background: white;
+    background: var(--text-primary);
     display: flex;
     justify-content: center;
     align-items: center;
-    color: black;
+    color: var(--button-text);
 }
 
 .musicPlayer .songAttributes .bottom {
@@ -113,7 +113,7 @@
 
 .musicPlayer .songAttributes .bottom .currentTime,
 .musicPlayer .songAttributes .bottom .duration {
-    color: white;
+    color: var(--text-primary);
     font-size: 12px;
     font-weight: bold;
 }
@@ -127,8 +127,8 @@
     border-radius: 10px;
     position: relative;
     background: linear-gradient(to right,
-            white 0%,
-            white var(--seek, 0%),
+            var(--text-primary) 0%,
+            var(--text-primary) var(--seek, 0%),
             #848484 var(--seek, 0%),
             #848484 100%);
     cursor: pointer;
@@ -141,7 +141,7 @@
 }
 
 .musicPlayer .songAttributes .bottom .progresBar::-moz-range-track {
-    background: #848484;
+    background: var(--text-header);
     height: 6px;
     border-radius: 10px;
 }
@@ -154,12 +154,12 @@
 }
 
 .musicPlayer .songAttributes .bottom .progresBar::-ms-fill-lower {
-    background: white;
+    background: var(--text-primary);
     border-radius: 10px;
 }
 
 .musicPlayer .songAttributes .bottom .progresBar::-ms-fill-upper {
-    background: #848484;
+    background: var(--text-header);
     border-radius: 10px;
 }
 
@@ -168,7 +168,7 @@
     width: 14px;
     height: 14px;
     border-radius: 50%;
-    background: white;
+    background: var(--text-primary);
     cursor: pointer;
     margin-top: -4px;
 }
@@ -177,7 +177,7 @@
     width: 14px;
     height: 14px;
     border-radius: 50%;
-    background: white;
+    background: var(--text-primary);
     cursor: pointer;
 }
 
@@ -185,7 +185,7 @@
     width: 15px;
     height: 15px;
     border-radius: 50%;
-    background: white;
+    background: var(--text-primary);
     border: none;
     cursor: pointer;
 }

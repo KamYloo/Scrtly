@@ -3,7 +3,7 @@
   width: 100vw;
   z-index: 1;
   flex-grow: 1;
-  background: rgba(0, 0, 0, 0.137);
+  background: var(--bg-color);
   backdrop-filter: blur(3px);
   transition: all 0.3s ease;
   padding: 20px;
@@ -15,7 +15,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  color: white;
+  color: var(--text-primary);
 
   img {
     width: 300px;
@@ -40,7 +40,7 @@
 
       h5 {
         margin-left: 12px;
-        color: rgba(255, 255, 255, 0.623);
+        color: var(--text-secondary);
       }
 
       .buttons {
@@ -51,16 +51,16 @@
 
         button {
           padding: 12px 16px;
-          background-color: aqua;
+          background-color: var(--button-color);
           border: none;
           border-radius: 14px;
-          color: black;
+          color: var(--button-text);
           font-weight: bold;
           cursor: pointer;
         }
 
         i {
-          color: aqua;
+          color: var(--button-color);
           height: 44px;
           width: 44px;
           display: flex;
@@ -91,14 +91,14 @@
 
   .albums .header a,
   .musicList .header a {
-    color: grey;
+    color: var(--text-header);
     font-size: 12px;
     text-decoration: none;
   }
 
   .albums {
-    color: white;
-    background-color: rgba(0, 0, 0, 0.575);
+    color: var(--text-primary);
+    background-color: var(--bg-color2);
     padding: 20px;
     border-radius: 6px;
     width: 40%;
@@ -128,7 +128,7 @@
             z-index: 5;
             font-size: 2.5vh;
             opacity: 0;
-            color: aqua;
+            color: var(--button-color);
             transition: opacity 0.3s ease-in-out;
             pointer-events: none;
           }
@@ -144,11 +144,11 @@
         span,
         p {
           font-size: 15px;
-          color: white;
+          color: var(--text-primary);
         }
 
         span {
-          color: #cdcdcd;
+          color: var(--text-secondary2);
         }
 
         p {
@@ -165,58 +165,58 @@
       }
 
       .item:nth-child(1) {
-        background-color: #476a8a;
+        background-color: var(--bg-color-home1);
 
         &:hover {
-          background-color: #235788;
+          background-color: var(--bg-color-home2);
         }
       }
 
       .item:nth-child(2) {
-        background-color: #a69984;
+        background-color: var(--bg-color-home3);
 
         &:hover {
-          background-color: #a78653;
+          background-color: var(--bg-color-home4);
         }
       }
 
       .item:nth-child(3) {
-        background-color: #a24c34;
+        background-color: var(--bg-color-home5);
 
         &:hover {
-          background-color: #a33617;
+          background-color: var(--bg-color-home6);
         }
       }
 
       .item:nth-child(4) {
-        background-color: #0d4045;
+        background-color: var(--bg-color-home7);
 
         &:hover {
-          background-color: #073236;
+          background-color: var(--bg-color-home8);
         }
       }
 
       .item:nth-child(5) {
-        background-color: #a67894;
+        background-color: var(--bg-color-home9);
 
         &:hover {
-          background-color: #a74280;
+          background-color: var(--bg-color-home10);
         }
       }
 
       .item:nth-child(6) {
-        background-color: #5547a5;
+        background-color: var(--bg-color-home11);
 
         &:hover {
-          background-color: #3724a5;
+          background-color: var(--bg-color-home12);
         }
       }
     }
   }
 
   .musicList {
-    background-color: rgba(0, 0, 0, 0.575);
-    color: white;
+    background-color: var(--bg-color2);
+    color: var(--text-primary);
     padding: 20px;
     border-radius: 6px;
     width: 65%;
@@ -233,7 +233,7 @@
         padding: 10px;
 
         &:hover {
-          box-shadow: 0px 12px 25px rgba(0, 0, 0, 0.6);
+          box-shadow: var(--shadow2);
         }
 
         .info,
@@ -245,7 +245,7 @@
 
         .info {
           p {
-            color: #919191;
+            color: var(--text-secondary3);
             font-size: 12px;
             font-weight: bold;
             margin-top: 6px;
@@ -269,19 +269,19 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: #32323d;
+            background-color: var(--text-secondary3);
             padding: 6px;
             border: 2px solid #464748;
             border-radius: 6px;
 
             i {
               font-size: 10px;
-              color: aqua;
+              color: var(--button-color);
             }
           }
 
           i {
-            color: #919191;
+            color: var(--text-secondary3);
             cursor: pointer;
           }
         }
@@ -300,18 +300,18 @@
   margin-top: 3vh;
   gap: 20px;
   padding: 20px;
-  background-color: rgba(0, 0, 0, 0.575);
+  background-color: var(--bg-color2);
 
   .header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 20px;
-    color: white;
+    color: var(--text-primary);
     font-size: 24px;
 
     a {
-      color: grey;
+      color: var(--text-header);
       font-size: 14px;
       text-decoration: none;
     }
@@ -324,7 +324,7 @@
     justify-content: center;
 
     .item {
-      color: white;
+      color: var(--text-primary);
       display: flex;
       flex-direction: column;
       width: 17vh;
@@ -333,7 +333,7 @@
       align-items: center;
       transition: transform 0.3s ease-in-out, box-shadow 0.2s ease-in-out;
       border-radius: 15px;
-      box-shadow: 0px 12px 25px rgba(0, 0, 0, 0.6);
+      box-shadow: var(--shadow2);
       will-change: transform;
 
       &:hover {
@@ -356,7 +356,7 @@
           right: 0.5vh;
           bottom: 0.5vh;
           font-size: 4vh;
-          color: aqua;
+          color: var(--button-color);
         }
       }
 
@@ -370,7 +370,7 @@
 
         span {
           font-size: 12px;
-          color: #919191;
+          color: var(--text-secondary3);
         }
       }
     }

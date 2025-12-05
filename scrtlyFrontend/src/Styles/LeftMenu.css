@@ -3,7 +3,7 @@
     height: 100%;
     min-height: 100vh;
     z-index: 1;
-    background: rgba(27, 27, 27, 0.644);
+    background: var(--bg-color3);
     backdrop-filter: blur(10px);
     padding: 20px 15px;
     overflow: hidden;
@@ -13,7 +13,7 @@
 }
 
 .LeftMenu .logoBox {
-    color: white;
+    color: var(--text-primary);
     display: flex;
     align-items: center;
     gap: 2vh;
@@ -47,10 +47,10 @@
     height: 45px;
     position: relative;
     margin-top: 20px;
-    color: aliceblue;
+    color: var(--text-primary);
     overflow: hidden;
     border-radius: 10px;
-    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.384);
+    /*box-shadow: var(--shadow3);*/
 }
 
 .LeftMenu .searchBox input {
@@ -83,7 +83,7 @@
 }
 
 .menuBox .title {
-    color: rgb(177, 177, 177);
+    color: var(--text-secondary4);
     font-size: 12px;
     font-weight: bold;
     margin-bottom: 10px;
@@ -105,7 +105,7 @@
 
 .menuBox ul li a {
     text-decoration: none;
-    color: rgb(177, 177, 177);
+    color: var(--text-secondary4);
     display: flex;
     align-items: center;
     font-size: 16px;
@@ -123,7 +123,7 @@
     left: -15px;
     width: 0px;
     height: 100%;
-    background: aqua;
+    background: var(--button-color);
     border-radius: 5px;
 }
 
@@ -135,7 +135,7 @@
 
 .menuBox ul li:hover a,
 .menuBox ul li.active a {
-    color: white;
+    color: var(--text-primary);
     transition: 0.3s;
 }
 
@@ -148,7 +148,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: rgb(177, 177, 177);
+    color: var(--text-secondary4);
     margin-bottom: 10px;
 }
 
@@ -160,7 +160,7 @@
 
 .playListBox .nameBox i {
     cursor: pointer;
-    color: white;
+    color: var(--text-primary);
 }
 
 .playListBox .scrollBox {
@@ -173,12 +173,12 @@
 .playListBox .scrollBox .playList {
     display: flex;
     align-items: center;
-    color: rgb(177, 177, 177);
+    color: var(--text-secondary4);
     margin: 10px 0;
 }
 
 .playListBox .scrollBox .playList:hover {
-    color: white;
+    color: var(--text-primary);
     transition: 0.3s;
 }
 
@@ -192,7 +192,7 @@
 }
 
 .playListBox .scrollBox .playList .trash:hover {
-    color: red;
+    color: #ff0000;
 }
 
 .playListBox .scrollBox .playList i {
@@ -225,14 +225,14 @@
 
 .trackList .top .trackName {
     margin-left: 10px;
-    color: white;
+    color: var(--text-primary);
     font-size: 14px;
 }
 
 .trackList .top .trackName .trackArtist {
     display: block;
     font-size: 12px;
-    color: rgb(167, 167, 167);
+    color: var(--text-secondary5);
 }
 
 .trackList .bottom {
@@ -240,7 +240,7 @@
     align-items: center;
     justify-content: space-between;
     margin-top: 20px;
-    color: rgb(167, 167, 167);
+    color: var(--text-secondary5);
 }
 
 .trackList .bottom i {
@@ -248,7 +248,7 @@
 }
 
 .trackList .bottom i:hover {
-    color: white;
+    color: var(--text-primary);
     transition: 0.3s;
     cursor: pointer;
 }
@@ -259,7 +259,7 @@
     border: none;
     outline: none;
     border-radius: 5px;
-    background: rgba(255, 255, 255, 0.123);
+    background: var(--bg-color4);
     appearance: none;
 }
 
@@ -280,7 +280,7 @@
     width: 10px;
     height: 20px;
     border-radius: 10px;
-    background: white;
+    background: var(--text-primary);
     border: 2px solid rgb(0, 0, 0);
     cursor: pointer;
     position: relative;

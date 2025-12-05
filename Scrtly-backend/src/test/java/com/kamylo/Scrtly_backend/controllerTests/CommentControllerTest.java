@@ -36,7 +36,6 @@ class CommentControllerTest {
 
     @BeforeEach
     void setUp() {
-        // optional common setup
     }
 
     private CommentDto sampleComment(Long id, String text) {

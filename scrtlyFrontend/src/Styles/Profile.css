@@ -4,7 +4,7 @@
     width: 100vh;
     z-index: 1;
     flex-grow: 1;
-    background: rgba(31, 31, 31, 0.596);
+    background: var(--bg-color10);
     backdrop-filter: blur(3px);
     transition: all 0.3s ease;
     display: flex;
@@ -26,7 +26,7 @@
     margin-top: 30px;
 
     .post {
-        border: 1px solid yellow;
+        border: 1px solid var(--text-secondary6);
         height: 34vh;
         width: 31vh;
         cursor: pointer;
@@ -70,7 +70,7 @@
             .stats,
             .description {
                 display: flex;
-                color: white;
+                color: var(--text-primary);
                 justify-content: space-between;
                 gap: 20px;
                 padding: 10px;
@@ -98,13 +98,13 @@
                 }
 
                 .follow {
-                    background: aqua;
+                    background: var(--button-color);
                     color: black;
                 }
                 .follow:hover, .following {
                     background: transparent;
-                    border-block: 2px solid aqua;
-                    color: aqua;
+                    border-block: 2px solid var(--button-color);
+                    color: var(--button-color);
                 }
 
                 i {
@@ -140,9 +140,9 @@
     flex-direction: column;
 
     .edit {
-        border: 2px solid white;
+        border: 2px solid var(--text-primary);
         border-radius: 10px;
-        background: rgba(0, 0, 0, 0.411);
+        background: var(--bg-color19);
         height: 66vh;
         width: 65vh;
         
@@ -153,9 +153,9 @@
 
             h2 {
                 font-size: xx-large;
-                color: white;
+                color: var(--text-primary);
                 font-family: cursive;
-                text-shadow: 5px 0 20px black;
+                text-shadow: 5px 0 20px rgba(0, 0, 0, 0.6);
             }
         }
 
@@ -172,7 +172,7 @@
             padding: 20px;
             margin: 20px;
             border-radius: 10px;
-            background: rgba(54, 54, 54, 0.644);
+            background: var(--bg-color10);
 
             .left {
                 display: flex;
@@ -190,7 +190,7 @@
                 p {
                     font-size: 20px;
                     font-weight: bold;
-                    color: white;
+                    color: var(--text-primary);
                 }
             }
 
@@ -202,7 +202,7 @@
                     outline: none;
                     border: none;
                     padding: 10px;
-                    background: aqua;
+                    background: var(--button-color);
                     color: black;
                     font-size: 13px;
                     font-weight: bold;
@@ -212,7 +212,7 @@
                 }
 
                 button:hover {
-                    background: rgb(4, 214, 214);
+                    background: var(--button-color-hover);
                 }
             }
         }
@@ -223,13 +223,13 @@
             padding: 20px;
             margin: 20px;
             border-radius: 10px;
-            background: rgba(54, 54, 54, 0.644);
+            background: var(--bg-color10);
             gap: 10px;
 
             h4 {
                 font-size: 18px;
                 font-weight: bold;
-                color: white;
+                color: var(--text-primary);
                 margin-bottom: 5px;
             }
 
@@ -240,8 +240,8 @@
                 border-radius: 10px;
                 padding: 10px;
                 height: 12vh;
-                background: rgba(0, 0, 0, 0.404);
-                color: rgb(184, 179, 179);
+                background: var(--bg-color19);
+                color: var(--text-primary);
                 font-size: 14px;
             }
             
@@ -257,7 +257,7 @@
 
         padding: 10px 30px;
         border-radius: 10px;
-        background: aqua;
+        background: var(--button-color);
         color: black;
         font-size: 13px;
         font-weight: bold;
@@ -266,7 +266,7 @@
     }
 
     .submit:hover {
-        background: rgb(4, 214, 214);
+        background: var(--button-color-hover);
     }
     }
     }
