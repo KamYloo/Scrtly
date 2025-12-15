@@ -219,12 +219,19 @@
   padding: 30px;
   position: absolute;
   border-radius: 10px;
-  background: rgba(19, 19, 20, 0.815);
+  background: var(--bg-color18);
   top: 0;
   bottom: 0;
   right: 0;
   left: 0;
   margin: auto;
+
+  .cancel {
+    position: absolute;
+    font-size: 2vh;
+    right: 1vh;
+    top: 1vh;
+  }
 
   form {
     display: flex;
@@ -245,6 +252,13 @@
       cursor: pointer;
       color: white;
     }
+  }
+
+  .songList {
+    display: flex;
+    flex-direction: column;
+    overflow: scroll;
+    height: 15vh;
   }
 
   .song {
