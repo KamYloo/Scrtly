@@ -12,9 +12,9 @@ import org.mapstruct.ReportingPolicy;
         unmappedTargetPolicy = ReportingPolicy.WARN
 )
 public interface UserMapper {
-
-    @Mapping(target = "observersCount", expression = "java(count(user.getFollowers()))")
-    @Mapping(target = "observationsCount", expression = "java(count(user.getFollowings()))")
+    @Mapping(target = "isArtist", expression = "java(user.getArtistEntity() != null)")
+    @Mapping(target = "observersCount", ignore = true)
+    @Mapping(target = "observationsCount", ignore = true)
     @Mapping(target = "observed",  ignore = true)
     @Mapping(target = "isPremium", ignore = true)
     UserDto toDto(UserEntity user);

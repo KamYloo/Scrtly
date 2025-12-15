@@ -16,10 +16,10 @@ import java.util.Set;
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
-    @EntityGraph(attributePaths = {"artistEntity", "refreshToken", "roles", "followers", "followings"})
+    @EntityGraph(attributePaths = {"artistEntity", "refreshToken", "roles"})
     Optional<UserEntity> findByEmail(String username);
 
-    @EntityGraph(attributePaths = {"artistEntity", "refreshToken", "roles", "followers", "followings"})
+    @EntityGraph(attributePaths = {"artistEntity", "refreshToken", "roles"})
     Optional<UserEntity> findByNickName(String nickname);
 
     @Query("select u from UserEntity u where u.fullName like %:query% or u.nickName like %:query%")
@@ -30,4 +30,14 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
             "and ( :query is null or :query = '' or lower(f.fullName) like concat('%', lower(:query), '%') )")
     Page<UserEntity> findFollowersByUserId(@Param("userId") Long userId, @Param("query") String query, Pageable pageable);
 
+    @Query("SELECT count(f) FROM UserEntity u JOIN u.followers f WHERE u.id = :userId")
+    long countFollowers(@Param("userId") Long userId);
+
+    @Query("SELECT count(f) FROM UserEntity u JOIN u.followings f WHERE u.id = :userId")
+    long countFollowings(@Param("userId") Long userId);
+
+    @Query("SELECT CASE WHEN COUNT(f) > 0 THEN true ELSE false END " +
+            "FROM UserEntity u JOIN u.followers f " +
+            "WHERE u.id = :userId AND f.id = :followerId")
+    boolean isFollowedBy(@Param("userId") Long userId, @Param("followerId") Long followerId);
 }

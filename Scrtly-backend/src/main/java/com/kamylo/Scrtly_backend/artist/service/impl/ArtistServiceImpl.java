@@ -68,6 +68,7 @@ public class ArtistServiceImpl implements ArtistService {
         }
 
         ArtistDto artistDto = artistMapper.toDto(artistEntity);
+        artistDto.setTotalFans((int) userRepository.countFollowers(artistId));
         artistDto.setObserved(observed);
         return artistDto;
     }

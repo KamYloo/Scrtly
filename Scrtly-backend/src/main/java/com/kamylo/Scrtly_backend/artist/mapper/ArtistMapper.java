@@ -27,7 +27,7 @@ public abstract class ArtistMapper {
 
 
     @Mapping(source = "user.profilePicture", target = "profilePicture")
-    @Mapping(target = "totalFans", expression = "java(countFollowers(entity.getUser()))")
+    @Mapping(target = "totalFans", ignore = true)
     @Mapping(target = "observed", ignore = true)
     @Mapping(target = "monthlyPlays", ignore = true)
     public abstract ArtistDto toDto(ArtistEntity entity);
@@ -43,13 +43,4 @@ public abstract class ArtistMapper {
     @InheritInverseConfiguration
     @Mapping(target = "user", ignore = true)
     public abstract ArtistEntity toEntity(ArtistDto dto);
-
-
-    int countFollowers(UserEntity user) {
-        return Optional.ofNullable(user)
-                .map(UserEntity::getFollowers)
-                .map(Set::size)
-                .orElse(0);
-    }
-
 }

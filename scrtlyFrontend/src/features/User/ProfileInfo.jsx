@@ -51,6 +51,14 @@ function ProfileInfo() {
                 <img
                     src={viewedUser?.profilePicture || defaultAvatar}
                     alt={viewedUser?.fullName || 'Profile Picture'}
+                    onClick={() => {
+                        if (viewedUser?.isArtist) {
+                            navigate(`/artist/${viewedUser.id}`);
+                        }
+                    }}
+                    style={{
+                        cursor: viewedUser?.isArtist ? 'pointer' : 'default'
+                    }}
                 />
                 <div className="right">
                     <div className="top">
@@ -66,9 +74,10 @@ function ProfileInfo() {
                                 <button onClick={() => navigate("/profile/edit")}>
                                     Edit Profile
                                 </button>
-                                <button onClick={() => setShowVerifyModal(true)} style={{ marginLeft: '10px' }}>
-                                    Verify
-                                </button>
+                                {!viewedUser?.isArtist && (
+                                    <button onClick={() => setShowVerifyModal(true)} style={{marginLeft: '10px'}}>
+                                        Verify
+                                    </button>)}
                             </>
                         )}
                     </div>
@@ -83,9 +92,9 @@ function ProfileInfo() {
                     </div>
                 </div>
             </div>
-            {showVerifyModal && <ArtistVerificationModal onClose={() => setShowVerifyModal(false)} />}
+            {showVerifyModal && <ArtistVerificationModal onClose={() => setShowVerifyModal(false)}/>}
         </div>
     );
 }
 
-export { ProfileInfo };
+export {ProfileInfo};

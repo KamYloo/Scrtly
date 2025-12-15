@@ -38,7 +38,6 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final FileService fileService;
     private final UserMapper userMapper;
-    private final UserLikeChecker userLikeChecker;
     private final ArtistVerificationTokenService artistVerificationTokenService;
     private final EmailService emailService;
     private final SubscriptionRepository subscriptionRepo;
@@ -71,8 +70,12 @@ public class UserServiceImpl implements UserService {
         UserEntity reqUser = (reqUsername != null) ? findUserByEmail(reqUsername) : null;
 
         UserDto userDto = userMapper.toDto(user);
-        if (reqUser != null)
-            userDto.setObserved(userLikeChecker.isUserFollowed(user,reqUser.getId()));
+        userDto.setObserversCount((int) userRepository.countFollowers(user.getId()));
+        userDto.setObservationsCount((int) userRepository.countFollowings(user.getId()));
+        if (reqUser != null) {
+            boolean isObserved = userRepository.isFollowedBy(user.getId(), reqUser.getId());
+            userDto.setObserved(isObserved);
+        }
         return userDto;
     }
 
@@ -98,7 +101,8 @@ public class UserServiceImpl implements UserService {
         userRepository.save(followToUser);
         userRepository.save(reqUser);
         UserDto userDto = userMapper.toDto(followToUser);
-        userDto.setObserved(userLikeChecker.isUserFollowed(followToUser,reqUser.getId()));
+        boolean isObserved = userRepository.isFollowedBy(followToUser.getId(), reqUser.getId());
+        userDto.setObserved(isObserved);
         return userDto;
     }
 
