@@ -7,18 +7,18 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface LikeRepository extends JpaRepository<LikeEntity, Long> {
-    @Query("select i from LikeEntity i where i.user.id = :userId and i.post.id = :postId")
-    LikeEntity isLikeExistPost(@Param("userId") Long userId, @Param("postId") Long postId);
+    Optional<LikeEntity> findByUserIdAndPostId(Long userId, Long postId);
 
-    @Query("select i from LikeEntity i where i.user.id = :userId and i.comment.id = :commentId")
-    LikeEntity isLikeExistComment(@Param("userId") Long userId, @Param("commentId") Long commentId);
+    Optional<LikeEntity> findByUserIdAndCommentId(Long userId, Long commentId);
 
-    @Query("select i from LikeEntity i where i.post.id=:postId")
-    List<LikeEntity> findByPostId(@Param("postId") Long postId);
+    @Query("SELECT l.post.id FROM LikeEntity l WHERE l.user.id = :userId AND l.post.id IN :postIds")
+    Set<Long> findPostIdsLikedByUser(@Param("userId") Long userId, @Param("postIds") List<Long> postIds);
 
-    @Query("select i from LikeEntity i where i.comment.id=:commentId")
-    List<LikeEntity> findByCommentId(@Param("commentId") Long commentId);
+    @Query("SELECT l.comment.id FROM LikeEntity l WHERE l.user.id = :userId AND l.comment.id IN :commentIds")
+    Set<Long> findCommentIdsLikedByUser(@Param("userId") Long userId, @Param("commentIds") List<Long> commentIds);
 }

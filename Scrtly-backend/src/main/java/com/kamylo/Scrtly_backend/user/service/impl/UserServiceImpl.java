@@ -15,7 +15,6 @@ import com.kamylo.Scrtly_backend.user.web.dto.request.UserRequestDto;
 import com.kamylo.Scrtly_backend.artist.service.ArtistVerificationTokenService;
 import com.kamylo.Scrtly_backend.email.service.EmailService;
 import com.kamylo.Scrtly_backend.common.service.FileService;
-import com.kamylo.Scrtly_backend.common.utils.UserLikeChecker;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,6 +1,5 @@
 package com.kamylo.Scrtly_backend.repositoryTests;
 
-import com.kamylo.Scrtly_backend.like.domain.LikeEntity;
 import com.kamylo.Scrtly_backend.post.domain.PostEntity;
 import com.kamylo.Scrtly_backend.post.repository.PostRepository;
 import com.kamylo.Scrtly_backend.post.repository.PostSpecification;
@@ -12,8 +11,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -50,36 +49,81 @@ class PostRepositoryIntegrationTest {
         user.setFollowings(new HashSet<>());
         user.setRoles(new HashSet<>());
         user.setPostEntity(new ArrayList<>());
+
         em.persist(user);
         em.flush();
         return user;
     }
 
     private PostEntity persistPost(String image, String description, UserEntity user) {
+        return persistPostWithCounts(image, description, user, 0, 0);
+    }
+
+    private PostEntity persistPostWithCounts(String image, String description, UserEntity user, int likeCount, int commentCount) {
         PostEntity p = PostEntity.builder()
                 .image(image)
                 .description(description)
                 .creationDate(LocalDateTime.now())
                 .updateDate(LocalDateTime.now())
                 .user(user)
+                .likeCount(likeCount)
+                .commentCount(commentCount)
                 .build();
-        p.setLikes(new HashSet<>());
-        p.setComments(new ArrayList<>());
         em.persist(p);
         em.flush();
         return p;
     }
 
-    private void persistLike(UserEntity user, PostEntity post) {
-        LikeEntity l = LikeEntity.builder()
-                .user(user)
-                .post(post)
-                .build();
-        em.persist(l);
-        if (post.getLikes() == null) post.setLikes(new HashSet<>());
-        post.getLikes().add(l);
-        em.merge(post);
-        em.flush();
+    @Test
+    void incrementLikeCount_increasesValueByOne() {
+        UserEntity u = persistUser("UserA");
+        PostEntity p = persistPost("img.jpg", "desc", u);
+
+        postRepository.incrementLikeCount(p.getId());
+
+        em.clear();
+
+        PostEntity updated = postRepository.findById(p.getId()).orElseThrow();
+        assertThat(updated.getLikeCount()).isEqualTo(1);
+    }
+
+    @Test
+    void decrementLikeCount_decreasesValueByOne() {
+        UserEntity u = persistUser("UserA");
+        PostEntity p = persistPostWithCounts("img.jpg", "desc", u, 10, 0);
+
+        postRepository.decrementLikeCount(p.getId());
+
+        em.clear();
+
+        PostEntity updated = postRepository.findById(p.getId()).orElseThrow();
+        assertThat(updated.getLikeCount()).isEqualTo(9);
+    }
+
+    @Test
+    void incrementCommentCount_increasesValueByOne() {
+        UserEntity u = persistUser("UserA");
+        PostEntity p = persistPost("img.jpg", "desc", u);
+
+        postRepository.incrementCommentCount(p.getId());
+
+        em.clear();
+
+        PostEntity updated = postRepository.findById(p.getId()).orElseThrow();
+        assertThat(updated.getCommentCount()).isEqualTo(1);
+    }
+
+    @Test
+    void decrementCommentCount_decreasesValueByOne() {
+        UserEntity u = persistUser("UserA");
+        PostEntity p = persistPostWithCounts("img.jpg", "desc", u, 0, 5);
+
+        postRepository.decrementCommentCount(p.getId());
+
+        em.clear();
+
+        PostEntity updated = postRepository.findById(p.getId()).orElseThrow();
+        assertThat(updated.getCommentCount()).isEqualTo(4);
     }
 
     @Test
@@ -106,32 +150,26 @@ class PostRepositoryIntegrationTest {
     @Test
     void findAll_withLikesSpecification_filtersByMinAndMaxLikes() {
         UserEntity author = persistUser("Author");
-        UserEntity liker1 = persistUser("L1");
-        UserEntity liker2 = persistUser("L2");
-        UserEntity liker3 = persistUser("L3");
 
-        PostEntity p0 = persistPost("p0.jpg", "zero likes", author); // 0
-        PostEntity p1 = persistPost("p1.jpg", "one like", author);   // 1
-        PostEntity p2 = persistPost("p2.jpg", "two likes", author);  // 2
-        PostEntity p3 = persistPost("p3.jpg", "three likes", author);// 3
-
-        persistLike(liker1, p1);
-
-        persistLike(liker1, p2);
-        persistLike(liker2, p2);
-
-        persistLike(liker1, p3);
-        persistLike(liker2, p3);
-        persistLike(liker3, p3);
+        persistPostWithCounts("p0.jpg", "zero likes", author, 0, 0);
+        persistPostWithCounts("p1.jpg", "one like", author, 1, 0);
+        persistPostWithCounts("p2.jpg", "two likes", author, 2, 0);
+        persistPostWithCounts("p3.jpg", "three likes", author, 3, 0);
 
         Specification<PostEntity> specMin2 = PostSpecification.hasMinLikes(2);
         Page<PostEntity> min2 = postRepository.findAll(specMin2, PageRequest.of(0, 10));
-        assertThat(min2.getTotalElements()).isEqualTo(2L); // p2 and p3
+        assertThat(min2.getTotalElements()).isEqualTo(2L);
+        assertThat(min2.getContent())
+                .extracting(PostEntity::getDescription)
+                .containsExactlyInAnyOrder("two likes", "three likes");
 
         Specification<PostEntity> between1and2 = Specification.where(PostSpecification.hasMinLikes(1))
                 .and(PostSpecification.hasMaxLikes(2));
         Page<PostEntity> between = postRepository.findAll(between1and2, PageRequest.of(0, 10));
-        assertThat(between.getTotalElements()).isEqualTo(2L); // p1 and p2
+        assertThat(between.getTotalElements()).isEqualTo(2L);
+        assertThat(between.getContent())
+                .extracting(PostEntity::getDescription)
+                .containsExactlyInAnyOrder("one like", "two likes");
 
         between.getContent().forEach(p -> {
             assertThat(p.getUser()).isNotNull();
@@ -142,7 +180,7 @@ class PostRepositoryIntegrationTest {
     @Test
     void findAll_specificationReturnsEmptyWhenNoMatches() {
         UserEntity author = persistUser("Solo");
-        persistPost("solo.jpg", "no likes", author);
+        persistPostWithCounts("solo.jpg", "no likes", author, 0, 0);
 
         Specification<PostEntity> spec = Specification.where(PostSpecification.hasMinLikes(5));
         Page<PostEntity> page = postRepository.findAll(spec, PageRequest.of(0, 10));

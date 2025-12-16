@@ -1,7 +1,6 @@
 package com.kamylo.Scrtly_backend.user.repository;
 
 import com.kamylo.Scrtly_backend.user.domain.UserEntity;
-import com.kamylo.Scrtly_backend.user.web.dto.UserMinimalDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;

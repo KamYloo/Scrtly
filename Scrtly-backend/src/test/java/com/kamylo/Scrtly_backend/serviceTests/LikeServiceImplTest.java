@@ -17,7 +17,6 @@ import com.kamylo.Scrtly_backend.like.repository.LikeRepository;
 import com.kamylo.Scrtly_backend.post.repository.PostRepository;
 import com.kamylo.Scrtly_backend.notification.service.NotificationService;
 import com.kamylo.Scrtly_backend.user.service.UserService;
-import com.kamylo.Scrtly_backend.common.utils.UserLikeChecker;
 import com.kamylo.Scrtly_backend.like.service.impl.LikeServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,7 +25,6 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 
-import java.util.HashSet;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -44,7 +42,6 @@ class LikeServiceImplTest {
     @Mock private CommentLikeMapper commentLikeMapper;
     @Mock private ApplicationEventPublisher eventPublisher;
     @Mock private NotificationService notificationService;
-    @Mock private UserLikeChecker userLikeChecker;
 
     @InjectMocks private LikeServiceImpl likeService;
 
@@ -65,13 +62,13 @@ class LikeServiceImplTest {
         post = PostEntity.builder()
                 .id(1L)
                 .user(user)
-                .likes(new HashSet<>())
+                .likeCount(10)
                 .build();
 
         comment = CommentEntity.builder()
                 .id(10L)
                 .user(user)
-                .likes(new HashSet<>())
+                .likeCount(5)
                 .build();
 
         existingLike = LikeEntity.builder()
@@ -82,22 +79,24 @@ class LikeServiceImplTest {
 
         postDto = new PostStatsDto();
         commentDto = new CommentStatsDto();
-
-        lenient().when(userLikeChecker.isPostLikedByUser(any(), anyLong())).thenReturn(false);
-        lenient().when(userLikeChecker.isCommentLikedByUser(any(), anyLong())).thenReturn(false);
     }
 
     @Test
     void likePost_shouldUnlike_whenAlreadyLiked() {
         when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
-        when(likeRepository.isLikeExistPost(user.getId(), post.getId())).thenReturn(existingLike);
+        when(likeRepository.findByUserIdAndPostId(user.getId(), post.getId())).thenReturn(Optional.of(existingLike));
         when(postRepository.findById(post.getId())).thenReturn(Optional.of(post));
         when(postLikeMapper.toDto(existingLike)).thenReturn(postDto);
 
         PostStatsDto result = likeService.likePost(post.getId(), user.getEmail());
 
         assertSame(postDto, result);
+        assertFalse(result.isLikedByUser());
+
         verify(likeRepository).deleteById(existingLike.getId());
+        verify(postRepository).decrementLikeCount(post.getId());
+        assertEquals(9, post.getLikeCount());
+
         verify(notificationService).decrementNotification(post.getUser().getId(), post.getId(), NotificationType.LIKE);
         verify(likeRepository, never()).save(any(LikeEntity.class));
         verify(eventPublisher, never()).publishEvent(any());
@@ -106,7 +105,7 @@ class LikeServiceImplTest {
     @Test
     void likePost_shouldLike_whenNotAlreadyLiked() {
         when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
-        when(likeRepository.isLikeExistPost(user.getId(), post.getId())).thenReturn(null);
+        when(likeRepository.findByUserIdAndPostId(user.getId(), post.getId())).thenReturn(Optional.empty());
         when(postRepository.findById(post.getId())).thenReturn(Optional.of(post));
 
         ArgumentCaptor<LikeEntity> likeCaptor = ArgumentCaptor.forClass(LikeEntity.class);
@@ -121,13 +120,17 @@ class LikeServiceImplTest {
         PostStatsDto result = likeService.likePost(post.getId(), user.getEmail());
 
         assertSame(postDto, result);
+        assertTrue(result.isLikedByUser());
 
         LikeEntity saved = likeCaptor.getValue();
         assertNotNull(saved);
         assertEquals(user, saved.getUser());
         assertEquals(post, saved.getPost());
 
-        verify(postRepository).save(post);
+        verify(likeRepository).save(any(LikeEntity.class));
+        verify(postRepository).incrementLikeCount(post.getId());
+        assertEquals(11, post.getLikeCount());
+
         verify(eventPublisher).publishEvent(any(NotificationEvent.class));
         verify(likeRepository, never()).deleteById(anyLong());
         verify(notificationService, never()).decrementNotification(anyLong(), anyLong(), any());
@@ -136,13 +139,14 @@ class LikeServiceImplTest {
     @Test
     void likePost_shouldThrow_whenPostNotFound() {
         when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
-        when(likeRepository.isLikeExistPost(user.getId(), post.getId())).thenReturn(null);
+        when(likeRepository.findByUserIdAndPostId(user.getId(), post.getId())).thenReturn(Optional.empty());
         when(postRepository.findById(post.getId())).thenReturn(Optional.empty());
 
         CustomException ex = assertThrows(CustomException.class, () -> likeService.likePost(post.getId(), user.getEmail()));
         assertEquals(BusinessErrorCodes.POST_NOT_FOUND, ex.getErrorCode());
 
         verify(likeRepository, never()).save(any());
+        verify(postRepository, never()).incrementLikeCount(anyLong());
         verify(eventPublisher, never()).publishEvent(any());
     }
 
@@ -155,22 +159,27 @@ class LikeServiceImplTest {
                 .build();
 
         when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
-        when(likeRepository.isLikeExistComment(user.getId(), comment.getId())).thenReturn(likeForComment);
         when(commentRepository.findById(comment.getId())).thenReturn(Optional.of(comment));
+        when(likeRepository.findByUserIdAndCommentId(user.getId(), comment.getId())).thenReturn(Optional.of(likeForComment));
         when(commentLikeMapper.toDto(likeForComment)).thenReturn(commentDto);
 
         CommentStatsDto result = likeService.likeComment(comment.getId(), user.getEmail());
 
         assertSame(commentDto, result);
+        assertFalse(result.isLikedByUser());
+
         verify(likeRepository).deleteById(likeForComment.getId());
+        verify(commentRepository).decrementLikeCount(comment.getId());
+        assertEquals(4, comment.getLikeCount());
+
         verify(likeRepository, never()).save(any(LikeEntity.class));
     }
 
     @Test
     void likeComment_shouldLike_whenNotAlreadyLiked() {
         when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
-        when(likeRepository.isLikeExistComment(user.getId(), comment.getId())).thenReturn(null);
         when(commentRepository.findById(comment.getId())).thenReturn(Optional.of(comment));
+        when(likeRepository.findByUserIdAndCommentId(user.getId(), comment.getId())).thenReturn(Optional.empty());
 
         ArgumentCaptor<LikeEntity> captor = ArgumentCaptor.forClass(LikeEntity.class);
         when(likeRepository.save(captor.capture())).thenAnswer(invocation -> {
@@ -183,23 +192,30 @@ class LikeServiceImplTest {
         CommentStatsDto result = likeService.likeComment(comment.getId(), user.getEmail());
 
         assertSame(commentDto, result);
+        assertTrue(result.isLikedByUser());
+
         LikeEntity saved = captor.getValue();
         assertNotNull(saved);
         assertEquals(user, saved.getUser());
         assertEquals(comment, saved.getComment());
-        verify(commentRepository).save(comment);
+
+        verify(likeRepository).save(any(LikeEntity.class));
+        verify(commentRepository).incrementLikeCount(comment.getId());
+        assertEquals(6, comment.getLikeCount());
+
         verify(likeRepository, never()).deleteById(anyLong());
     }
 
     @Test
     void likeComment_shouldThrow_whenCommentNotFound() {
         when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
-        when(likeRepository.isLikeExistComment(user.getId(), comment.getId())).thenReturn(null);
         when(commentRepository.findById(comment.getId())).thenReturn(Optional.empty());
 
         CustomException ex = assertThrows(CustomException.class, () -> likeService.likeComment(comment.getId(), user.getEmail()));
         assertEquals(BusinessErrorCodes.COMMENT_NOT_FOUND, ex.getErrorCode());
 
+        verify(likeRepository, never()).findByUserIdAndCommentId(anyLong(), anyLong());
         verify(likeRepository, never()).save(any());
+        verify(commentRepository, never()).incrementLikeCount(anyLong());
     }
 }

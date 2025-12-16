@@ -11,7 +11,6 @@ import com.kamylo.Scrtly_backend.common.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.common.handler.CustomException;
 import com.kamylo.Scrtly_backend.artist.repository.ArtistRepository;
 import com.kamylo.Scrtly_backend.song.repository.SongRepository;
-import com.kamylo.Scrtly_backend.user.mapper.UserMapper;
 import com.kamylo.Scrtly_backend.user.mapper.UserMinimalMapper;
 import com.kamylo.Scrtly_backend.user.repository.UserRepository;
 import com.kamylo.Scrtly_backend.common.service.FileService;
