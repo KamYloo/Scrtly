@@ -16,7 +16,6 @@ import com.kamylo.Scrtly_backend.common.service.FileService;
 import com.kamylo.Scrtly_backend.user.service.UserRoleService;
 import com.kamylo.Scrtly_backend.user.service.UserService;
 import com.kamylo.Scrtly_backend.artist.service.impl.ArtistServiceImpl;
-import com.kamylo.Scrtly_backend.common.utils.ArtistUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -25,7 +24,6 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.mockito.MockedStatic;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -45,6 +43,7 @@ import static org.mockito.Mockito.*;
 class ArtistServiceImplTest {
 
     private static final Long ARTIST_ID = 1L;
+    private static final Long ARTIST_USER_ID = 2L;
     private static final String USER_EMAIL = "user@example.com";
     private static final String ARTIST_USERNAME = "artist@example.com";
 
@@ -66,7 +65,7 @@ class ArtistServiceImplTest {
     @BeforeEach
     void setUp() {
         artistUser = UserEntity.builder()
-                .id(2L)
+                .id(ARTIST_USER_ID)
                 .email("artist-owner@example.com")
                 .build();
 
@@ -144,13 +143,17 @@ class ArtistServiceImplTest {
         @Test
         void getArtistProfile_whenUsernameNull_setsObservedFalse() {
             when(artistRepository.findById(ARTIST_ID)).thenReturn(Optional.of(artistEntity));
+            when(userRepository.countFollowers(ARTIST_USER_ID)).thenReturn(100L);
 
             ArtistDto dto = artistService.getArtistProfile(ARTIST_ID, null);
 
             assertNotNull(dto);
             assertFalse(dto.isObserved());
+            assertEquals(100, dto.getTotalFans());
+
             verify(artistRepository).findById(ARTIST_ID);
             verify(artistMapper).toDto(artistEntity);
+            verify(userRepository).countFollowers(ARTIST_USER_ID);
             verifyNoInteractions(userService);
         }
 
@@ -162,17 +165,18 @@ class ArtistServiceImplTest {
             when(artistRepository.findById(ARTIST_ID)).thenReturn(Optional.of(artistEntity));
             when(userService.findUserByEmail(username)).thenReturn(user);
 
-            try (MockedStatic<ArtistUtil> mocked = mockStatic(ArtistUtil.class)) {
-                mocked.when(() -> ArtistUtil.isArtistFollowed(artistEntity.getUser(), user.getId())).thenReturn(true);
+            when(userRepository.isFollowedBy(ARTIST_USER_ID, user.getId())).thenReturn(true);
+            when(userRepository.countFollowers(ARTIST_USER_ID)).thenReturn(50L);
 
-                ArtistDto dto = artistService.getArtistProfile(ARTIST_ID, username);
+            ArtistDto dto = artistService.getArtistProfile(ARTIST_ID, username);
 
-                assertNotNull(dto);
-                assertTrue(dto.isObserved());
-                verify(artistRepository).findById(ARTIST_ID);
-                verify(userService).findUserByEmail(username);
-                mocked.verify(() -> ArtistUtil.isArtistFollowed(artistEntity.getUser(), user.getId()));
-            }
+            assertNotNull(dto);
+            assertTrue(dto.isObserved());
+            assertEquals(50, dto.getTotalFans());
+
+            verify(artistRepository).findById(ARTIST_ID);
+            verify(userService).findUserByEmail(username);
+            verify(userRepository).isFollowedBy(ARTIST_USER_ID, user.getId());
         }
 
         @Test
@@ -183,16 +187,16 @@ class ArtistServiceImplTest {
             when(artistRepository.findById(ARTIST_ID)).thenReturn(Optional.of(artistEntity));
             when(userService.findUserByEmail(username)).thenReturn(user);
 
-            try (MockedStatic<ArtistUtil> mocked = mockStatic(ArtistUtil.class)) {
-                mocked.when(() -> ArtistUtil.isArtistFollowed(artistEntity.getUser(), user.getId())).thenReturn(false);
+            when(userRepository.isFollowedBy(ARTIST_USER_ID, user.getId())).thenReturn(false);
+            when(userRepository.countFollowers(ARTIST_USER_ID)).thenReturn(10L);
 
-                ArtistDto dto = artistService.getArtistProfile(ARTIST_ID, username);
+            ArtistDto dto = artistService.getArtistProfile(ARTIST_ID, username);
 
-                assertNotNull(dto);
-                assertFalse(dto.isObserved());
-                verify(userService).findUserByEmail(username);
-                mocked.verify(() -> ArtistUtil.isArtistFollowed(artistEntity.getUser(), user.getId()));
-            }
+            assertNotNull(dto);
+            assertFalse(dto.isObserved());
+
+            verify(userService).findUserByEmail(username);
+            verify(userRepository).isFollowedBy(ARTIST_USER_ID, user.getId());
         }
 
         @Test

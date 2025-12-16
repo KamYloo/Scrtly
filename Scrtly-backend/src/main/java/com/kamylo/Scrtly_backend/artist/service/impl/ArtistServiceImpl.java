@@ -16,7 +16,6 @@ import com.kamylo.Scrtly_backend.user.repository.UserRepository;
 import com.kamylo.Scrtly_backend.common.service.FileService;
 import com.kamylo.Scrtly_backend.user.service.UserRoleService;
 import com.kamylo.Scrtly_backend.user.service.UserService;
-import com.kamylo.Scrtly_backend.common.utils.ArtistUtil;
 import com.kamylo.Scrtly_backend.user.web.dto.UserMinimalDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -60,14 +59,15 @@ public class ArtistServiceImpl implements ArtistService {
     public ArtistDto getArtistProfile(Long artistId, String username) {
         ArtistEntity artistEntity = artistRepository.findById(artistId).orElseThrow(
                 () -> new CustomException(BusinessErrorCodes.ARTIST_NOT_FOUND));
+        Long userId = artistEntity.getUser().getId();
         boolean observed = false;
         if (username != null) {
             UserEntity user = userService.findUserByEmail(username);
-            observed = ArtistUtil.isArtistFollowed(artistEntity.getUser(), user.getId());
+            observed = userRepository.isFollowedBy(userId, user.getId());
         }
 
         ArtistDto artistDto = artistMapper.toDto(artistEntity);
-        artistDto.setTotalFans((int) userRepository.countFollowers(artistId));
+        artistDto.setTotalFans((int) userRepository.countFollowers(userId));
         artistDto.setObserved(observed);
         return artistDto;
     }
