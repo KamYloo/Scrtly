@@ -4,9 +4,8 @@ import com.kamylo.Scrtly_backend.comment.domain.CommentEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.*;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -17,4 +16,12 @@ public interface CommentRepository extends JpaRepository<CommentEntity, Long>, J
 
     @EntityGraph(attributePaths = {"user", "parentComment", "post"})
     Page<CommentEntity> findAll(Specification<CommentEntity> spec, Pageable pageable);
+
+    @Modifying
+    @Query("UPDATE CommentEntity c SET c.likeCount = c.likeCount + 1 WHERE c.id = :id")
+    void incrementLikeCount(@Param("id") Long id);
+
+    @Modifying
+    @Query("UPDATE CommentEntity c SET c.likeCount = c.likeCount - 1 WHERE c.id = :id")
+    void decrementLikeCount(@Param("id") Long id);
 }
