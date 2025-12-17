@@ -3,6 +3,8 @@ package com.kamylo.Scrtly_backend.album.service;
 import com.kamylo.Scrtly_backend.album.mapper.AlbumMapper;
 import com.kamylo.Scrtly_backend.album.web.dto.AlbumDto;
 import com.kamylo.Scrtly_backend.common.service.FileService;
+import com.kamylo.Scrtly_backend.like.repository.SongLikeRepository;
+import com.kamylo.Scrtly_backend.song.domain.SongEntity;
 import com.kamylo.Scrtly_backend.song.mapper.SongMapper;
 import com.kamylo.Scrtly_backend.song.service.HlsService;
 import com.kamylo.Scrtly_backend.song.web.dto.SongDto;
@@ -24,7 +26,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +42,7 @@ public class AlbumServiceImpl implements AlbumService {
     private final SongMapper songMapper;
     private final SongRepository songRepository;
     private final HlsService hlsService;
+    private final SongLikeRepository songLikeRepository;
 
     @Override
     @Transactional
@@ -47,7 +52,6 @@ public class AlbumServiceImpl implements AlbumService {
 
         String imagePath = null;
         if (albumImage != null && !albumImage.isEmpty()) {
-            // only save when file provided and not empty
             imagePath = fileService.saveFile(albumImage, "albumImages/");
         }
 
@@ -97,16 +101,38 @@ public class AlbumServiceImpl implements AlbumService {
     }
 
     @Override
-    public List<SongDto> getAlbumTracks(Integer albumId) {
-        AlbumEntity albumEntity = albumMapper.toEntity(getAlbum(albumId));
-        if (albumEntity == null) {
+    public List<SongDto> getAlbumTracks(Integer albumId, String username) {
+        if (!albumRepository.existsById(albumId)) {
             throw new CustomException(BusinessErrorCodes.ALBUM_NOT_FOUND);
         }
-        return songRepository.findByAlbumId(albumEntity.getId())
-                .stream()
-                .map(songMapper::toDto)
+        List<SongEntity> songs = songRepository.findByAlbumId(albumId);
+
+        if (songs.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        Set<Long> likedSongIds;
+        if (username != null) {
+            UserEntity user = userService.findUserByEmail(username);
+            List<Long> songIds = songs.stream()
+                    .map(SongEntity::getId)
+                    .toList();
+
+            likedSongIds = songLikeRepository.findSongIdsLikedByUser(user.getId(), songIds);
+        } else {
+            likedSongIds = Collections.emptySet();
+        }
+
+        Set<Long> finalLikedSongIds = likedSongIds;
+        return songs.stream()
+                .map(song -> {
+                    SongDto dto = songMapper.toDto(song);
+                    dto.setFavorite(finalLikedSongIds.contains(song.getId()));
+                    return dto;
+                })
                 .toList();
     }
+
 
     @Override
     @Transactional

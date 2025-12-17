@@ -69,8 +69,9 @@ public class AlbumController {
     }
 
     @GetMapping("/{albumId}/tracks")
-    public ResponseEntity<List<SongDto>> getAlbumTracks(@PathVariable @Positive(message = "{id.positive}") Integer albumId) {
-        List<SongDto> songs = albumService.getAlbumTracks(albumId);
+    public ResponseEntity<List<SongDto>> getAlbumTracks(@PathVariable @Positive(message = "{id.positive}") Integer albumId,  Principal principal) {
+        String username = (principal != null ? principal.getName() : null);
+        List<SongDto> songs = albumService.getAlbumTracks(albumId, username);
         return new  ResponseEntity<>(songs, HttpStatus.OK);
     }
 

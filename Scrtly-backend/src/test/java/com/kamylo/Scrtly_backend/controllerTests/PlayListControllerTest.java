@@ -1,13 +1,16 @@
 package com.kamylo.Scrtly_backend.controllerTests;
 
 import com.kamylo.Scrtly_backend.playList.service.PlayListService;
+import com.kamylo.Scrtly_backend.playList.web.controller.PlayListController;
 import com.kamylo.Scrtly_backend.playList.web.dto.PlayListDto;
 import com.kamylo.Scrtly_backend.playList.web.dto.request.PlayListCreateRequest;
 import com.kamylo.Scrtly_backend.playList.web.dto.request.PlayListUpdateRequest;
 import com.kamylo.Scrtly_backend.song.web.dto.SongDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -30,7 +33,7 @@ class PlayListControllerTest {
     private PlayListService playListService;
 
     @InjectMocks
-    private com.kamylo.Scrtly_backend.playList.web.controller.PlayListController controller;
+    private PlayListController controller;
 
     @Mock
     private Principal principal;
@@ -76,6 +79,7 @@ class PlayListControllerTest {
 
         assertEquals(HttpStatus.OK, resp.getStatusCode());
         assertNotNull(resp.getBody());
+
         ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
         verify(playListService).getPlayLists(captor.capture());
         assertEquals(0, captor.getValue().getPageNumber());
@@ -109,19 +113,39 @@ class PlayListControllerTest {
     }
 
     @Test
-    void getPlayListTracks_passesPageable_andReturnsPaged() {
+    void getPlayListTracks_passesPageableAndUsername_andReturnsPaged() {
         Integer id = 7;
         SongDto s = new SongDto();
         Pageable pageable = PageRequest.of(1, 5);
-        when(playListService.getPlayListTracks(eq(id), any(Pageable.class))).thenReturn(new PageImpl<>(List.of(s)));
+        String username = "userTrackTest";
 
-        var resp = controller.getPlayListTracks(id, pageable);
+        when(principal.getName()).thenReturn(username);
+        when(playListService.getPlayListTracks(eq(id), any(Pageable.class), eq(username)))
+                .thenReturn(new PageImpl<>(List.of(s)));
+
+        var resp = controller.getPlayListTracks(id, pageable, principal);
 
         assertEquals(HttpStatus.OK, resp.getStatusCode());
-        ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
-        verify(playListService).getPlayListTracks(eq(id), captor.capture());
-        assertEquals(1, captor.getValue().getPageNumber());
-        assertEquals(5, captor.getValue().getPageSize());
+
+        ArgumentCaptor<Pageable> pageCaptor = ArgumentCaptor.forClass(Pageable.class);
+        verify(playListService).getPlayListTracks(eq(id), pageCaptor.capture(), eq(username));
+        assertEquals(1, pageCaptor.getValue().getPageNumber());
+        assertEquals(5, pageCaptor.getValue().getPageSize());
+    }
+
+    @Test
+    void getPlayListTracks_whenPrincipalIsNull_passesNullUsername() {
+        Integer id = 77;
+        SongDto s = new SongDto();
+        Pageable pageable = PageRequest.of(0, 10);
+
+        when(playListService.getPlayListTracks(eq(id), any(Pageable.class), isNull()))
+                .thenReturn(new PageImpl<>(List.of(s)));
+
+        var resp = controller.getPlayListTracks(id, pageable, null);
+
+        assertEquals(HttpStatus.OK, resp.getStatusCode());
+        verify(playListService).getPlayListTracks(eq(id), any(Pageable.class), isNull());
     }
 
     @Test

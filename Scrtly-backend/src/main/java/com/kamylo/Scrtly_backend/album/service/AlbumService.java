@@ -13,6 +13,6 @@ public interface AlbumService {
     AlbumDto getAlbum(Integer albumId) ;
     Page<AlbumDto> searchAlbums(String artistName, String albumName, Pageable pageable);
     Page<AlbumDto> getAlbumsByArtist(Long artistId, String albumName, Pageable pageable);
-    List<SongDto> getAlbumTracks(Integer albumId);
+    List<SongDto> getAlbumTracks(Integer albumId, String username);
     void deleteAlbum(Integer albumId, String username) ;
 }

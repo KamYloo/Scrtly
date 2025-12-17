@@ -53,7 +53,7 @@ function ProfileInfo() {
                     alt={viewedUser?.fullName || 'Profile Picture'}
                     onClick={() => {
                         if (viewedUser?.isArtist) {
-                            navigate(`/artist/${viewedUser.id}`);
+                            navigate(`/artist/${viewedUser.id}/popular`);
                         }
                     }}
                     style={{

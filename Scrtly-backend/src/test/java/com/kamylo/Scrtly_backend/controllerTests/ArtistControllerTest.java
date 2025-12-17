@@ -1,24 +1,29 @@
 package com.kamylo.Scrtly_backend.controllerTests;
 
+import com.kamylo.Scrtly_backend.artist.service.ArtistService;
 import com.kamylo.Scrtly_backend.artist.web.controller.ArtistController;
 import com.kamylo.Scrtly_backend.artist.web.dto.ArtistDto;
 import com.kamylo.Scrtly_backend.artist.web.dto.request.ArtistUpdateRequest;
 import com.kamylo.Scrtly_backend.metrics.messaging.publisher.MetricsPublisher;
 import com.kamylo.Scrtly_backend.song.web.dto.SongDto;
-import com.kamylo.Scrtly_backend.artist.service.ArtistService;
 import com.kamylo.Scrtly_backend.user.web.dto.UserMinimalDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+
 import java.security.Principal;
 import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -117,23 +122,48 @@ class ArtistControllerTest {
     }
 
     @Test
-    void getArtistTracksHandler_shouldReturnPagedTracksAndPassPagination() {
+    void getArtistTracksHandler_shouldReturnPagedTracksAndPassPaginationAndUsername() {
         SongDto song = mockSongDto();
         Page<SongDto> songsPage = new PageImpl<>(List.of(song));
-        when(artistService.getArtistTracks(eq(10L), any(Pageable.class))).thenReturn(songsPage);
+        String username = "fanUser";
+        Principal principal = mock(Principal.class);
+        when(principal.getName()).thenReturn(username);
+
+        when(artistService.getArtistTracks(eq(10L), any(Pageable.class), eq(username)))
+                .thenReturn(songsPage);
 
         int page = 1;
         int size = 7;
-        var response = controller.getArtistTracksHandler(10L, page, size);
+
+        var response = controller.getArtistTracksHandler(10L, page, size, principal);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
 
         ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
-        verify(artistService, times(1)).getArtistTracks(eq(10L), captor.capture());
+        verify(artistService, times(1)).getArtistTracks(eq(10L), captor.capture(), eq(username));
         Pageable captured = captor.getValue();
         assertEquals(page, captured.getPageNumber());
         assertEquals(size, captured.getPageSize());
+    }
+
+    @Test
+    void getArtistTracksHandler_withoutPrincipal_shouldPassNullUsername() {
+        SongDto song = mockSongDto();
+        Page<SongDto> songsPage = new PageImpl<>(List.of(song));
+
+        when(artistService.getArtistTracks(eq(11L), any(Pageable.class), isNull()))
+                .thenReturn(songsPage);
+
+        int page = 0;
+        int size = 10;
+
+        var response = controller.getArtistTracksHandler(11L, page, size, null);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+
+        verify(artistService, times(1)).getArtistTracks(eq(11L), any(Pageable.class), isNull());
     }
 
     @Test

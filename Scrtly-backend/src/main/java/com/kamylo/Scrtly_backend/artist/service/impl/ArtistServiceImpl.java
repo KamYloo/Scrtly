@@ -3,6 +3,8 @@ package com.kamylo.Scrtly_backend.artist.service.impl;
 import com.kamylo.Scrtly_backend.artist.mapper.ArtistMapper;
 import com.kamylo.Scrtly_backend.artist.service.ArtistService;
 import com.kamylo.Scrtly_backend.artist.web.dto.ArtistDto;
+import com.kamylo.Scrtly_backend.like.repository.SongLikeRepository;
+import com.kamylo.Scrtly_backend.song.domain.SongEntity;
 import com.kamylo.Scrtly_backend.song.mapper.SongMapper;
 import com.kamylo.Scrtly_backend.song.web.dto.SongDto;
 import com.kamylo.Scrtly_backend.artist.domain.ArtistEntity;
@@ -24,7 +26,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -40,7 +44,7 @@ public class ArtistServiceImpl implements ArtistService {
     private final ArtistMapper artistMapper;
     private final SongMapper songMapper;
     private final UserMinimalMapper userMapper;
-
+    private final SongLikeRepository songLikeRepository;
     private final FileService fileService;
 
     @Override
@@ -102,9 +106,33 @@ public class ArtistServiceImpl implements ArtistService {
     }
 
     @Override
-    public Page<SongDto> getArtistTracks(Long artistId, Pageable pageable) {
-       artistMapper.toEntity(getArtistById(artistId));
-       return songRepository.findByArtistId(artistId, pageable).map(songMapper::toDto);
+    public Page<SongDto> getArtistTracks(Long artistId, Pageable pageable, String username) {
+        artistMapper.toEntity(getArtistById(artistId));
+        Page<SongEntity> songsPage = songRepository.findByArtistId(artistId, pageable);
+
+        if (songsPage.isEmpty()) {
+            return Page.empty(pageable);
+        }
+
+        Set<Long> likedSongIds;
+        if (username != null) {
+            UserEntity user = userService.findUserByEmail(username);
+            List<Long> songIds = songsPage.getContent().stream()
+                    .map(SongEntity::getId)
+                    .toList();
+
+            likedSongIds = songLikeRepository.findSongIdsLikedByUser(user.getId(), songIds);
+        } else {
+            likedSongIds = Collections.emptySet();
+        }
+
+        Set<Long> finalLikedSongIds = likedSongIds;
+
+        return songsPage.map(song -> {
+            SongDto dto = songMapper.toDto(song);
+            dto.setFavorite(finalLikedSongIds.contains(song.getId()));
+            return dto;
+        });
     }
 
     @Override

@@ -84,7 +84,6 @@ class SongRepositoryIntegrationTest {
                 .artist(artist)
                 .contentType("audio/mpeg")
                 .duration(180)
-                .favorite(false)
                 .build();
         SongEntity saved = songRepository.save(song);
         em.flush();

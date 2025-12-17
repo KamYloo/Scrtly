@@ -1,23 +1,23 @@
 package com.kamylo.Scrtly_backend.serviceTests;
 
-import com.kamylo.Scrtly_backend.album.mapper.AlbumMapper;
-import com.kamylo.Scrtly_backend.album.web.dto.AlbumDto;
-import com.kamylo.Scrtly_backend.song.mapper.SongMapper;
-import com.kamylo.Scrtly_backend.song.service.HlsService;
-import com.kamylo.Scrtly_backend.song.web.dto.SongDto;
 import com.kamylo.Scrtly_backend.album.domain.AlbumEntity;
+import com.kamylo.Scrtly_backend.album.mapper.AlbumMapper;
+import com.kamylo.Scrtly_backend.album.repository.AlbumRepository;
+import com.kamylo.Scrtly_backend.album.service.AlbumServiceImpl;
+import com.kamylo.Scrtly_backend.album.web.dto.AlbumDto;
 import com.kamylo.Scrtly_backend.artist.domain.ArtistEntity;
-import com.kamylo.Scrtly_backend.song.domain.SongEntity;
-import com.kamylo.Scrtly_backend.user.domain.UserEntity;
 import com.kamylo.Scrtly_backend.common.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.common.handler.CustomException;
-import com.kamylo.Scrtly_backend.album.repository.AlbumRepository;
-import com.kamylo.Scrtly_backend.artist.repository.ArtistRepository;
-import com.kamylo.Scrtly_backend.song.repository.SongRepository;
 import com.kamylo.Scrtly_backend.common.service.FileService;
+import com.kamylo.Scrtly_backend.like.repository.SongLikeRepository;
+import com.kamylo.Scrtly_backend.song.domain.SongEntity;
+import com.kamylo.Scrtly_backend.song.mapper.SongMapper;
+import com.kamylo.Scrtly_backend.song.repository.SongRepository;
+import com.kamylo.Scrtly_backend.song.service.HlsService;
+import com.kamylo.Scrtly_backend.song.web.dto.SongDto;
+import com.kamylo.Scrtly_backend.user.domain.UserEntity;
 import com.kamylo.Scrtly_backend.user.service.UserRoleService;
 import com.kamylo.Scrtly_backend.user.service.UserService;
-import com.kamylo.Scrtly_backend.album.service.AlbumServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,13 +26,17 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -48,7 +52,6 @@ class AlbumServiceImplTest {
     private static final String SAVED_IMAGE_PATH = "path/to/image.jpg";
 
     @Mock private AlbumRepository albumRepository;
-    @Mock private ArtistRepository artistRepository;
     @Mock private UserService userService;
     @Mock private UserRoleService userRoleService;
     @Mock private FileService fileService;
@@ -56,6 +59,7 @@ class AlbumServiceImplTest {
     @Mock private AlbumMapper albumMapper;
     @Mock private SongMapper songMapper;
     @Mock private HlsService hlsService;
+    @Mock private SongLikeRepository songLikeRepository;
 
     @InjectMocks
     private AlbumServiceImpl albumService;
@@ -203,7 +207,7 @@ class AlbumServiceImplTest {
         Page<AlbumDto> result = albumService.getAlbums(pageable);
 
         assertEquals(1, result.getTotalElements());
-        assertEquals("Test", result.getContent().get(0).getTitle());
+        assertEquals("Test", result.getContent().getFirst().getTitle());
     }
 
     @Test
@@ -246,36 +250,85 @@ class AlbumServiceImplTest {
     }
 
     @Test
-    void getAlbumTracks_returnsMappedTracks() {
-        Integer albumId = 11;
-        AlbumEntity entity = createAlbumEntity(albumId, 2L, Collections.emptyList(), null);
-        SongEntity song = createSong(21, "t.mp3", "s.jpg", 200);
-        AlbumDto albumDto = createAlbumDto(albumId, "ALB");
+    void getAlbumTracks_throws_whenAlbumNotFound() {
+        Integer albumId = 999;
+        String username = "user@example.com";
 
-        when(albumRepository.findById(albumId)).thenReturn(Optional.of(entity));
-        when(albumMapper.toDto(entity)).thenReturn(albumDto);
-        when(albumMapper.toEntity(albumDto)).thenReturn(entity);
-        when(songRepository.findByAlbumId(albumId)).thenReturn(List.of(song));
+        when(albumRepository.existsById(albumId)).thenReturn(false);
 
-        SongDto songDto = new SongDto();
-        songDto.setDuration(200);
-        when(songMapper.toDto(song)).thenReturn(songDto);
+        CustomException ex = assertThrows(CustomException.class,
+                () -> albumService.getAlbumTracks(albumId, username));
 
-        List<SongDto> tracks = albumService.getAlbumTracks(albumId);
-        assertEquals(1, tracks.size());
-        assertEquals(200, tracks.get(0).getDuration());
+        assertEquals(BusinessErrorCodes.ALBUM_NOT_FOUND, ex.getErrorCode());
+
+        verify(songRepository, never()).findByAlbumId(anyInt());
     }
 
     @Test
-    void getAlbumTracks_throws_whenMapperReturnsNull() {
-        Integer albumId = 999;
-        AlbumEntity entity = createAlbumEntity(albumId, 2L, null, null);
+    void getAlbumTracks_returnsTracksWithoutFavorites_whenUsernameIsNull() {
+        Integer albumId = 10;
+        SongEntity song = createSong(100, "track.mp3", "img.jpg", 300);
+        SongDto songDto = new SongDto();
+        songDto.setId(100L);
+        songDto.setDuration(300);
 
-        when(albumRepository.findById(albumId)).thenReturn(Optional.of(entity));
-        when(albumMapper.toDto(entity)).thenReturn(null);
+        when(albumRepository.existsById(albumId)).thenReturn(true);
+        when(songRepository.findByAlbumId(albumId)).thenReturn(List.of(song));
+        when(songMapper.toDto(song)).thenReturn(songDto);
 
-        CustomException ex = assertThrows(CustomException.class, () -> albumService.getAlbumTracks(albumId));
-        assertEquals(BusinessErrorCodes.ALBUM_NOT_FOUND, ex.getErrorCode());
+        List<SongDto> result = albumService.getAlbumTracks(albumId, null);
+
+        assertEquals(1, result.size());
+        assertEquals(300, result.getFirst().getDuration());
+        assertFalse(result.getFirst().isFavorite());
+
+        verify(userService, never()).findUserByEmail(anyString());
+        verify(songLikeRepository, never()).findSongIdsLikedByUser(anyLong(), anyList());
+    }
+
+    @Test
+    void getAlbumTracks_returnsTracksWithFavorites_whenUserLoggedIn() {
+        Integer albumId = 20;
+        String username = "fan@example.com";
+        Long userId = 555L;
+
+        SongEntity s1 = createSong(201, "t1.mp3", "i1.jpg", 200);
+        SongEntity s2 = createSong(202, "t2.mp3", "i2.jpg", 210);
+
+        SongDto d1 = new SongDto(); d1.setId(201L);
+        SongDto d2 = new SongDto(); d2.setId(202L);
+
+        UserEntity user = new UserEntity();
+        user.setId(userId);
+
+        when(albumRepository.existsById(albumId)).thenReturn(true);
+        when(songRepository.findByAlbumId(albumId)).thenReturn(List.of(s1, s2));
+        when(userService.findUserByEmail(username)).thenReturn(user);
+
+        when(songLikeRepository.findSongIdsLikedByUser(eq(userId), anyList()))
+                .thenReturn(Set.of(201L));
+
+        when(songMapper.toDto(s1)).thenReturn(d1);
+        when(songMapper.toDto(s2)).thenReturn(d2);
+
+        List<SongDto> result = albumService.getAlbumTracks(albumId, username);
+
+        assertEquals(2, result.size());
+        assertTrue(result.stream().filter(s -> s.getId().equals(201L)).findFirst().get().isFavorite());
+        assertFalse(result.stream().filter(s -> s.getId().equals(202L)).findFirst().get().isFavorite());
+    }
+
+    @Test
+    void getAlbumTracks_returnsEmptyList_whenNoSongsFound() {
+        Integer albumId = 30;
+        when(albumRepository.existsById(albumId)).thenReturn(true);
+        when(songRepository.findByAlbumId(albumId)).thenReturn(Collections.emptyList());
+
+        List<SongDto> result = albumService.getAlbumTracks(albumId, "anyUser");
+
+        assertTrue(result.isEmpty());
+
+        verify(userService, never()).findUserByEmail(anyString());
     }
 
     @Test
@@ -292,7 +345,7 @@ class AlbumServiceImplTest {
         Page<AlbumDto> result = albumService.getAlbumsByArtist(artistId, null, pageable);
 
         assertEquals(1, result.getTotalElements());
-        assertEquals("PagedNoQuery", result.getContent().get(0).getTitle());
+        assertEquals("PagedNoQuery", result.getContent().getFirst().getTitle());
     }
 
     @Test
@@ -310,7 +363,7 @@ class AlbumServiceImplTest {
         Page<AlbumDto> result = albumService.getAlbumsByArtist(artistId, "Filtered", pageable);
 
         assertEquals(1, result.getTotalElements());
-        assertEquals("Filtered", result.getContent().get(0).getTitle());
+        assertEquals("Filtered", result.getContent().getFirst().getTitle());
     }
 
     @Test
@@ -397,5 +450,4 @@ class AlbumServiceImplTest {
         verify(fileService).deleteFile("albumCover.jpg");
         verify(albumRepository).deleteById(albumId);
     }
-
 }

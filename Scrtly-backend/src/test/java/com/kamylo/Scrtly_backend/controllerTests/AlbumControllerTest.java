@@ -1,21 +1,25 @@
 package com.kamylo.Scrtly_backend.controllerTests;
 
+import com.kamylo.Scrtly_backend.album.service.AlbumService;
 import com.kamylo.Scrtly_backend.album.web.controller.AlbumController;
-import com.kamylo.Scrtly_backend.album.web.dto.request.AlbumCreateRequest;
 import com.kamylo.Scrtly_backend.album.web.dto.AlbumDto;
+import com.kamylo.Scrtly_backend.album.web.dto.request.AlbumCreateRequest;
 import com.kamylo.Scrtly_backend.metrics.messaging.publisher.MetricsPublisher;
 import com.kamylo.Scrtly_backend.song.web.dto.SongDto;
-import com.kamylo.Scrtly_backend.album.service.AlbumService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.security.Principal;
 import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -79,6 +83,7 @@ class AlbumControllerTest {
 
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
+
         ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
         verify(albumService).getAlbums(captor.capture());
         Pageable p = captor.getValue();
@@ -98,6 +103,7 @@ class AlbumControllerTest {
 
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
+
         ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
         verify(albumService).getAlbumsByArtist(eq(artistId), eq(query), captor.capture());
         Pageable p = captor.getValue();
@@ -124,9 +130,10 @@ class AlbumControllerTest {
     void getAlbumTracks_returnsListOfSongs() {
         Integer albumId = 11;
         SongDto s1 = sampleSongDto();
-        when(albumService.getAlbumTracks(albumId)).thenReturn(List.of(s1));
 
-        var response = controller.getAlbumTracks(albumId);
+        when(albumService.getAlbumTracks(albumId, null)).thenReturn(List.of(s1));
+
+        var response = controller.getAlbumTracks(albumId, null);
 
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -134,7 +141,24 @@ class AlbumControllerTest {
         assertNotNull(body);
         assertEquals(1, body.size());
         assertEquals(180, body.get(0).getDuration());
-        verify(albumService).getAlbumTracks(albumId);
+
+        verify(albumService).getAlbumTracks(albumId, null);
+    }
+
+    @Test
+    void getAlbumTracks_withLoggedInUser_passesUsernameToService() {
+        Integer albumId = 12;
+        String username = "fan@example.com";
+        SongDto s1 = sampleSongDto();
+
+        when(principal.getName()).thenReturn(username);
+        when(albumService.getAlbumTracks(albumId, username)).thenReturn(List.of(s1));
+
+        var response = controller.getAlbumTracks(albumId, principal);
+
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(albumService).getAlbumTracks(albumId, username);
     }
 
     @Test
