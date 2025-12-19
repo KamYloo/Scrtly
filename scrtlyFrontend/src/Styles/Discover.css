@@ -907,8 +907,8 @@
       }
 
       .postView {
-        width: 100%;
-        height: calc(100dvh - 180px);
+        max-width: 100%;
+        height: calc(100dvh - 40px);
         background: rgba(19, 19, 20, 0.98);
         top: 5vh;
         flex-direction: column;
@@ -917,7 +917,7 @@
       }
 
       .imgPost {
-        width: 100%;
+        max-width: 100%;
         max-height: 40vh;
       }
 
@@ -927,6 +927,7 @@
         flex-direction: column;
         max-width: 100%;
         overflow-y: hidden;
+        height: 60vh;
 
         img {
           width: 35px;
@@ -938,7 +939,6 @@
         }
 
         .comments {
-          max-height: 30dvh;
         }
 
         .addComment {
@@ -1018,13 +1018,18 @@
 
     .feed {
       .posts {
-        width: 100%;
+        min-width: 100%;
         height: 60vh;
         padding: 2vh 2vh;
 
         .postsSettings {
           font-size: 2.5vh;
         }
+      }
+
+      .postView {
+        min-width: 100%;
+        height: calc(100dvh - 180px);
       }
 
       .post {
