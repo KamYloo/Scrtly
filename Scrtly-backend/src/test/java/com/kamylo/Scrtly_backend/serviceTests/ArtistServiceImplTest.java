@@ -1,31 +1,35 @@
 package com.kamylo.Scrtly_backend.serviceTests;
 
-import com.kamylo.Scrtly_backend.artist.mapper.ArtistMapper;
-import com.kamylo.Scrtly_backend.artist.web.dto.ArtistDto;
-import com.kamylo.Scrtly_backend.song.mapper.SongMapper;
-import com.kamylo.Scrtly_backend.song.web.dto.SongDto;
 import com.kamylo.Scrtly_backend.artist.domain.ArtistEntity;
-import com.kamylo.Scrtly_backend.song.domain.SongEntity;
-import com.kamylo.Scrtly_backend.user.domain.UserEntity;
+import com.kamylo.Scrtly_backend.artist.mapper.ArtistMapper;
+import com.kamylo.Scrtly_backend.artist.repository.ArtistRepository;
+import com.kamylo.Scrtly_backend.artist.service.impl.ArtistServiceImpl;
+import com.kamylo.Scrtly_backend.artist.web.dto.ArtistDto;
 import com.kamylo.Scrtly_backend.common.handler.BusinessErrorCodes;
 import com.kamylo.Scrtly_backend.common.handler.CustomException;
-import com.kamylo.Scrtly_backend.artist.repository.ArtistRepository;
-import com.kamylo.Scrtly_backend.song.repository.SongRepository;
-import com.kamylo.Scrtly_backend.user.repository.UserRepository;
 import com.kamylo.Scrtly_backend.common.service.FileService;
+import com.kamylo.Scrtly_backend.like.repository.SongLikeRepository;
+import com.kamylo.Scrtly_backend.song.domain.SongEntity;
+import com.kamylo.Scrtly_backend.song.mapper.SongMapper;
+import com.kamylo.Scrtly_backend.song.repository.SongRepository;
+import com.kamylo.Scrtly_backend.song.web.dto.SongDto;
+import com.kamylo.Scrtly_backend.user.domain.UserEntity;
+import com.kamylo.Scrtly_backend.user.mapper.UserMinimalMapper;
+import com.kamylo.Scrtly_backend.user.repository.UserRepository;
 import com.kamylo.Scrtly_backend.user.service.UserRoleService;
 import com.kamylo.Scrtly_backend.user.service.UserService;
-import com.kamylo.Scrtly_backend.artist.service.impl.ArtistServiceImpl;
-import com.kamylo.Scrtly_backend.common.utils.ArtistUtil;
+import com.kamylo.Scrtly_backend.user.web.dto.UserMinimalDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.mockito.MockedStatic;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -34,10 +38,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -45,6 +52,7 @@ import static org.mockito.Mockito.*;
 class ArtistServiceImplTest {
 
     private static final Long ARTIST_ID = 1L;
+    private static final Long ARTIST_USER_ID = 2L;
     private static final String USER_EMAIL = "user@example.com";
     private static final String ARTIST_USERNAME = "artist@example.com";
 
@@ -56,17 +64,19 @@ class ArtistServiceImplTest {
     @Mock private FileService fileService;
     @Mock private ArtistMapper artistMapper;
     @Mock private SongMapper songMapper;
+    @Mock private SongLikeRepository songLikeRepository;
+    @Mock private UserMinimalMapper userMinimalMapper;
 
     @InjectMocks private ArtistServiceImpl artistService;
 
     private ArtistEntity artistEntity;
-    private UserEntity artistUser;
     private SongEntity songEntity;
+    private UserEntity regularUser;
 
     @BeforeEach
     void setUp() {
-        artistUser = UserEntity.builder()
-                .id(2L)
+        UserEntity artistUser = UserEntity.builder()
+                .id(ARTIST_USER_ID)
                 .email("artist-owner@example.com")
                 .build();
 
@@ -83,6 +93,11 @@ class ArtistServiceImplTest {
                 .title("Track 1")
                 .build();
 
+        regularUser = UserEntity.builder()
+                .id(99L)
+                .email(USER_EMAIL)
+                .build();
+
         Mockito.lenient().when(artistMapper.toDto(any(ArtistEntity.class))).thenAnswer(inv -> {
             ArtistEntity a = inv.getArgument(0);
             ArtistDto d = new ArtistDto();
@@ -94,6 +109,7 @@ class ArtistServiceImplTest {
         Mockito.lenient().when(songMapper.toDto(any(SongEntity.class))).thenAnswer(inv -> {
             SongEntity s = inv.getArgument(0);
             SongDto sd = new SongDto();
+            sd.setId(s.getId());
             sd.setTitle(s.getTitle());
             return sd;
         });
@@ -109,7 +125,7 @@ class ArtistServiceImplTest {
 
         assertNotNull(res);
         assertEquals(1, res.getTotalElements());
-        assertEquals("Pseudonym", res.getContent().get(0).getPseudonym());
+        assertEquals("Pseudonym", res.getContent().getFirst().getPseudonym());
         verify(artistRepository).findAll(pageable);
         verify(artistMapper).toDto(any(ArtistEntity.class));
     }
@@ -144,13 +160,17 @@ class ArtistServiceImplTest {
         @Test
         void getArtistProfile_whenUsernameNull_setsObservedFalse() {
             when(artistRepository.findById(ARTIST_ID)).thenReturn(Optional.of(artistEntity));
+            when(userRepository.countFollowers(ARTIST_USER_ID)).thenReturn(100L);
 
             ArtistDto dto = artistService.getArtistProfile(ARTIST_ID, null);
 
             assertNotNull(dto);
             assertFalse(dto.isObserved());
+            assertEquals(100, dto.getTotalFans());
+
             verify(artistRepository).findById(ARTIST_ID);
             verify(artistMapper).toDto(artistEntity);
+            verify(userRepository).countFollowers(ARTIST_USER_ID);
             verifyNoInteractions(userService);
         }
 
@@ -162,17 +182,18 @@ class ArtistServiceImplTest {
             when(artistRepository.findById(ARTIST_ID)).thenReturn(Optional.of(artistEntity));
             when(userService.findUserByEmail(username)).thenReturn(user);
 
-            try (MockedStatic<ArtistUtil> mocked = mockStatic(ArtistUtil.class)) {
-                mocked.when(() -> ArtistUtil.isArtistFollowed(artistEntity.getUser(), user.getId())).thenReturn(true);
+            when(userRepository.isFollowedBy(ARTIST_USER_ID, user.getId())).thenReturn(true);
+            when(userRepository.countFollowers(ARTIST_USER_ID)).thenReturn(50L);
 
-                ArtistDto dto = artistService.getArtistProfile(ARTIST_ID, username);
+            ArtistDto dto = artistService.getArtistProfile(ARTIST_ID, username);
 
-                assertNotNull(dto);
-                assertTrue(dto.isObserved());
-                verify(artistRepository).findById(ARTIST_ID);
-                verify(userService).findUserByEmail(username);
-                mocked.verify(() -> ArtistUtil.isArtistFollowed(artistEntity.getUser(), user.getId()));
-            }
+            assertNotNull(dto);
+            assertTrue(dto.isObserved());
+            assertEquals(50, dto.getTotalFans());
+
+            verify(artistRepository).findById(ARTIST_ID);
+            verify(userService).findUserByEmail(username);
+            verify(userRepository).isFollowedBy(ARTIST_USER_ID, user.getId());
         }
 
         @Test
@@ -183,16 +204,16 @@ class ArtistServiceImplTest {
             when(artistRepository.findById(ARTIST_ID)).thenReturn(Optional.of(artistEntity));
             when(userService.findUserByEmail(username)).thenReturn(user);
 
-            try (MockedStatic<ArtistUtil> mocked = mockStatic(ArtistUtil.class)) {
-                mocked.when(() -> ArtistUtil.isArtistFollowed(artistEntity.getUser(), user.getId())).thenReturn(false);
+            when(userRepository.isFollowedBy(ARTIST_USER_ID, user.getId())).thenReturn(false);
+            when(userRepository.countFollowers(ARTIST_USER_ID)).thenReturn(1L);
 
-                ArtistDto dto = artistService.getArtistProfile(ARTIST_ID, username);
+            ArtistDto dto = artistService.getArtistProfile(ARTIST_ID, username);
 
-                assertNotNull(dto);
-                assertFalse(dto.isObserved());
-                verify(userService).findUserByEmail(username);
-                mocked.verify(() -> ArtistUtil.isArtistFollowed(artistEntity.getUser(), user.getId()));
-            }
+            assertNotNull(dto);
+            assertFalse(dto.isObserved());
+
+            verify(userService).findUserByEmail(username);
+            verify(userRepository).isFollowedBy(ARTIST_USER_ID, user.getId());
         }
 
         @Test
@@ -279,7 +300,6 @@ class ArtistServiceImplTest {
         @Test
         void updateArtist_updatesOnlyBio_whenBannerNull() {
             String username = ARTIST_USERNAME;
-            MultipartFile bannerImg = null;
             String newBio = "Bio updated";
 
             ArtistEntity a = ArtistEntity.builder()
@@ -295,7 +315,7 @@ class ArtistServiceImplTest {
             when(userService.findUserByEmail(username)).thenReturn(user);
             when(userRepository.save(any(UserEntity.class))).thenAnswer(inv -> inv.getArgument(0));
 
-            ArtistDto dto = artistService.updateArtist(username, bannerImg, newBio);
+            artistService.updateArtist(username, null, newBio);
 
             ArgumentCaptor<UserEntity> captor = ArgumentCaptor.forClass(UserEntity.class);
             verify(userRepository).save(captor.capture());
@@ -325,7 +345,7 @@ class ArtistServiceImplTest {
             when(userService.findUserByEmail(username)).thenReturn(user);
             when(userRepository.save(any(UserEntity.class))).thenAnswer(inv -> inv.getArgument(0));
 
-            ArtistDto dto = artistService.updateArtist(username, bannerImg, null);
+            artistService.updateArtist(username, bannerImg, null);
 
             ArgumentCaptor<UserEntity> captor = ArgumentCaptor.forClass(UserEntity.class);
             verify(userRepository).save(captor.capture());
@@ -373,22 +393,63 @@ class ArtistServiceImplTest {
     }
 
     @Test
-    void getArtistTracks_returnsPagedSongDtos() {
+    void getArtistTracks_withUser_checksFavorites() {
         Pageable pageable = PageRequest.of(0, 10);
         when(artistRepository.findById(ARTIST_ID)).thenReturn(Optional.of(artistEntity));
 
         Page<SongEntity> page = new PageImpl<>(Collections.singletonList(songEntity));
         when(songRepository.findByArtistId(ARTIST_ID, pageable)).thenReturn(page);
 
-        Page<SongDto> res = artistService.getArtistTracks(ARTIST_ID, pageable);
+        when(userService.findUserByEmail(USER_EMAIL)).thenReturn(regularUser);
+        when(songLikeRepository.findSongIdsLikedByUser(eq(regularUser.getId()), anyList()))
+                .thenReturn(Set.of(songEntity.getId()));
+
+        Page<SongDto> res = artistService.getArtistTracks(ARTIST_ID, pageable, USER_EMAIL);
 
         assertNotNull(res);
         assertEquals(1, res.getTotalElements());
-        assertEquals(songEntity.getTitle(), res.getContent().get(0).getTitle());
+
+        SongDto dto = res.getContent().getFirst();
+        assertEquals(songEntity.getTitle(), dto.getTitle());
+        assertTrue(dto.isFavorite());
 
         verify(artistRepository).findById(ARTIST_ID);
         verify(songRepository).findByArtistId(ARTIST_ID, pageable);
-        verify(songMapper).toDto(any(SongEntity.class));
+        verify(userService).findUserByEmail(USER_EMAIL);
+        verify(songLikeRepository).findSongIdsLikedByUser(eq(regularUser.getId()), anyList());
+    }
+
+    @Test
+    void getArtistTracks_withoutUser_doesNotCheckFavorites() {
+        Pageable pageable = PageRequest.of(0, 10);
+
+        when(artistRepository.findById(ARTIST_ID)).thenReturn(Optional.of(artistEntity));
+
+        Page<SongEntity> page = new PageImpl<>(Collections.singletonList(songEntity));
+        when(songRepository.findByArtistId(ARTIST_ID, pageable)).thenReturn(page);
+
+        Page<SongDto> res = artistService.getArtistTracks(ARTIST_ID, pageable, null);
+
+        assertNotNull(res);
+        SongDto dto = res.getContent().getFirst();
+        assertFalse(dto.isFavorite());
+
+        verify(userService, never()).findUserByEmail(anyString());
+        verify(songLikeRepository, never()).findSongIdsLikedByUser(anyLong(), anyList());
+    }
+
+    @Test
+    void getArtistTracks_whenEmpty_returnsEmptyPageWithoutChecks() {
+        Pageable pageable = PageRequest.of(0, 10);
+
+        when(artistRepository.findById(ARTIST_ID)).thenReturn(Optional.of(artistEntity));
+        when(songRepository.findByArtistId(ARTIST_ID, pageable)).thenReturn(Page.empty(pageable));
+
+        Page<SongDto> res = artistService.getArtistTracks(ARTIST_ID, pageable, USER_EMAIL);
+
+        assertTrue(res.isEmpty());
+        verify(userService, never()).findUserByEmail(anyString());
+        verify(songLikeRepository, never()).findSongIdsLikedByUser(anyLong(), anyList());
     }
 
     @Test
@@ -396,10 +457,30 @@ class ArtistServiceImplTest {
         Pageable pageable = PageRequest.of(0, 10);
         when(artistRepository.findById(ARTIST_ID)).thenReturn(Optional.empty());
 
-        CustomException ex = assertThrows(CustomException.class, () -> artistService.getArtistTracks(ARTIST_ID, pageable));
+        CustomException ex = assertThrows(CustomException.class, () ->
+                artistService.getArtistTracks(ARTIST_ID, pageable, USER_EMAIL));
+
         assertEquals(BusinessErrorCodes.ARTIST_NOT_FOUND, ex.getErrorCode());
 
         verify(artistRepository).findById(ARTIST_ID);
         verifyNoInteractions(songRepository);
+    }
+
+    @Test
+    void getFans_returnsMappedDtos() {
+        Pageable pageable = PageRequest.of(0, 10);
+        String query = "search";
+        UserMinimalDto uDto = new UserMinimalDto();
+
+        Page<UserEntity> page = new PageImpl<>(List.of(regularUser));
+        when(userRepository.findFollowersByUserId(ARTIST_ID, query, pageable)).thenReturn(page);
+        when(userMinimalMapper.toDto(regularUser)).thenReturn(uDto);
+
+        Page<UserMinimalDto> result = artistService.getFans(ARTIST_ID, pageable, query);
+
+        assertNotNull(result);
+        assertEquals(1, result.getTotalElements());
+        verify(userRepository).findFollowersByUserId(ARTIST_ID, query, pageable);
+        verify(userMinimalMapper).toDto(regularUser);
     }
 }

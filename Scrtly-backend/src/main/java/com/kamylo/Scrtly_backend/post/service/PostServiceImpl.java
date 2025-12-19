@@ -1,5 +1,6 @@
 package com.kamylo.Scrtly_backend.post.service;
 
+import com.kamylo.Scrtly_backend.like.repository.LikeRepository;
 import com.kamylo.Scrtly_backend.post.mapper.PostMapper;
 import com.kamylo.Scrtly_backend.post.web.dto.PostDto;
 import com.kamylo.Scrtly_backend.user.web.dto.UserDto;
@@ -12,7 +13,6 @@ import com.kamylo.Scrtly_backend.post.repository.PostRepository;
 import com.kamylo.Scrtly_backend.notification.service.NotificationService;
 import com.kamylo.Scrtly_backend.user.service.UserService;
 import com.kamylo.Scrtly_backend.post.repository.PostSpecification;
-import com.kamylo.Scrtly_backend.common.utils.UserLikeChecker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +20,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +33,7 @@ public class PostServiceImpl implements PostService {
     private final UserService userService;
     private final FileServiceImpl fileService;
     private final PostMapper postMapper;
-    private final UserLikeChecker userLikeChecker;
+    private final LikeRepository likeRepository;
     private final NotificationService notificationService;
 
 
@@ -46,6 +50,8 @@ public class PostServiceImpl implements PostService {
                .user(user)
                .description(description)
                .image(imagePath)
+               .commentCount(0)
+               .likeCount(0)
                .build();
 
        PostEntity savedPost = postRepository.save(newPost);
@@ -97,21 +103,30 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Page<PostDto> getPosts(Pageable pageable, String username, Integer minLikes, Integer maxLikes) {
-        UserEntity user = (username != null) ? userService.findUserByEmail(username) : null;
-
         Specification<PostEntity> spec = Specification
                 .where(PostSpecification.hasMinLikes(minLikes))
                 .and(PostSpecification.hasMaxLikes(maxLikes));
 
         Page<PostEntity> page = postRepository.findAll(spec, pageable);
 
+        if (page.isEmpty()) {
+            return page.map(postMapper::toDto);
+        }
+
+        Set<Long> likedPostIds = new HashSet<>();
+        if (username != null) {
+            UserEntity user = userService.findUserByEmail(username);
+
+            List<Long> postIdsOnPage = page.getContent().stream()
+                    .map(PostEntity::getId)
+                    .toList();
+
+            likedPostIds.addAll(likeRepository.findPostIdsLikedByUser(user.getId(), postIdsOnPage));
+        }
+
         return page.map(postEntity -> {
             PostDto dto = postMapper.toDto(postEntity);
-            if (user != null) {
-                dto.setLikedByUser(
-                        userLikeChecker.isPostLikedByUser(postEntity, user.getId())
-                );
-            }
+            dto.setLikedByUser(likedPostIds.contains(postEntity.getId()));
             return dto;
         });
     }

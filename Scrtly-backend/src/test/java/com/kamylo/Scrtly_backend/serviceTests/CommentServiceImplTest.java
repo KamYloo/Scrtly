@@ -7,6 +7,7 @@ import com.kamylo.Scrtly_backend.comment.service.CommentServiceImpl;
 import com.kamylo.Scrtly_backend.comment.web.dto.CommentDto;
 import com.kamylo.Scrtly_backend.comment.web.dto.request.CommentRequest;
 import com.kamylo.Scrtly_backend.common.handler.CustomException;
+import com.kamylo.Scrtly_backend.like.repository.LikeRepository;
 import com.kamylo.Scrtly_backend.notification.domain.enums.NotificationType;
 import com.kamylo.Scrtly_backend.notification.events.NotificationEvent;
 import com.kamylo.Scrtly_backend.notification.service.NotificationService;
@@ -14,22 +15,22 @@ import com.kamylo.Scrtly_backend.post.domain.PostEntity;
 import com.kamylo.Scrtly_backend.post.repository.PostRepository;
 import com.kamylo.Scrtly_backend.user.domain.UserEntity;
 import com.kamylo.Scrtly_backend.user.service.UserService;
-import com.kamylo.Scrtly_backend.common.utils.UserLikeChecker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -45,7 +46,7 @@ class CommentServiceImplTest {
     @Mock private UserService userService;
     @Mock private PostRepository postRepository;
     @Mock private CommentMapper commentMapper;
-    @Mock private UserLikeChecker userLikeChecker;
+    @Mock private LikeRepository likeRepository; // Nowy mock
     @Mock private ApplicationEventPublisher eventPublisher;
     @Mock private NotificationService notificationService;
 
@@ -69,9 +70,11 @@ class CommentServiceImplTest {
                 .user(user)
                 .post(post)
                 .comment("Test Comment")
+                .likeCount(0)
                 .build();
 
         commentDto = new CommentDto();
+        commentDto.setId(3L);
         commentDto.setComment("Test Comment");
     }
 
@@ -86,6 +89,7 @@ class CommentServiceImplTest {
         CommentDto result = commentService.createComment(req, user.getEmail());
 
         assertThat(result).isEqualTo(commentDto);
+        verify(postRepository).incrementCommentCount(post.getId());
         verify(eventPublisher).publishEvent(any(NotificationEvent.class));
     }
 
@@ -132,6 +136,7 @@ class CommentServiceImplTest {
         CommentDto result = commentService.createComment(req, user.getEmail());
 
         assertThat(result).isEqualTo(commentDto);
+        verify(postRepository).incrementCommentCount(post.getId());
         verify(eventPublisher).publishEvent(any(NotificationEvent.class));
     }
 
@@ -196,14 +201,19 @@ class CommentServiceImplTest {
     void getCommentsByPostId_sortLatestAndLiked() {
         Pageable pg = PageRequest.of(0,1);
         Page<CommentEntity> page = new PageImpl<>(Collections.singletonList(comment));
+
         when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
         when(commentRepository.findAll(any(Specification.class), eq(pg))).thenReturn(page);
+
+        when(likeRepository.findCommentIdsLikedByUser(eq(user.getId()), anyList()))
+                .thenReturn(Set.of(3L));
+
         when(commentMapper.toDto(comment)).thenReturn(commentDto);
-        when(userLikeChecker.isCommentLikedByUser(comment, user.getId())).thenReturn(true);
 
         Page<CommentDto> res = commentService.getCommentsByPostId(2L, "latest", pg, user.getEmail());
 
         assertThat(res.getContent().get(0).isLikedByUser()).isTrue();
+        verify(likeRepository).findCommentIdsLikedByUser(eq(user.getId()), anyList());
     }
 
     @Test
@@ -216,6 +226,7 @@ class CommentServiceImplTest {
         Page<CommentDto> res = commentService.getCommentsByPostId(2L, "popular", pg, null);
 
         assertThat(res).isNotEmpty();
+        verifyNoInteractions(likeRepository);
     }
 
     @Test
@@ -233,14 +244,19 @@ class CommentServiceImplTest {
     void getReplies_mappingAndLiked() {
         Pageable pg = PageRequest.of(0,1);
         Page<CommentEntity> page = new PageImpl<>(Collections.singletonList(comment));
+
         when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
         when(commentRepository.findByParentCommentId(3L, pg)).thenReturn(page);
+
+        when(likeRepository.findCommentIdsLikedByUser(eq(user.getId()), anyList()))
+                .thenReturn(Collections.emptySet());
+
         when(commentMapper.toDto(comment)).thenReturn(commentDto);
-        when(userLikeChecker.isCommentLikedByUser(comment, user.getId())).thenReturn(false);
 
         Page<CommentDto> res = commentService.getReplies(3L, pg, user.getEmail());
 
         assertThat(res.getContent().get(0).isLikedByUser()).isFalse();
+        verify(likeRepository).findCommentIdsLikedByUser(eq(user.getId()), anyList());
     }
 
     @Test
@@ -254,6 +270,7 @@ class CommentServiceImplTest {
 
         assertThat(res).isNotEmpty();
         assertThat(res.getContent().get(0).isLikedByUser()).isFalse();
+        verifyNoInteractions(likeRepository);
     }
 
 
@@ -265,6 +282,7 @@ class CommentServiceImplTest {
         commentService.deleteComment(3L, user.getEmail());
 
         verify(commentRepository).delete(comment);
+        verify(postRepository).decrementCommentCount(post.getId());
         verify(notificationService).decrementNotification(user.getId(), post.getId(), NotificationType.COMMENT);
     }
 
@@ -277,6 +295,9 @@ class CommentServiceImplTest {
         UserEntity other = new UserEntity(); other.setId(99L);
         comment.setUser(other);
         when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
+
         assertThrows(CustomException.class, () -> commentService.deleteComment(3L, user.getEmail()));
+
+        verify(postRepository, never()).decrementCommentCount(anyLong());
     }
 }

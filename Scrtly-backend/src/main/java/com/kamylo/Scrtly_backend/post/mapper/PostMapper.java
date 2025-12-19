@@ -15,20 +15,8 @@ import org.mapstruct.ReportingPolicy;
         uses = {UserMinimalMapper.class}
 )
 public interface PostMapper {
-
-    @Mapping(target = "likeCount", ignore = true)
-    @Mapping(target = "commentCount", ignore = true)
     @Mapping(target = "likedByUser", ignore = true)
     PostDto toDto(PostEntity entity);
 
     PostEntity toEntity(PostDto dto);
-
-
-    @AfterMapping
-    @Mapping(target = "likes", ignore = true)
-    @Mapping(target = "comments", ignore = true)
-    default void fillCounts(PostEntity entity, @MappingTarget PostDto dto) {
-        dto.setLikeCount(entity.getLikes() != null ? entity.getLikes().size() : 0);
-        dto.setCommentCount(entity.getComments() != null ? entity.getComments().size() : 0);
-    }
 }

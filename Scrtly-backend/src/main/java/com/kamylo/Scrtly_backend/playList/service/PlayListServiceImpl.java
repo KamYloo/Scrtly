@@ -21,7 +21,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -126,8 +129,32 @@ public class PlayListServiceImpl implements PlayListService {
     }
 
     @Override
-    public Page<SongDto> getPlayListTracks(Integer playListId, Pageable pageable) {
-        return songRepository.findByPlaylistId(playListId, pageable).map(songMapper::toDto);
+    public Page<SongDto> getPlayListTracks(Integer playListId, Pageable pageable, String username) {
+        Page<SongEntity> songsPage = songRepository.findByPlaylistId(playListId, pageable);
+
+        if (songsPage.isEmpty()) {
+            return Page.empty(pageable);
+        }
+
+        Set<Long> likedSongIds;
+        if (username != null) {
+            UserEntity user = userService.findUserByEmail(username);
+            List<Long> songIds = songsPage.getContent().stream()
+                    .map(SongEntity::getId)
+                    .toList();
+
+            likedSongIds = songLikeRepository.findSongIdsLikedByUser(user.getId(), songIds);
+        } else {
+            likedSongIds = Collections.emptySet();
+        }
+
+        Set<Long> finalLikedSongIds = likedSongIds;
+
+        return songsPage.map(song -> {
+            SongDto dto = songMapper.toDto(song);
+            dto.setFavorite(finalLikedSongIds.contains(song.getId()));
+            return dto;
+        });
     }
 
     @Override
@@ -156,10 +183,7 @@ public class PlayListServiceImpl implements PlayListService {
                 .orElseThrow(() -> new CustomException(BusinessErrorCodes.PLAYLIST_NOT_FOUND));
         if (validatePlayListOwnership(username, playListEntity)) {
             if (playListEntity.isFavourite()) {
-                for (SongEntity songEntity : playListEntity.getSongs()) {
-                    songEntity.setFavorite(false);
-                    songLikeRepository.deleteBySong(songEntity);
-                }
+                songLikeRepository.deleteByUserAndSongs(playListEntity.getUser(), playListEntity.getSongs());
             }
             if(playListEntity.getCoverImage() != null) {
                 fileService.deleteFile(playListEntity.getCoverImage());

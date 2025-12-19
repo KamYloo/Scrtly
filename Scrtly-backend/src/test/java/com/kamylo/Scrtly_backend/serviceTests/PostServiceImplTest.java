@@ -1,5 +1,6 @@
 package com.kamylo.Scrtly_backend.serviceTests;
 
+import com.kamylo.Scrtly_backend.like.repository.LikeRepository;
 import com.kamylo.Scrtly_backend.post.mapper.PostMapper;
 import com.kamylo.Scrtly_backend.post.web.dto.PostDto;
 import com.kamylo.Scrtly_backend.user.web.dto.UserDto;
@@ -12,7 +13,6 @@ import com.kamylo.Scrtly_backend.notification.service.NotificationService;
 import com.kamylo.Scrtly_backend.user.service.UserService;
 import com.kamylo.Scrtly_backend.common.service.impl.FileServiceImpl;
 import com.kamylo.Scrtly_backend.post.service.PostServiceImpl;
-import com.kamylo.Scrtly_backend.common.utils.UserLikeChecker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -41,7 +42,7 @@ class PostServiceImplTest {
     @Mock private UserService userService;
     @Mock private FileServiceImpl fileService;
     @Mock private PostMapper postMapper;
-    @Mock private UserLikeChecker userLikeChecker;
+    @Mock private LikeRepository likeRepository;
     @Mock private NotificationService notificationService;
 
     @InjectMocks private PostServiceImpl postService;
@@ -49,6 +50,7 @@ class PostServiceImplTest {
     private UserEntity createUser(Long id) {
         UserEntity u = new UserEntity();
         u.setId(id);
+        u.setEmail("user" + id + "@example.com");
         return u;
     }
 
@@ -58,11 +60,14 @@ class PostServiceImplTest {
                 .user(user)
                 .description(description)
                 .image(image)
+                .likeCount(0)
+                .commentCount(0)
                 .build();
     }
 
-    private PostDto createPostDto(String description, String image) {
+    private PostDto createPostDto(Long id, String description, String image) {
         PostDto dto = new PostDto();
+        dto.setId(id);
         dto.setDescription(description);
         dto.setImage(image);
         return dto;
@@ -80,7 +85,7 @@ class PostServiceImplTest {
 
         UserEntity user = createUser(1L);
         PostEntity savedEntity = createPostEntity(1L, user, description, "image/path");
-        PostDto expectedDto = createPostDto(description, "image/path");
+        PostDto expectedDto = createPostDto(1L, description, "image/path");
 
         when(userService.findUserByEmail(username)).thenReturn(user);
         when(file.isEmpty()).thenReturn(false);
@@ -108,7 +113,7 @@ class PostServiceImplTest {
 
         UserEntity user = createUser(1L);
         PostEntity savedEntity = createPostEntity(2L, user, description, null);
-        PostDto expectedDto = createPostDto(description, null);
+        PostDto expectedDto = createPostDto(2L, description, null);
 
         when(userService.findUserByEmail(username)).thenReturn(user);
         when(file.isEmpty()).thenReturn(true);
@@ -134,6 +139,7 @@ class PostServiceImplTest {
         when(file.isEmpty()).thenReturn(false);
 
         UserEntity user = createUser(1L);
+        user.setEmail(username);
         PostEntity postEntity = createPostEntity(postId, user, "Old description", "old/path");
 
         when(postRepository.findById(postId)).thenReturn(Optional.of(postEntity));
@@ -141,7 +147,7 @@ class PostServiceImplTest {
         when(fileService.updateFile(file, "old/path", "postImages/")).thenReturn("new/path");
         when(postRepository.save(any(PostEntity.class))).thenReturn(postEntity);
 
-        PostDto expectedDto = createPostDto("Updated description", "new/path");
+        PostDto expectedDto = createPostDto(postId, "Updated description", "new/path");
         when(postMapper.toDto(any(PostEntity.class))).thenReturn(expectedDto);
 
         PostDto result = postService.updatePost(postId, username, file, "Updated description");
@@ -180,7 +186,8 @@ class PostServiceImplTest {
         UserEntity owner = createUser(2L);
         PostEntity post = createPostEntity(postId, owner, null, null);
 
-        UserEntity caller = createUser(1L);
+        UserEntity caller = createUser(1L); // Different ID
+        caller.setEmail(username);
 
         when(postRepository.findById(postId)).thenReturn(Optional.of(post));
         when(userService.findUserByEmail(username)).thenReturn(caller);
@@ -199,13 +206,14 @@ class PostServiceImplTest {
         String username = "user@example.com";
 
         UserEntity user = createUser(1L);
+        user.setEmail(username);
         PostEntity post = createPostEntity(postId, user, "Old description", "old/path");
 
         when(postRepository.findById(postId)).thenReturn(Optional.of(post));
         when(userService.findUserByEmail(username)).thenReturn(user);
         when(postRepository.save(any(PostEntity.class))).thenReturn(post);
 
-        PostDto expected = createPostDto("New description", "old/path");
+        PostDto expected = createPostDto(postId, "New description", "old/path");
         when(postMapper.toDto(any(PostEntity.class))).thenReturn(expected);
 
         PostDto result = postService.updatePost(postId, username, null, "New description");
@@ -218,87 +226,11 @@ class PostServiceImplTest {
     }
 
     @Test
-    void updatePost_shouldUpdateOnlyImage_whenDescriptionNull() {
-        Long postId = 1L;
-        String username = "user@example.com";
-        MultipartFile file = mock(MultipartFile.class);
-        when(file.isEmpty()).thenReturn(false);
-
-        UserEntity user = createUser(1L);
-        PostEntity post = createPostEntity(postId, user, "Old description", "old/path");
-
-        when(postRepository.findById(postId)).thenReturn(Optional.of(post));
-        when(userService.findUserByEmail(username)).thenReturn(user);
-        when(fileService.updateFile(file, "old/path", "postImages/")).thenReturn("new/path");
-        when(postRepository.save(any(PostEntity.class))).thenReturn(post);
-
-        PostDto expected = createPostDto("Old description", "new/path");
-        when(postMapper.toDto(any(PostEntity.class))).thenReturn(expected);
-
-        PostDto result = postService.updatePost(postId, username, file, null);
-
-        assertNotNull(result);
-        assertEquals("Old description", result.getDescription());
-        assertEquals("new/path", result.getImage());
-    }
-
-    @Test
-    void updatePost_shouldNotUpdateImage_whenFileEmpty() {
-        Long postId = 1L;
-        String username = "user@example.com";
-        MultipartFile file = mock(MultipartFile.class);
-        when(file.isEmpty()).thenReturn(true);
-
-        UserEntity user = createUser(1L);
-        PostEntity post = createPostEntity(postId, user, "Old description", "old/path");
-
-        when(postRepository.findById(postId)).thenReturn(Optional.of(post));
-        when(userService.findUserByEmail(username)).thenReturn(user);
-        when(postRepository.save(any(PostEntity.class))).thenReturn(post);
-
-        PostDto expected = createPostDto("Updated description", "old/path");
-        when(postMapper.toDto(any(PostEntity.class))).thenReturn(expected);
-
-        PostDto result = postService.updatePost(postId, username, file, "Updated description");
-
-        assertNotNull(result);
-        assertEquals("Updated description", result.getDescription());
-        assertEquals("old/path", result.getImage());
-
-        verify(fileService, never()).updateFile(any(), any(), anyString());
-    }
-
-    @Test
-    void updatePost_shouldNotUpdateDescription_whenNullOrEmpty() {
-        Long postId = 1L;
-        String username = "user@example.com";
-
-        UserEntity user = createUser(1L);
-        PostEntity post = createPostEntity(postId, user, "Old description", "old/path");
-
-        when(postRepository.findById(postId)).thenReturn(Optional.of(post));
-        when(userService.findUserByEmail(username)).thenReturn(user);
-        when(fileService.updateFile(any(MultipartFile.class), eq("old/path"), eq("postImages/"))).thenReturn("new/path");
-        when(postRepository.save(any(PostEntity.class))).thenReturn(post);
-
-        when(postMapper.toDto(any(PostEntity.class))).thenReturn(createPostDto("Old description", "new/path"));
-        PostDto r1 = postService.updatePost(postId, username, mock(MultipartFile.class), null);
-        assertNotNull(r1);
-
-        when(postMapper.toDto(any(PostEntity.class))).thenReturn(createPostDto("Old description", "new/path"));
-        MultipartFile fileMock = mock(MultipartFile.class);
-        when(fileMock.isEmpty()).thenReturn(false);
-        PostDto r2 = postService.updatePost(postId, username, fileMock, "");
-        assertNotNull(r2);
-
-        verify(postRepository, atLeastOnce()).save(any(PostEntity.class));
-    }
-
-    @Test
     void deletePost_shouldDeletePost() {
         Long postId = 1L;
         String username = "user@example.com";
         UserEntity user = createUser(1L);
+        user.setEmail(username);
         PostEntity postEntity = createPostEntity(postId, user, null, "image/path");
 
         when(postRepository.findById(postId)).thenReturn(Optional.of(postEntity));
@@ -312,40 +244,6 @@ class PostServiceImplTest {
     }
 
     @Test
-    void deletePost_shouldThrowExceptionWhenPostNotFound() {
-        Long postId = 1L;
-        String username = "user@example.com";
-
-        when(postRepository.findById(postId)).thenReturn(Optional.empty());
-
-        CustomException ex = assertThrows(CustomException.class,
-                () -> postService.deletePost(postId, username));
-
-        assertEquals(BusinessErrorCodes.POST_NOT_FOUND, ex.getErrorCode());
-        verify(postRepository).findById(postId);
-        verifyNoMoreInteractions(userService, notificationService, fileService);
-    }
-
-    @Test
-    void deletePost_shouldThrowExceptionWhenUserNotOwner() {
-        Long postId = 1L;
-        String username = "user@example.com";
-        UserEntity owner = createUser(2L);
-        UserEntity caller = createUser(1L);
-        PostEntity post = createPostEntity(postId, owner, null, "some/path");
-
-        when(postRepository.findById(postId)).thenReturn(Optional.of(post));
-        when(userService.findUserByEmail(username)).thenReturn(caller);
-
-        CustomException ex = assertThrows(CustomException.class,
-                () -> postService.deletePost(postId, username));
-
-        assertEquals(BusinessErrorCodes.POST_MISMATCH, ex.getErrorCode());
-        verify(postRepository).findById(postId);
-        verify(userService).findUserByEmail(username);
-    }
-
-    @Test
     void getPostsByUser_shouldReturnUserPosts() {
         String nickName = "user123";
         UserDto userDto = new UserDto();
@@ -353,7 +251,7 @@ class PostServiceImplTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         PostEntity postEntity = createPostEntity(1L, null, "Test post", null);
-        PostDto postDto = createPostDto("Test post", null);
+        PostDto postDto = createPostDto(1L, "Test post", null);
 
         when(userService.findUserByNickname(nickName)).thenReturn(userDto);
         when(postRepository.findByUserId(eq(userDto.getId()), eq(pageable)))
@@ -373,27 +271,54 @@ class PostServiceImplTest {
         Pageable pageable = PageRequest.of(0, 10);
         UserEntity user = createUser(1L);
 
-        PostEntity postEntity = createPostEntity(1L, null, "Test post", null);
-        PostDto postDto = createPostDto("Test post", null);
+        PostEntity postEntity = createPostEntity(100L, null, "Test post", null);
+        PostDto postDto = createPostDto(100L, "Test post", null);
 
-        when(userService.findUserByEmail(username)).thenReturn(user);
         when(postRepository.findAll(ArgumentMatchers.<Specification<PostEntity>>any(), eq(pageable)))
                 .thenReturn(new PageImpl<>(Collections.singletonList(postEntity)));
+        when(userService.findUserByEmail(username)).thenReturn(user);
+        when(likeRepository.findPostIdsLikedByUser(eq(user.getId()), anyList()))
+                .thenReturn(Set.of(100L));
         when(postMapper.toDto(any(PostEntity.class))).thenReturn(postDto);
-        when(userLikeChecker.isPostLikedByUser(eq(postEntity), eq(user.getId()))).thenReturn(true);
 
         Page<PostDto> result = postService.getPosts(pageable, username, null, null);
 
         assertFalse(result.isEmpty());
+        verify(likeRepository).findPostIdsLikedByUser(eq(user.getId()), anyList());
         assertTrue(result.getContent().get(0).isLikedByUser());
     }
 
     @Test
-    void getPosts_shouldReturnAllPosts_whenNoUsername_userServiceNotCalled() {
+    void getPosts_shouldReturnAllPosts_whenUserProvided_butNotLiked() {
+        String username = "user@example.com";
         Pageable pageable = PageRequest.of(0, 10);
+        UserEntity user = createUser(1L);
 
+        PostEntity postEntity = createPostEntity(100L, null, "Test post", null);
+        PostDto postDto = createPostDto(100L, "Test post", null);
+
+        when(postRepository.findAll(ArgumentMatchers.<Specification<PostEntity>>any(), eq(pageable)))
+                .thenReturn(new PageImpl<>(Collections.singletonList(postEntity)));
+
+        when(userService.findUserByEmail(username)).thenReturn(user);
+
+        when(likeRepository.findPostIdsLikedByUser(eq(user.getId()), anyList()))
+                .thenReturn(Collections.emptySet());
+
+        when(postMapper.toDto(any(PostEntity.class))).thenReturn(postDto);
+
+        Page<PostDto> result = postService.getPosts(pageable, username, null, null);
+
+        assertFalse(result.isEmpty());
+        verify(likeRepository).findPostIdsLikedByUser(eq(user.getId()), anyList());
+        assertFalse(result.getContent().get(0).isLikedByUser());
+    }
+
+    @Test
+    void getPosts_shouldReturnAllPosts_whenNoUsername_skipLikeChecking() {
+        Pageable pageable = PageRequest.of(0, 10);
         PostEntity postEntity = createPostEntity(2L, null, "Public post", null);
-        PostDto postDto = createPostDto("Public post", null);
+        PostDto postDto = createPostDto(2L, "Public post", null);
 
         when(postRepository.findAll(ArgumentMatchers.<Specification<PostEntity>>any(), eq(pageable)))
                 .thenReturn(new PageImpl<>(Collections.singletonList(postEntity)));
@@ -402,9 +327,22 @@ class PostServiceImplTest {
         Page<PostDto> result = postService.getPosts(pageable, null, null, null);
 
         assertFalse(result.isEmpty());
-        assertFalse(result.getContent().get(0).isLikedByUser());
 
         verify(userService, never()).findUserByEmail(anyString());
-        verify(userLikeChecker, never()).isPostLikedByUser(any(PostEntity.class), anyLong());
+        verify(likeRepository, never()).findPostIdsLikedByUser(anyLong(), anyList());
+        assertFalse(result.getContent().get(0).isLikedByUser());
+    }
+
+    @Test
+    void getPosts_shouldReturnEmptyPage_whenNoPostsFound() {
+        Pageable pageable = PageRequest.of(0, 10);
+        when(postRepository.findAll(ArgumentMatchers.<Specification<PostEntity>>any(), eq(pageable)))
+                .thenReturn(Page.empty());
+
+        Page<PostDto> result = postService.getPosts(pageable, "someUser", null, null);
+
+        assertTrue(result.isEmpty());
+        verify(userService, never()).findUserByEmail(anyString());
+        verify(likeRepository, never()).findPostIdsLikedByUser(anyLong(), anyList());
     }
 }

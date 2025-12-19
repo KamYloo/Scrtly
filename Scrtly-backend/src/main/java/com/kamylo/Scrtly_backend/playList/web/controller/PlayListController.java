@@ -56,8 +56,12 @@ public class PlayListController {
     }
 
     @GetMapping("/{playListId}/tracks")
-    public ResponseEntity<PagedResponse<SongDto>> getPlayListTracks(@PathVariable @Positive(message = "{id.positive}") Integer playListId, @PageableDefault(size = 10) Pageable pageable) {
-        Page<SongDto> songs = playListService.getPlayListTracks(playListId, pageable);
+    public ResponseEntity<PagedResponse<SongDto>> getPlayListTracks(
+            @PathVariable @Positive(message = "{id.positive}") Integer playListId,
+            @PageableDefault(size = 10) Pageable pageable,
+            Principal principal) {
+        String username = (principal != null ? principal.getName() : null);
+        Page<SongDto> songs = playListService.getPlayListTracks(playListId, pageable, username);
         return new ResponseEntity<>(PagedResponse.of(songs), HttpStatus.OK);
     }
 

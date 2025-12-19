@@ -46,6 +46,12 @@ class NotificationRepositoryIntegrationTest {
                 .password("secret")
                 .enable(true)
                 .build();
+
+        u.setFollowers(new HashSet<>());
+        u.setFollowings(new HashSet<>());
+        u.setRoles(new HashSet<>());
+        u.setPostEntity(new ArrayList<>());
+
         em.persist(u);
         em.flush();
         return u;
@@ -58,9 +64,10 @@ class NotificationRepositoryIntegrationTest {
                 .creationDate(LocalDateTime.now())
                 .updateDate(LocalDateTime.now())
                 .user(user)
+                .likeCount(0)
+                .commentCount(0)
                 .build();
-        p.setLikes(new HashSet<>());
-        p.setComments(new ArrayList<>());
+
         em.persist(p);
         em.flush();
         return p;
@@ -93,7 +100,7 @@ class NotificationRepositoryIntegrationTest {
         UserEntity author = persistUser("Author");
         PostEntity post = persistPost("p.jpg", "desc", author);
 
-        NotificationType type = NotificationType.values()[0];
+        NotificationType type = NotificationType.LIKE; // Używamy konkretnego typu
 
         NotificationEntity saved = persistNotification("hello",
                 LocalDateTime.now().minusHours(1),
@@ -117,22 +124,25 @@ class NotificationRepositoryIntegrationTest {
         PostEntity postA = persistPost("a.jpg", "a", author);
         PostEntity postB = persistPost("b.jpg", "b", author);
 
-        NotificationType type = NotificationType.values()[0];
+        NotificationType type = NotificationType.COMMENT;
 
         persistNotification("n1",
                 LocalDateTime.now().minusDays(2),
                 LocalDateTime.now().minusDays(1),
                 type, recipient, postA);
+
         persistNotification("n2",
                 LocalDateTime.now().minusDays(1),
                 LocalDateTime.now().minusHours(6),
                 type, recipient, null);
+
         persistNotification("n3",
                 LocalDateTime.now().minusHours(10),
                 LocalDateTime.now().minusHours(1),
                 type, recipient, postB);
 
         Page<NotificationEntity> page = notificationRepository.findByRecipientIdOrderByUpdatedDateDescCreatedDateDesc(recipient.getId(), PageRequest.of(0, 2));
+
         assertThat(page.getTotalElements()).isEqualTo(3L);
         assertThat(page.getContent()).hasSize(2);
 
@@ -151,18 +161,21 @@ class NotificationRepositoryIntegrationTest {
         PostEntity post1 = persistPost("one.jpg", "one", author);
         PostEntity post2 = persistPost("two.jpg", "two", author);
 
-        NotificationType type = NotificationType.values()[0];
+        NotificationType type = NotificationType.LIKE;
 
         persistNotification("for1a", LocalDateTime.now(), LocalDateTime.now(), type, recipient, post1);
         persistNotification("for1b", LocalDateTime.now(), LocalDateTime.now(), type, recipient, post1);
         persistNotification("for2", LocalDateTime.now(), LocalDateTime.now(), type, recipient, post2);
 
         notificationRepository.deleteAllByPost(post1);
+
         em.flush();
         em.clear();
 
         Page<NotificationEntity> remaining = notificationRepository.findByRecipientIdOrderByUpdatedDateDescCreatedDateDesc(recipient.getId(), PageRequest.of(0, 10));
+
         assertThat(remaining.getTotalElements()).isEqualTo(1L);
         assertThat(remaining.getContent().get(0).getPost()).isNotNull();
+        assertThat(remaining.getContent().get(0).getPost().getId()).isEqualTo(post2.getId());
     }
 }

@@ -31,7 +31,7 @@ public class CommentSpecification {
 
     public static Specification<CommentEntity> orderByLikes() {
         return (root, query, criteriaBuilder) -> {
-            query.orderBy(criteriaBuilder.desc(criteriaBuilder.size(root.get("likes"))));
+            query.orderBy(criteriaBuilder.desc(root.get("likeCount")));
             return criteriaBuilder.conjunction();
         };
     }

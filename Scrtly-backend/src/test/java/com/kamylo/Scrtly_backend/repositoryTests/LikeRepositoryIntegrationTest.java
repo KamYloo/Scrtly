@@ -13,9 +13,9 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -56,9 +56,9 @@ class LikeRepositoryIntegrationTest {
                 .creationDate(LocalDateTime.now())
                 .updateDate(LocalDateTime.now())
                 .user(user)
+                .likeCount(0)
+                .commentCount(0)
                 .build();
-        p.setLikes(new HashSet<>());
-        p.setComments(new ArrayList<>());
         em.persist(p);
         em.flush();
         return p;
@@ -71,9 +71,8 @@ class LikeRepositoryIntegrationTest {
                 .lastModifiedDate(LocalDateTime.now())
                 .post(post)
                 .user(user)
+                .likeCount(0)
                 .build();
-        c.setLikes(new HashSet<>());
-        c.setReplies(new HashSet<>());
         em.persist(c);
         em.flush();
         return c;
@@ -85,9 +84,6 @@ class LikeRepositoryIntegrationTest {
                 .post(post)
                 .build();
         em.persist(l);
-        if (post.getLikes() == null) post.setLikes(new HashSet<>());
-        post.getLikes().add(l);
-        em.merge(post);
         em.flush();
         return l;
     }
@@ -98,69 +94,82 @@ class LikeRepositoryIntegrationTest {
                 .comment(comment)
                 .build();
         em.persist(l);
-        if (comment.getLikes() == null) comment.setLikes(new HashSet<>());
-        comment.getLikes().add(l);
-        em.merge(comment);
         em.flush();
         return l;
     }
 
     @Test
-    void isLikeExistPost_returnsLikeWhenPresent_andNullWhenAbsent() {
+    void findByUserIdAndPostId_returnsOptionalWithLike_whenPresent() {
         UserEntity u = persistUser("UserA");
         PostEntity p = persistPost("imgA.jpg", "descA", u);
 
-        LikeEntity none = likeRepository.isLikeExistPost(u.getId(), p.getId());
-        assertThat(none).isNull();
+        Optional<LikeEntity> absent = likeRepository.findByUserIdAndPostId(u.getId(), p.getId());
+        assertThat(absent).isEmpty();
 
-        LikeEntity saved = persistLikeForPost(u, p);
+        LikeEntity savedLike = persistLikeForPost(u, p);
 
-        LikeEntity found = likeRepository.isLikeExistPost(u.getId(), p.getId());
-        assertThat(found).isNotNull();
-        assertThat(found.getId()).isEqualTo(saved.getId());
-        assertThat(found.getPost()).isNotNull();
-        assertThat(found.getPost().getId()).isEqualTo(p.getId());
-        assertThat(found.getUser()).isNotNull();
-        assertThat(found.getUser().getId()).isEqualTo(u.getId());
+        Optional<LikeEntity> present = likeRepository.findByUserIdAndPostId(u.getId(), p.getId());
+        assertThat(present).isPresent();
+        assertThat(present.get().getId()).isEqualTo(savedLike.getId());
+        assertThat(present.get().getPost().getId()).isEqualTo(p.getId());
     }
 
     @Test
-    void findByPostId_returnsAllLikesForGivenPost() {
-        UserEntity u1 = persistUser("Liker1");
-        UserEntity u2 = persistUser("Liker2");
-        UserEntity u3 = persistUser("Liker3");
-        PostEntity post = persistPost("post.jpg", "post", persistUser("Author"));
-
-        persistLikeForPost(u1, post);
-        persistLikeForPost(u2, post);
-        persistLikeForPost(u3, post);
-
-        List<LikeEntity> likes = likeRepository.findByPostId(post.getId());
-        assertThat(likes).hasSize(3);
-        assertThat(likes).allSatisfy(l -> {
-            assertThat(l.getPost()).isNotNull();
-            assertThat(l.getPost().getId()).isEqualTo(post.getId());
-            assertThat(l.getUser()).isNotNull();
-        });
-    }
-
-    @Test
-    void isLikeExistComment_and_findByCommentId_workForCommentLikes() {
+    void findByUserIdAndCommentId_returnsOptionalWithLike_whenPresent() {
         UserEntity author = persistUser("AuthorC");
         PostEntity post = persistPost("pC.jpg", "descC", author);
         CommentEntity c = persistComment(post, persistUser("Commenter"));
 
-        assertThat(likeRepository.isLikeExistComment(author.getId(), c.getId())).isNull();
+        Optional<LikeEntity> absent = likeRepository.findByUserIdAndCommentId(author.getId(), c.getId());
+        assertThat(absent).isEmpty();
 
-        LikeEntity saved = persistLikeForComment(author, c);
+        LikeEntity savedLike = persistLikeForComment(author, c);
 
-        LikeEntity found = likeRepository.isLikeExistComment(author.getId(), c.getId());
-        assertThat(found).isNotNull();
-        assertThat(found.getId()).isEqualTo(saved.getId());
-
-        List<LikeEntity> likes = likeRepository.findByCommentId(c.getId());
-        assertThat(likes).hasSize(1);
-        assertThat(likes.get(0).getComment()).isNotNull();
-        assertThat(likes.get(0).getComment().getId()).isEqualTo(c.getId());
+        Optional<LikeEntity> present = likeRepository.findByUserIdAndCommentId(author.getId(), c.getId());
+        assertThat(present).isPresent();
+        assertThat(present.get().getId()).isEqualTo(savedLike.getId());
     }
+
+    @Test
+    void findPostIdsLikedByUser_returnsCorrectIds() {
+        UserEntity user = persistUser("Liker");
+        UserEntity otherUser = persistUser("Other");
+
+        PostEntity p1 = persistPost("1.jpg", "1", user);
+        PostEntity p2 = persistPost("2.jpg", "2", user);
+        PostEntity p3 = persistPost("3.jpg", "3", user);
+
+        persistLikeForPost(user, p1);
+        persistLikeForPost(user, p3);
+
+        persistLikeForPost(otherUser, p2);
+
+        List<Long> postIdsToCheck = List.of(p1.getId(), p2.getId(), p3.getId());
+
+        Set<Long> result = likeRepository.findPostIdsLikedByUser(user.getId(), postIdsToCheck);
+
+        assertThat(result).hasSize(2);
+        assertThat(result).containsExactlyInAnyOrder(p1.getId(), p3.getId());
+        assertThat(result).doesNotContain(p2.getId());
     }
+
+    @Test
+    void findCommentIdsLikedByUser_returnsCorrectIds() {
+        UserEntity user = persistUser("CommentLiker");
+        PostEntity post = persistPost("p.jpg", "d", user);
+
+        CommentEntity c1 = persistComment(post, user);
+        CommentEntity c2 = persistComment(post, user);
+        CommentEntity c3 = persistComment(post, user);
+
+        persistLikeForComment(user, c2);
+
+        List<Long> commentIdsToCheck = List.of(c1.getId(), c2.getId(), c3.getId());
+
+        Set<Long> result = likeRepository.findCommentIdsLikedByUser(user.getId(), commentIdsToCheck);
+
+        assertThat(result).hasSize(1);
+        assertThat(result).contains(c2.getId());
+        assertThat(result).doesNotContain(c1.getId(), c3.getId());
+    }
+}

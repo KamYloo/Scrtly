@@ -2,8 +2,9 @@ import React, {useState} from 'react'
 import toast from "react-hot-toast";
 import {useLazySearchSongQuery} from "../../Redux/services/songApi.js";
 import {useUploadSongToPlaylistMutation} from "../../Redux/services/playlistApi.js";
+import {MdCancel} from "react-icons/md";
 
-function AddSongToPlayList({playListId}) {
+function AddSongToPlayList({onClose, playListId}) {
     const [keyword, setKeyword] = useState('');
 
     const [triggerSearch, { data: searchResults = [], isLoading: isSearching, isError: searchError }] =
@@ -28,6 +29,7 @@ function AddSongToPlayList({playListId}) {
 
     return (
         <div className='searchSong'>
+            <i className='cancel' onClick={onClose}><MdCancel/></i>
             <form onSubmit={handleSearch}>
                 <input type="text" placeholder='title...' onChange={(e) => setKeyword(e.target.value)}/>
                 <button disabled={keyword.trim() === ''}>Search</button>
@@ -37,14 +39,14 @@ function AddSongToPlayList({playListId}) {
                     {searchResults.map((song) => (
                         <div className="song" key={song.id}>
                             <div className="detail">
-                                <img src={song?.imageSong} alt="" />
+                                <img src={song?.imageSong} alt=""/>
                                 <div className="songData">
                                     <span>{song?.title}</span>
                                     <p>{song?.artist.pseudonym}</p>
                                 </div>
                             </div>
-                            <button onClick={() => handleAddSong(song.id)} disabled={isAdding }>
-                                {isAdding  ? "Adding..." : "Add Song"}
+                            <button onClick={() => handleAddSong(song.id)} disabled={isAdding}>
+                                {isAdding ? "Adding..." : "Add Song"}
                             </button>
                         </div>
                     ))}
@@ -58,4 +60,4 @@ function AddSongToPlayList({playListId}) {
     )
 }
 
-export { AddSongToPlayList }
+export {AddSongToPlayList}

@@ -381,7 +381,7 @@
   padding: 30px;
   position: absolute;
   border-radius: 10px;
-  background: rgba(19, 19, 20, 0.815);
+  background: var(--bg-color18);
   top: 0;
   bottom: 0;
   right: 0;
@@ -393,6 +393,7 @@
     font-size: 2vh;
     right: 1vh;
     top: 1vh;
+    color: var(--button-cancel);
   }
 
   form {
@@ -412,8 +413,15 @@
       background: rgb(53, 53, 53);
       border: none;
       cursor: pointer;
-      color: var(--text-primary);
+      color: white;
     }
+  }
+
+  .userList {
+    display: flex;
+    flex-direction: column;
+    overflow: scroll;
+    height: 25vh;
   }
 
   .user {
@@ -436,7 +444,7 @@
       }
 
       span {
-        color: var(--text-primary);
+        color: white;
       }
     }
 
@@ -456,7 +464,7 @@
   border: none;
   border-radius: 10px;
   background: rgb(53, 53, 53);
-  color: var(--text-primary);
+  color: white;
   cursor: pointer;
   transition: background 0.3s ease-in-out;
 }
@@ -482,7 +490,7 @@
   border: none;
   outline: none;
   background: rgba(10, 10, 10, 0.63);
-  color: var(--text-primary);
+  color: white;
 }
 
 .addUser {

@@ -1,6 +1,5 @@
 package com.kamylo.Scrtly_backend.comment.domain;
 
-import com.kamylo.Scrtly_backend.like.domain.LikeEntity;
 import com.kamylo.Scrtly_backend.post.domain.PostEntity;
 import com.kamylo.Scrtly_backend.user.domain.UserEntity;
 import jakarta.persistence.*;
@@ -49,8 +48,8 @@ public class CommentEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
-    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private Set<LikeEntity> likes = new HashSet<>();
+    @Column(name = "like_count", nullable = false)
+    private int likeCount = 0;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_comment_id")

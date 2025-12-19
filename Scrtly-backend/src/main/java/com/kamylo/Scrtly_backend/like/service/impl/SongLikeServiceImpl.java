@@ -35,18 +35,16 @@ public class SongLikeServiceImpl implements SongLikeService {
         SongLikeEntity existingLike = songLikeRepository.findByUserIdAndSongId(user.getId(), songId);
 
         if (existingLike != null) {
-            song.setFavorite(false);
             songLikeRepository.delete(existingLike);
             playListService.removeFromFavourites(user, song);
             return songLikeMapper.toDto(existingLike);
         } else {
-            song.setFavorite(true);
-            playListService.addToFavourites(user, song);
             SongLikeEntity newLike = SongLikeEntity.builder()
                     .song(song)
                     .user(user)
                     .build();
             songLikeRepository.save(newLike);
+            playListService.addToFavourites(user, song);
             return songLikeMapper.toDto(newLike);
         }
     }

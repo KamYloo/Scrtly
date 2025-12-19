@@ -17,17 +17,10 @@ import org.mapstruct.ReportingPolicy;
 )
 public interface CommentMapper {
     @Mapping(source = "parentComment.id",   target = "parentCommentId")
-    @Mapping(target = "likeCount", ignore = true)
     @Mapping(target = "likedByUser", ignore = true)
     CommentDto toDto(CommentEntity entity);
 
-    @Mapping(target = "likes", ignore = true)
     @Mapping(target = "parentComment", ignore = true)
     @Mapping(target = "replies", ignore = true)
     CommentEntity toEntity(CommentDto dto);
-
-    @AfterMapping
-    default void enrich(CommentEntity entity, @MappingTarget CommentDto dto) {
-        dto.setLikeCount(entity.getLikes() != null ? entity.getLikes().size() : 0);
-    }
 }

@@ -2,7 +2,6 @@ package com.kamylo.Scrtly_backend.serviceTests;
 
 import com.kamylo.Scrtly_backend.common.handler.CustomException;
 import com.kamylo.Scrtly_backend.common.service.FileService;
-import com.kamylo.Scrtly_backend.common.utils.UserLikeChecker;
 import com.kamylo.Scrtly_backend.email.EmailTemplateName;
 import com.kamylo.Scrtly_backend.email.service.EmailService;
 import com.kamylo.Scrtly_backend.payment.domain.enums.SubscriptionStatus;
@@ -45,7 +44,6 @@ class UserServiceImplTest {
     @Mock private UserRepository userRepository;
     @Mock private FileService fileService;
     @Mock private UserMapper mapper;
-    @Mock private UserLikeChecker userLikeChecker;
     @Mock private MultipartFile multipartFile;
     @Mock private ArtistVerificationTokenService artistVerificationTokenService;
     @Mock private EmailService emailService;
@@ -65,11 +63,15 @@ class UserServiceImplTest {
         user.setNickName("User1");
         user.setFullName("Test User");
         user.setRoles(new HashSet<>());
+        user.setFollowers(new HashSet<>());
+        user.setFollowings(new HashSet<>());
 
         anotherUser = new UserEntity();
         anotherUser.setId(2L);
         anotherUser.setEmail("another@example.com");
         anotherUser.setNickName("User2");
+        anotherUser.setFollowers(new HashSet<>());
+        anotherUser.setFollowings(new HashSet<>());
 
         userDto = new UserDto();
         userDto.setNickName("User1");
@@ -138,23 +140,33 @@ class UserServiceImplTest {
 
     @Test
     void getUserProfile_whenObserved_shouldSetObservedTrue() {
-        when(userRepository.findByEmail("another@example.com")).thenReturn(Optional.of(anotherUser));
         when(userRepository.findByNickName("User1")).thenReturn(Optional.of(user));
-        when(userLikeChecker.isUserFollowed(user, anotherUser.getId())).thenReturn(true);
+        when(userRepository.findByEmail("another@example.com")).thenReturn(Optional.of(anotherUser));
         when(mapper.toDto(user)).thenReturn(userDto);
 
+        when(userRepository.countFollowers(user.getId())).thenReturn(10L);
+        when(userRepository.countFollowings(user.getId())).thenReturn(5L);
+        when(userRepository.isFollowedBy(user.getId(), anotherUser.getId())).thenReturn(true);
+
         UserDto result = userService.getUserProfile("User1", "another@example.com");
+
         assertThat(result.isObserved()).isTrue();
+        assertThat(result.getObserversCount()).isEqualTo(10);
+        assertThat(result.getObservationsCount()).isEqualTo(5);
     }
 
     @Test
     void getUserProfile_whenNotObserved_shouldSetObservedFalse() {
-        when(userRepository.findByEmail("another@example.com")).thenReturn(Optional.of(anotherUser));
         when(userRepository.findByNickName("User1")).thenReturn(Optional.of(user));
-        when(userLikeChecker.isUserFollowed(user, anotherUser.getId())).thenReturn(false);
+        when(userRepository.findByEmail("another@example.com")).thenReturn(Optional.of(anotherUser));
         when(mapper.toDto(user)).thenReturn(userDto);
 
+        when(userRepository.countFollowers(user.getId())).thenReturn(0L);
+        when(userRepository.countFollowings(user.getId())).thenReturn(0L);
+        when(userRepository.isFollowedBy(user.getId(), anotherUser.getId())).thenReturn(false);
+
         UserDto result = userService.getUserProfile("User1", "another@example.com");
+
         assertThat(result.isObserved()).isFalse();
     }
 
@@ -162,9 +174,13 @@ class UserServiceImplTest {
     void getUserProfile_whenRequesterNull_shouldSetObservedFalse() {
         when(userRepository.findByNickName("User1")).thenReturn(Optional.of(user));
         when(mapper.toDto(user)).thenReturn(userDto);
+        when(userRepository.countFollowers(anyLong())).thenReturn(0L);
+        when(userRepository.countFollowings(anyLong())).thenReturn(0L);
 
         UserDto result = userService.getUserProfile("User1", null);
+
         assertThat(result.isObserved()).isFalse();
+        verify(userRepository, never()).isFollowedBy(anyLong(), anyLong());
     }
 
     @Test
@@ -172,21 +188,28 @@ class UserServiceImplTest {
         when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
         when(userRepository.findById(2L)).thenReturn(Optional.of(anotherUser));
         when(mapper.toDto(anotherUser)).thenReturn(userDto);
+        when(userRepository.isFollowedBy(anotherUser.getId(), user.getId())).thenReturn(true);
 
         userService.followUser(2L, "user@example.com");
+
         assertThat(user.getFollowings()).contains(anotherUser);
         assertThat(anotherUser.getFollowers()).contains(user);
+        verify(userRepository).save(user);
+        verify(userRepository).save(anotherUser);
     }
 
     @Test
     void followUser_whenFollowingAlready_shouldUnfollow() {
         user.getFollowings().add(anotherUser);
         anotherUser.getFollowers().add(user);
+
         when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
         when(userRepository.findById(2L)).thenReturn(Optional.of(anotherUser));
         when(mapper.toDto(anotherUser)).thenReturn(userDto);
+        when(userRepository.isFollowedBy(anotherUser.getId(), user.getId())).thenReturn(false);
 
         userService.followUser(2L, "user@example.com");
+
         assertThat(user.getFollowings()).doesNotContain(anotherUser);
         assertThat(anotherUser.getFollowers()).doesNotContain(user);
     }

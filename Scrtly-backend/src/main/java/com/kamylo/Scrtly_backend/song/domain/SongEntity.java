@@ -52,8 +52,6 @@ public class SongEntity {
     @Column(name = "image_song", nullable = false, length = 255)
     private String imageSong;
 
-    private boolean favorite;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "album_id", nullable = false)
     private AlbumEntity album;

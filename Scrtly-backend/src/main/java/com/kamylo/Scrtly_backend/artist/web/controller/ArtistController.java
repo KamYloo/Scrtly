@@ -62,10 +62,12 @@ public class ArtistController {
     public ResponseEntity<PagedResponse<SongDto>> getArtistTracksHandler(
             @PathVariable @Positive(message = "{id.positive}") Long artistId,
             @RequestParam(defaultValue = "0") @Min(0) int page,
-            @RequestParam(defaultValue = "9") @Min(1) @Max(200) int size) {
+            @RequestParam(defaultValue = "9") @Min(1) @Max(200) int size,
+            Principal principal) {
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<SongDto> songs = artistService.getArtistTracks(artistId, pageable);
+        String username = (principal != null ? principal.getName() : null);
+        Page<SongDto> songs = artistService.getArtistTracks(artistId, pageable, username);
         return new ResponseEntity<>(PagedResponse.of(songs), HttpStatus.OK);
     }
 

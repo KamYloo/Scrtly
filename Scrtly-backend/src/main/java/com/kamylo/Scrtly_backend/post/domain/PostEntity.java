@@ -1,10 +1,8 @@
 package com.kamylo.Scrtly_backend.post.domain;
 
 import com.kamylo.Scrtly_backend.comment.domain.CommentEntity;
-import com.kamylo.Scrtly_backend.like.domain.LikeEntity;
 import com.kamylo.Scrtly_backend.user.domain.UserEntity;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -13,9 +11,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "post")
@@ -45,17 +41,17 @@ public class PostEntity {
     @Column(nullable = false)
     private LocalDateTime updateDate;
 
+    @Column(name = "like_count", nullable = false)
+    private int likeCount = 0;
+
+    @Column(name = "comment_count", nullable = false)
+    private int commentCount = 0;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
-    private Set<LikeEntity> likes = new HashSet<>();
-
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    @ToString.Exclude
     private List<CommentEntity> comments = new ArrayList<>();
-
-
 }

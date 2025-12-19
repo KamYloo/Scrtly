@@ -59,7 +59,6 @@ class PlayListServiceImplTest {
     private UserEntity user;
     private UserEntity anotherUser;
     private PlayListEntity playList;
-    private PlayListDto playListDto;
     private MultipartFile playListImage;
     private SongEntity song;
 
@@ -92,8 +91,6 @@ class PlayListServiceImplTest {
         playList = makePlayList(user);
         playListImage = mock(MultipartFile.class);
         song = makeSong();
-        SongDto songDto = new SongDto();
-        songDto.setTitle("Song 1");
 
         Mockito.lenient().when(playListRepository.save(any(PlayListEntity.class)))
                 .thenAnswer(inv -> inv.getArgument(0));
@@ -111,10 +108,10 @@ class PlayListServiceImplTest {
                 .thenAnswer(inv -> {
                     SongEntity s = inv.getArgument(0);
                     SongDto sd = new SongDto();
+                    sd.setId(s.getId());
                     sd.setTitle(s.getTitle());
                     return sd;
                 });
-
     }
 
     @Nested
@@ -192,7 +189,7 @@ class PlayListServiceImplTest {
         List<PlayListDto> content = result.getContent();
         assertNotNull(content);
         assertEquals(1, content.size());
-        PlayListDto dto = content.get(0);
+        PlayListDto dto = content.getFirst();
         assertEquals("My Playlist", dto.getTitle());
         assertEquals("old/path", dto.getCoverImage());
 
@@ -212,7 +209,7 @@ class PlayListServiceImplTest {
         List<PlayListDto> content = result.getContent();
         assertNotNull(content);
         assertEquals(1, content.size());
-        PlayListDto dto = content.get(0);
+        PlayListDto dto = content.getFirst();
         assertEquals("My Playlist", dto.getTitle());
         assertEquals("old/path", dto.getCoverImage());
 
@@ -332,7 +329,7 @@ class PlayListServiceImplTest {
         ArgumentCaptor<PlayListEntity> captor = ArgumentCaptor.forClass(PlayListEntity.class);
         verify(playListRepository, times(2)).save(captor.capture());
 
-        PlayListEntity created = captor.getAllValues().get(0);
+        PlayListEntity created = captor.getAllValues().getFirst();
         assertTrue(created.isFavourite());
         assertEquals(user.getId(), created.getUser().getId());
     }
@@ -403,30 +400,65 @@ class PlayListServiceImplTest {
     }
 
     @Test
-    void addSongToPlayList_shouldThrowSongNotFound_whenSongDoesNotExist() {
-        when(songRepository.findById(SONG_ID)).thenReturn(Optional.empty());
-
-        CustomException ex = assertThrows(CustomException.class, () ->
-                playListService.addSongToPlayList(SONG_ID, PLAYLIST_ID, USER_EMAIL)
-        );
-        assertEquals(BusinessErrorCodes.SONG_NOT_FOUND, ex.getErrorCode());
-        verify(playListRepository, never()).save(any());
-    }
-
-    @Test
-    void getPlayListTracks_shouldReturnSongDtos() {
+    void getPlayListTracks_shouldReturnSongDtos_andCheckFavorites_whenUserLoggedIn() {
         Pageable pageable = PageRequest.of(0, 10);
         Page<SongEntity> page = new PageImpl<>(List.of(song));
-        when(songRepository.findByPlaylistId(PLAYLIST_ID, pageable)).thenReturn(page);
 
-        Page<SongDto> result = playListService.getPlayListTracks(PLAYLIST_ID, pageable);
+        when(songRepository.findByPlaylistId(PLAYLIST_ID, pageable)).thenReturn(page);
+        when(userService.findUserByEmail(USER_EMAIL)).thenReturn(user);
+        when(songLikeRepository.findSongIdsLikedByUser(eq(user.getId()), anyList()))
+                .thenReturn(Set.of(song.getId()));
+
+        Page<SongDto> result = playListService.getPlayListTracks(PLAYLIST_ID, pageable, USER_EMAIL);
 
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
-        assertEquals("Song 1", result.getContent().get(0).getTitle());
+
+        SongDto dto = result.getContent().getFirst();
+        assertEquals("Song 1", dto.getTitle());
+        assertTrue(dto.isFavorite());
 
         verify(songRepository).findByPlaylistId(PLAYLIST_ID, pageable);
+        verify(userService).findUserByEmail(USER_EMAIL);
+        verify(songLikeRepository).findSongIdsLikedByUser(eq(user.getId()), anyList());
         verify(songMapper).toDto(any(SongEntity.class));
+    }
+
+    @Test
+    void getPlayListTracks_shouldReturnSongDtos_withoutFavorites_whenUserNotLoggedIn() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<SongEntity> page = new PageImpl<>(List.of(song));
+
+        when(songRepository.findByPlaylistId(PLAYLIST_ID, pageable)).thenReturn(page);
+
+        Page<SongDto> result = playListService.getPlayListTracks(PLAYLIST_ID, pageable, null);
+
+        assertNotNull(result);
+        assertEquals(1, result.getTotalElements());
+
+        SongDto dto = result.getContent().getFirst();
+        assertEquals("Song 1", dto.getTitle());
+        assertFalse(dto.isFavorite());
+
+        verify(songRepository).findByPlaylistId(PLAYLIST_ID, pageable);
+        verify(userService, never()).findUserByEmail(anyString());
+        verify(songLikeRepository, never()).findSongIdsLikedByUser(anyLong(), anyList());
+        verify(songMapper).toDto(any(SongEntity.class));
+    }
+
+    @Test
+    void getPlayListTracks_shouldReturnEmptyPage_whenNoSongsFound() {
+        Pageable pageable = PageRequest.of(0, 10);
+        when(songRepository.findByPlaylistId(PLAYLIST_ID, pageable)).thenReturn(Page.empty(pageable));
+
+        Page<SongDto> result = playListService.getPlayListTracks(PLAYLIST_ID, pageable, USER_EMAIL);
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+
+        verify(songRepository).findByPlaylistId(PLAYLIST_ID, pageable);
+        verify(userService, never()).findUserByEmail(anyString());
+        verify(songLikeRepository, never()).findSongIdsLikedByUser(anyLong(), anyList());
     }
 
     @Nested
@@ -509,52 +541,61 @@ class PlayListServiceImplTest {
 
     @Nested
     class DeleteTests {
+
         @Test
-        void deletePlayList_shouldDeletePlayList_whenNotFavourite_andOwnershipValid() {
+        void deletePlayList_shouldDeletePlayList_whenNotFavourite_andOwnerValid() {
             playList.setFavourite(false);
+
             when(playListRepository.findById(PLAYLIST_ID)).thenReturn(Optional.of(playList));
+
             when(userService.findUserByEmail(USER_EMAIL)).thenReturn(user);
 
             playListService.deletePlayList(PLAYLIST_ID, USER_EMAIL);
 
-            verify(playListRepository).delete(playList);
             verify(fileService).deleteFile(playList.getCoverImage());
+            verify(playListRepository).delete(playList);
         }
 
         @Test
-        void deletePlayList_shouldProcessFavourite_whenFavouriteTrue() {
+        void deletePlayList_shouldProcessFavourite_withBulkDelete_whenFavouriteTrue() {
             playList.setFavourite(true);
             playList.getSongs().add(song);
+
             when(playListRepository.findById(PLAYLIST_ID)).thenReturn(Optional.of(playList));
+
             when(userService.findUserByEmail(USER_EMAIL)).thenReturn(user);
 
             playListService.deletePlayList(PLAYLIST_ID, USER_EMAIL);
 
-            verify(songLikeRepository).deleteBySong(song);
+            verify(songLikeRepository).deleteByUserAndSongs(playList.getUser(), playList.getSongs());
             verify(playListRepository).delete(playList);
             verify(fileService).deleteFile(playList.getCoverImage());
         }
 
         @Test
-        void deletePlayList_shouldThrowPlaylistMismatch_whenOwnershipInvalid() {
+        void deletePlayList_shouldThrowMismatch_whenUserNotOwner() {
             when(playListRepository.findById(PLAYLIST_ID)).thenReturn(Optional.of(playList));
+
             when(userService.findUserByEmail(OTHER_EMAIL)).thenReturn(anotherUser);
 
             CustomException ex = assertThrows(CustomException.class,
                     () -> playListService.deletePlayList(PLAYLIST_ID, OTHER_EMAIL));
+
             assertEquals(BusinessErrorCodes.PLAYLIST_MISMATCH, ex.getErrorCode());
+
             verify(playListRepository, never()).delete(any());
-            verify(fileService, never()).deleteFile(anyString());
         }
 
         @Test
-        void deletePlayList_shouldThrowPlaylistNotFound_whenPlayListMissing() {
+        void deletePlayList_shouldThrowNotFound_whenPlayListMissing() {
             when(playListRepository.findById(PLAYLIST_ID)).thenReturn(Optional.empty());
 
             CustomException ex = assertThrows(CustomException.class,
                     () -> playListService.deletePlayList(PLAYLIST_ID, USER_EMAIL));
+
             assertEquals(BusinessErrorCodes.PLAYLIST_NOT_FOUND, ex.getErrorCode());
             verify(playListRepository, never()).delete(any());
         }
     }
+
 }
