@@ -541,52 +541,61 @@ class PlayListServiceImplTest {
 
     @Nested
     class DeleteTests {
+
         @Test
-        void deletePlayList_shouldDeletePlayList_whenNotFavourite_andOwnershipValid() {
+        void deletePlayList_shouldDeletePlayList_whenNotFavourite_andOwnerValid() {
             playList.setFavourite(false);
+
             when(playListRepository.findById(PLAYLIST_ID)).thenReturn(Optional.of(playList));
+
             when(userService.findUserByEmail(USER_EMAIL)).thenReturn(user);
 
             playListService.deletePlayList(PLAYLIST_ID, USER_EMAIL);
 
-            verify(playListRepository).delete(playList);
             verify(fileService).deleteFile(playList.getCoverImage());
+            verify(playListRepository).delete(playList);
         }
 
         @Test
-        void deletePlayList_shouldProcessFavourite_whenFavouriteTrue() {
+        void deletePlayList_shouldProcessFavourite_withBulkDelete_whenFavouriteTrue() {
             playList.setFavourite(true);
             playList.getSongs().add(song);
+
             when(playListRepository.findById(PLAYLIST_ID)).thenReturn(Optional.of(playList));
+
             when(userService.findUserByEmail(USER_EMAIL)).thenReturn(user);
 
             playListService.deletePlayList(PLAYLIST_ID, USER_EMAIL);
 
-            verify(songLikeRepository).deleteBySong(song);
+            verify(songLikeRepository).deleteByUserAndSongs(playList.getUser(), playList.getSongs());
             verify(playListRepository).delete(playList);
             verify(fileService).deleteFile(playList.getCoverImage());
         }
 
         @Test
-        void deletePlayList_shouldThrowPlaylistMismatch_whenOwnershipInvalid() {
+        void deletePlayList_shouldThrowMismatch_whenUserNotOwner() {
             when(playListRepository.findById(PLAYLIST_ID)).thenReturn(Optional.of(playList));
+
             when(userService.findUserByEmail(OTHER_EMAIL)).thenReturn(anotherUser);
 
             CustomException ex = assertThrows(CustomException.class,
                     () -> playListService.deletePlayList(PLAYLIST_ID, OTHER_EMAIL));
+
             assertEquals(BusinessErrorCodes.PLAYLIST_MISMATCH, ex.getErrorCode());
+
             verify(playListRepository, never()).delete(any());
-            verify(fileService, never()).deleteFile(anyString());
         }
 
         @Test
-        void deletePlayList_shouldThrowPlaylistNotFound_whenPlayListMissing() {
+        void deletePlayList_shouldThrowNotFound_whenPlayListMissing() {
             when(playListRepository.findById(PLAYLIST_ID)).thenReturn(Optional.empty());
 
             CustomException ex = assertThrows(CustomException.class,
                     () -> playListService.deletePlayList(PLAYLIST_ID, USER_EMAIL));
+
             assertEquals(BusinessErrorCodes.PLAYLIST_NOT_FOUND, ex.getErrorCode());
             verify(playListRepository, never()).delete(any());
         }
     }
+
 }

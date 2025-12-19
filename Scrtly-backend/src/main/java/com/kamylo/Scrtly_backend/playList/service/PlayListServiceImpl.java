@@ -183,9 +183,7 @@ public class PlayListServiceImpl implements PlayListService {
                 .orElseThrow(() -> new CustomException(BusinessErrorCodes.PLAYLIST_NOT_FOUND));
         if (validatePlayListOwnership(username, playListEntity)) {
             if (playListEntity.isFavourite()) {
-                for (SongEntity songEntity : playListEntity.getSongs()) {
-                    songLikeRepository.deleteBySong(songEntity);
-                }
+                songLikeRepository.deleteByUserAndSongs(playListEntity.getUser(), playListEntity.getSongs());
             }
             if(playListEntity.getCoverImage() != null) {
                 fileService.deleteFile(playListEntity.getCoverImage());

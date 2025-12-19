@@ -187,4 +187,55 @@ class SongLikeRepositoryIntegrationTest {
         assertThat(likedIds).containsExactlyInAnyOrder(song1.getId(), song3.getId());
         assertThat(likedIds).doesNotContain(song2.getId());
     }
+
+    @Test
+    void deleteByUserAndSongs_removesSpecificLikes_preservesOthersAndOtherUsers() {
+        UserEntity user = persistUser("TargetUser");
+        UserEntity otherUser = persistUser("OtherUser");
+
+        ArtistEntity artist = persistArtist("ArtistD");
+        AlbumEntity album = persistAlbum("AlbumD", artist);
+
+        SongEntity s1 = persistSong("S1_DeleteMe", album, artist);
+        SongEntity s2 = persistSong("S2_DeleteMe", album, artist);
+        SongEntity s3 = persistSong("S3_KeepMe", album, artist);
+
+        persistSongLike(user, s1);
+        persistSongLike(user, s2);
+        SongLikeEntity likeToKeep = persistSongLike(user, s3);
+
+        SongLikeEntity otherLike1 = persistSongLike(otherUser, s1);
+        SongLikeEntity otherLike2 = persistSongLike(otherUser, s2);
+
+        em.flush();
+        em.clear();
+
+        UserEntity userRef = userRepository.findById(user.getId()).orElseThrow();
+        SongEntity s1Ref = songRepository.findById(s1.getId()).orElseThrow();
+        SongEntity s2Ref = songRepository.findById(s2.getId()).orElseThrow();
+
+        songLikeRepository.deleteByUserAndSongs(userRef, List.of(s1Ref, s2Ref));
+
+        em.flush();
+        em.clear();
+
+        List<SongLikeEntity> remainingLikes = songLikeRepository.findAll();
+
+        assertThat(remainingLikes).hasSize(3);
+
+        boolean userHasDeletedLikes = remainingLikes.stream()
+                .anyMatch(sl -> sl.getUser().getId().equals(user.getId()) &&
+                        (sl.getSong().getId().equals(s1.getId()) || sl.getSong().getId().equals(s2.getId())));
+
+        assertThat(userHasDeletedLikes).isFalse();
+
+        boolean userHasKeptLike = remainingLikes.stream()
+                .anyMatch(sl -> sl.getUser().getId().equals(user.getId()) && sl.getSong().getId().equals(s3.getId()));
+        assertThat(userHasKeptLike).isTrue();
+
+        long otherUserLikesCount = remainingLikes.stream()
+                .filter(sl -> sl.getUser().getId().equals(otherUser.getId()))
+                .count();
+        assertThat(otherUserLikesCount).isEqualTo(2);
+    }
 }
