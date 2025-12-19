@@ -8,7 +8,11 @@ const baseQuery = fetchBaseQuery({
 const baseQueryWithReauth = async (args, api, options) => {
     let result = await baseQuery(args, api, options);
 
-    if (result.error?.status === 401) {
+    const isLoginRequest = typeof args === 'string'
+        ? args.includes('/auth/login')
+        : args.url === '/auth/login';
+
+    if (result.error?.status === 401 && !isLoginRequest) {
         const refreshResult = await baseQuery(
             { url: '/auth/refresh', method: 'POST', responseHandler: 'text' },
             api,
@@ -19,7 +23,9 @@ const baseQueryWithReauth = async (args, api, options) => {
             result = await baseQuery(args, api, options);
         } else {
             localStorage.removeItem('isLoggedIn');
-            window.location.href = '/login';
+            if (window.location.pathname !== '/login') {
+                window.location.href = '/login';
+            }
         }
     }
 
