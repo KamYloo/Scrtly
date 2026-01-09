@@ -28,15 +28,16 @@ The recommendation system will be designed with a two-stage model: fast, aggrega
 The developed platform will combine high-quality streaming functionality with extensive social features, enabling more interactive music discovery and deepening the relationship between artists and audiences. Deployment in a containerized environment on a VPS using Cloudflare as a CDN and predefined components (PostgreSQL, RabbitMQ, Redis, backend, frontend, certbot, Watchtower) will achieve the required levels of performance, availability, and security. Recommendation mechanisms and integration with Stripe will form the basis for the development of a subscription-based business model and creator promotion.
 
 ## Sample Screenshots
-![image1](https://github.com/user-attachments/assets/fc80c89e-cbae-4fb7-a72d-b614a38c9278)
-![image2](https://github.com/user-attachments/assets/0500c33d-bf36-4f96-ae29-96f69b850849)
-![image3](https://github.com/user-attachments/assets/87a48966-f63d-4352-bc9a-c3447c4b2cb7)
-![image4](https://github.com/user-attachments/assets/14cc2f14-1e90-4be1-a108-373673505789)
-![image5](https://github.com/user-attachments/assets/ddc1fa2c-da17-43e3-b261-c53238286933)
-![image6](https://github.com/user-attachments/assets/d9105059-b81b-4261-8379-66f34d5e143e)
-![image7](https://github.com/user-attachments/assets/185b8b1e-a236-4c9d-bd06-b63365f803d5)
-
-
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/b329d92b-3b3b-4396-8b5d-1fe2403b385d" />
+<img width="1917" height="909" alt="image" src="https://github.com/user-attachments/assets/d286f533-898a-40a7-8d24-3d8d43d769ed" />
+<img width="1919" height="909" alt="image" src="https://github.com/user-attachments/assets/5e7f89d8-8c85-4c21-b61c-922424a9bad1" />
+<img width="1919" height="907" alt="image" src="https://github.com/user-attachments/assets/8adcd5f5-ecf8-47d2-9454-fccf6dfcfc83" />
+<img width="1918" height="908" alt="image" src="https://github.com/user-attachments/assets/cc7ce6b3-df65-412c-8063-4dab8e4fdcad" />
+<img width="1916" height="908" alt="image" src="https://github.com/user-attachments/assets/a99ae1c5-7570-437c-8d55-fe795773acde" />
+<img width="1918" height="908" alt="image" src="https://github.com/user-attachments/assets/e168b4ad-234b-44fc-853d-2aa0a9007d76" />
+<img width="1918" height="912" alt="image" src="https://github.com/user-attachments/assets/feabd30c-0da5-47e5-9e51-1523ab96d2db" />
+<img width="1918" height="904" alt="image" src="https://github.com/user-attachments/assets/2522cb42-93e3-48ed-adc6-1481e17b97f5" />
+<img width="1918" height="910" alt="image" src="https://github.com/user-attachments/assets/f20502b7-d38b-4d39-8380-5aa89d9bb754" />
 
 ## How to run the backend
 ### Install Maven dependencies:
@@ -60,4 +61,54 @@ npm install
 - In the terminal, run the command:
 ```
 npm run dev
+```
+
+### Env File 
+```
+POSTGRES_DB=
+POSTGRES_USER=
+POSTGRES_PASSWORD=
+
+RABBIT_USER=
+RABBIT_PASS=
+SPRING_RABBITMQ_HOST=
+SPRING_RABBITMQ_PORT=
+SPRING_RABBITMQ_STOMP_PORT=
+RABBIT_VHOST=
+
+REDIS_PASSWORD=
+
+SERVER_PORT=
+SECRET_KEY=
+
+APPLICATION_FILE_CDN=
+
+VITE_APP_BACKEND_URL=
+
+MAIL_USERNAME=
+MAIL_PASSWORD=
+
+MAILING_BACKEND_ACTIVATION_URL=
+MAILING_BACKEND_RESET_PASSWORD_URL=
+MAILING_BACKEND_ARTIST_VERIFY_URL=
+MAILING_FRONTEND_REDIRECT_URL=
+
+CERTBOT_EMAIL=
+CERTBOT_DOMAIN1=
+CERTBOT_DOMAIN2=
+CERTBOT_DOMAIN3=
+
+DOCKER_HUB_USERNAME=
+DOCKER_HUB_ACCESS_TOKEN=
+
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+
+OAUTH2_BACKEND_REDIRECT_URL=
+
+STRIPE_API_KEY=
+STRIPE_WEBHOOK_SECRET=
+STRIPE_PRICE_ID_MONTHLY=
+VITE_STRIPE_PUBLIC_KEY=
+
 ```
